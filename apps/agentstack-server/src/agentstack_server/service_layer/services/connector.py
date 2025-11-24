@@ -34,6 +34,7 @@ from agentstack_server.domain.models.connector import (
 from agentstack_server.domain.models.user import User
 from agentstack_server.exceptions import EntityNotFoundError, PlatformError
 from agentstack_server.service_layer.unit_of_work import IUnitOfWorkFactory
+from agentstack_server.utils.oauth import parse_bearer_mcp_www_authenticate
 
 logger = logging.getLogger(__name__)
 
@@ -107,7 +108,10 @@ class ConnectorService:
             if isinstance(err, httpx.HTTPStatusError):
                 if err.response.status_code == status.HTTP_401_UNAUTHORIZED:
                     await self._bootstrap_auth(
-                        connector=connector, callback_url=callback_uri, redirect_url=redirect_url
+                        connector=connector,
+                        callback_url=callback_uri,
+                        redirect_url=redirect_url,
+                        www_authenticate=err.response.headers.get("www-authenticate"),
                     )
                     connector.state = ConnectorState.auth_required
                 else:
@@ -266,8 +270,27 @@ class ConnectorService:
                 return preset
         return None
 
-    async def _bootstrap_auth(self, *, connector: Connector, callback_url: str, redirect_url: AnyUrl | None) -> None:
-        metadata = await self._discover_connector_metadata(connector=connector)
+    async def _bootstrap_auth(
+        self,
+        *,
+        connector: Connector,
+        callback_url: str,
+        redirect_url: AnyUrl | None,
+        www_authenticate: str | None = None,
+    ) -> None:
+        resource_metadata_url: str | None = None
+        scope: str | None = None
+        if www_authenticate:
+            try:
+                parsed = parse_bearer_mcp_www_authenticate(www_authenticate)
+                resource_metadata_url = parsed.get("resource_metadata")
+                scope = parsed.get("scope")
+            except Exception:
+                logger.warning(f"Failed to parse www-authenticate header: {www_authenticate}", exc_info=True)
+
+        metadata = await self._discover_connector_metadata(
+            connector=connector, resource_metadata_url=resource_metadata_url
+        )
         if not metadata:
             raise RuntimeError("No metadata found for the connector")
         auth_metadata, resource_metadata = metadata
@@ -286,6 +309,8 @@ class ConnectorService:
                 code_verifier=code_verifier,
                 redirect_uri=callback_url,
                 resource=resource_metadata.resource,
+                scope=scope
+                or (" ".join(resource_metadata.scopes_supported) if resource_metadata.scopes_supported else None),
             )
             connector.auth.flow = AuthorizationCodeFlow(
                 authorization_endpoint=uri,
@@ -303,9 +328,10 @@ class ConnectorService:
         if connector.auth.token:
             try:
                 async with self._create_oauth_client(connector=connector) as client:
-                    auth_metadata = await self._discover_connector_metadata(connector=connector)
-                    if not auth_metadata:
+                    metadata = await self._discover_connector_metadata(connector=connector)
+                    if not metadata:
                         raise RuntimeError("Authorization server no longer contains necessary metadata")
+                    auth_metadata, _ = metadata
                     revoke_endpoint = auth_metadata.get("revocation_endpoint")
                     if not isinstance(revoke_endpoint, str):
                         raise RuntimeError("Authorization server does not support token revocation")
@@ -354,9 +380,9 @@ class ConnectorService:
         )
 
     async def _discover_connector_metadata(
-        self, *, connector: Connector
+        self, *, connector: Connector, resource_metadata_url: str | None = None
     ) -> tuple[AuthorizationServerMetadata, _ResourceServerMetadata] | None:
-        resource_metadata = await _discover_resource_metadata(str(connector.url))
+        resource_metadata = await _discover_resource_metadata(resource_metadata_url or str(connector.url))
         if not resource_metadata or not resource_metadata.authorization_servers:
             return None
         auth_metadata = await _discover_auth_metadata(resource_metadata.authorization_servers[0])
