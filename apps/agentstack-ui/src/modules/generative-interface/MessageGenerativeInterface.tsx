@@ -20,26 +20,6 @@ interface Props {
 
 export function MessageGenerativeInterface({ message }: Props) {
   const part = getMessageGenerativeInterface(message);
-  const { submitGenerativeInterface } = useAgentRun();
-  const { isLastMessage } = useMessages();
-
-  const handleInteraction = useCallback(
-    (componentId: string, eventType: string, payload?: Record<string, unknown>) => {
-      if (!part || !isLastMessage(message)) {
-        return;
-      }
-
-      submitGenerativeInterface(
-        {
-          component_id: componentId,
-          event_type: eventType,
-          payload,
-        },
-        part.taskId,
-      );
-    },
-    [part, message, isLastMessage, submitGenerativeInterface],
-  );
 
   if (!part) {
     return null;
