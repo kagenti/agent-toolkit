@@ -26,6 +26,13 @@ export const catalog = defineCatalog(schema, {
       }),
       description: 'Clickable button',
     },
+    VerticalContainer: {
+      props: z.object({
+        gap: z.number().optional(),
+      }),
+      hasChildren: true,
+      description: 'Container that stacks children vertically',
+    },
   },
   actions: {
     confirm_button: { description: 'Agree' },
@@ -43,6 +50,9 @@ export const components: Components<typeof catalog> = {
     >
       {loading ? '...' : props.label}
     </button>
+  ),
+  VerticalContainer: ({ props, children }) => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: props.gap ?? 8 }}>{children}</div>
   ),
 };
 
