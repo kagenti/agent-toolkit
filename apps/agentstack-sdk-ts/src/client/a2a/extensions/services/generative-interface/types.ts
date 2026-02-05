@@ -6,14 +6,14 @@
 import type z from 'zod';
 
 import type {
-  componentNodeSchema,
+  uiElementSchema,
   generativeInterfaceDemandsSchema,
   generativeInterfaceFulfillmentsSchema,
   generativeInterfaceResponseSchema,
   generativeInterfaceSpecSchema,
 } from './schemas';
 
-export type ComponentNode = z.infer<typeof componentNodeSchema>;
+export type UIElement = z.infer<typeof uiElementSchema>;
 
 export type GenerativeInterfaceSpec = z.infer<typeof generativeInterfaceSpecSchema>;
 

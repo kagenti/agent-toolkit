@@ -8,7 +8,7 @@ import a2a.types
 import agentstack_sdk.a2a.extensions
 from a2a.types import Message
 from agentstack_sdk.a2a.extensions.services.generative_interface import (
-    ComponentNode,
+    UIElement,
     GenerativeInterfaceExtensionServer,
     GenerativeInterfaceExtensionSpec,
     GenerativeInterfaceSpec,
@@ -64,10 +64,14 @@ async def agent(
     yield "Here's a button for you to click:"
 
     spec = GenerativeInterfaceSpec(
-        root=ComponentNode(
-            type="Button",
-            props={"id": "action-button", "label": "Click me!", "kind": "primary"},
-        )
+        root="action-button",
+        elements={
+            "action-button": UIElement(
+                key="action-button",
+                type="Button",
+                props={"label": "Click me!", "action": "confirm_button"},
+            )
+        }
     )
 
     response = await ui.request_ui(spec=spec)

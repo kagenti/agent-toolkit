@@ -5,12 +5,8 @@
 
 'use client';
 
-import { useCallback } from 'react';
-
-import { useMessages } from '#modules/messages/contexts/Messages/index.ts';
 import type { UIAgentMessage } from '#modules/messages/types.ts';
 import { getMessageGenerativeInterface } from '#modules/messages/utils.ts';
-import { useAgentRun } from '#modules/runs/contexts/agent-run/index.ts';
 
 import { GenerativeInterfaceRenderer } from './GenerativeInterfaceRenderer';
 
@@ -25,14 +21,5 @@ export function MessageGenerativeInterface({ message }: Props) {
     return null;
   }
 
-  return (
-    <GenerativeInterfaceRenderer
-      spec={{
-        root: 'foobar',
-        elements: {
-          foobar: { key: 'foobar', type: 'Button', props: { title: 'Hello' } },
-        },
-      }}
-    />
-  );
+  return <GenerativeInterfaceRenderer spec={part.spec} />;
 }

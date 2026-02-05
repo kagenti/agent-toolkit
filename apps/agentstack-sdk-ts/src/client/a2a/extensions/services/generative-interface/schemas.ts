@@ -5,20 +5,16 @@
 
 import z from 'zod';
 
-export const componentNodeSchema: z.ZodType<{
-  type: string;
-  props?: Record<string, unknown>;
-  children: unknown[];
-}> = z.lazy(() =>
-  z.object({
-    type: z.string(),
-    props: z.record(z.string(), z.unknown()).optional(),
-    children: z.array(componentNodeSchema).default([]),
-  }),
-);
+export const uiElementSchema = z.object({
+  key: z.string(),
+  type: z.string(),
+  props: z.record(z.string(), z.unknown()).default({}),
+  children: z.array(z.string()).default([]),
+});
 
 export const generativeInterfaceSpecSchema = z.object({
-  root: componentNodeSchema,
+  root: z.string(),
+  elements: z.record(z.string(), uiElementSchema),
 });
 
 export const generativeInterfaceResponseSchema = z.object({

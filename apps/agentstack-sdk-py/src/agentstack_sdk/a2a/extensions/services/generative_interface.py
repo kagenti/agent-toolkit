@@ -14,7 +14,6 @@ from agentstack_sdk.a2a.extensions.base import (
     BaseExtensionClient,
     BaseExtensionServer,
     BaseExtensionSpec,
-    NoParamsBaseExtensionSpec,
 )
 from agentstack_sdk.a2a.types import AgentMessage, InputRequired
 
@@ -22,14 +21,16 @@ if TYPE_CHECKING:
     from agentstack_sdk.server.context import RunContext
 
 
-class ComponentNode(BaseModel):
+class UIElement(BaseModel):
+    key: str
     type: str
-    props: dict[str, Any] | None = None
-    children: list[ComponentNode] = Field(default_factory=list)
+    props: dict[str, Any] = Field(default_factory=dict)
+    children: list[str] = Field(default_factory=list)
 
 
 class GenerativeInterfaceSpec(BaseModel):
-    root: ComponentNode
+    root: str
+    elements: dict[str, UIElement]
 
 
 class GenerativeInterfaceResponse(BaseModel):
@@ -61,7 +62,6 @@ class GenerativeInterfaceExtensionSpec(BaseExtensionSpec[FoobarParams]):
 class GenerativeInterfaceExtensionServer(
     BaseExtensionServer[GenerativeInterfaceExtensionSpec, GenerativeInterfaceExtensionMetadata]
 ):
-    
     @override
     def handle_incoming_message(self, message: A2AMessage, run_context: RunContext, request_context: RequestContext):
         super().handle_incoming_message(message, run_context, request_context)
