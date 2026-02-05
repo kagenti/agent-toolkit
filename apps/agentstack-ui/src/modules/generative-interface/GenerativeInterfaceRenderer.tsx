@@ -14,6 +14,7 @@ import {
 } from '@json-render/react';
 import { defineCatalog, Spec } from '@json-render/core';
 import { schema } from '@json-render/react';
+import { Button, InlineLoading } from '@carbon/react';
 import { z } from 'zod';
 import { ReactNode, useMemo, useRef } from 'react';
 
@@ -23,8 +24,10 @@ export const catalog = defineCatalog(schema, {
       props: z.object({
         label: z.string(),
         action: z.string(),
+        kind: z.enum(['primary', 'secondary', 'tertiary', 'ghost', 'danger']).optional(),
+        size: z.enum(['sm', 'md', 'lg']).optional(),
       }),
-      description: 'Clickable button',
+      description: 'Clickable button (Carbon Button)',
     },
     VerticalContainer: {
       props: z.object({
@@ -32,6 +35,19 @@ export const catalog = defineCatalog(schema, {
       }),
       hasChildren: true,
       description: 'Container that stacks children vertically',
+    },
+    Paragraph: {
+      props: z.object({
+        text: z.string(),
+      }),
+      description: 'Text paragraph',
+    },
+    HorizontalContainer: {
+      props: z.object({
+        gap: z.number().optional(),
+      }),
+      hasChildren: true,
+      description: 'Container that stacks children horizontally',
     },
   },
   actions: {
@@ -41,18 +57,21 @@ export const catalog = defineCatalog(schema, {
 
 export const components: Components<typeof catalog> = {
   Button: ({ props, onAction, loading }) => (
-    <button
-      onClick={() =>
-        onAction?.({
-          name: props.action,
-        })
-      }
+    <Button
+      kind={props.kind ?? 'primary'}
+      size={props.size ?? 'md'}
+      disabled={loading}
+      onClick={() => onAction?.({ name: props.action })}
     >
-      {loading ? '...' : props.label}
-    </button>
+      {loading ? <InlineLoading /> : props.label}
+    </Button>
   ),
   VerticalContainer: ({ props, children }) => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: props.gap ?? 8 }}>{children}</div>
+  ),
+  Paragraph: ({ props }) => <p>{props.text}</p>,
+  HorizontalContainer: ({ props, children }) => (
+    <div style={{ display: 'flex', flexDirection: 'row', gap: props.gap ?? 8 }}>{children}</div>
   ),
 };
 

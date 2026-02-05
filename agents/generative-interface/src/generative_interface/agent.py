@@ -1,30 +1,35 @@
 # Copyright 2025 © BeeAI a Series of LF Projects, LLC
 # SPDX-License-Identifier: Apache-2.0
 
+import json
 import os
 from typing import Annotated
 
-import a2a.types
-import agentstack_sdk.a2a.extensions
-from a2a.types import Message
+from a2a.types import Message, TextPart
+from agentstack_sdk.a2a.extensions import (
+    AgentDetail,
+    AgentDetailContributor,
+    LLMServiceExtensionServer,
+    LLMServiceExtensionSpec,
+)
 from agentstack_sdk.a2a.extensions.services.generative_interface import (
-    UIElement,
     GenerativeInterfaceExtensionServer,
     GenerativeInterfaceExtensionSpec,
     GenerativeInterfaceSpec,
 )
 from agentstack_sdk.server import Server
+from agentstack_sdk.server.context import RunContext
 from agentstack_sdk.server.middleware.platform_auth_backend import PlatformAuthBackend
-
-agent_detail_extension_spec = agentstack_sdk.a2a.extensions.AgentDetailExtensionSpec(
-    params=agentstack_sdk.a2a.extensions.AgentDetail(
-        interaction_mode="multi-turn",
-    )
-)
-
-
+from openai import AsyncOpenAI
+from openai.types.chat import ChatCompletionMessageParam
 
 server = Server()
+
+AGENT_GOAL = """You are a financial advisor assistant. Your first task is to ask the user about their gender (male/female/fish) before providing any financial advice. Use the UI components to create an interactive experience."""
+
+
+def _get_text(message: Message) -> str:
+    return "\n\n".join(part.root.text for part in message.parts or [] if isinstance(part.root, TextPart))
 
 
 @server.agent(
@@ -33,53 +38,78 @@ server = Server()
     version="1.0.0",
     default_input_modes=["text", "text/plain"],
     default_output_modes=["text", "text/plain"],
-    capabilities=a2a.types.AgentCapabilities(
-        streaming=True,
-        push_notifications=False,
-        state_transition_history=False,
-        extensions=[
-            *agent_detail_extension_spec.to_agent_card_extensions(),
-        ],
+    description="Financial advisor with dynamic UI generation",
+    detail=AgentDetail(
+        interaction_mode="multi-turn",
+        author=AgentDetailContributor(name="IBM"),
     ),
-    skills=[
-        a2a.types.AgentSkill(
-            id="generative-interface",
-            name="Generative Interface",
-            description="Demonstrates dynamic UI rendering with generative interface",
-            tags=["generative-interface"],
-        )
-    ],
 )
 async def agent(
-    _message: Message,
-    ui: Annotated[
-        GenerativeInterfaceExtensionServer,
-        GenerativeInterfaceExtensionSpec.demand()
-    ],
+    message: Message,
+    context: RunContext,
+    ui: Annotated[GenerativeInterfaceExtensionServer, GenerativeInterfaceExtensionSpec.demand()],
+    llm: Annotated[LLMServiceExtensionServer, LLMServiceExtensionSpec.single_demand()],
 ):
-    """Example demonstrating an agent using generative interface to render dynamic UI."""
+    await context.store(message)
 
-    print(ui.catalog_prompt)
-
-    yield "Here's a button for you to click:"
-
-    spec = GenerativeInterfaceSpec(
-        root="action-button",
-        elements={
-            "action-button": UIElement(
-                key="action-button",
-                type="Button",
-                props={"label": "Click me!", "action": "confirm_button"},
-            )
-        }
+    (llm_config,) = llm.data.llm_fulfillments.values()
+    client = AsyncOpenAI(
+        api_key=llm_config.api_key,
+        base_url=llm_config.api_base,
     )
 
-    response = await ui.request_ui(spec=spec)
+    system_prompt = f"""{ui.catalog_prompt}
 
-    if response:
-        yield f"You clicked: {response.component_id} (event: {response.event_type})"
-    else:
-        yield "No interaction received."
+{AGENT_GOAL}
+"""
+
+    history = context.load_history()
+    llm_messages: list[ChatCompletionMessageParam] = [{"role": "system", "content": system_prompt}]
+
+    async for item in history:
+        if isinstance(item, Message):
+            if content := _get_text(item):
+                role = "assistant" if item.role == "agent" else "user"
+                llm_messages.append({"role": role, "content": content})
+
+    response = await client.chat.completions.create(
+        model=llm_config.api_model,
+        messages=llm_messages,
+    )
+
+    assistant_content = response.choices[0].message.content or ""
+
+    ui_spec = parse_spec_stream(assistant_content)
+
+    if ui_spec:
+        ui_response = await ui.request_ui(spec=ui_spec)
+        if ui_response:
+            yield f"You selected: {ui_response.component_id}"
+
+
+def parse_spec_stream(content: str) -> GenerativeInterfaceSpec | None:
+    spec: dict = {"root": "", "elements": {}}
+
+    for line in content.strip().split("\n"):
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            patch = json.loads(line)
+            if patch.get("op") == "set":
+                path = patch.get("path", "")
+                value = patch.get("value")
+                if path == "/root":
+                    spec["root"] = value
+                elif path.startswith("/elements/"):
+                    key = path[len("/elements/"):]
+                    spec["elements"][key] = value
+        except json.JSONDecodeError:
+            continue
+
+    if spec["root"] and spec["elements"]:
+        return GenerativeInterfaceSpec.model_validate(spec)
+    return None
 
 
 def serve():
