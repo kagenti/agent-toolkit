@@ -11,7 +11,6 @@ This document provides a machine-readable index for the Agent Stack platform. AI
 - [Quickstart](https://agentstack.beeai.dev/stable/introduction/quickstart): Install Agent Stack using the one-line installer, configure your LLM provider, and run your first pre-built agent from the terminal.
 - [CLI Reference](https://agentstack.beeai.dev/stable/reference/cli-reference): The complete command-line manual for managing agents, configuring model providers, and platform lifecycle.
 - [Server SDK (Python)](https://agentstack.beeai.dev/stable/agent-integration/overview): The primary library for wrapping any agent logic and integrating it with platform extensions.
-- [Platform API Client](https://agentstack.beeai.dev/stable/custom-ui/platform-api-client): Complete reference for the TypeScript client used to build custom interfaces and call platform services.
 
 ## Deploying Agents to Agent Stack
 
@@ -44,7 +43,7 @@ This document provides a machine-readable index for the Agent Stack platform. AI
 - [Add Citations](https://agentstack.beeai.dev/stable/agent-integration/citations): Include source references in agent responses using clickable links and hover tooltips, and map citations to specific text segments via start and end indices.
 - [Work with Canvas](https://agentstack.beeai.dev/stable/agent-integration/canvas): Handle artifact edit requests by parsing selection indices and user descriptions, allowing agents to perform targeted modifications to existing code or documents.
 
-## Custom UI DevelopmentP
+## Custom UI Development
 - [Getting Started](https://agentstack.beeai.dev/stable/custom-ui/getting-started): Install the Agent Stack TypeScript SDK, initialize the platform API client, and implement the A2A client to stream messages and handle agent-to-user interactions.
 - [A2A Client Integration](https://agentstack.beeai.dev/stable/custom-ui/a2a-client): Implement advanced A2A flows to resolve agent demands, handle real-time task status updates for streaming UI elements, and manage multi-turn interactions using task-scoped metadata.
 - [Agent Requirements](https://agentstack.beeai.dev/stable/custom-ui/agent-requirements): Configure service extensions like LLMs and MCP, fulfill agent dependency demands via dependency injection, and utilize SDK helpers to render UI extensions such as forms, approvals, and citations in your own custom UI code.
