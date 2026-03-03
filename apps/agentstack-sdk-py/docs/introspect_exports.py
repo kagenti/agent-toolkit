@@ -1,8 +1,5 @@
-#!/usr/bin/env python
-"""
-Trace the public API of agentstack-sdk-py by following star-import chains,
-then enrich each discovered name with griffe metadata.
-"""
+# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# SPDX-License-Identifier: Apache-2.0
 
 from __future__ import annotations
 
@@ -25,7 +22,6 @@ import griffe
 
 class ExportItem(BaseModel):
     model_config = ConfigDict(validate_assignment=True)
-
     name: str
     origin: str
     kind: str | None = None
