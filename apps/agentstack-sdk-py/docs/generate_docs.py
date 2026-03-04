@@ -74,7 +74,11 @@ TOP_MODULES = [
 # submodule_cards – optional list of child modules rendered as a card grid
 # group_by_origin – split items into sections per origin sub-module (used for platform)
 
-# TODO: This must be updated when the imports logic and structure changes, for example if we directly populate some __init__.py file instead of importing directly from some .py file
+# This must be updated when the imports logic and structure changes,
+# for example if we directly populate some __init__.py file instead of importing directly from some .py file.
+# On one hand, this allows fine grained control over what we actually show in the docs, on the other hand it requires maintenance.
+# One must also update the docs/docs.json file to add the generated pages to the sidebar.
+
 PAGE_CONFIG: list[dict] = [
     # ── server ────────────────────────────────────────────────────────────────
     {
@@ -216,24 +220,16 @@ PAGE_CONFIG: list[dict] = [
         "import_path": "agentstack_sdk.a2a.extensions.ui",
     },
     # ── platform (grouped by sub-module) ──────────────────────────────────────
-    {
-        "json_key": None,
-        "filename": "platform-idx",
-        "title": "Platform API Overview",
-        "description": "Clients for files, vector stores, contexts, providers, and more",
-        "import_path": "agentstack_sdk.platform",
-        "submodule_cards": [
-            {"title": "Platform", "filename": "platform", "description": "General platform client and utilities"},
-            {"title": "Common", "filename": "platform-common", "description": "Shared types and utilities"},
-            {"title": "Context", "filename": "platform-context", "description": "Context management"},
-        ],
-    },
-    {
+        {
         "json_key": "agentstack_sdk.platform",
-        "filename": "platform",
+        "filename": "platform-new",
         "title": "Platform",
         "description": "Clients for files, vector stores, contexts, providers, and more",
         "import_path": "agentstack_sdk.platform",
+        "submodule_cards": [
+            {"title": "Common", "filename": "platform-common", "description": "Shared types and utilities"},
+            {"title": "Context", "filename": "platform-context", "description": "Context management"},
+        ],
         "group_by_origin": True,
     },
     # ── platform.context ──────────────────────────────────────────────────────
@@ -364,7 +360,7 @@ _FILENAME_TO_TITLE: dict[str, str] = {}
 _FILENAME_TO_PARENT: dict[str, str] = {}  # child filename → parent filename
 
 
-def _build_module_maps() -> None:
+def _build_high_level_import_maps() -> None:
     if _JSON_KEY_TO_FILENAME:
         return
     for cfg in PAGE_CONFIG:
@@ -390,7 +386,7 @@ def _symbol_breadcrumb_ancestors(parent_filename: str) -> list[tuple[str, str]]:
 
 
 def _find_longest_matching_json_key(origin: str) -> str | None:
-    """Return the longest PAGE_CONFIG json_key that is a prefix of *origin*."""
+    """Return the longest _JSON_KEY_TO_FILENAME (PAGE_CONFIG) json_key that is a prefix of *origin*."""
     best_key: str | None = None
     best_len = 0
     for key in _JSON_KEY_TO_FILENAME:
@@ -404,7 +400,6 @@ def _symbol_import_path(item: dict) -> str:
     """Best import path to use on a symbol's own page."""
     origin = item.get("origin", "")
     longest = _find_longest_matching_json_key(origin)
-
     if longest:
         return _JSON_KEY_TO_IMPORT_PATH[longest]
 
@@ -594,7 +589,7 @@ def render_function_page(
 
 
 def main() -> None:
-    _build_module_maps()
+    _build_high_level_import_maps()
     parser = argparse.ArgumentParser(
         description="Generate Python SDK reference docs (MDX) from exports_structure.json."
     )

@@ -163,15 +163,7 @@
                       }
                     ]
                   },
-                  {
-                    "group": "Platform API",
-                    "pages": [
-                      "development/reference/python-sdk/platform-idx",
-                      "development/reference/python-sdk/platform",
-                      "development/reference/python-sdk/platform-common",
-                      "development/reference/python-sdk/platform-context"
-                    ]
-                  },
+                  "development/reference/python-sdk/platform-new",
                   "development/reference/python-sdk/types",
                   "development/reference/python-sdk/util"
                 ]

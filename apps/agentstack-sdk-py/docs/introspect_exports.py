@@ -268,6 +268,7 @@ def _init_imports_file(init_file: Path, module_stem: str) -> bool:
     return False
 
 
+# TODO: this might need to change if the logic of how the classes etc. are exposed changes
 def trace_package(root: Path) -> dict[str, list[ExportItem]]:
     """
     Walk every __init__.py in the package and compute its effective public API.
