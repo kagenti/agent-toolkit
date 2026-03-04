@@ -142,12 +142,7 @@
                 "group": "Python SDK",
                 "pages": [
                   "development/reference/python-sdk/overview",
-                  {
-                    "group": "Server",
-                    "pages": [
-                      "development/reference/python-sdk/server"
-                    ]
-                  },
+                  "development/reference/python-sdk/server",
                   {
                     "group": "A2A Extensions",
                     "pages": [

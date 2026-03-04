@@ -73,6 +73,8 @@ TOP_MODULES = [
 # import_path     – Python import path shown in the code snippet
 # submodule_cards – optional list of child modules rendered as a card grid
 # group_by_origin – split items into sections per origin sub-module (used for platform)
+
+# TODO: This must be updated when the imports logic and structure changes, for example if we directly populate some __init__.py file instead of importing directly from some .py file
 PAGE_CONFIG: list[dict] = [
     # ── server ────────────────────────────────────────────────────────────────
     {
@@ -81,6 +83,32 @@ PAGE_CONFIG: list[dict] = [
         "title": "Server",
         "description": "Core server for creating and running A2A-compatible agents",
         "import_path": "agentstack_sdk.server",
+        "submodule_cards": [
+            {"title": "Middleware", "filename": "server-middleware-platform-auth-backend", "description": "Platform authentication middleware"},
+            {"title": "Memory context store", "filename": "server-store-memory-context-store", "description": "Context management using in-memory storage"},
+            {"title": "Platform context store", "filename": "server-store-platform-context-store", "description": "Context management using platform storage"},
+        ],
+    },
+    {
+        "json_key": "agentstack_sdk.server.middleware.platform_auth_backend",
+        "filename": "server-middleware-platform-auth-backend",
+        "title": "Server Middleware Platform Auth Backend",
+        "description": "Core server for creating and running A2A-compatible agents",
+        "import_path": "agentstack_sdk.server.middleware.platform_auth_backend",
+    },
+    {
+        "json_key": "agentstack_sdk.server.store.memory_context_store",
+        "filename": "server-store-memory-context-store",
+        "title": "Server Memory Context Store",
+        "description": "In-memory context store for the server",
+        "import_path": "agentstack_sdk.server.store.memory_context_store",
+    },
+    {
+        "json_key": "agentstack_sdk.server.store.platform_context_store",
+        "filename": "server-store-platform-context-store",
+        "title": "Server Platform Context Store",
+        "description": "Platform context store for the server",
+        "import_path": "agentstack_sdk.server.store.platform_context_store",
     },
     # ── a2a (index, items live in sub-pages) ──────────────────────────────────
     {
@@ -92,8 +120,16 @@ PAGE_CONFIG: list[dict] = [
         "submodule_cards": [
             {"title": "Auth", "filename": "a2a-auth", "description": "OAuth and secrets authentication"},
             {"title": "Common", "filename": "a2a-common", "description": "Shared base classes and form types"},
-            {"title": "Interactions", "filename": "a2a-interactions", "description": "Human-in-the-loop interaction extensions"},
-            {"title": "Services", "filename": "a2a-services", "description": "LLM, embedding, MCP, and platform services"},
+            {
+                "title": "Interactions",
+                "filename": "a2a-interactions",
+                "description": "Human-in-the-loop interaction extensions",
+            },
+            {
+                "title": "Services",
+                "filename": "a2a-services",
+                "description": "LLM, embedding, MCP, and platform services",
+            },
             {"title": "Tools", "filename": "a2a-tools", "description": "Tool call approval extensions"},
             {"title": "UI", "filename": "a2a-ui", "description": "Rich UI component extensions"},
         ],
@@ -102,12 +138,16 @@ PAGE_CONFIG: list[dict] = [
     {
         "json_key": None,
         "filename": "a2a-auth",
-        "title": "Auth Extensions",
+        "title": "Auth Extensions Overview",
         "description": "OAuth and secrets authentication extensions",
         "import_path": "agentstack_sdk.a2a.extensions.auth",
         "submodule_cards": [
             {"title": "Extensions", "filename": "a2a-auth-oauth", "description": "OAuth 2.0 flow extensions"},
-            {"title": "Storage", "filename": "a2a-auth-oauth-storage", "description": "OAuth 2.0 flow storage extensions"},
+            {
+                "title": "Storage",
+                "filename": "a2a-auth-oauth-storage",
+                "description": "OAuth 2.0 flow storage extensions",
+            },
             {"title": "Secrets", "filename": "a2a-auth-secrets", "description": "Secrets injection extensions"},
         ],
     },
@@ -231,7 +271,7 @@ PAGE_CONFIG: list[dict] = [
 ]
 
 # ---------------------------------------------------------------------------
-# Jinja2 custom filters
+# Jinja2 custom transformations
 # ---------------------------------------------------------------------------
 
 _TYPE_PREFIXES = (
@@ -281,14 +321,12 @@ def _extra_lines(text: str | None) -> str:
     return "\n".join(lines[1:]).strip() if len(lines) > 1 else ""
 
 
-def _sig_params(params: list[dict] | None, max_params: int | None = None) -> str:
+def _sig_params(params: list[dict] | None, max_params: int = 5) -> str:
     """Parameter names only — keeps accordion titles short."""
     if not params:
         return ""
-    if max_params is not None:
-        return ", ".join(p["name"] for p in params[:max_params]) + ("..." if len(params) > max_params else "")
-    else:        
-        return ", ".join(p["name"] for p in params)
+
+    return ", ".join(p["name"] for p in params[:max_params]) + ("..." if len(params) > max_params else "")
 
 
 def _truncate_val(val: str | None, max_len: int = 40) -> str:
@@ -366,8 +404,10 @@ def _symbol_import_path(item: dict) -> str:
     """Best import path to use on a symbol's own page."""
     origin = item.get("origin", "")
     longest = _find_longest_matching_json_key(origin)
+
     if longest:
         return _JSON_KEY_TO_IMPORT_PATH[longest]
+
     # Fallback: use origin directly
     return origin
 
@@ -387,8 +427,6 @@ def _symbol_page_parent_title(parent_filename: str) -> str:
     return _FILENAME_TO_TITLE.get(parent_filename, parent_filename.replace("-", " ").title())
 
 
-
-
 # ---------------------------------------------------------------------------
 # Item helpers
 # ---------------------------------------------------------------------------
@@ -397,7 +435,9 @@ def _symbol_page_parent_title(parent_filename: str) -> str:
 def _split_items(items: list[dict]) -> tuple[list[dict], list[dict], list[dict]]:
     classes = sorted([i for i in items if i.get("kind") == "class"], key=lambda i: i.get("name", ""))
     functions = sorted([i for i in items if i.get("kind") == "function"], key=lambda i: i.get("name", ""))
-    constants = sorted([i for i in items if i.get("kind") not in ("class", "function")], key=lambda i: i.get("name", ""))
+    constants = sorted(
+        [i for i in items if i.get("kind") not in ("class", "function")], key=lambda i: i.get("name", "")
+    )
     return classes, functions, constants
 
 
@@ -405,7 +445,7 @@ def _origin_submodule(item: dict, base_key: str) -> str:
     origin = item.get("origin", "")
     prefix = base_key + "."
     if origin.startswith(prefix):
-        return origin[len(prefix):].split(".")[0]
+        return origin[len(prefix) :].split(".")[0]
     return ""
 
 
@@ -491,6 +531,9 @@ def render_page(env: Environment, cfg: dict, data: dict, version: str) -> str:
     all_functions = [f for g in groups for f in g["functions"]]
     import_example = _import_example(import_path, all_classes, all_functions) if items else ""
 
+    parent_filename = _FILENAME_TO_PARENT.get(cfg["filename"], "")
+    breadcrumb_ancestors = _symbol_breadcrumb_ancestors(parent_filename) if parent_filename else []
+
     tmpl = env.get_template("module.mdx.j2")
     return tmpl.render(
         autogen_warning=AUTOGEN_WARNING,
@@ -502,6 +545,7 @@ def render_page(env: Environment, cfg: dict, data: dict, version: str) -> str:
         groups=groups,
         base_href=base_href,
         symbol_base_href=symbol_base_href,
+        breadcrumb_ancestors=breadcrumb_ancestors,
     )
 
 
@@ -544,7 +588,6 @@ def render_function_page(
     )
 
 
-
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
@@ -552,7 +595,9 @@ def render_function_page(
 
 def main() -> None:
     _build_module_maps()
-    parser = argparse.ArgumentParser(description="Generate Python SDK reference docs (MDX) from exports_structure.json.")
+    parser = argparse.ArgumentParser(
+        description="Generate Python SDK reference docs (MDX) from exports_structure.json."
+    )
     parser.add_argument(
         "--json-file",
         type=Path,
@@ -577,8 +622,7 @@ def main() -> None:
 
     if not json_file.exists():
         raise FileNotFoundError(
-            f"exports_structure.json not found at {json_file}.\n"
-            "Run `mise x -- uv run introspect_exports.py` first."
+            f"exports_structure.json not found at {json_file}.\nRun `mise x -- uv run introspect_exports.py` first."
         )
 
     data = json.loads(json_file.read_text())
@@ -637,10 +681,7 @@ def main() -> None:
             symbol_count += 1
 
     module_count = 1 + len(PAGE_CONFIG)
-    print(
-        f"\nGenerated {module_count} module pages + {symbol_count} symbol pages"
-        f" in {version}/reference/python-sdk/"
-    )
+    print(f"\nGenerated {module_count} module pages + {symbol_count} symbol pages in {version}/reference/python-sdk/")
 
 
 if __name__ == "__main__":

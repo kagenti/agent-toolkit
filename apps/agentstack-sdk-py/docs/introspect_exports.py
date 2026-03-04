@@ -16,6 +16,10 @@ import argparse
 
 import griffe
 
+
+SRC_ROOT = Path()
+
+
 class ExportItem(BaseModel):
     model_config = ConfigDict(validate_assignment=True)
     name: str
@@ -45,9 +49,7 @@ def parse_allnames(tree: ast.Module) -> list[str]:
             and isinstance(node.value, ast.List)
         ):
             return [
-                elt.value
-                for elt in node.value.elts
-                if isinstance(elt, ast.Constant) and isinstance(elt.value, str)
+                elt.value for elt in node.value.elts if isinstance(elt, ast.Constant) and isinstance(elt.value, str)
             ]
     return []
 
@@ -194,8 +196,7 @@ def collect_exports(path: Path, visited: set[str] | None = None) -> list[ExportI
         if node.names[0].name == "*":
             if resolved is None:
                 print(
-                    f"  ⚠  Cannot resolve relative import "
-                    f"{'.' * node.level}{node.module or ''} in {parse_file}",
+                    f"  ⚠  Cannot resolve relative import {'.' * node.level}{node.module or ''} in {parse_file}",
                     file=sys.stderr,
                 )
                 continue
@@ -325,6 +326,7 @@ def _fmt_docstring(ds: griffe.Docstring | None) -> str | None:
 
 FILTER_FUNCTION_LABELS = {"module-attribute"}
 
+
 def _serialize_function(fn: griffe.Function) -> dict[str, Any]:
     params = []
     for p in fn.parameters:
@@ -333,7 +335,7 @@ def _serialize_function(fn: griffe.Function) -> dict[str, Any]:
         entry: dict[str, Any] = {"name": p.name}
         if p.annotation:
             entry["type"] = _fmt_annotation(p.annotation)
-        if p.default is not None and str(p.default) not in ("None", "PosOnlyArgsSep", "KwOnlyArgsSep"):
+        if p.default is not None and str(p.default) not in ("PosOnlyArgsSep", "KwOnlyArgsSep"):
             entry["default"] = str(p.default)
         entry["kind"] = p.kind.value if p.kind and hasattr(p.kind, "value") else str(p.kind)
         params.append(entry)
@@ -433,9 +435,10 @@ def _serialize_class(cls: griffe.Class) -> dict[str, Any]:
             field["docstring"] = field_doc
         val = getattr(actual, "value", None)
         if val is not None:
-            v = str(val)
-            if len(v) <= 120:
-                field["default"] = v
+            v = str(val)[:120]
+            field["default"] = v
+            if len(v) > 120:
+                field["default"] += "..."
         class_attrs.append(field)
     if class_attrs:
         result["class_attributes"] = class_attrs
@@ -476,7 +479,7 @@ def _serialize_class(cls: griffe.Class) -> dict[str, Any]:
                     pe["type"] = _fmt_annotation(p.annotation)
                 if p.default is not None and str(p.default) not in ("None", "PosOnlyArgsSep", "KwOnlyArgsSep"):
                     d = str(p.default)
-                    pe["default"] = d if len(d) <= 80 else "..."
+                    pe["default"] = d if len(d) <= 80 else d[:80] + "..."
                 params.append(pe)
         if params:
             method_info["params"] = params
@@ -496,23 +499,22 @@ def _serialize_class(cls: griffe.Class) -> dict[str, Any]:
 
 def _is_constant(name: str) -> bool:
     """Check if a name follows the UPPER_SNAKE_CASE constant convention."""
-    return bool(re.match(r'^[A-Z0-9_]+$', name))
+    return bool(re.match(r"^[A-Z0-9_]+$", name))
 
 
 def _is_callable_annotation(ann_str: str | None) -> bool:
     """Return True if the annotation string represents a Callable type."""
     if not ann_str:
         return False
-    return bool(re.match(r'^(typing\.)?Callable\b', ann_str))
+    return bool(re.match(r"^(typing\.)?Callable\b", ann_str))
 
-import enum
 
 class TypingKind(str, enum.Enum):
     SPECIAL_FORM = "special_form"
     TYPE_VAR = "type_var"
     NEW_TYPE = "new_type"
-    TYPE_ALIAS = "type_alias"        # PEP 613 / PEP 695 explicit alias
-    UNION_ALIAS = "union_alias"      # A | B style
+    TYPE_ALIAS = "type_alias"  # PEP 613 / PEP 695 explicit alias
+    UNION_ALIAS = "union_alias"  # A | B style
 
 
 _SPECIAL_FORM_PREFIXES = [
@@ -529,9 +531,9 @@ _VALUE_PREFIX_TO_KIND: list[tuple[str, TypingKind]] = [
     *(("typing." + p, TypingKind.SPECIAL_FORM) for p in _SPECIAL_FORM_PREFIXES),
     *((p, TypingKind.SPECIAL_FORM) for p in _SPECIAL_FORM_PREFIXES),
     ("typing.TypeVar(", TypingKind.TYPE_VAR),
-    ("TypeVar(",        TypingKind.TYPE_VAR),
+    ("TypeVar(", TypingKind.TYPE_VAR),
     ("typing.NewType(", TypingKind.NEW_TYPE),
-    ("NewType(",        TypingKind.NEW_TYPE),
+    ("NewType(", TypingKind.NEW_TYPE),
 ]
 
 _TYPE_ALIAS_ANNOTATION_NAMES = {"TypeAlias", "typing.TypeAlias", "typing_extensions.TypeAlias"}
@@ -564,52 +566,49 @@ def _get_typing_kind(attr: griffe.Attribute) -> str | None:
     return None
 
 
-def _serialize_attribute(attr: griffe.Attribute, name: str = "") -> dict[str, Any]:
+def _serialize_attribute(attr: griffe.Attribute, name: str = "") -> dict[str, str | list[str] | None]:
     """
     Serialize a module-level attribute/variable or constant.
 
     Callable-annotated attributes are serialised with kind="function".
-    Type alias assignments (typing.Literal, Union, TypeVar, etc.) are
+    Type alias assignments (typing.Literal, Union, etc.) are
     serialised with kind="type_alias" and the actual type expression as "type".
     Other attributes are distinguished as constants (UPPER_SNAKE_CASE) or
     regular variables.
     """
     ann = getattr(attr, "annotation", None)
     ann_str = _fmt_annotation(ann)
-
-    if _is_callable_annotation(ann_str):
-        result: dict[str, Any] = {"kind": "function", "annotation": ann_str}
-        doc = _fmt_docstring(attr.docstring)
-        if doc:
-            result["docstring"] = doc
-        if attr.labels:
-            result["labels"] = sorted(str(l) for l in attr.labels if str(l) not in FILTER_FUNCTION_LABELS)
-        return result
+    result: dict[str, str | list[str] | None] = {}
+    doc = _fmt_docstring(attr.docstring)
+    if doc:
+        result["docstring"] = doc
 
     if typing_kind := _get_typing_kind(attr):
         val = getattr(attr, "value", None)
         type_str = str(val).strip() if val is not None else ann_str
-        result = {"kind": typing_kind}
+        result["kind"] = typing_kind
         if type_str:
             result["definition"] = type_str
-        doc = _fmt_docstring(attr.docstring)
-        if doc:
-            result["docstring"] = doc
+
+        return result
+
+    if ann:
+        result["annotation"] = ann_str
+
+    if _is_callable_annotation(ann_str):
+        result["kind"] = "function"
+        if attr.labels:
+            result["labels"] = sorted(str(l) for l in attr.labels if str(l) not in FILTER_FUNCTION_LABELS)
         return result
 
     kind = "constant" if _is_constant(name) else "attribute"
-    result: dict[str, Any] = {"kind": kind}
-    ann = getattr(attr, "annotation", None)
-    if ann:
-        result["annotation"] = _fmt_annotation(ann)
+    result["kind"] = kind
     val = getattr(attr, "value", None)
     if val is not None:
         v = str(val)
         if len(v) <= 200:
             result["value"] = v
-    doc = _fmt_docstring(attr.docstring)
-    if doc:
-        result["docstring"] = doc
+
     return result
 
 
@@ -627,27 +626,34 @@ def _lookup_griffe(pkg: griffe.Module, dotted_path: str, name: str) -> griffe.Ob
         return None
 
 
-_LOGGER_TYPE_NAMES = {"logging.Logger", "Logger", "logging.RootLogger", "RootLogger", "TypeVar", "typing.TypeVar"}
+_UNWANTED_ANNOTATIONS = {
+    "logging.Logger",
+    "Logger",
+    "logging.RootLogger",
+    "RootLogger",
+    "TypeVar",
+    "typing.TypeVar",
+}
+
+_UNWANTED_VALUE_PREFIXES = {
+    "logging.getLogger",
+    "getLogger",
+    "TypeVar",
+    "typing.TypeVar",
+}
 
 
 def _is_unwanted_attribute(attr: griffe.Attribute) -> bool:
-    """Return True if the attribute is a logging.Logger instance."""
+    """Return True if the attribute is a logging.Logger instance or TypeVar."""
     ann = getattr(attr, "annotation", None)
-    ann_str = _fmt_annotation(ann)
-    if ann_str and ann_str in _LOGGER_TYPE_NAMES:
+    if _fmt_annotation(ann) in _UNWANTED_ANNOTATIONS:
         return True
-    # Fallback: check the value expression (e.g. `logging.getLogger(...)`)
-    type_filter = {
-        "logging.getLogger",
-        "getLogger",
-        "TypeVar",
-        "typing.TypeVar",
-    }
+
     val = getattr(attr, "value", None)
     if val is not None:
         val_str = str(val).strip()
-        if any(val_str.startswith(f"{prefix}(") for prefix in type_filter):
-            return True
+        return any(val_str.startswith(f"{prefix}(") for prefix in _UNWANTED_VALUE_PREFIXES)
+
     return False
 
 
@@ -688,7 +694,9 @@ def enrich_api(
             elif kind == "ATTRIBUTE":
                 if _is_unwanted_attribute(member):  # pyrefly: ignore[bad-argument-type]
                     continue
-                exp = exp.model_copy(update=_serialize_attribute(member, exp.name))  # pyrefly: ignore[bad-argument-type]
+                exp = exp.model_copy(
+                    update=_serialize_attribute(member, exp.name)
+                )  # pyrefly: ignore[bad-argument-type]
             else:
                 exp.kind = kind.lower()
                 doc = _fmt_docstring(getattr(member, "docstring", None))
@@ -699,9 +707,6 @@ def enrich_api(
         result[module_path] = enriched_exports
 
     return result
-
-
-SRC_ROOT = ""
 
 
 def main() -> None:
@@ -721,9 +726,9 @@ def main() -> None:
     args = parser.parse_args()
 
     # Allow helper functions (resolve_absolute, _path_to_module) to use the
-    # correct source root when --src-root is overridden. 
+    # correct source root when --src-root is overridden.
     global SRC_ROOT
-    SRC_ROOT = args.src_root.resolve()
+    SRC_ROOT = Path(args.src_root.resolve())
 
     if not SRC_ROOT.exists():
         sys.exit(f"Package source not found at {SRC_ROOT}")

@@ -21,5 +21,5 @@ from agentstack_sdk.platform import AddProvider
 | Attribute | Type | Default |
 |-------|------|---------|
 | `type` | `Literal['add_provider']` | `'add_provider'` |
-| `auto_stop_timeout_sec` | `int \| None` | — |
+| `auto_stop_timeout_sec` | `int \| None` | `pydantic.Field(default=None, gt=0, le=60...` |
 | `variables` | `dict[str, str] \| None` | `None` |

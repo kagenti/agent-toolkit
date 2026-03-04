@@ -4,7 +4,12 @@ description: "{{ description }}"
 ---
 
 {{ autogen_warning }}
+{%- if base_href and breadcrumb_ancestors %}
+
+[Python SDK Reference]({{ base_href }}/overview){% for anc_title, anc_filename in breadcrumb_ancestors %} / [{{ anc_title }}]({{ base_href }}/{{ anc_filename }}){% endfor %} / {{ title }}
+{%- endif %}
 {%- if import_example %}
+
 
 ```py
 {{ import_example }}
