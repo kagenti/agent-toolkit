@@ -50,19 +50,19 @@ from agentstack_sdk.server import Server
 | `configure_logger` | `bool` | `True` |
 | `configure_telemetry` | `bool` | `False` |
 | `self_registration` | `bool` | `True` |
-| `self_registration_id` | `str \| None` | — |
-| `task_store` | `TaskStore \| None` | — |
-| `context_store` | `ContextStore \| None` | — |
-| `queue_manager` | `QueueManager \| None` | — |
+| `self_registration_id` | `str \| None` | `None` |
+| `task_store` | `TaskStore \| None` | `None` |
+| `context_store` | `ContextStore \| None` | `None` |
+| `queue_manager` | `QueueManager \| None` | `None` |
 | `task_timeout` | `timedelta` | `timedelta(minutes=10)` |
-| `push_config_store` | `PushNotificationConfigStore \| None` | — |
-| `push_sender` | `PushNotificationSender \| None` | — |
-| `request_context_builder` | `RequestContextBuilder \| None` | — |
+| `push_config_store` | `PushNotificationConfigStore \| None` | `None` |
+| `push_sender` | `PushNotificationSender \| None` | `None` |
+| `request_context_builder` | `RequestContextBuilder \| None` | `None` |
 | `host` | `str` | `'127.0.0.1'` |
 | `port` | `int` | `10000` |
-| `url` | `str \| None` | — |
-| `uds` | `str \| None` | — |
-| `fd` | `int \| None` | — |
+| `url` | `str \| None` | `None` |
+| `uds` | `str \| None` | `None` |
+| `fd` | `int \| None` | `None` |
 | `loop` | `Literal['none', 'auto', 'asyncio', 'uvloop']` | `'auto'` |
 | `http` | `type[asyncio.Protocol] \| uvicorn_config.HTTPProtocolType` | `'auto'` |
 | `ws` | `type[asyncio.Protocol] \| uvicorn_config.WSProtocolType` | `'auto'` |
@@ -72,44 +72,44 @@ from agentstack_sdk.server import Server
 | `ws_ping_timeout` | `float \| None` | `20.0` |
 | `ws_per_message_deflate` | `bool` | `True` |
 | `lifespan` | `uvicorn_config.LifespanType` | `'auto'` |
-| `lifespan_fn` | `Lifespan[AppType] \| None` | — |
-| `env_file` | `str \| os.PathLike[str] \| None` | — |
+| `lifespan_fn` | `Lifespan[AppType] \| None` | `None` |
+| `env_file` | `str \| os.PathLike[str] \| None` | `None` |
 | `log_config` | `dict[str, Any] \| str \| RawConfigParser \| IO[Any] \| None` | `uvicorn_config.LOGGING_CONFIG` |
-| `log_level` | `str \| int \| None` | — |
+| `log_level` | `str \| int \| None` | `None` |
 | `access_log` | `bool` | `True` |
-| `use_colors` | `bool \| None` | — |
+| `use_colors` | `bool \| None` | `None` |
 | `interface` | `uvicorn_config.InterfaceType` | `'auto'` |
 | `reload` | `bool` | `False` |
-| `reload_dirs` | `list[str] \| str \| None` | — |
+| `reload_dirs` | `list[str] \| str \| None` | `None` |
 | `reload_delay` | `float` | `0.25` |
-| `reload_includes` | `list[str] \| str \| None` | — |
-| `reload_excludes` | `list[str] \| str \| None` | — |
-| `workers` | `int \| None` | — |
+| `reload_includes` | `list[str] \| str \| None` | `None` |
+| `reload_excludes` | `list[str] \| str \| None` | `None` |
+| `workers` | `int \| None` | `None` |
 | `proxy_headers` | `bool` | `True` |
 | `server_header` | `bool` | `True` |
 | `date_header` | `bool` | `True` |
-| `forwarded_allow_ips` | `list[str] \| str \| None` | — |
+| `forwarded_allow_ips` | `list[str] \| str \| None` | `None` |
 | `root_path` | `str` | `''` |
-| `limit_concurrency` | `int \| None` | — |
-| `limit_max_requests` | `int \| None` | — |
+| `limit_concurrency` | `int \| None` | `None` |
+| `limit_max_requests` | `int \| None` | `None` |
 | `backlog` | `int` | `2048` |
 | `timeout_keep_alive` | `int` | `5` |
 | `timeout_notify` | `int` | `30` |
 | `timeout_worker_healthcheck` | `int` | `5` |
-| `timeout_graceful_shutdown` | `int \| None` | — |
-| `callback_notify` | `Callable[..., Awaitable[None]] \| None` | — |
-| `ssl_keyfile` | `str \| os.PathLike[str] \| None` | — |
-| `ssl_certfile` | `str \| os.PathLike[str] \| None` | — |
-| `ssl_keyfile_password` | `str \| None` | — |
+| `timeout_graceful_shutdown` | `int \| None` | `None` |
+| `callback_notify` | `Callable[..., Awaitable[None]] \| None` | `None` |
+| `ssl_keyfile` | `str \| os.PathLike[str] \| None` | `None` |
+| `ssl_certfile` | `str \| os.PathLike[str] \| None` | `None` |
+| `ssl_keyfile_password` | `str \| None` | `None` |
 | `ssl_version` | `int` | `uvicorn_config.SSL_PROTOCOL_VERSION` |
 | `ssl_cert_reqs` | `int` | `CERT_NONE` |
-| `ssl_ca_certs` | `str \| None` | — |
+| `ssl_ca_certs` | `str \| None` | `None` |
 | `ssl_ciphers` | `str` | `'TLSv1'` |
-| `headers` | `list[tuple[str, str]] \| None` | — |
+| `headers` | `list[tuple[str, str]] \| None` | `None` |
 | `factory` | `bool` | `False` |
-| `h11_max_incomplete_event_size` | `int \| None` | — |
-| `self_registration_client_factory` | `Callable[[], PlatformClient] \| None` | — |
-| `auth_backend` | `SdkAuthenticationBackend \| None` | — |
+| `h11_max_incomplete_event_size` | `int \| None` | `None` |
+| `self_registration_client_factory` | `Callable[[], PlatformClient] \| None` | `None` |
+| `auth_backend` | `SdkAuthenticationBackend \| None` | `None` |
 
 **Returns:** `None`
 

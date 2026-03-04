@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import ast
 import enum
+import functools
 import json
 import re
 import sys
@@ -15,9 +16,6 @@ from pydantic import BaseModel, ConfigDict
 import argparse
 
 import griffe
-
-
-SRC_ROOT = Path()
 
 
 class ExportItem(BaseModel):
@@ -54,23 +52,26 @@ def parse_allnames(tree: ast.Module) -> list[str]:
     return []
 
 
-def resolve_absolute(module_path: str) -> Path | None:
-    """
-    Resolve an absolute dotted module path to a filesystem path, but only
-    if the module lives inside the same package (SRC_ROOT).
-    """
-    pkg_name = SRC_ROOT.name  # e.g. "agentstack_sdk"
-    if not module_path.startswith(pkg_name):
-        return None
-    parts = module_path.split(".")
-    candidate: Path = SRC_ROOT.parent
-    for part in parts:
-        candidate = candidate / part
+def _resolve_candidate(candidate: Path) -> Path | None:
+    """Resolve a candidate path to a package directory or .py module, or None."""
     if (candidate / "__init__.py").exists():
         return candidate
     if candidate.with_suffix(".py").exists():
         return candidate.with_suffix(".py")
     return None
+
+
+def resolve_absolute(module_path: str, src_root: Path) -> Path | None:
+    """
+    Resolve an absolute dotted module path to a filesystem path, but only
+    if the module lives inside the same package (src_root).
+    """
+    if not module_path.startswith(src_root.name):
+        return None
+    candidate: Path = src_root.parent
+    for part in module_path.split("."):
+        candidate = candidate / part
+    return _resolve_candidate(candidate)
 
 
 def resolve_relative(current_pkg_path: Path, level: int, module_suffix: str | None) -> Path | None:
@@ -87,22 +88,16 @@ def resolve_relative(current_pkg_path: Path, level: int, module_suffix: str | No
         base = base.parent
 
     if module_suffix:
-        parts = module_suffix.split(".")
         candidate = base
-        for part in parts:
+        for part in module_suffix.split("."):
             candidate = candidate / part
     else:
         candidate = base
 
-    # Prefer package (directory with __init__.py) over plain module
-    if (candidate / "__init__.py").exists():
-        return candidate
-    if candidate.with_suffix(".py").exists():
-        return candidate.with_suffix(".py")
-    return None
+    return _resolve_candidate(candidate)
 
 
-def collect_exports(path: Path, visited: set[str] | None = None) -> list[ExportItem]:
+def collect_exports(path: Path, src_root: Path, visited: set[str] | None = None) -> list[ExportItem]:
     """
     Recursively collect effective exports from a file or package directory.
 
@@ -136,7 +131,7 @@ def collect_exports(path: Path, visited: set[str] | None = None) -> list[ExportI
         return []
 
     exports: list[ExportItem] = []
-    origin = _path_to_module(parse_file)
+    origin = _path_to_module(parse_file, src_root)
 
     # ── 1. Check for an explicit __all__ ────────────────────────────────────
     declared = parse_allnames(tree)
@@ -180,9 +175,9 @@ def collect_exports(path: Path, visited: set[str] | None = None) -> list[ExportI
         if node.level == 0:
             # ── absolute star import from within the same package ────────────
             if node.names and node.names[0].name == "*" and node.module:
-                resolved_abs = resolve_absolute(node.module)
+                resolved_abs = resolve_absolute(node.module, src_root)
                 if resolved_abs is not None:
-                    child_exports = collect_exports(resolved_abs, visited)
+                    child_exports = collect_exports(resolved_abs, src_root, visited)
                     exports.extend(child_exports)
             else:
                 # Capture intentional `Name as Name` re-exports
@@ -200,12 +195,12 @@ def collect_exports(path: Path, visited: set[str] | None = None) -> list[ExportI
                     file=sys.stderr,
                 )
                 continue
-            child_exports = collect_exports(resolved, visited)
+            child_exports = collect_exports(resolved, src_root, visited)
             exports.extend(child_exports)
 
         # ── relative explicit: `from .X import Name as Name` ────────────────
         else:
-            resolved_module = _path_to_module(resolved) if resolved else (node.module or "")
+            resolved_module = _path_to_module(resolved, src_root) if resolved else (node.module or "")
             for alias in node.names:
                 if alias.name != "*":
                     exports.append(ExportItem(name=alias.asname or alias.name, origin=resolved_module))
@@ -213,12 +208,12 @@ def collect_exports(path: Path, visited: set[str] | None = None) -> list[ExportI
     return _deduplicate(exports)
 
 
-def _path_to_module(path: Path | None) -> str:
-    """Convert an absolute path under SRC_ROOT.parent to a dotted module name."""
+def _path_to_module(path: Path | None, src_root: Path) -> str:
+    """Convert an absolute path under src_root.parent to a dotted module name."""
     if path is None:
         return ""
     try:
-        rel = path.relative_to(SRC_ROOT.parent)
+        rel = path.relative_to(src_root.parent)
     except ValueError:
         return str(path)
     parts = list(rel.parts)
@@ -239,6 +234,7 @@ def _deduplicate(exports: list[ExportItem]) -> list[ExportItem]:
     return result
 
 
+@functools.lru_cache(maxsize=None)
 def _init_imports_file(init_file: Path, module_stem: str) -> bool:
     """
     Return True if *init_file* contains any import that explicitly references
@@ -269,38 +265,45 @@ def _init_imports_file(init_file: Path, module_stem: str) -> bool:
 
 
 # TODO: this might need to change if the logic of how the classes etc. are exposed changes
-def trace_package(root: Path) -> dict[str, list[ExportItem]]:
+def trace_package(root: Path, src_root: Path) -> dict[str, list[ExportItem]]:
     """
     Walk every __init__.py in the package and compute its effective public API.
     Also picks up flat .py modules anywhere in the package tree that are NOT
     already referenced (imported) by the sibling __init__.py.
+    It is currently not clear what should actually be exposed so this approach takes everything directly
+    exposed through the __init__ files and adds everything that lies separately alongside this scheme.
     Returns {dotted_module_path: [ExportItem, ...]}.
     """
     result: dict[str, list[ExportItem]] = {}
-
-    for init_file in sorted(root.rglob("__init__.py")):
-        if "__pycache__" in init_file.parts:
+    init_files: list[Path] = []
+    other_files: list[Path] = []
+    # collect and categorize all .py files under the root (skip __pycache__)
+    for py_file in sorted(root.rglob("*.py")):
+        if "__pycache__" in py_file.parts:
             continue
+        if py_file.name == "__init__.py":
+            init_files.append(py_file)
+        elif not py_file.name.startswith("_"):
+            other_files.append(py_file)
+
+    # collect all the __init_.py exports, which directly define the main public API of each package
+    for init_file in init_files:
         pkg_dir = init_file.parent
-        module_name = _path_to_module(pkg_dir)
-        exports = collect_exports(pkg_dir)  # fresh visited set per package
+        module_name = _path_to_module(pkg_dir, src_root)
+        exports = collect_exports(pkg_dir, src_root)  # fresh visited set per package
         result[module_name] = exports
 
     # Also pick up flat .py modules anywhere in the package tree (e.g. a2a/types.py).
     # Skip a file if the sibling __init__.py already imports from it — those
     # exports are already captured via the package entry above.
-    for py_file in sorted(root.rglob("*.py")):
-        if py_file.name == "__init__.py" or py_file.name.startswith("_"):
-            continue
-        if "__pycache__" in py_file.parts:
-            continue
-        module_name = _path_to_module(py_file)
+    for py_file in other_files:
+        module_name = _path_to_module(py_file, src_root)
         if module_name in result:
             continue
         sibling_init = py_file.parent / "__init__.py"
         if _init_imports_file(sibling_init, py_file.stem):
             continue
-        exports = collect_exports(py_file)
+        exports = collect_exports(py_file, src_root)
         if exports:
             result[module_name] = exports
 
@@ -321,14 +324,17 @@ def _fmt_annotation(ann: Any) -> str | None:
 def _fmt_docstring(ds: griffe.Docstring | None) -> str | None:
     if not ds or not ds.value:
         return None
-    text = ds.value.strip()
-    return text
+    return ds.value.strip() or None
 
 
 FILTER_FUNCTION_LABELS = {"module-attribute"}
 
+_SENTINEL_DEFAULTS = frozenset({"PosOnlyArgsSep", "KwOnlyArgsSep"})
+_MAX_DEFAULT_LEN = 80
 
-def _serialize_function(fn: griffe.Function) -> dict[str, Any]:
+
+def _serialize_params(fn: griffe.Function) -> list[dict[str, Any]]:
+    """Serialize function/method parameters, skipping self/cls."""
     params = []
     for p in fn.parameters:
         if p.name in ("self", "cls"):
@@ -336,10 +342,16 @@ def _serialize_function(fn: griffe.Function) -> dict[str, Any]:
         entry: dict[str, Any] = {"name": p.name}
         if p.annotation:
             entry["type"] = _fmt_annotation(p.annotation)
-        if p.default is not None and str(p.default) not in ("PosOnlyArgsSep", "KwOnlyArgsSep"):
-            entry["default"] = str(p.default)
+        if p.default is not None and str(p.default) not in _SENTINEL_DEFAULTS:
+            d = str(p.default)
+            entry["default"] = d if len(d) <= _MAX_DEFAULT_LEN else d[:_MAX_DEFAULT_LEN] + "..."
         entry["kind"] = p.kind.value if p.kind and hasattr(p.kind, "value") else str(p.kind)
         params.append(entry)
+    return params
+
+
+def _serialize_function(fn: griffe.Function) -> dict[str, Any]:
+    params = _serialize_params(fn)
 
     result: dict[str, Any] = {"kind": "function", "params": params}
     if fn.returns:
@@ -412,11 +424,12 @@ def _serialize_class(cls: griffe.Class) -> dict[str, Any]:
     if doc:
         result["docstring"] = doc
 
-    # Fields (class-level attributes, excluding private and dunder)
-    class_attrs = []
+    class_attrs: list[dict[str, Any]] = []
+    methods: list[dict[str, Any]] = []
+    init_assigned: list[dict[str, Any]] | None = None
+
     for name, member in cls.members.items():
-        if name.startswith("_"):
-            continue
+        is_private = name.startswith("_")
         actual = member
 
         if isinstance(member, griffe.Alias):
@@ -425,73 +438,51 @@ def _serialize_class(cls: griffe.Class) -> dict[str, Any]:
             except Exception:
                 continue
 
-        if actual.kind.name != "ATTRIBUTE":
-            continue
-        field: dict[str, Any] = {"name": name}
-        ann = getattr(actual, "annotation", None)
-        if ann:
-            field["type"] = _fmt_annotation(ann)
-        field_doc = _fmt_docstring(actual.docstring)
-        if field_doc:
-            field["docstring"] = field_doc
-        val = getattr(actual, "value", None)
-        if val is not None:
-            v = str(val)[:120]
-            field["default"] = v
-            if len(v) > 120:
-                field["default"] += "..."
-        class_attrs.append(field)
+        kind_name = actual.kind.name
+
+        # ── class-level attributes (excluding private and dunder) ──────────
+        if kind_name == "ATTRIBUTE" and not is_private:
+            field: dict[str, Any] = {"name": name}
+            ann = getattr(actual, "annotation", None)
+            if ann:
+                field["type"] = _fmt_annotation(ann)
+            field_doc = _fmt_docstring(actual.docstring)
+            if field_doc:
+                field["docstring"] = field_doc
+            val = getattr(actual, "value", None)
+            # TODO: this might need some change if we find this to be
+            if val is not None:
+                v = str(val)
+                field["default"] = v[:120] + ("..." if len(v) > 120 else "")
+            class_attrs.append(field)
+
+        # ── public methods (excluding dunder, but including __init__) ───────
+        elif kind_name == "FUNCTION" and (not is_private or name == "__init__"):
+            method_info: dict[str, Any] = {"name": name}
+            if name == "__init__":
+                method_info["kind"] = "constructor"
+                init_assigned = _identify_arguments_from_init(actual)  # pyrefly: ignore[bad-argument-type]
+            elif _is_factory_classmethod(actual, cls.name):  # pyrefly: ignore[bad-argument-type]
+                method_info["kind"] = "constructor"
+            else:
+                method_info["kind"] = "method"
+            params = _serialize_params(actual)  # pyrefly: ignore[bad-argument-type]
+            if params:
+                method_info["params"] = params
+            if hasattr(actual, "returns") and actual.returns:
+                method_info["returns"] = _fmt_annotation(actual.returns)
+            method_doc = _fmt_docstring(actual.docstring)
+            if method_doc:
+                method_info["docstring"] = method_doc
+            if actual.labels:
+                method_info["labels"] = sorted(str(l) for l in actual.labels)
+            methods.append(method_info)
+
     if class_attrs:
         result["class_attributes"] = class_attrs
-
-    # Public methods (excluding dunder, but including __init__)
-    methods = []
-    for name, member in cls.members.items():
-        if name.startswith("_") and name != "__init__":
-            continue
-        actual = member
-        if member.kind.name == "ALIAS":
-            if hasattr(member, "target"):
-                actual = member.target
-            else:
-                continue
-        if actual.kind.name != "FUNCTION":
-            continue
-        method_info: dict[str, Any] = {"name": name}
-        if name == "__init__":
-            method_info["kind"] = "constructor"
-            # Find self.attribute assignments in the __init__ body
-            assigned_attributes = _identify_arguments_from_init(actual)  # pyrefly: ignore[bad-argument-type]
-            if assigned_attributes:
-                class_attrs_names = {attr["name"] for attr in class_attrs}
-                result["attributes"] = [aa for aa in assigned_attributes if aa["name"] not in class_attrs_names]
-
-        elif _is_factory_classmethod(actual, cls.name):  # pyrefly: ignore[bad-argument-type]
-            method_info["kind"] = "constructor"
-        else:
-            method_info["kind"] = "method"
-        params = []
-        if hasattr(actual, "parameters") and actual.parameters:
-            for p in actual.parameters:
-                if p.name in ("self", "cls"):
-                    continue
-                pe: dict[str, Any] = {"name": p.name}
-                if p.annotation:
-                    pe["type"] = _fmt_annotation(p.annotation)
-                if p.default is not None and str(p.default) not in ("None", "PosOnlyArgsSep", "KwOnlyArgsSep"):
-                    d = str(p.default)
-                    pe["default"] = d if len(d) <= 80 else d[:80] + "..."
-                params.append(pe)
-        if params:
-            method_info["params"] = params
-        if hasattr(actual, "returns") and actual.returns:
-            method_info["returns"] = _fmt_annotation(actual.returns)
-        method_doc = _fmt_docstring(actual.docstring)
-        if method_doc:
-            method_info["docstring"] = method_doc
-        if actual.labels:
-            method_info["labels"] = sorted(str(l) for l in actual.labels)
-        methods.append(method_info)
+    if init_assigned:
+        class_attrs_names = {attr["name"] for attr in class_attrs}
+        result["attributes"] = [aa for aa in init_assigned if aa["name"] not in class_attrs_names]
     if methods:
         result["methods"] = methods
 
@@ -528,13 +519,16 @@ _SPECIAL_FORM_PREFIXES = [
     "Concatenate[",
 ]
 
+_TYPING_KIND_PREFIXES: list[tuple[str, TypingKind]] = [
+    ("TypeVar(", TypingKind.TYPE_VAR),
+    ("NewType(", TypingKind.NEW_TYPE),
+]
+
 _VALUE_PREFIX_TO_KIND: list[tuple[str, TypingKind]] = [
     *(("typing." + p, TypingKind.SPECIAL_FORM) for p in _SPECIAL_FORM_PREFIXES),
     *((p, TypingKind.SPECIAL_FORM) for p in _SPECIAL_FORM_PREFIXES),
-    ("typing.TypeVar(", TypingKind.TYPE_VAR),
-    ("TypeVar(", TypingKind.TYPE_VAR),
-    ("typing.NewType(", TypingKind.NEW_TYPE),
-    ("NewType(", TypingKind.NEW_TYPE),
+    *(("typing." + prefix, kind) for prefix, kind in _TYPING_KIND_PREFIXES),
+    *_TYPING_KIND_PREFIXES,
 ]
 
 _TYPE_ALIAS_ANNOTATION_NAMES = {"TypeAlias", "typing.TypeAlias", "typing_extensions.TypeAlias"}
@@ -617,9 +611,8 @@ def _lookup_griffe(pkg: griffe.Module, dotted_path: str, name: str) -> griffe.Ob
     """Resolve dotted_path in the griffe module tree, then look up name."""
     try:
         obj = pkg
-        # Strip the leading "agentstack_sdk." prefix if present
-        relative = dotted_path.removeprefix("agentstack_sdk.")
-        if relative and relative != "agentstack_sdk":
+        relative = dotted_path.removeprefix(f"{pkg.name}.")
+        if relative and relative != pkg.name:
             for part in relative.split("."):
                 obj = obj[part]
         return obj[name]
@@ -728,17 +721,16 @@ def main() -> None:
 
     # Allow helper functions (resolve_absolute, _path_to_module) to use the
     # correct source root when --src-root is overridden.
-    global SRC_ROOT
-    SRC_ROOT = Path(args.src_root.resolve())
+    src_root = Path(args.src_root.resolve())
 
-    if not SRC_ROOT.exists():
-        sys.exit(f"Package source not found at {SRC_ROOT}")
+    if not src_root.exists():
+        sys.exit(f"Package source not found at {src_root}")
 
     # ── Phase 1: star-import tracing ─────────────────────────────────────────
-    api = trace_package(SRC_ROOT)
+    api = trace_package(src_root, src_root)
 
     # ── Phase 2: griffe enrichment ───────────────────────────────────────────
-    pkg = griffe.load("agentstack_sdk", search_paths=[str(SRC_ROOT.parent)])
+    pkg = griffe.load(src_root.name, search_paths=[str(src_root.parent)])
     enriched = enrich_api(api, pkg)
 
     out_file: Path = args.output

@@ -222,7 +222,7 @@ PAGE_CONFIG: list[dict] = [
     # ── platform (grouped by sub-module) ──────────────────────────────────────
         {
         "json_key": "agentstack_sdk.platform",
-        "filename": "platform-new",
+        "filename": "platform",
         "title": "Platform",
         "description": "Clients for files, vector stores, contexts, providers, and more",
         "import_path": "agentstack_sdk.platform",
@@ -676,7 +676,7 @@ def main() -> None:
             symbol_count += 1
 
     module_count = 1 + len(PAGE_CONFIG)
-    print(f"\nGenerated {module_count} module pages + {symbol_count} symbol pages in {version}/reference/python-sdk/")
+    print(f"Generated {module_count} module pages + {symbol_count} symbol pages in {args.docs_dir}")
 
 
 if __name__ == "__main__":

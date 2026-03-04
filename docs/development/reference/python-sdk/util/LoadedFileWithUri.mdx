@@ -34,9 +34,9 @@ from agentstack_sdk.util import LoadedFileWithUri
 | Name | Type | Default |
 |------|------|---------|
 | `response` | `Response` | — |
-| `filename` | `str \| None` | — |
-| `content_type` | `str \| None` | — |
-| `file_size_bytes` | `int \| None` | — |
+| `filename` | `str \| None` | `None` |
+| `content_type` | `str \| None` | `None` |
+| `file_size_bytes` | `int \| None` | `None` |
 </Accordion>
 
 
@@ -52,7 +52,7 @@ This allows us to handle gzip, deflate, brotli, and zstd encoded responses.
 
 | Name | Type | Default |
 |------|------|---------|
-| `chunk_size` | `int \| None` | — |
+| `chunk_size` | `int \| None` | `None` |
 
 **Returns:** `Iterator[bytes]`
 
@@ -65,7 +65,7 @@ string encoding.
 
 | Name | Type | Default |
 |------|------|---------|
-| `chunk_size` | `int \| None` | — |
+| `chunk_size` | `int \| None` | `None` |
 
 **Returns:** `Iterator[str]`
 
@@ -86,7 +86,7 @@ This allows us to handle gzip, deflate, brotli, and zstd encoded responses.
 
 | Name | Type | Default |
 |------|------|---------|
-| `chunk_size` | `int \| None` | — |
+| `chunk_size` | `int \| None` | `None` |
 
 **Returns:** `AsyncIterator[bytes]`
 
@@ -99,7 +99,7 @@ string encoding.
 
 | Name | Type | Default |
 |------|------|---------|
-| `chunk_size` | `int \| None` | — |
+| `chunk_size` | `int \| None` | `None` |
 
 **Returns:** `AsyncIterator[str]`
 

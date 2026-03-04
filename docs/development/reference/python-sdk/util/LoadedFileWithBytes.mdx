@@ -35,9 +35,9 @@ from agentstack_sdk.util import LoadedFileWithBytes
 | Name | Type | Default |
 |------|------|---------|
 | `content` | `bytes` | — |
-| `filename` | `str \| None` | — |
-| `content_type` | `str \| None` | — |
-| `encoding` | `str \| None` | — |
+| `filename` | `str \| None` | `None` |
+| `content_type` | `str \| None` | `None` |
+| `encoding` | `str \| None` | `None` |
 </Accordion>
 
 
@@ -50,7 +50,7 @@ from agentstack_sdk.util import LoadedFileWithBytes
 
 | Name | Type | Default |
 |------|------|---------|
-| `chunk_size` | `int \| None` | — |
+| `chunk_size` | `int \| None` | `None` |
 
 **Returns:** `Iterator[bytes]`
 
@@ -60,7 +60,7 @@ from agentstack_sdk.util import LoadedFileWithBytes
 
 | Name | Type | Default |
 |------|------|---------|
-| `chunk_size` | `int \| None` | — |
+| `chunk_size` | `int \| None` | `None` |
 
 **Returns:** `Iterator[str]`
 
@@ -78,7 +78,7 @@ from agentstack_sdk.util import LoadedFileWithBytes
 
 | Name | Type | Default |
 |------|------|---------|
-| `chunk_size` | `int \| None` | — |
+| `chunk_size` | `int \| None` | `None` |
 
 **Returns:** `AsyncIterator[bytes]`
 
@@ -88,7 +88,7 @@ from agentstack_sdk.util import LoadedFileWithBytes
 
 | Name | Type | Default |
 |------|------|---------|
-| `chunk_size` | `int \| None` | — |
+| `chunk_size` | `int \| None` | `None` |
 
 **Returns:** `AsyncIterator[str]`
 
