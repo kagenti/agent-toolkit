@@ -107,7 +107,7 @@ uv run python docs/introspect_exports.py \\
 echo "Running generate_docs.py..."
 uv run python docs/generate_docs.py \\
   --json-file "${TEMP_JSON}" \\
-  --docs-dir "${DOCS_ROOT}" \\
+  --docs-dir "${SDK_DOCS_DIR}" \\
   --templates-dir "docs/templates"
 
 # Step 4: delete the introspect JSON

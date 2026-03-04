@@ -106,7 +106,8 @@ PAGE_CONFIG: list[dict] = [
         "description": "OAuth and secrets authentication extensions",
         "import_path": "agentstack_sdk.a2a.extensions.auth",
         "submodule_cards": [
-            {"title": "OAuth", "filename": "a2a-auth-oauth", "description": "OAuth 2.0 flow extensions"},
+            {"title": "Extensions", "filename": "a2a-auth-oauth", "description": "OAuth 2.0 flow extensions"},
+            {"title": "Storage", "filename": "a2a-auth-oauth-storage", "description": "OAuth 2.0 flow storage extensions"},
             {"title": "Secrets", "filename": "a2a-auth-secrets", "description": "Secrets injection extensions"},
         ],
     },
@@ -117,13 +118,6 @@ PAGE_CONFIG: list[dict] = [
         "title": "OAuth Extensions",
         "description": "OAuth 2.0 flow extensions",
         "import_path": "agentstack_sdk.a2a.extensions.auth.oauth",
-        "submodule_cards": [
-            {
-                "title": "OAuth Storage",
-                "filename": "a2a-auth-oauth-storage",
-                "description": "Storage backends for OAuth flow state",
-            }
-        ],
     },
     # ── a2a.auth.oauth.storage ────────────────────────────────────────────────
     {
@@ -183,12 +177,40 @@ PAGE_CONFIG: list[dict] = [
     },
     # ── platform (grouped by sub-module) ──────────────────────────────────────
     {
+        "json_key": None,
+        "filename": "platform-idx",
+        "title": "Platform API Overview",
+        "description": "Clients for files, vector stores, contexts, providers, and more",
+        "import_path": "agentstack_sdk.platform",
+        "submodule_cards": [
+            {"title": "Platform", "filename": "platform", "description": "General platform client and utilities"},
+            {"title": "Common", "filename": "platform-common", "description": "Shared types and utilities"},
+            {"title": "Context", "filename": "platform-context", "description": "Context management"},
+        ],
+    },
+    {
         "json_key": "agentstack_sdk.platform",
         "filename": "platform",
-        "title": "Platform API",
+        "title": "Platform",
         "description": "Clients for files, vector stores, contexts, providers, and more",
         "import_path": "agentstack_sdk.platform",
         "group_by_origin": True,
+    },
+    # ── platform.context ──────────────────────────────────────────────────────
+    {
+        "json_key": "agentstack_sdk.platform.common",
+        "filename": "platform-common",
+        "title": "Common",
+        "description": "Shared types and utilities",
+        "import_path": "agentstack_sdk.platform.common",
+    },
+    # ── platform.common ───────────────────────────────────────────────────────
+    {
+        "json_key": "agentstack_sdk.platform.context",
+        "filename": "platform-context",
+        "title": "Context",
+        "description": "Context management",
+        "import_path": "agentstack_sdk.platform.context",
     },
     # ── types ─────────────────────────────────────────────────────────────────
     {
@@ -304,7 +326,7 @@ _FILENAME_TO_TITLE: dict[str, str] = {}
 _FILENAME_TO_PARENT: dict[str, str] = {}  # child filename → parent filename
 
 
-def _ensure_module_maps() -> None:
+def _build_module_maps() -> None:
     if _JSON_KEY_TO_FILENAME:
         return
     for cfg in PAGE_CONFIG:
@@ -319,7 +341,6 @@ def _ensure_module_maps() -> None:
 
 def _symbol_breadcrumb_ancestors(parent_filename: str) -> list[tuple[str, str]]:
     """Return ordered list of (title, filename) ancestors from root down to *parent_filename* (inclusive)."""
-    _ensure_module_maps()
     chain: list[tuple[str, str]] = []
     current = parent_filename
     while current:
@@ -332,7 +353,6 @@ def _symbol_breadcrumb_ancestors(parent_filename: str) -> list[tuple[str, str]]:
 
 def _find_longest_matching_json_key(origin: str) -> str | None:
     """Return the longest PAGE_CONFIG json_key that is a prefix of *origin*."""
-    _ensure_module_maps()
     best_key: str | None = None
     best_len = 0
     for key in _JSON_KEY_TO_FILENAME:
@@ -364,7 +384,6 @@ def _symbol_page_parent_filename(item: dict) -> str:
 
 def _symbol_page_parent_title(parent_filename: str) -> str:
     """Human-readable title of the parent module page."""
-    _ensure_module_maps()
     return _FILENAME_TO_TITLE.get(parent_filename, parent_filename.replace("-", " ").title())
 
 
@@ -532,10 +551,12 @@ def render_function_page(
 
 
 def main() -> None:
+    _build_module_maps()
     parser = argparse.ArgumentParser(description="Generate Python SDK reference docs (MDX) from exports_structure.json.")
     parser.add_argument(
         "--json-file",
         type=Path,
+        default=Path(__file__).resolve().parent / "exports_structure.json",
         help="Path to the exports_structure.json manifest",
     )
     parser.add_argument(
@@ -562,13 +583,12 @@ def main() -> None:
 
     data = json.loads(json_file.read_text())
     env = _make_env(templates_dir)
-    _ensure_module_maps()
 
-    version = "development"
-    out_dir = docs_dir / version / "reference" / "python-sdk"
+    out_dir = docs_dir
     out_dir.mkdir(parents=True, exist_ok=True)
 
     # ── overview + module pages (as before) ──────────────────────────────────
+    version = "development"
     content = render_overview(env, version)
     (out_dir / "overview.mdx").write_text(content)
 

@@ -16,10 +16,6 @@ import argparse
 
 import griffe
 
-
-
-
-
 class ExportItem(BaseModel):
     model_config = ConfigDict(validate_assignment=True)
     name: str
@@ -736,20 +732,16 @@ def main() -> None:
     api = trace_package(SRC_ROOT)
 
     # ── Phase 2: griffe enrichment ───────────────────────────────────────────
-    print("\nLoading package with griffe for metadata enrichment...")
-
     pkg = griffe.load("agentstack_sdk", search_paths=[str(SRC_ROOT.parent)])
     enriched = enrich_api(api, pkg)
-    print("  ✓ griffe enrichment complete")
 
     out_file: Path = args.output
     out_file.parent.mkdir(parents=True, exist_ok=True)
     out_file.write_text(json.dumps(enriched, indent=2))
-    print(f"\n→ Saved to {out_file}")
 
     pkg_count = len(enriched)
     name_count = sum(len(v) for v in enriched.values())
-    print(f"  {pkg_count} packages · {name_count} total exports")
+    print(f"Python SDK: Extracted {pkg_count} packages · {name_count} total exports")
 
 
 if __name__ == "__main__":

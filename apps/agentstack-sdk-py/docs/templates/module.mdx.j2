@@ -6,7 +6,7 @@ description: "{{ description }}"
 {{ autogen_warning }}
 {%- if import_example %}
 
-```python
+```py
 {{ import_example }}
 ```
 {%- endif %}
@@ -28,10 +28,6 @@ description: "{{ description }}"
 ---
 
 ## {{ group.title }}
-
-```python
-{{ group.import_example }}
-```
 
 {%- endif %}
 {%- if group.classes %}

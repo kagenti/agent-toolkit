@@ -9,7 +9,7 @@ description: "{{ fn.docstring | first_line }}"
 [Python SDK Reference]({{ base_href }}/overview){% for title, filename in breadcrumb_ancestors %} / [{{ title }}]({{ base_href }}/{{ filename }}){% endfor %} / {{ fn.name }}
 {%- endif %}
 
-```python
+```py
 from {{ import_path }} import {{ fn.name }}
 ```
 {%- if fn.labels %}
@@ -24,11 +24,10 @@ Labels: {% for label in fn.labels %}`{{ label }}`{% if not loop.last %}, {% endi
 
 ## Parameters
 
-| Name | Type | Default | Description |
-|------|------|---------|-------------|
-{%- for p in fn.params %}
-| `{{ p.name }}` | {% if p.type %}`{{ p.type | shorten_type }}`{% else %}—{% endif %} | {% if p.default %}`{{ p.default | truncate_val }}`{% else %}—{% endif %} | {{ p.docstring | first_line if p.docstring else '' }} |
-{%- endfor %}
+| Name | Type | Default |
+|------|------|---------|
+{% for p in fn.params %}| `{{ p.name }}` | {% if p.type %}`{{ p.type | table_type }}`{% else %}—{% endif %} | {% if p.default %}`{{ p.default | truncate_val }}`{% else %}—{% endif %} |
+{% endfor %}
 
 {%- endif %}
 {%- if fn.returns %}

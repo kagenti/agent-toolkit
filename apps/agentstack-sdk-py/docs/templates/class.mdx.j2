@@ -9,7 +9,7 @@ description: "{{ cls.docstring | first_line }}"
 [Python SDK Reference]({{ base_href }}/overview){% for title, filename in breadcrumb_ancestors %} / [{{ title }}]({{ base_href }}/{{ filename }}){% endfor %} / {{ cls.name }}
 {%- endif %}
 
-```python
+```py
 from {{ import_path }} import {{ cls.name }}
 ```
 {%- if cls.bases %}
