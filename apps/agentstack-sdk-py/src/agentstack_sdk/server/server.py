@@ -37,9 +37,7 @@ from agentstack_sdk.platform.client import PlatformClient
 from agentstack_sdk.platform.provider import Provider
 from agentstack_sdk.server.agent import Agent, AgentFactory
 from agentstack_sdk.server.agent import agent as agent_decorator
-from agentstack_sdk.server.middleware.platform_auth_backend import PlatformAuthBackend
 from agentstack_sdk.server.store.context_store import ContextStore
-from agentstack_sdk.server.store.platform_context_store import PlatformContextStore
 from agentstack_sdk.server.telemetry import configure_telemetry as configure_telemetry_func
 from agentstack_sdk.server.utils import cancel_task
 from agentstack_sdk.types import SdkAuthenticationBackend
@@ -141,7 +139,10 @@ class Server:
         if not self._agent_factory:
             raise ValueError("Agent is not registered")
 
-        context_store = context_store or PlatformContextStore()
+        from agentstack_sdk.server.middleware.platform_auth_backend import PlatformAuthBackend
+        from agentstack_sdk.server.store.platform_context_store import PlatformContextStore
+
+        context_store = context_store if context_store is not None else PlatformContextStore()
         auth_backend = auth_backend if auth_backend is not None else PlatformAuthBackend()
         self._agent = self._agent_factory(context_store.modify_dependencies)
         card_url = url and url.strip()
