@@ -778,8 +778,8 @@ def test_invalid_request_structure(client: Client):
     assert response.status_code == 200
     data = response.json()
     assert "error" in data
-    # The jsonrpc library returns MethodNotFoundError for unknown methods
-    assert data["error"]["code"] == MethodNotFoundError().code
+    # The jsonrpc library returns InvalidRequestError for malformed requests
+    assert data["error"]["code"] == InvalidRequestError().code
 
 
 def test_method_not_implemented(client: Client, handler: mock.AsyncMock, ensure_mock_task):
