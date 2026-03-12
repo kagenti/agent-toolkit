@@ -5,10 +5,13 @@ from __future__ import annotations
 
 import json
 import uuid
+from uuid import UUID
 
 import pytest
 from a2a.types import AgentCapabilities, AgentCard
-from sqlalchemy import UUID, text
+from google.protobuf.json_format import MessageToDict
+from pydantic import HttpUrl
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncConnection
 
 from agentstack_server.configuration import Configuration
@@ -30,19 +33,20 @@ def set_di_configuration(override_global_dependency):
 @pytest.fixture
 async def test_provider(set_di_configuration, normal_user: UUID) -> Provider:
     """Create a test provider for use in tests."""
-    source = NetworkProviderLocation(root="http://localhost:8000")
+    source = NetworkProviderLocation(root=HttpUrl("http://localhost:8000"))
     return Provider(
         source=source,
         origin=source.origin,
-        agent_card=AgentCard(
-            name="Hello World Agent",
-            description="Just a hello world agent",
-            url="http://localhost:8000/",
-            version="1.0.0",
-            default_input_modes=["text"],
-            default_output_modes=["text"],
-            capabilities=AgentCapabilities(),
-            skills=[],
+        agent_card=MessageToDict(
+            AgentCard(
+                name="Hello World Agent",
+                description="Just a hello world agent",
+                version="1.0.0",
+                default_input_modes=["text"],
+                default_output_modes=["text"],
+                capabilities=AgentCapabilities(),
+                skills=[],
+            )
         ),
         created_by=normal_user,
     )
@@ -232,10 +236,11 @@ async def test_create_duplicate_provider(db_transaction: AsyncConnection, test_p
 
     # Try to create provider with same source (will generate same ID)
     duplicate_source = NetworkProviderLocation(root="http://localhost:8000")  # Same source, will generate same ID
+    duplicate_card = {**test_provider.agent_card, "name": "NEW_AGENT"}
     duplicate_provider = Provider(
         source=duplicate_source,
         origin=duplicate_source.origin,
-        agent_card=test_provider.agent_card.model_copy(update={"name": "NEW_AGENT"}),
+        agent_card=duplicate_card,
         created_by=normal_user,
     )
 

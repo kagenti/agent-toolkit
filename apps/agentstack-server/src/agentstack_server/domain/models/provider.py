@@ -1,6 +1,5 @@
 # Copyright 2025 © BeeAI a Series of LF Projects, LLC
 # SPDX-License-Identifier: Apache-2.0
-
 from __future__ import annotations
 
 import hashlib
@@ -10,7 +9,6 @@ from typing import Any
 from urllib.parse import quote, urljoin
 from uuid import UUID
 
-from a2a.types import AgentCard
 from a2a.utils import AGENT_CARD_WELL_KNOWN_PATH
 from httpx import AsyncClient
 from kink import di
@@ -87,18 +85,18 @@ class NetworkProviderLocation(RootModel):
         location_digest = hashlib.sha256(str(self.root).encode()).digest()
         return UUID(bytes=location_digest[:16])
 
-    async def load_agent_card(self) -> AgentCard:
-        from a2a.types import AgentCard
-
+    async def load_agent_card(self) -> dict[str, Any]:
         async with AsyncClient() as client:
             try:
                 response = await client.get(urljoin(str(self.a2a_url), AGENT_CARD_WELL_KNOWN_PATH), timeout=1)
                 response.raise_for_status()
-                card = AgentCard.model_validate(response.json())
+                card = response.json()
                 if ext := get_extension(card, SELF_REGISTRATION_EXTENSION_URI):
-                    assert ext.params
-                    self_registration_id = ext.params["self_registration_id"]
-                    if quote(self.root.fragment or "", safe="") != quote(self_registration_id, safe=""):
+                    params = ext.get("params", {})
+                    self_registration_id = params.get("self_registration_id")
+                    if self_registration_id and quote(self.root.fragment or "", safe="") != quote(
+                        self_registration_id, safe=""
+                    ):
                         raise ValueError(
                             f"Self registration id does not match: {self.root.fragment} != {self_registration_id}"
                         )
@@ -119,7 +117,7 @@ class Provider(BaseModel):
     updated_at: AwareDatetime = Field(default_factory=utc_now)
     created_by: UUID
     last_active_at: AwareDatetime = Field(default_factory=utc_now)
-    agent_card: AgentCard
+    agent_card: dict[str, Any]
     state: ProviderState = ProviderState.ONLINE
 
 

@@ -23,8 +23,8 @@ from a2a.server.tasks import PushNotificationConfigStore, PushNotificationSender
 from fastapi import FastAPI
 from fastapi.applications import AppType
 from fastapi.responses import PlainTextResponse
+from google.protobuf.json_format import MessageToDict
 from httpx import HTTPError, HTTPStatusError
-from pydantic import AnyUrl
 from starlette.authentication import AuthenticationError
 from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.requests import HTTPConnection
@@ -34,10 +34,10 @@ from tenacity import AsyncRetrying, retry_if_exception_type, stop_after_attempt,
 from agentstack_sdk.platform import get_platform_client
 from agentstack_sdk.platform.client import PlatformClient
 from agentstack_sdk.platform.provider import Provider
-from agentstack_sdk.server.agent import Agent, AgentFactory
+from agentstack_sdk.server.agent import Agent
 from agentstack_sdk.server.agent import agent as agent_decorator
+from agentstack_sdk.server.constants import DEFAULT_IMPLICIT_EXTENSIONS
 from agentstack_sdk.server.store.context_store import ContextStore
-from agentstack_sdk.server.store.memory_context_store import InMemoryContextStore
 from agentstack_sdk.server.telemetry import configure_telemetry as configure_telemetry_func
 from agentstack_sdk.server.utils import cancel_task
 from agentstack_sdk.types import SdkAuthenticationBackend
@@ -47,7 +47,6 @@ from agentstack_sdk.util.logging import logger
 
 class Server:
     def __init__(self) -> None:
-        self._agent_factory: AgentFactory | None = None
         self._agent: Agent | None = None
         self.server: uvicorn.Server | None = None
         self._context_store: ContextStore | None = None
@@ -57,11 +56,11 @@ class Server:
 
     @functools.wraps(agent_decorator)
     def agent(self, *args, **kwargs) -> Callable:
-        if self._agent_factory:
+        if self._agent:
             raise ValueError("Server can have only one agent.")
 
         def decorator(fn: Callable) -> Callable:
-            self._agent_factory = agent_decorator(*args, **kwargs)(fn)
+            self._agent = agent_decorator(*args, **kwargs)(fn)
             return fn
 
         return decorator
@@ -135,28 +134,29 @@ class Server:
     ) -> None:
         if self.server:
             raise RuntimeError("The server is already running")
-        if not self._agent_factory:
+        if not self._agent:
             raise ValueError("Agent is not registered")
 
-        context_store = context_store or InMemoryContextStore()
-        self._agent = self._agent_factory(context_store.modify_dependencies)
-        card_url = url and url.strip()
-        self._agent.card.url = card_url.rstrip("/") if card_url else f"http://{host}:{port}"
+        implicit_extensions = DEFAULT_IMPLICIT_EXTENSIONS.copy()
 
-        if self_registration_client_factory:
-            self._self_registration_client = self_registration_client_factory()
-        elif not self._production_mode:
-            # Use basic auth (admin:admin) for local dev self-registration
-            self._self_registration_client = PlatformClient(
-                base_url=self._platform_url,
-                auth=(
-                    os.getenv("PLATFORM_USERNAME", "admin"),
-                    os.getenv("PLATFORM_PASSWORD", "admin"),
-                ),
+        self_registration = False if self._production_mode else self_registration
+        if self_registration:
+            from agentstack_sdk.a2a.extensions.services.platform import _PlatformSelfRegistrationExtensionServer
+
+            self._self_registration_client = (
+                self_registration_client_factory() if self_registration_client_factory else None
             )
-        else:
-            self._self_registration_client = None
-        self._self_registration_id = urllib.parse.quote(self_registration_id or self._agent.card.name)
+            self._self_registration_id = urllib.parse.quote(self_registration_id or self._agent.initial_card.name)
+            from agentstack_sdk.a2a.extensions.services.platform import (
+                _PlatformSelfRegistrationExtensionParams,
+                _PlatformSelfRegistrationExtensionSpec,
+            )
+
+            implicit_extensions[_PlatformSelfRegistrationExtensionSpec.URI] = _PlatformSelfRegistrationExtensionServer(
+                _PlatformSelfRegistrationExtensionSpec(
+                    _PlatformSelfRegistrationExtensionParams(self_registration_id=self._self_registration_id)
+                )
+            )
 
         if headers is None:
             headers = [("server", "a2a")]
@@ -166,8 +166,6 @@ class Server:
         import uvicorn
 
         from agentstack_sdk.server.app import create_app
-
-        self_registration = False if self._production_mode else self_registration
 
         @asynccontextmanager
         async def _lifespan_fn(app: FastAPI) -> AsyncGenerator[None, None]:
@@ -183,26 +181,11 @@ class Server:
                         with suppress(Exception):
                             await cancel_task(register_task)
 
-        card_url = AnyUrl(self._agent.card.url)
-        if card_url.host == "invalid":
-            self._agent.card.url = f"http://{host}:{port}"
-
-        if self_registration:
-            from agentstack_sdk.a2a.extensions.services.platform import (
-                _PlatformSelfRegistrationExtensionParams,
-                _PlatformSelfRegistrationExtensionSpec,
-            )
-
-            self._agent.card.capabilities.extensions = [
-                *(self._agent.card.capabilities.extensions or []),
-                *_PlatformSelfRegistrationExtensionSpec(
-                    _PlatformSelfRegistrationExtensionParams(self_registration_id=self._self_registration_id)
-                ).to_agent_card_extensions(),
-            ]
-
         app = create_app(
             self._agent,
+            url=url.strip().rstrip("/") if url else f"http://{host}:{port}",
             lifespan=_lifespan_fn,
+            implicit_extensions=implicit_extensions,
             task_store=task_store,
             context_store=context_store,
             queue_manager=queue_manager,
@@ -214,7 +197,6 @@ class Server:
         )
 
         if auth_backend:
-            auth_backend.update_card_security_schemes(self._agent.card)
 
             def on_error(connection: HTTPConnection, error: AuthenticationError) -> PlainTextResponse:
                 return PlainTextResponse("Unauthorized", status_code=401)

@@ -10,21 +10,20 @@ from collections.abc import AsyncGenerator, AsyncIterator
 import pytest
 from a2a.client import Client, ClientEvent, create_text_message_object
 from a2a.types import (
-    DataPart,
-    FilePart,
-    FileWithBytes,
+    Artifact,
     Message,
-    MessageSendParams,
+    Part,
     Role,
     SendMessageRequest,
-    SendStreamingMessageRequest,
+    StreamResponse,
     Task,
     TaskArtifactUpdateEvent,
     TaskState,
     TaskStatus,
     TaskStatusUpdateEvent,
-    TextPart,
 )
+from google.protobuf.json_format import MessageToDict, ParseDict
+from google.protobuf.struct_pb2 import Value
 
 from agentstack_sdk.a2a.types import AgentArtifact, AgentMessage, InputRequired, Metadata, RunYield
 from agentstack_sdk.server import Server
@@ -38,10 +37,10 @@ async def get_final_task_from_stream(stream: AsyncIterator[ClientEvent | Message
     final_task = None
     async for event in stream:
         match event:
-            case (task, None):
+            case (_, task):
                 final_task = task
-            case (task, TaskStatusUpdateEvent(status=TaskStatus(state=state))):
-                if state in {TaskState.auth_required, TaskState.input_required}:
+            case (StreamResponse(status_update=TaskStatusUpdateEvent(status=TaskStatus(state=state))), task):
+                if state in {TaskState.TASK_STATE_AUTH_REQUIRED, TaskState.TASK_STATE_INPUT_REQUIRED}:
                     break
                 final_task = task
     return final_task
@@ -52,18 +51,7 @@ def create_send_request_object(text: str | None = None, task_id: str | None = No
     if task_id:
         message.task_id = task_id
     return SendMessageRequest(
-        id=str(uuid.uuid4()),
-        params=MessageSendParams(message=message),
-    )
-
-
-def create_streaming_request_object(text: str | None = None, task_id: str | None = None):
-    message = create_text_message_object(content=text or "test")
-    if task_id:
-        message.task_id = task_id
-    return SendStreamingMessageRequest(
-        id=str(uuid.uuid4()),
-        params=MessageSendParams(message=message),
+        message=message,
     )
 
 
@@ -72,7 +60,7 @@ async def sync_function_agent(create_server_with_agent) -> AsyncGenerator[tuple[
     def sync_function_agent(message: Message):
         """Synchronous function agent that returns a string directly."""
 
-        return f"sync_function_agent: {message.parts[0].root.text}"
+        return f"sync_function_agent: {message.parts[0].text}"
 
     async with create_server_with_agent(sync_function_agent) as (server, client):
         yield server, client
@@ -84,7 +72,7 @@ async def sync_function_with_context_agent(create_server_with_agent) -> AsyncGen
         """Synchronous function agent with context that uses context.yield_sync."""
         context.yield_sync("first sync yield")
 
-        return f"sync_function_with_context_agent: {message.parts[0].root.text}"
+        return f"sync_function_with_context_agent: {message.parts[0].text}"
 
     async with create_server_with_agent(sync_function_with_context_agent) as (server, client):
         yield server, client
@@ -109,7 +97,7 @@ async def sync_generator_with_context_agent(create_server_with_agent) -> AsyncGe
         context.yield_sync("sync_generator_with_context context yield")
         yield "sync_generator_with_context yield 2"
 
-        yield f"sync_generator_with_context_agent: {message.parts[0].root.text}"
+        yield f"sync_generator_with_context_agent: {message.parts[0].text}"
 
     async with create_server_with_agent(sync_generator_with_context_agent) as (server, client):
         yield server, client
@@ -121,7 +109,7 @@ async def async_function_agent(create_server_with_agent) -> AsyncGenerator[tuple
         """Asynchronous function agent that returns a string directly."""
         await asyncio.sleep(0.01)
 
-        return f"async_function_agent: {message.parts[0].root.text}"
+        return f"async_function_agent: {message.parts[0].text}"
 
     async with create_server_with_agent(async_function_agent) as (server, client):
         yield server, client
@@ -134,7 +122,7 @@ async def async_function_with_context_agent(create_server_with_agent) -> AsyncGe
         await context.yield_async("first async yield")
         await asyncio.sleep(0.01)
 
-        return f"async_function_with_context_agent: {message.parts[0].root.text}"
+        return f"async_function_with_context_agent: {message.parts[0].text}"
 
     async with create_server_with_agent(async_function_with_context_agent) as (server, client):
         yield server, client
@@ -148,7 +136,7 @@ async def async_generator_agent(create_server_with_agent) -> AsyncGenerator[tupl
         await asyncio.sleep(0.01)
         yield "async_generator yield 2"
 
-        yield f"async_generator_agent: {message.parts[0].root.text}"
+        yield f"async_generator_agent: {message.parts[0].text}"
 
     async with create_server_with_agent(async_generator_agent) as (server, client):
         yield server, client
@@ -163,7 +151,7 @@ async def async_generator_with_context_agent(create_server_with_agent) -> AsyncG
         await asyncio.sleep(0.01)
         yield "async_generator_with_context yield 2"
 
-        yield f"async_generator_with_context_agent: {message.parts[0].root.text}"
+        yield f"async_generator_with_context_agent: {message.parts[0].text}"
 
     async with create_server_with_agent(async_generator_with_context_agent) as (server, client):
         yield server, client
@@ -175,12 +163,12 @@ async def sync_function_resume_agent(create_server_with_agent) -> AsyncGenerator
         """Synchronous function agent that requires input and handles resume."""
         resume_message = context.yield_sync(
             TaskStatus(
-                state=TaskState.input_required,
+                state=TaskState.TASK_STATE_INPUT_REQUIRED,
                 message=create_text_message_object(content="Need input"),
             )
         )
 
-        return f"sync_function_resume_agent: received {resume_message.parts[0].root.text}"
+        return f"sync_function_resume_agent: received {resume_message.parts[0].text}"
 
     async with create_server_with_agent(sync_function_resume_agent) as (server, client):
         yield server, client
@@ -192,7 +180,7 @@ async def sync_generator_resume_agent(create_server_with_agent) -> AsyncGenerato
         """Synchronous generator agent that requires input and handles resume."""
         yield "sync_generator_resume_agent: starting"
         resume_message = yield InputRequired(text="Need input")
-        yield f"sync_generator_resume_agent: received {resume_message.parts[0].root.text}"
+        yield f"sync_generator_resume_agent: received {resume_message.parts[0].text}"
 
     async with create_server_with_agent(sync_generator_resume_agent) as (server, client):
         yield server, client
@@ -203,10 +191,12 @@ async def async_function_resume_agent(create_server_with_agent) -> AsyncGenerato
     async def async_function_resume_agent(message: Message, context: RunContext):
         """Asynchronous function agent that requires input and handles resume."""
         resume_message = await context.yield_async(
-            TaskStatus(state=TaskState.input_required, message=create_text_message_object(content="Need input"))
+            TaskStatus(
+                state=TaskState.TASK_STATE_INPUT_REQUIRED, message=create_text_message_object(content="Need input")
+            )
         )
 
-        return f"async_function_resume_agent: received {resume_message.parts[0].root.text}"
+        return f"async_function_resume_agent: received {resume_message.parts[0].text}"
 
     async with create_server_with_agent(async_function_resume_agent) as (server, client):
         yield server, client
@@ -218,7 +208,7 @@ async def async_generator_resume_agent(create_server_with_agent) -> AsyncGenerat
         """Asynchronous generator agent that requires input and handles resume."""
         yield "async_generator_resume_agent: starting"
         resume_message = yield InputRequired(text="Need input")
-        yield f"async_generator_resume_agent: received {resume_message.parts[0].root.text}"
+        yield f"async_generator_resume_agent: received {resume_message.parts[0].text}"
 
     async with create_server_with_agent(async_generator_resume_agent) as (server, client):
         yield server, client
@@ -232,9 +222,9 @@ async def test_sync_function_agent(sync_function_agent):
     final_task = await get_final_task_from_stream(client.send_message(message))
 
     assert final_task is not None
-    assert final_task.status.state == TaskState.completed
+    assert final_task.status.state == TaskState.TASK_STATE_COMPLETED
     # pyrefly: ignore [missing-attribute, unsupported-operation]
-    assert "sync_function_agent: hello" in final_task.history[-1].parts[0].root.text
+    assert "sync_function_agent: hello" in final_task.history[-1].parts[0].text
 
 
 async def test_sync_function_with_context_agent(sync_function_with_context_agent):
@@ -245,10 +235,10 @@ async def test_sync_function_with_context_agent(sync_function_with_context_agent
     final_task = await get_final_task_from_stream(client.send_message(message))
 
     assert final_task is not None
-    assert final_task.status.state == TaskState.completed
+    assert final_task.status.state == TaskState.TASK_STATE_COMPLETED
     # Should have intermediate yield and final result
     # pyrefly: ignore [missing-attribute, not-iterable]
-    messages = [msg.parts[0].root.text for msg in final_task.history if msg.role.value == "agent"]
+    messages = [msg.parts[0].text for msg in final_task.history if msg.role == Role.ROLE_AGENT]
     assert "first sync yield" in messages
     assert "sync_function_with_context_agent: hello" in messages
 
@@ -261,9 +251,9 @@ async def test_sync_generator_agent(sync_generator_agent):
     final_task = await get_final_task_from_stream(client.send_message(message))
 
     assert final_task is not None
-    assert final_task.status.state == TaskState.completed
+    assert final_task.status.state == TaskState.TASK_STATE_COMPLETED
     # pyrefly: ignore [missing-attribute, not-iterable]
-    messages = [msg.parts[0].root.text for msg in final_task.history if msg.role.value == "agent"]
+    messages = [msg.parts[0].text for msg in final_task.history if msg.role == Role.ROLE_AGENT]
     assert "sync_generator yield 1" in messages
     assert "sync_generator yield 2" in messages
 
@@ -276,9 +266,9 @@ async def test_sync_generator_with_context_agent(sync_generator_with_context_age
     final_task = await get_final_task_from_stream(client.send_message(message))
 
     assert final_task is not None
-    assert final_task.status.state == TaskState.completed
+    assert final_task.status.state == TaskState.TASK_STATE_COMPLETED
     # pyrefly: ignore [missing-attribute, not-iterable]
-    messages = [msg.parts[0].root.text for msg in final_task.history if msg.role.value == "agent"]
+    messages = [msg.parts[0].text for msg in final_task.history if msg.role == Role.ROLE_AGENT]
     assert "sync_generator_with_context yield 1" in messages
     assert "sync_generator_with_context context yield" in messages
     assert "sync_generator_with_context yield 2" in messages
@@ -293,9 +283,9 @@ async def test_async_function_agent(async_function_agent):
     final_task = await get_final_task_from_stream(client.send_message(message))
 
     assert final_task is not None
-    assert final_task.status.state == TaskState.completed
+    assert final_task.status.state == TaskState.TASK_STATE_COMPLETED
     # pyrefly: ignore [missing-attribute, unsupported-operation]
-    assert "async_function_agent: hello" in final_task.history[-1].parts[0].root.text
+    assert "async_function_agent: hello" in final_task.history[-1].parts[0].text
 
 
 async def test_async_function_with_context_agent(async_function_with_context_agent):
@@ -306,9 +296,9 @@ async def test_async_function_with_context_agent(async_function_with_context_age
     final_task = await get_final_task_from_stream(client.send_message(message))
 
     assert final_task is not None
-    assert final_task.status.state == TaskState.completed
+    assert final_task.status.state == TaskState.TASK_STATE_COMPLETED
     # pyrefly: ignore [missing-attribute, not-iterable]
-    messages = [msg.parts[0].root.text for msg in final_task.history if msg.role.value == "agent"]
+    messages = [msg.parts[0].text for msg in final_task.history if msg.role == Role.ROLE_AGENT]
     assert "first async yield" in messages
     assert "async_function_with_context_agent: hello" in messages
 
@@ -321,9 +311,9 @@ async def test_async_generator_agent(async_generator_agent):
     final_task = await get_final_task_from_stream(client.send_message(message))
 
     assert final_task is not None
-    assert final_task.status.state == TaskState.completed
+    assert final_task.status.state == TaskState.TASK_STATE_COMPLETED
     # pyrefly: ignore [missing-attribute, not-iterable]
-    messages = [msg.parts[0].root.text for msg in final_task.history if msg.role.value == "agent"]
+    messages = [msg.parts[0].text for msg in final_task.history if msg.role == Role.ROLE_AGENT]
     assert "async_generator yield 1" in messages
     assert "async_generator yield 2" in messages
     assert "async_generator_agent: hello" in messages
@@ -337,9 +327,9 @@ async def test_async_generator_with_context_agent(async_generator_with_context_a
     final_task = await get_final_task_from_stream(client.send_message(message))
 
     assert final_task is not None
-    assert final_task.status.state == TaskState.completed
+    assert final_task.status.state == TaskState.TASK_STATE_COMPLETED
     # pyrefly: ignore [missing-attribute, not-iterable]
-    messages = [msg.parts[0].root.text for msg in final_task.history if msg.role.value == "agent"]
+    messages = [msg.parts[0].text for msg in final_task.history if msg.role == Role.ROLE_AGENT]
     assert "async_generator_with_context yield 1" in messages
     assert "async_generator_with_context context yield" in messages
     assert "async_generator_with_context yield 2" in messages
@@ -355,7 +345,7 @@ async def test_sync_function_resume_agent(sync_function_resume_agent):
     initial_task = await get_final_task_from_stream(client.send_message(message))
 
     assert initial_task is not None
-    assert initial_task.status.state == TaskState.input_required
+    assert initial_task.status.state == TaskState.TASK_STATE_INPUT_REQUIRED
 
     # Resume with additional data
     resume_message = create_text_message_object(content="resume data")
@@ -364,9 +354,9 @@ async def test_sync_function_resume_agent(sync_function_resume_agent):
     final_task = await get_final_task_from_stream(client.send_message(resume_message))
 
     assert final_task is not None
-    assert final_task.status.state == TaskState.completed
+    assert final_task.status.state == TaskState.TASK_STATE_COMPLETED
     # pyrefly: ignore [missing-attribute, unsupported-operation]
-    assert "sync_function_resume_agent: received resume data" in final_task.history[-1].parts[0].root.text
+    assert "sync_function_resume_agent: received resume data" in final_task.history[-1].parts[0].text
 
 
 async def test_sync_generator_resume_agent(sync_generator_resume_agent):
@@ -378,9 +368,9 @@ async def test_sync_generator_resume_agent(sync_generator_resume_agent):
     initial_task = await get_final_task_from_stream(client.send_message(message))
 
     assert initial_task is not None
-    assert initial_task.status.state == TaskState.input_required
+    assert initial_task.status.state == TaskState.TASK_STATE_INPUT_REQUIRED
     # pyrefly: ignore [missing-attribute, not-iterable]
-    messages = [msg.parts[0].root.text for msg in initial_task.history if msg.role.value == "agent"]
+    messages = [msg.parts[0].text for msg in initial_task.history if msg.role == Role.ROLE_AGENT]
     assert "sync_generator_resume_agent: starting" in messages
 
     # Resume with additional data
@@ -391,9 +381,9 @@ async def test_sync_generator_resume_agent(sync_generator_resume_agent):
     final_task = await get_final_task_from_stream(client.send_message(resume_message))
 
     assert final_task is not None
-    assert final_task.status.state == TaskState.completed
+    assert final_task.status.state == TaskState.TASK_STATE_COMPLETED
     # pyrefly: ignore [missing-attribute, not-iterable]
-    messages = [msg.parts[0].root.text for msg in final_task.history if msg.role.value == "agent"]
+    messages = [msg.parts[0].text for msg in final_task.history if msg.role == Role.ROLE_AGENT]
     assert "sync_generator_resume_agent: received resume data" in messages
 
 
@@ -406,7 +396,7 @@ async def test_async_function_resume_agent(async_function_resume_agent):
     initial_task = await get_final_task_from_stream(client.send_message(message))
 
     assert initial_task is not None
-    assert initial_task.status.state == TaskState.input_required
+    assert initial_task.status.state == TaskState.TASK_STATE_INPUT_REQUIRED
 
     # Resume with additional data
     resume_message = create_text_message_object(content="resume data")
@@ -416,9 +406,9 @@ async def test_async_function_resume_agent(async_function_resume_agent):
     final_task = await get_final_task_from_stream(client.send_message(resume_message))
 
     assert final_task is not None
-    assert final_task.status.state == TaskState.completed
+    assert final_task.status.state == TaskState.TASK_STATE_COMPLETED
     # pyrefly: ignore [missing-attribute, unsupported-operation]
-    assert "async_function_resume_agent: received resume data" in final_task.history[-1].parts[0].root.text
+    assert "async_function_resume_agent: received resume data" in final_task.history[-1].parts[0].text
 
 
 async def test_async_generator_resume_agent(async_generator_resume_agent):
@@ -430,9 +420,9 @@ async def test_async_generator_resume_agent(async_generator_resume_agent):
     initial_task = await get_final_task_from_stream(client.send_message(message))
 
     assert initial_task is not None
-    assert initial_task.status.state == TaskState.input_required
+    assert initial_task.status.state == TaskState.TASK_STATE_INPUT_REQUIRED
     # pyrefly: ignore [missing-attribute, not-iterable]
-    messages = [msg.parts[0].root.text for msg in initial_task.history if msg.role.value == "agent"]
+    messages = [msg.parts[0].text for msg in initial_task.history if msg.role == Role.ROLE_AGENT]
     assert "async_generator_resume_agent: starting" in messages
 
     # Resume with additional data
@@ -443,9 +433,9 @@ async def test_async_generator_resume_agent(async_generator_resume_agent):
     final_task = await get_final_task_from_stream(client.send_message(resume_message))
 
     assert final_task is not None
-    assert final_task.status.state == TaskState.completed
+    assert final_task.status.state == TaskState.TASK_STATE_COMPLETED
     # pyrefly: ignore [missing-attribute, not-iterable]
-    messages = [msg.parts[0].root.text for msg in final_task.history if msg.role.value == "agent"]
+    messages = [msg.parts[0].text for msg in final_task.history if msg.role == Role.ROLE_AGENT]
     assert "async_generator_resume_agent: received resume data" in messages
 
 
@@ -459,11 +449,11 @@ async def test_sync_function_streaming(sync_function_agent):
     status_events = []
     for event in events:
         match event:
-            case (_, TaskStatusUpdateEvent() as update):
-                status_events.append(update)
+            case (StreamResponse(status_update=TaskStatusUpdateEvent() as status_update), _):
+                status_events.append(status_update)
 
     assert len(status_events) > 0
-    assert status_events[-1].status.state == TaskState.completed
+    assert status_events[-1].status.state == TaskState.TASK_STATE_COMPLETED
 
 
 async def test_sync_generator_streaming(sync_generator_agent):
@@ -476,14 +466,14 @@ async def test_sync_generator_streaming(sync_generator_agent):
     status_events = []
     for event in events:
         match event:
-            case (_, TaskStatusUpdateEvent() as update):
-                status_events.append(update)
+            case (StreamResponse(status_update=TaskStatusUpdateEvent() as status_update), _):
+                status_events.append(status_update)
 
     assert len(status_events) > 0
-    assert status_events[-1].status.state == TaskState.completed
+    assert status_events[-1].status.state == TaskState.TASK_STATE_COMPLETED
 
     # Should see multiple working state messages for each yield
-    working_events = [e for e in status_events if e.status.state == TaskState.working]
+    working_events = [e for e in status_events if e.status.state == TaskState.TASK_STATE_WORKING]
     assert len(working_events) >= 3  # At least 3 yields from the generator
 
 
@@ -495,16 +485,15 @@ async def test_async_generator_streaming(async_generator_agent):
         events.append(event)
 
     status_events = []
-    for event in events:
-        match event:
-            case (_, TaskStatusUpdateEvent() as update):
-                status_events.append(update)
+    for resp, _ in events:
+        if MessageToDict(resp.status_update.status):
+            status_events.append(resp.status_update)
 
     assert len(status_events) > 0
-    assert status_events[-1].status.state == TaskState.completed
+    assert status_events[-1].status.state == TaskState.TASK_STATE_COMPLETED
 
     # Should see multiple working state messages for each yield
-    working_events = [e for e in status_events if e.status.state == TaskState.working]
+    working_events = [e for e in status_events if e.status.state == TaskState.TASK_STATE_WORKING]
     assert len(working_events) >= 2  # At least 2 yields from the generator
 
 
@@ -523,13 +512,13 @@ async def test_yield_dict_vs_metadata(create_server_with_agent):
         final_task = await get_final_task_from_stream(client.send_message(message))
 
         assert final_task is not None
-        assert final_task.status.state == TaskState.completed
+        assert final_task.status.state == TaskState.TASK_STATE_COMPLETED
         # pyrefly: ignore [missing-attribute, unsupported-operation]
-        assert final_task.history[0].parts[0].root.data == {"data": "this should be datapart"}
+        assert MessageToDict(final_task.history[0].parts[0].data) == {"data": "this should be datapart"}
         # pyrefly: ignore [unsupported-operation]
-        assert final_task.history[1].metadata == {"metadata": "this should be metadata"}
+        assert MessageToDict(final_task.history[1].metadata) == {"metadata": "this should be metadata"}
         # pyrefly: ignore [unsupported-operation]
-        assert final_task.history[2].metadata == {
+        assert MessageToDict(final_task.history[2].metadata) == {
             "metadata": "this class still behaves as dict",
             "metadata2": "and can be used in union",
         }
@@ -544,19 +533,18 @@ async def test_yield_dict_vs_metadata(create_server_with_agent):
 async def test_yield_of_all_types(create_server_with_agent):
     async def yielder_of_all_types_agent(message: Message, context: RunContext) -> AsyncIterator[RunYield]:
         """Synchronous function agent that returns a string directly."""
-        text_part = TextPart(text="text")
-        message = AgentMessage(parts=[text_part], role=Role.agent, message_id=str(uuid.uuid4()))
+        text_part = Part(text="text")
+        message = AgentMessage(parts=[text_part], role=Role.ROLE_AGENT, message_id=str(uuid.uuid4()))
         yield message
         yield text_part
-        yield TaskStatus(message=message, state=TaskState.working)
+        yield TaskStatus(message=message, state=TaskState.TASK_STATE_WORKING)
         yield AgentArtifact(parts=[text_part])
-        yield FilePart(file=FileWithBytes(bytes="0", name="test.txt"))
-        yield DataPart(data={"a": 1})
+        yield Part(raw=b"0", filename="test.txt")
+        yield Part(data=ParseDict({"a": 1}, Value()))
         yield TaskStatusUpdateEvent(
-            status=TaskStatus(state=TaskState.working, message=message),
+            status=TaskStatus(state=TaskState.TASK_STATE_WORKING, message=message),
             task_id=context.task_id,
             context_id=context.context_id,
-            final=False,
         )
         yield TaskArtifactUpdateEvent(
             artifact=AgentArtifact(artifact_id=str(uuid.uuid4()), parts=[text_part]),
@@ -571,9 +559,17 @@ async def test_yield_of_all_types(create_server_with_agent):
         message_cnt, artifact_cnt = 0, 0
         async for event in client.send_message(create_text_message_object(content="hello")):
             match event:
-                case (Task(), TaskStatusUpdateEvent(status=TaskStatus(message=msg))) if msg:
+                case (
+                    StreamResponse(
+                        status_update=TaskStatusUpdateEvent(status=TaskStatus(message=Message(message_id=message_id)))
+                    ),
+                    _,
+                ) if message_id:
                     message_cnt += 1
-                case (Task(), TaskArtifactUpdateEvent()):
+                case (
+                    StreamResponse(artifact_update=TaskArtifactUpdateEvent(artifact=Artifact(artifact_id=artifact_id))),
+                    _,
+                ) if artifact_id:
                     artifact_cnt += 1
         assert message_cnt == 9
         assert artifact_cnt == 2

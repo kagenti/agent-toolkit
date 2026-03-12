@@ -2,23 +2,6 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "agentstack-server",
-            "type": "debugpy",
-            "justMyCode": false,
-            "request": "launch",
-            "console": "internalConsole",
-            "module": "uvicorn",
-            "args": [
-                "agentstack_server.application:app",
-                "--host=0.0.0.0",
-                "--port=18333",
-                "--timeout-keep-alive=60",
-                "--timeout-graceful-shutdown=2"
-            ],
-            "envFile": "${workspaceFolder}/.env",
-            "console": "internalConsole",
-        },
-        {
             "name": "debug-file",
             "type": "debugpy",
             "justMyCode": false,

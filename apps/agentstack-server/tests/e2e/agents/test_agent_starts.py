@@ -13,15 +13,14 @@ from unittest import mock
 
 import pytest
 import uvicorn
-from a2a.client import A2AClientHTTPError
+from a2a.client import A2AClientError
 from a2a.client.helpers import create_text_message_object
+from a2a.server.agent_execution import AgentExecutor
 from a2a.server.apps import A2AStarletteApplication
+from a2a.server.request_handlers import DefaultRequestHandler
+from a2a.server.tasks import InMemoryTaskStore
 from a2a.types import AgentCapabilities, AgentCard, Role, Task, TaskState
-from agentstack_sdk.a2a.extensions import (
-    LLMFulfillment,
-    LLMServiceExtensionClient,
-    LLMServiceExtensionSpec,
-)
+from agentstack_sdk.a2a.extensions import LLMFulfillment, LLMServiceExtensionClient, LLMServiceExtensionSpec
 from agentstack_sdk.platform import ModelProvider, Provider
 from agentstack_sdk.platform.context import Context, ContextPermissions, Permissions
 
@@ -30,7 +29,7 @@ pytestmark = pytest.mark.e2e
 
 def extract_agent_text_from_stream(task: Task) -> str:
     assert task.history
-    return "".join(item.parts[0].root.text for item in task.history if item.role == Role.agent if item.parts)
+    return "".join(item.parts[0].text for item in task.history if item.role == Role.ROLE_AGENT if item.parts)
 
 
 @pytest.mark.skip(reason="Agent import from container image is now handled by kagenti operator")
@@ -76,7 +75,7 @@ async def test_imported_agent(
             task = await get_final_task_from_stream(a2a_client.send_message(message))
 
             # Verify response
-            assert task.status.state == TaskState.completed, f"Fail: {task.status.message.parts[0].root.text}"
+            assert task.status.state == TaskState.TASK_STATE_COMPLETED, f"Fail: {task.status.message.parts[0].text}"
             assert "ciao" in extract_agent_text_from_stream(task).lower()
 
             # Run 3 requests in parallel (test that each request waits)
@@ -85,12 +84,12 @@ async def test_imported_agent(
             )
 
             for task in run_results:
-                assert task.status.state == TaskState.completed, f"Fail: {task.status.message.parts[0].root.text}"
+                assert task.status.state == TaskState.TASK_STATE_COMPLETED, f"Fail: {task.status.message.parts[0].text}"
                 assert "ciao" in extract_agent_text_from_stream(task).lower()
 
         with subtests.test("run chat agent for the second time"):
             task = await get_final_task_from_stream(a2a_client.send_message(message))
-            assert task.status.state == TaskState.completed, f"Fail: {task.status.message.parts[0].root.text}"
+            assert task.status.state == TaskState.TASK_STATE_COMPLETED, f"Fail: {task.status.message.parts[0].text}"
             assert "ciao" in extract_agent_text_from_stream(task).lower()
 
     invalid_context_token = await context.generate_token(
@@ -101,7 +100,7 @@ async def test_imported_agent(
     async with a2a_client_factory(providers[0].agent_card, invalid_context_token) as a2a_client:
         with (
             subtests.test("run chat agent with invalid token"),
-            pytest.raises(A2AClientHTTPError, match="403 Forbidden"),
+            pytest.raises(A2AClientError, match="403 Forbidden"),
         ):
             await get_final_task_from_stream(a2a_client.send_message(message))
 
@@ -119,6 +118,7 @@ EXTERNAL_AGENT_CARD: dict[str, Any] = {
 }
 
 
+
 @pytest.fixture
 def external_a2a_server(free_port, setup_platform_client, clean_up_fn):
     server_instance: uvicorn.Server | None = None
@@ -127,12 +127,13 @@ def external_a2a_server(free_port, setup_platform_client, clean_up_fn):
     agent_card = AgentCard(**EXTERNAL_AGENT_CARD)
     agent_card.url = f"http://host.docker.internal:{free_port}"
 
-    handler = mock.AsyncMock()
+    executor = mock.AsyncMock(spec=AgentExecutor)
+    http_handler = DefaultRequestHandler(agent_executor=executor, task_store=InMemoryTaskStore())
 
     def start_server():
         nonlocal server_instance, thread
 
-        app = A2AStarletteApplication(agent_card, handler)
+        app = A2AStarletteApplication(agent_card=agent_card, http_handler=http_handler)
         config = uvicorn.Config(app=app.build(), port=free_port, log_level="warning")
         server_instance = uvicorn.Server(config)
 

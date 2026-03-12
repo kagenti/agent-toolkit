@@ -16,7 +16,6 @@ logger = logging.getLogger(__name__)
 TEST_AGENT_CARD = AgentCard(
     name="TestAgent",
     description="A test agent",
-    url="http://test-agent.example.com:8000/",
     version="1.0.0",
     default_input_modes=["text"],
     default_output_modes=["text"],

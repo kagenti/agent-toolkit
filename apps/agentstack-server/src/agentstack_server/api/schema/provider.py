@@ -4,7 +4,8 @@
 
 from __future__ import annotations
 
-from a2a.types import AgentCard
+from typing import Any
+
 from pydantic import BaseModel, Field
 
 from agentstack_server.domain.models.provider import ProviderLocation
@@ -12,7 +13,7 @@ from agentstack_server.domain.models.provider import ProviderLocation
 
 class CreateProviderRequest(BaseModel):
     location: ProviderLocation
-    agent_card: AgentCard | None = None
+    agent_card: dict[str, Any] | None = None
     origin: str | None = Field(
         default=None,
         description=(
