@@ -8,8 +8,8 @@ from typing import Annotated
 from uuid import uuid4
 
 import pytest
-from a2a.client import Client
-from a2a.types import Message, Role, TaskState
+from a2a.client import Client, create_text_message_object
+from a2a.types import SendMessageRequest, Message, Role, TaskState
 from agentstack_sdk.a2a.extensions.services.platform import (
     PlatformApiExtensionClient,
     PlatformApiExtensionServer,
@@ -82,7 +82,7 @@ async def test_platform_api_extension(file_reader_writer_factory, permissions, s
         )
 
         # send message
-        task = await get_final_task_from_stream(client.send_message(message))
+        task = await get_final_task_from_stream(client.send_message(SendMessageRequest(message=message)))
 
         if should_fail:
             assert task.status.state == TaskState.TASK_STATE_FAILED

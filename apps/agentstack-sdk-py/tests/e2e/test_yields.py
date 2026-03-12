@@ -219,7 +219,7 @@ async def test_sync_function_agent(sync_function_agent):
     _, client = sync_function_agent
     message = create_text_message_object(content="hello")
 
-    final_task = await get_final_task_from_stream(client.send_message(message))
+    final_task = await get_final_task_from_stream(client.send_message(SendMessageRequest(message=message)))
 
     assert final_task is not None
     assert final_task.status.state == TaskState.TASK_STATE_COMPLETED
@@ -232,7 +232,7 @@ async def test_sync_function_with_context_agent(sync_function_with_context_agent
     _, client = sync_function_with_context_agent
     message = create_text_message_object(content="hello")
 
-    final_task = await get_final_task_from_stream(client.send_message(message))
+    final_task = await get_final_task_from_stream(client.send_message(SendMessageRequest(message=message)))
 
     assert final_task is not None
     assert final_task.status.state == TaskState.TASK_STATE_COMPLETED
@@ -248,7 +248,7 @@ async def test_sync_generator_agent(sync_generator_agent):
     _, client = sync_generator_agent
     message = create_text_message_object(content="hello")
 
-    final_task = await get_final_task_from_stream(client.send_message(message))
+    final_task = await get_final_task_from_stream(client.send_message(SendMessageRequest(message=message)))
 
     assert final_task is not None
     assert final_task.status.state == TaskState.TASK_STATE_COMPLETED
@@ -263,7 +263,7 @@ async def test_sync_generator_with_context_agent(sync_generator_with_context_age
     _, client = sync_generator_with_context_agent
     message = create_text_message_object(content="hello")
 
-    final_task = await get_final_task_from_stream(client.send_message(message))
+    final_task = await get_final_task_from_stream(client.send_message(SendMessageRequest(message=message)))
 
     assert final_task is not None
     assert final_task.status.state == TaskState.TASK_STATE_COMPLETED
@@ -280,7 +280,7 @@ async def test_async_function_agent(async_function_agent):
     _, client = async_function_agent
     message = create_text_message_object(content="hello")
 
-    final_task = await get_final_task_from_stream(client.send_message(message))
+    final_task = await get_final_task_from_stream(client.send_message(SendMessageRequest(message=message)))
 
     assert final_task is not None
     assert final_task.status.state == TaskState.TASK_STATE_COMPLETED
@@ -293,7 +293,7 @@ async def test_async_function_with_context_agent(async_function_with_context_age
     _, client = async_function_with_context_agent
     message = create_text_message_object(content="hello")
 
-    final_task = await get_final_task_from_stream(client.send_message(message))
+    final_task = await get_final_task_from_stream(client.send_message(SendMessageRequest(message=message)))
 
     assert final_task is not None
     assert final_task.status.state == TaskState.TASK_STATE_COMPLETED
@@ -308,7 +308,7 @@ async def test_async_generator_agent(async_generator_agent):
     _, client = async_generator_agent
     message = create_text_message_object(content="hello")
 
-    final_task = await get_final_task_from_stream(client.send_message(message))
+    final_task = await get_final_task_from_stream(client.send_message(SendMessageRequest(message=message)))
 
     assert final_task is not None
     assert final_task.status.state == TaskState.TASK_STATE_COMPLETED
@@ -324,7 +324,7 @@ async def test_async_generator_with_context_agent(async_generator_with_context_a
     _, client = async_generator_with_context_agent
     message = create_text_message_object(content="hello")
 
-    final_task = await get_final_task_from_stream(client.send_message(message))
+    final_task = await get_final_task_from_stream(client.send_message(SendMessageRequest(message=message)))
 
     assert final_task is not None
     assert final_task.status.state == TaskState.TASK_STATE_COMPLETED
@@ -342,7 +342,7 @@ async def test_sync_function_resume_agent(sync_function_resume_agent):
     message = create_text_message_object(content="initial")
 
     # First interaction - should require input
-    initial_task = await get_final_task_from_stream(client.send_message(message))
+    initial_task = await get_final_task_from_stream(client.send_message(SendMessageRequest(message=message)))
 
     assert initial_task is not None
     assert initial_task.status.state == TaskState.TASK_STATE_INPUT_REQUIRED
@@ -351,7 +351,7 @@ async def test_sync_function_resume_agent(sync_function_resume_agent):
     resume_message = create_text_message_object(content="resume data")
     resume_message.task_id = initial_task.id
 
-    final_task = await get_final_task_from_stream(client.send_message(resume_message))
+    final_task = await get_final_task_from_stream(client.send_message(SendMessageRequest(message=resume_message)))
 
     assert final_task is not None
     assert final_task.status.state == TaskState.TASK_STATE_COMPLETED
@@ -365,7 +365,7 @@ async def test_sync_generator_resume_agent(sync_generator_resume_agent):
     message = create_text_message_object(content="initial")
 
     # First interaction - should require input
-    initial_task = await get_final_task_from_stream(client.send_message(message))
+    initial_task = await get_final_task_from_stream(client.send_message(SendMessageRequest(message=message)))
 
     assert initial_task is not None
     assert initial_task.status.state == TaskState.TASK_STATE_INPUT_REQUIRED
@@ -378,7 +378,7 @@ async def test_sync_generator_resume_agent(sync_generator_resume_agent):
     resume_message.task_id = initial_task.id
     resume_message.context_id = initial_task.context_id
 
-    final_task = await get_final_task_from_stream(client.send_message(resume_message))
+    final_task = await get_final_task_from_stream(client.send_message(SendMessageRequest(message=resume_message)))
 
     assert final_task is not None
     assert final_task.status.state == TaskState.TASK_STATE_COMPLETED
@@ -393,7 +393,7 @@ async def test_async_function_resume_agent(async_function_resume_agent):
     message = create_text_message_object(content="initial")
 
     # First interaction - should require input
-    initial_task = await get_final_task_from_stream(client.send_message(message))
+    initial_task = await get_final_task_from_stream(client.send_message(SendMessageRequest(message=message)))
 
     assert initial_task is not None
     assert initial_task.status.state == TaskState.TASK_STATE_INPUT_REQUIRED
@@ -403,7 +403,7 @@ async def test_async_function_resume_agent(async_function_resume_agent):
     resume_message.task_id = initial_task.id
 
     # First interaction - should require input
-    final_task = await get_final_task_from_stream(client.send_message(resume_message))
+    final_task = await get_final_task_from_stream(client.send_message(SendMessageRequest(message=resume_message)))
 
     assert final_task is not None
     assert final_task.status.state == TaskState.TASK_STATE_COMPLETED
@@ -417,7 +417,7 @@ async def test_async_generator_resume_agent(async_generator_resume_agent):
     message = create_text_message_object(content="initial")
 
     # First interaction - should require input
-    initial_task = await get_final_task_from_stream(client.send_message(message))
+    initial_task = await get_final_task_from_stream(client.send_message(SendMessageRequest(message=message)))
 
     assert initial_task is not None
     assert initial_task.status.state == TaskState.TASK_STATE_INPUT_REQUIRED
@@ -430,7 +430,7 @@ async def test_async_generator_resume_agent(async_generator_resume_agent):
     resume_message.task_id = initial_task.id
     resume_message.context_id = initial_task.context_id
 
-    final_task = await get_final_task_from_stream(client.send_message(resume_message))
+    final_task = await get_final_task_from_stream(client.send_message(SendMessageRequest(message=resume_message)))
 
     assert final_task is not None
     assert final_task.status.state == TaskState.TASK_STATE_COMPLETED
@@ -443,7 +443,7 @@ async def test_sync_function_streaming(sync_function_agent):
     """Test synchronous function agent with streaming."""
     _, client = sync_function_agent
     events = []
-    async for event in client.send_message(create_text_message_object(content="hello")):
+    async for event in client.send_message(SendMessageRequest(message=create_text_message_object(content="hello"))):
         events.append(event)
 
     status_events = []
@@ -460,7 +460,7 @@ async def test_sync_generator_streaming(sync_generator_agent):
     """Test synchronous generator agent with streaming to see intermediate yields."""
     _, client = sync_generator_agent
     events = []
-    async for event in client.send_message(create_text_message_object(content="hello")):
+    async for event in client.send_message(SendMessageRequest(message=create_text_message_object(content="hello"))):
         events.append(event)
 
     status_events = []
@@ -481,7 +481,7 @@ async def test_async_generator_streaming(async_generator_agent):
     """Test asynchronous generator agent with streaming to see intermediate yields."""
     _, client = async_generator_agent
     events = []
-    async for event in client.send_message(create_text_message_object(content="hello")):
+    async for event in client.send_message(SendMessageRequest(message=create_text_message_object(content="hello"))):
         events.append(event)
 
     status_events = []
@@ -509,7 +509,7 @@ async def test_yield_dict_vs_metadata(create_server_with_agent):
     async with create_server_with_agent(yielder_of_meta_data) as (_, client):
         message = create_text_message_object(content="hello")
 
-        final_task = await get_final_task_from_stream(client.send_message(message))
+        final_task = await get_final_task_from_stream(client.send_message(SendMessageRequest(message=message)))
 
         assert final_task is not None
         assert final_task.status.state == TaskState.TASK_STATE_COMPLETED
@@ -557,7 +557,7 @@ async def test_yield_of_all_types(create_server_with_agent):
 
     async with create_server_with_agent(yielder_of_all_types_agent) as (_, client):
         message_cnt, artifact_cnt = 0, 0
-        async for event in client.send_message(create_text_message_object(content="hello")):
+        async for event in client.send_message(SendMessageRequest(message=create_text_message_object(content="hello"))):
             match event:
                 case (
                     StreamResponse(

@@ -11,7 +11,7 @@ from typing import Annotated
 import pytest
 from a2a.client import Client, ClientEvent
 from a2a.client.helpers import create_text_message_object
-from a2a.types import Message, Task
+from a2a.types import Message, SendMessageRequest, Task
 from google.protobuf.json_format import MessageToDict
 
 from agentstack_sdk.a2a.extensions import (
@@ -67,7 +67,7 @@ async def test_extension_is_not_reused(llm_extension_agent):
         message.metadata = extension_client.fulfillment_metadata(
             llm_fulfillments={"default": LLMFulfillment(api_key=str(i), api_model="model", api_base="base")}
         )
-        tasks.append(asyncio.create_task(get_final_task_from_stream(client.send_message(message))))
+        tasks.append(asyncio.create_task(get_final_task_from_stream(client.send_message(SendMessageRequest(message=message)))))
 
     results = await asyncio.gather(*tasks)
     for i, task in enumerate(results):
@@ -107,7 +107,7 @@ async def test_error_extension_without_stacktrace(error_agent_without_stacktrace
     error_spec = ErrorExtensionSpec.from_agent_card(client._card)
 
     message = create_text_message_object()
-    task = await get_final_task_from_stream(client.send_message(message))
+    task = await get_final_task_from_stream(client.send_message(SendMessageRequest(message=message)))
 
     # Find the error message in history
     error_message = None
@@ -141,7 +141,7 @@ async def test_error_extension_exception_group_with_stacktrace(exception_group_a
     error_spec = ErrorExtensionSpec.from_agent_card(client._card)
 
     message = create_text_message_object()
-    task = await get_final_task_from_stream(client.send_message(message))
+    task = await get_final_task_from_stream(client.send_message(SendMessageRequest(message=message)))
 
     # Find the error message
     error_message = None
@@ -228,7 +228,7 @@ async def test_error_extension_context_isolation(context_isolation_agent):
     # Create tasks for parallel execution
     async def send_request(request_id: str) -> Task:
         message = create_text_message_object(content=request_id)
-        return await get_final_task_from_stream(client.send_message(message))
+        return await get_final_task_from_stream(client.send_message(SendMessageRequest(message=message)))
 
     # Execute all requests in parallel
     tasks = await asyncio.gather(*[send_request(rid) for rid in request_ids])

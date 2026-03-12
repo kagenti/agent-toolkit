@@ -15,7 +15,7 @@ from uuid import uuid4
 import httpx
 import pytest
 import uvicorn
-from a2a.types import Message, Part, Role, TaskState
+from a2a.types import SendMessageRequest, Message, Part, Role, TaskState
 from agentstack_sdk.a2a.extensions import OAuthExtensionClient, OAuthFulfillment
 from agentstack_sdk.a2a.extensions.auth.oauth import OAuthExtensionSpec
 from mcp.server.auth.provider import (
@@ -169,7 +169,7 @@ async def test_custom_mcp_client_with_oauth_example(
 
             # Send initial message - agent will start OAuth flow and return auth_required
             task = None
-            async for event in running_example.client.send_message(message):
+            async for event in running_example.client.send_message(SendMessageRequest(message=message)):
                 if isinstance(event, tuple):
                     task, _ = event
 
@@ -194,7 +194,7 @@ async def test_custom_mcp_client_with_oauth_example(
             auth_response.context_id = running_example.context.id
 
             # Agent completes OAuth token exchange, calls MCP tool, returns result
-            async for event in running_example.client.send_message(auth_response):
+            async for event in running_example.client.send_message(SendMessageRequest(message=auth_response)):
                 if isinstance(event, tuple):
                     task, _ = event
 

@@ -19,7 +19,7 @@ from a2a.server.agent_execution import AgentExecutor
 from a2a.server.apps import A2AStarletteApplication
 from a2a.server.request_handlers import DefaultRequestHandler
 from a2a.server.tasks import InMemoryTaskStore
-from a2a.types import AgentCapabilities, AgentCard, Role, Task, TaskState
+from a2a.types import SendMessageRequest, AgentCapabilities, AgentCard, AgentInterface, AgentSkill, Role, Task, TaskState
 from agentstack_sdk.a2a.extensions import LLMFulfillment, LLMServiceExtensionClient, LLMServiceExtensionSpec
 from agentstack_sdk.platform import ModelProvider, Provider
 from agentstack_sdk.platform.context import Context, ContextPermissions, Permissions
@@ -72,7 +72,7 @@ async def test_imported_agent(
                 }
             )
             message.context_id = context.id
-            task = await get_final_task_from_stream(a2a_client.send_message(message))
+            task = await get_final_task_from_stream(a2a_client.send_message(SendMessageRequest(message=message)))
 
             # Verify response
             assert task.status.state == TaskState.TASK_STATE_COMPLETED, f"Fail: {task.status.message.parts[0].text}"
@@ -80,7 +80,7 @@ async def test_imported_agent(
 
             # Run 3 requests in parallel (test that each request waits)
             run_results = await asyncio.gather(
-                *(get_final_task_from_stream(a2a_client.send_message(message)) for _ in range(num_parallel))
+                *(get_final_task_from_stream(a2a_client.send_message(SendMessageRequest(message=message))) for _ in range(num_parallel))
             )
 
             for task in run_results:
@@ -88,7 +88,7 @@ async def test_imported_agent(
                 assert "ciao" in extract_agent_text_from_stream(task).lower()
 
         with subtests.test("run chat agent for the second time"):
-            task = await get_final_task_from_stream(a2a_client.send_message(message))
+            task = await get_final_task_from_stream(a2a_client.send_message(SendMessageRequest(message=message)))
             assert task.status.state == TaskState.TASK_STATE_COMPLETED, f"Fail: {task.status.message.parts[0].text}"
             assert "ciao" in extract_agent_text_from_stream(task).lower()
 
@@ -102,7 +102,7 @@ async def test_imported_agent(
             subtests.test("run chat agent with invalid token"),
             pytest.raises(A2AClientError, match="403 Forbidden"),
         ):
-            await get_final_task_from_stream(a2a_client.send_message(message))
+            await get_final_task_from_stream(a2a_client.send_message(SendMessageRequest(message=message)))
 
 
 EXTERNAL_AGENT_CARD: dict[str, Any] = {

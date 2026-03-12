@@ -7,7 +7,7 @@ from uuid import uuid4
 
 import pytest
 from a2a.client.helpers import create_text_message_object
-from a2a.types import Message, Role, TaskState
+from a2a.types import SendMessageRequest, Message, Role, TaskState
 from agentstack_sdk.a2a.extensions import (
     ApprovalExtensionClient,
     ApprovalExtensionSpec,
@@ -40,7 +40,7 @@ async def test_basic_approve_example(subtests, a2a_client_factory, test_configur
 
             # Get initial task - may go to input_required if tool is called
             task = None
-            async for event in running_example.client.send_message(message):
+            async for event in running_example.client.send_message(SendMessageRequest(message=message)):
                 if isinstance(event, tuple):
                     task, _ = event
 
@@ -55,7 +55,7 @@ async def test_basic_approve_example(subtests, a2a_client_factory, test_configur
                     parts=[],
                     metadata={spec.URI: response.model_dump(mode="json")},
                 )
-                async for event in running_example.client.send_message(response_message):
+                async for event in running_example.client.send_message(SendMessageRequest(message=response_message)):
                     if isinstance(event, tuple):
                         task, _ = event
 
@@ -72,7 +72,7 @@ async def test_basic_approve_example(subtests, a2a_client_factory, test_configur
 
             # Get initial task
             task = None
-            async for event in running_example.client.send_message(message):
+            async for event in running_example.client.send_message(SendMessageRequest(message=message)):
                 if isinstance(event, tuple):
                     task, _ = event
 
@@ -92,7 +92,7 @@ async def test_basic_approve_example(subtests, a2a_client_factory, test_configur
                     parts=[],
                     metadata={spec.URI: response.model_dump(mode="json")},
                 )
-                async for event in running_example.client.send_message(response_message):
+                async for event in running_example.client.send_message(SendMessageRequest(message=response_message)):
                     if isinstance(event, tuple):
                         task, _ = event
                 rejection_count += 1

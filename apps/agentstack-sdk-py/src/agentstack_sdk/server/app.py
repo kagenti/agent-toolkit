@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from datetime import timedelta
 
-import importlib_metadata
-import packaging.version
 from a2a.server.agent_execution import RequestContextBuilder
 from a2a.server.apps.jsonrpc import A2AFastAPIApplication
 from a2a.server.apps.rest import A2ARESTFastAPIApplication
@@ -18,6 +16,7 @@ from a2a.server.tasks import (
     TaskStore,
 )
 from a2a.types import AgentInterface
+from a2a.utils.constants import PROTOCOL_VERSION_CURRENT
 from fastapi import APIRouter, FastAPI
 from fastapi.applications import AppType
 from fastapi.params import Depends
@@ -65,7 +64,7 @@ def create_app(
         push_sender=push_sender,
         request_context_builder=request_context_builder,
     )
-    protocol_version = packaging.version.parse(importlib_metadata.version("a2a-sdk")).base_version
+    protocol_version = PROTOCOL_VERSION_CURRENT
 
     agent.initialize(
         a2a_security=auth_backend.get_card_security_schemes() if auth_backend else None,

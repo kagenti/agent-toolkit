@@ -7,7 +7,7 @@ from pathlib import Path
 from uuid import uuid4
 
 import pytest
-from a2a.types import Message, Part, Role, TaskState
+from a2a.types import SendMessageRequest, Message, Part, Role, TaskState
 from agentstack_sdk.a2a.extensions import (
     EmbeddingFulfillment,
     EmbeddingServiceExtensionClient,
@@ -90,7 +90,7 @@ async def test_conversation_rag_agent_example(
                 metadata=metadata,
             )
 
-            task = await get_final_task_from_stream(running_example.client.send_message(message))
+            task = await get_final_task_from_stream(running_example.client.send_message(SendMessageRequest(message=message)))
 
             assert task.status.state == TaskState.TASK_STATE_COMPLETED, (
                 f"Fail: {task.status.message.parts[0].root.text}"
@@ -108,7 +108,7 @@ async def test_conversation_rag_agent_example(
                 metadata=metadata,
             )
 
-            task = await get_final_task_from_stream(running_example.client.send_message(message))
+            task = await get_final_task_from_stream(running_example.client.send_message(SendMessageRequest(message=message)))
 
             assert task.status.state == TaskState.TASK_STATE_COMPLETED, (
                 f"Fail: {task.status.message.parts[0].root.text}"

@@ -25,7 +25,6 @@ from a2a.types import (
     AgentCard,
     AgentInterface,
     CancelTaskRequest,
-    CreateTaskPushNotificationConfigRequest,
     DeleteTaskPushNotificationConfigRequest,
     GetTaskPushNotificationConfigRequest,
     GetTaskRequest,
@@ -172,7 +171,7 @@ class ProxyRequestHandler(RequestHandler):
         self._uow = uow
 
     @asynccontextmanager
-    async def _client_transport(self, context: ServerCallContext | None = None) -> AsyncIterator[ClientTransport]:
+    async def _client_transport(self, context: ServerCallContext) -> AsyncIterator[ClientTransport]:
         from fastapi.security.utils import get_authorization_scheme_param
 
         if self._agent_card is None:
@@ -232,7 +231,7 @@ class ProxyRequestHandler(RequestHandler):
             )
             await uow.commit()
 
-    def _forward_context(self, context: ServerCallContext | None = None) -> ClientCallContext:
+    def _forward_context(self, context: ServerCallContext) -> ClientCallContext:
         return ClientCallContext(state={**(context.state if context else {}), "user_id": self._user.id})
 
     def _response_to_event(self, response: StreamResponse) -> tuple[str, str, Event]:
@@ -258,14 +257,14 @@ class ProxyRequestHandler(RequestHandler):
 
     @_handle_exception
     @override
-    async def on_get_task(self, params: GetTaskRequest, context: ServerCallContext | None = None) -> Task | None:
+    async def on_get_task(self, params: GetTaskRequest, context: ServerCallContext) -> Task | None:
         await self._check_task(params.id)
         async with self._client_transport(context) as transport:
             return await transport.get_task(params, context=self._forward_context(context))
 
     @_handle_exception
     @override
-    async def on_cancel_task(self, params: CancelTaskRequest, context: ServerCallContext | None = None) -> Task | None:
+    async def on_cancel_task(self, params: CancelTaskRequest, context: ServerCallContext) -> Task | None:
         await self._check_task(params.id)
         async with self._client_transport(context) as transport:
             return await transport.cancel_task(params, context=self._forward_context(context))
@@ -273,7 +272,7 @@ class ProxyRequestHandler(RequestHandler):
     @_handle_exception
     @override
     async def on_message_send(
-        self, params: SendMessageRequest, context: ServerCallContext | None = None
+        self, params: SendMessageRequest, context: ServerCallContext
     ) -> Task | Message:
         # we set task_id and context_id if not configured
         with trace.get_tracer(INSTRUMENTATION_NAME).start_as_current_span("on_message_send") as span:
@@ -294,7 +293,7 @@ class ProxyRequestHandler(RequestHandler):
     @_handle_exception
     @override
     async def on_message_send_stream(
-        self, params: SendMessageRequest, context: ServerCallContext | None = None
+        self, params: SendMessageRequest, context: ServerCallContext
     ) -> AsyncGenerator[Event]:
         with trace.get_tracer(INSTRUMENTATION_NAME).start_as_current_span("on_message_send_stream") as span:
             # we set task_id and context_id if not configured
@@ -323,8 +322,8 @@ class ProxyRequestHandler(RequestHandler):
     @override
     async def on_create_task_push_notification_config(
         self,
-        params: CreateTaskPushNotificationConfigRequest,
-        context: ServerCallContext | None = None,
+        params: TaskPushNotificationConfig,
+        context: ServerCallContext,
     ) -> TaskPushNotificationConfig:
         await self._check_task(params.task_id)
         async with self._client_transport(context) as transport:
@@ -335,7 +334,7 @@ class ProxyRequestHandler(RequestHandler):
     async def on_get_task_push_notification_config(
         self,
         params: GetTaskPushNotificationConfigRequest,
-        context: ServerCallContext | None = None,
+        context: ServerCallContext,
     ) -> TaskPushNotificationConfig:
         await self._check_task(params.task_id)
         async with self._client_transport(context) as transport:
@@ -346,7 +345,7 @@ class ProxyRequestHandler(RequestHandler):
     async def on_subscribe_to_task(
         self,
         params: SubscribeToTaskRequest,
-        context: ServerCallContext | None = None,
+        context: ServerCallContext,
     ) -> AsyncGenerator[Event]:
         await self._check_task(params.id)
         async with self._client_transport(context) as transport:
@@ -359,7 +358,7 @@ class ProxyRequestHandler(RequestHandler):
     async def on_list_task_push_notification_configs(
         self,
         params: ListTaskPushNotificationConfigsRequest,
-        context: ServerCallContext | None = None,
+        context: ServerCallContext,
     ) -> ListTaskPushNotificationConfigsResponse:
         raise NotImplementedError("This is not supported by the client transport yet")
 
@@ -367,7 +366,7 @@ class ProxyRequestHandler(RequestHandler):
     async def on_delete_task_push_notification_config(
         self,
         params: DeleteTaskPushNotificationConfigRequest,
-        context: ServerCallContext | None = None,
+        context: ServerCallContext,
     ) -> None:
         raise NotImplementedError("This is not supported by the client transport yet")
         # await self._check_task(params.task_id)
@@ -379,7 +378,7 @@ class ProxyRequestHandler(RequestHandler):
     async def on_list_tasks(
         self,
         params: ListTasksRequest,
-        context: ServerCallContext | None = None,
+        context: ServerCallContext,
     ) -> ListTasksResponse:
         raise NotImplementedError("This is not supported by the client transport yet")
 

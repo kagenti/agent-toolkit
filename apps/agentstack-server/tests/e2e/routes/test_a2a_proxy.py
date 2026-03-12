@@ -36,7 +36,6 @@ from a2a.types.a2a_pb2 import (
     Artifact,
     Message,
     Part,
-    PushNotificationConfig,
     Role,
     Task,
     TaskArtifactUpdateEvent,
@@ -532,7 +531,8 @@ def test_set_push_notification_config(client: Client, handler: mock.AsyncMock, e
     # Setup mock response
     task_push_config = TaskPushNotificationConfig(
         task_id="t2",
-        push_notification_config=PushNotificationConfig(url="https://example.com", token="secret-token"),
+        url="https://example.com",
+        token="secret-token",
     )
     handler.on_create_task_push_notification_config.return_value = task_push_config
 
@@ -545,10 +545,8 @@ def test_set_push_notification_config(client: Client, handler: mock.AsyncMock, e
             "method": "CreateTaskPushNotificationConfig",
             "params": {
                 "task_id": "task1",
-                "config": {
-                    "url": "https://example.com",
-                    "token": "secret-token",
-                },
+                "url": "https://example.com",
+                "token": "secret-token",
             },
         },
     )
@@ -556,7 +554,7 @@ def test_set_push_notification_config(client: Client, handler: mock.AsyncMock, e
     # Verify response
     assert response.status_code == 200
     data = response.json()
-    assert data["result"]["pushNotificationConfig"]["token"] == "secret-token"
+    assert data["result"]["token"] == "secret-token"
 
     # Verify handler was called
     handler.on_create_task_push_notification_config.assert_awaited_once()
@@ -567,7 +565,8 @@ def test_get_push_notification_config(client: Client, handler: mock.AsyncMock, e
     # Setup mock response
     task_push_config = TaskPushNotificationConfig(
         task_id="task1",
-        push_notification_config=PushNotificationConfig(url="https://example.com", token="secret-token"),
+        url="https://example.com",
+        token="secret-token",
     )
 
     handler.on_get_task_push_notification_config.return_value = task_push_config
@@ -589,7 +588,7 @@ def test_get_push_notification_config(client: Client, handler: mock.AsyncMock, e
     # Verify response
     assert response.status_code == 200
     data = response.json()
-    assert data["result"]["pushNotificationConfig"]["token"] == "secret-token"
+    assert data["result"]["token"] == "secret-token"
 
     # Verify handler was called
     handler.on_get_task_push_notification_config.assert_awaited_once()

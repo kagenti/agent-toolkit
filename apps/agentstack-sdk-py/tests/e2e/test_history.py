@@ -10,6 +10,7 @@ from a2a.client import Client, ClientEvent, create_text_message_object
 from a2a.types import (
     Message,
     Role,
+    SendMessageRequest,
     Task,
 )
 
@@ -36,7 +37,7 @@ async def send_message_get_response(
     message = create_text_message_object(content=content)
     if context_id is not None:
         message.context_id = context_id
-    final_task = await get_final_task_from_stream(client.send_message(message))
+    final_task = await get_final_task_from_stream(client.send_message(SendMessageRequest(message=message)))
 
     agent_messages = [msg.parts[0].text for msg in final_task.history or []]
     return agent_messages, final_task.context_id
