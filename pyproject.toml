@@ -1,0 +1,16 @@
+[project]
+name = "agent-toolkit"
+version = "0.1.0"
+description = "Kagenti Agent Toolkit"
+requires-python = ">=3.11"
+license = "Apache-2.0"
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["agent_toolkit"]
