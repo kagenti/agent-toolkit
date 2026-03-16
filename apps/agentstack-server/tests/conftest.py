@@ -34,7 +34,7 @@ class Configuration(BaseSettings):
     test_agent_image: str = "registry.cr-system.svc.cluster.local:5000/chat-test:latest"
     server_url: str = "http://agentstack-api.localtest.me:8080"
     db_url: str = "postgresql+asyncpg://agentstack-user:password@postgresql:5432/agentstack"
-    keycloak_url: str = "http://localhost:8336"
+    keycloak_url: str = "http://keycloak.localtest.me:8080"
 
     @computed_field
     @property

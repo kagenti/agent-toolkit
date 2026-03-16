@@ -12,7 +12,7 @@ from sqlalchemy import UUID, text
 from sqlalchemy.ext.asyncio import AsyncConnection
 
 from agentstack_server.configuration import Configuration
-from agentstack_server.domain.models.provider import NetworkProviderLocation, Provider
+from agentstack_server.domain.models.provider import NetworkProviderLocation, Provider, ProviderState
 from agentstack_server.exceptions import DuplicateEntityError, EntityNotFoundError
 from agentstack_server.infrastructure.persistence.repositories.provider import SqlAlchemyProviderRepository
 from agentstack_server.utils.utils import utc_now
@@ -87,7 +87,7 @@ async def test_get_provider(db_transaction: AsyncConnection, test_provider, norm
             "url": "http://localhost:8000/",
             "version": "1.0.0",
         },
-        "state": None,
+        "state": "online",
         "created_by": normal_user,
     }
 
@@ -110,7 +110,7 @@ async def test_get_provider(db_transaction: AsyncConnection, test_provider, norm
     assert provider.id == provider_data["id"]
     assert str(provider.source.root) == provider_data["source"]
     assert provider.source_type == provider_data["source_type"]
-    assert provider.state is None
+    assert provider.state == ProviderState.ONLINE
 
 
 async def test_get_provider_not_found(db_transaction: AsyncConnection):
@@ -166,7 +166,7 @@ async def test_list_providers(db_transaction: AsyncConnection, normal_user: UUID
             "url": "http://localhost:8001/",
             "version": "1.0.0",
         },
-        "state": None,
+        "state": "online",
         "created_by": normal_user,
     }
     second_provider = {
@@ -186,7 +186,7 @@ async def test_list_providers(db_transaction: AsyncConnection, normal_user: UUID
             "url": "http://localhost:8002/",
             "version": "1.0.0",
         },
-        "state": None,
+        "state": "online",
         "created_by": normal_user,
     }
 

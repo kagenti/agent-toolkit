@@ -50,7 +50,7 @@ async def provider_id(db_transaction: AsyncConnection, normal_user: UUID) -> UUI
             "last_active_at": utc_now(),
             "agent_card": "{}",
             "created_by": normal_user,
-            "state": None,
+            "state": "online",
         },
     )
     return provider_id
@@ -64,8 +64,8 @@ async def model_provider_id(db_transaction: AsyncConnection) -> UUID:
     await db_transaction.execute(
         text(
             """
-            INSERT INTO model_providers (id, name, type, base_url, created_at)
-            VALUES (:id, :name, :type, :base_url, :created_at)
+            INSERT INTO model_providers (id, name, type, base_url, state, created_at)
+            VALUES (:id, :name, :type, :base_url, :state, :created_at)
             """
         ),
         {
@@ -73,6 +73,7 @@ async def model_provider_id(db_transaction: AsyncConnection) -> UUID:
             "name": "Test Model Provider",
             "type": "openai",
             "base_url": f"https://test-{model_provider_id}.example.com",
+            "state": "online",
             "created_at": utc_now(),
         },
     )
@@ -343,7 +344,7 @@ async def test_get_all_multiple_entities(
                 "last_active_at": utc_now(),
                 "agent_card": "{}",
                 "created_by": normal_user,
-                "state": None,
+                "state": "online",
             },
         )
 
@@ -446,7 +447,7 @@ async def test_variable_isolation_between_entity_types(
             "last_active_at": utc_now(),
             "agent_card": "{}",
             "created_by": normal_user,
-            "state": None,
+            "state": "online",
         },
     )
 
@@ -454,8 +455,8 @@ async def test_variable_isolation_between_entity_types(
     await db_transaction.execute(
         text(
             """
-            INSERT INTO model_providers (id, name, type, base_url, created_at)
-            VALUES (:id, :name, :type, :base_url, :created_at)
+            INSERT INTO model_providers (id, name, type, base_url, state, created_at)
+            VALUES (:id, :name, :type, :base_url, :state, :created_at)
             """
         ),
         {
@@ -463,6 +464,7 @@ async def test_variable_isolation_between_entity_types(
             "name": "Test Model Provider",
             "type": "openai",
             "base_url": f"https://test-{entity_id}.example.com",
+            "state": "online",
             "created_at": utc_now(),
         },
     )

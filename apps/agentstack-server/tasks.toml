@@ -473,7 +473,7 @@ run = """
 set -euxo pipefail
 VM_NAME=integration-test-run
 
-{{ mise_bin }} run agentstack:delete --vm-name="$VM_NAME"
+# {{ mise_bin }} run agentstack:delete --vm-name="$VM_NAME"
 
 {{ mise_bin }} run agentstack:start \
     --vm-name="$VM_NAME" \
@@ -482,6 +482,7 @@ VM_NAME=integration-test-run
 
 eval "$( {{ mise_bin }} run agentstack:shell --vm-name="$VM_NAME" )"
 
+{{ mise_bin }} run agentstack-server:dev:disconnect --vm-name="$VM_NAME"
 {{ mise_bin }} run agentstack-server:dev:connect --vm-name="$VM_NAME"
 
 uv run pytest -m integration

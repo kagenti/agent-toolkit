@@ -540,8 +540,15 @@ redis:
     existingSecret: ""
     existingSecretPasswordKey: ""
   containerSecurityContext:
-    runAsNonRoot: false
-  podSecurityContext: {}
+    runAsNonRoot: true
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    seccompProfile:
+      type: RuntimeDefault
+  podSecurityContext:
+    runAsNonRoot: true
   master:
     persistence:
       enabled: false
