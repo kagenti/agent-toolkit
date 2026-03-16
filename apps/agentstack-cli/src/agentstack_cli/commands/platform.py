@@ -835,55 +835,53 @@ async def start_cmd(
                 "Creating PV for Phoenix data",
                 input=phoenix_pv_yaml.encode("utf-8"),
             )
-        # Install a Helm 4 post-renderer plugin that strips the postgres-otel
-        # StatefulSet from kagenti-deps (x86-only Fedora image) and patches Phoenix
-        # to use SQLite instead of PostgreSQL for local dev.
-        otel_enabled = any("components.otel.enabled=true" in v.lower() for v in scoped_sets.get("kagenti-deps", []))
-        kagenti_deps_post_renderer: list[str] = []
-        if otel_enabled:
-            patch_script = (importlib.resources.files("agentstack_cli") / "data" / "k8s" / "patch_kagenti_otel.py").read_text()
-            await run_in_vm(
-                vm_name,
-                [
-                    "bash", "-c",
-                    textwrap.dedent("""\
-                        PLUGIN_DIR=/tmp/helm-plugin-patch-postgres
-                        mkdir -p "$PLUGIN_DIR"
-                        cat > "$PLUGIN_DIR/plugin.yaml" << 'YAML'
-                        apiVersion: v1
-                        type: postrenderer/v1
-                        name: patch-postgres
-                        version: 0.1.0
-                        runtime: subprocess
-                        runtimeConfig:
-                          platformCommand:
-                            - command: ${HELM_PLUGIN_DIR}/run.sh
-                        YAML
-                        cat > "$PLUGIN_DIR/patch.py"
-                    """),
-                ],
-                "Preparing post-renderer patch script",
-                input=patch_script.encode("utf-8"),
-            )
-            # Write run.sh separately to avoid shebang escaping issues with bash -c
-            await run_in_vm(
-                vm_name,
-                [
-                    "python3", "-c",
-                    "import os; "
-                    "p='/tmp/helm-plugin-patch-postgres/run.sh'; "
-                    f"open(p,'wb').write(b'\\x23\\x21/bin/bash\\nset -e\\nexport AGENTSTACK_KEYCLOAK_IMAGE={shlex.quote(keycloak_image)}\\nexec python3 /tmp/helm-plugin-patch-postgres/patch.py\\n'); "
-                    "os.chmod(p, 0o755)",
-                ],
-                "Writing post-renderer entrypoint",
-            )
-            await run_in_vm(
-                vm_name,
-                ["helm", "plugin", "install", "/tmp/helm-plugin-patch-postgres"],
-                "Installing post-renderer plugin",
-                check=False,  # already installed on subsequent runs
-            )
-            kagenti_deps_post_renderer = ["--post-renderer=patch-postgres"]
+        # Install a Helm 4 post-renderer plugin that patches kagenti-deps manifests:
+        # - Strips postgres-otel StatefulSet (x86-only Fedora image, SCC-incompatible)
+        # - Patches Phoenix to use SQLite instead of PostgreSQL
+        # - Patches container registry Service to NodePort 30500 for local image pushes
+        patch_script = (importlib.resources.files("agentstack_cli") / "data" / "k8s" / "patch_kagenti_otel.py").read_text()
+        await run_in_vm(
+            vm_name,
+            [
+                "bash", "-c",
+                textwrap.dedent("""\
+                    PLUGIN_DIR=/tmp/helm-plugin-patch-postgres
+                    mkdir -p "$PLUGIN_DIR"
+                    cat > "$PLUGIN_DIR/plugin.yaml" << 'YAML'
+                    apiVersion: v1
+                    type: postrenderer/v1
+                    name: patch-postgres
+                    version: 0.1.0
+                    runtime: subprocess
+                    runtimeConfig:
+                      platformCommand:
+                        - command: ${HELM_PLUGIN_DIR}/run.sh
+                    YAML
+                    cat > "$PLUGIN_DIR/patch.py"
+                """),
+            ],
+            "Preparing post-renderer patch script",
+            input=patch_script.encode("utf-8"),
+        )
+        # Write run.sh separately to avoid shebang escaping issues with bash -c
+        await run_in_vm(
+            vm_name,
+            [
+                "python3", "-c",
+                "import os; "
+                "p='/tmp/helm-plugin-patch-postgres/run.sh'; "
+                f"open(p,'wb').write(b'\\x23\\x21/bin/bash\\nset -e\\nexport AGENTSTACK_KEYCLOAK_IMAGE={shlex.quote(keycloak_image)}\\nexec python3 /tmp/helm-plugin-patch-postgres/patch.py\\n'); "
+                "os.chmod(p, 0o755)",
+            ],
+            "Writing post-renderer entrypoint",
+        )
+        await run_in_vm(
+            vm_name,
+            ["helm", "plugin", "install", "/tmp/helm-plugin-patch-postgres"],
+            "Installing post-renderer plugin",
+            check=False,  # already installed on subsequent runs
+        )
+        kagenti_deps_post_renderer = ["--post-renderer=patch-postgres"]
         await run_in_vm(
             vm_name,
             [
