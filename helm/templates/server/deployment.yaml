@@ -6,7 +6,7 @@ metadata:
     app: agentstack-server
     {{- include "agentstack.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.server.replicaCount }}
   selector:
     matchLabels:
       app: agentstack-server
@@ -14,36 +14,34 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/providers: {{ include (print $.Template.BasePath "/config/providers.yaml") . | sha256sum }}
-        checksum/secret: {{ include (print $.Template.BasePath "/config/secret.yaml") . | sha256sum }}
-      {{- with .Values.podAnnotations }}
+        checksum/secrets: {{ include (printf "%s/templates/server/secrets.yaml" .Chart.Name) . | sha256sum }}
+      {{- with .Values.server.podAnnotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
         app: agentstack-server
         {{- include "agentstack.labels" . | nindent 8 }}
-        {{- with .Values.podLabels }}
+        {{- with .Values.server.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
-      {{- if .Values.hostNetwork }}
+      {{- if .Values.server.hostNetwork }}
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
       {{- end }}
       {{- include "agentstack.imagePullSecrets" . | nindent 6 }}
-      serviceAccountName: {{ include "agentstack.serviceAccountName" . }}
-      {{- with .Values.podSecurityContext }}
+      {{- with .Values.server.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       initContainers:
-        {{- if .Values.initContainers.createVectorDbExtension }}
+        {{- if .Values.server.initContainers.createVectorDbExtension }}
         - name: create-pgvector-extension
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: "{{ .Values.server.image.repository }}:{{ .Values.server.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.server.image.pullPolicy }}
           workingDir: "/app/"
           command: [ "create-vector-extension" ]
-          {{- with .Values.securityContext }}
+          {{- with .Values.server.securityContext }}
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
@@ -79,11 +77,11 @@ spec:
           {{- end }}
         {{- end }}
         - name: run-migrations
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: "{{ .Values.server.image.repository }}:{{ .Values.server.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.server.image.pullPolicy }}
           workingDir: "/app/"
           command: [ "migrate" ]
-          {{- with .Values.securityContext }}
+          {{- with .Values.server.securityContext }}
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
@@ -118,11 +116,11 @@ spec:
               readOnly: true
           {{- end }}
         - name: create-buckets
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: "{{ .Values.server.image.repository }}:{{ .Values.server.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.server.image.pullPolicy }}
           workingDir: "/app/"
           command: [ "create-buckets" ]
-          {{- with .Values.securityContext }}
+          {{- with .Values.server.securityContext }}
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
@@ -152,25 +150,25 @@ spec:
               value: {{ ternary "true" "false" (eq (include "agentstack.s3.protocol" .) "https") | quote}}
       containers:
         - name: {{ .Chart.Name }}
-          {{- with .Values.securityContext }}
+          {{- with .Values.server.securityContext }}
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: "{{ .Values.server.image.repository }}:{{ .Values.server.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.server.image.pullPolicy }}
           ports:
             - name: http
               containerPort: 8333
               protocol: TCP
-          {{- with .Values.livenessProbe }}
+          {{- with .Values.server.livenessProbe }}
           livenessProbe:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with .Values.readinessProbe }}
+          {{- with .Values.server.readinessProbe }}
           readinessProbe:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with .Values.resources }}
+          {{- with .Values.server.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
@@ -178,19 +176,19 @@ spec:
             {{/* see https://fastapi.tiangolo.com/deployment/https/?h=forwarded+allow+ips#proxy-forwarded-headers */}}
             - name: TRUST_PROXY_HEADERS
               value: {{ .Values.trustProxyHeaders | quote }}
-            {{- if .Values.cors.enabled }}
+            {{- if .Values.server.cors.enabled }}
             - name: CORS__ENABLED
-              value: {{ .Values.cors.enabled | quote }}
+              value: {{ .Values.server.cors.enabled | quote }}
             - name: CORS__ALLOW_ORIGINS
-              value: {{ .Values.cors.allowOrigins | toJson | quote }}
+              value: {{ .Values.server.cors.allowOrigins | toJson | quote }}
             - name: CORS__ALLOW_ORIGIN_REGEX
-              value: {{ .Values.cors.allowOriginRegex | quote }}
+              value: {{ .Values.server.cors.allowOriginRegex | quote }}
             - name: CORS__ALLOW_METHODS
-              value: {{ .Values.cors.allowMethods | toJson | quote }}
+              value: {{ .Values.server.cors.allowMethods | toJson | quote }}
             - name: CORS__ALLOW_HEADERS
-              value: {{ .Values.cors.allowHeaders | toJson | quote }}
+              value: {{ .Values.server.cors.allowHeaders | toJson | quote }}
             - name: CORS__ALLOW_CREDENTIALS
-              value: {{ .Values.cors.allowCredentials | quote }}
+              value: {{ .Values.server.cors.allowCredentials | quote }}
             {{- end }}
             - name: A2A_PROXY__REQUESTS_EXPIRE_AFTER_DAYS
               value: {{ .Values.a2aProxyRequestsExpireAfterDays | quote }}
@@ -336,12 +334,12 @@ spec:
             {{- end }}
             {{- end }}
             - name: RATE_LIMIT__ENABLED
-              value: {{ .Values.rateLimit.enabled | quote }}
+              value: {{ .Values.server.rateLimit.enabled | quote }}
             - name: RATE_LIMIT__STRATEGY
-              value: {{ .Values.rateLimit.strategy | quote }}
+              value: {{ .Values.server.rateLimit.strategy | quote }}
             - name: RATE_LIMIT__GLOBAL_LIMITS
-              value: {{ .Values.rateLimit.globalLimits | join "; " | quote }}
-            {{- range $role, $limits := .Values.rateLimit.roleBasedLimits }}
+              value: {{ .Values.server.rateLimit.globalLimits | join "; " | quote }}
+            {{- range $role, $limits := .Values.server.rateLimit.roleBasedLimits }}
             - name: RATE_LIMIT__ROLE_BASED_LIMITS__{{ $role | upper }}__OPENAI_CHAT_COMPLETION_TOKENS
               value: {{ $limits.openai_chat_completion_tokens | join "; " | quote }}
             - name: RATE_LIMIT__ROLE_BASED_LIMITS__{{ $role | upper }}__OPENAI_CHAT_COMPLETION_REQUESTS
@@ -355,7 +353,7 @@ spec:
                   key: presets.json
                   name: agentstack-connectors-secret
             - name: UVICORN_TIMEOUT_KEEP_ALIVE
-              value: {{ .Values.uvicornTimeoutKeepAlive | quote }}
+              value: {{ .Values.server.uvicornTimeoutKeepAlive | quote }}
             - name: TELEMETRY__COLLECTOR_URL
               value: "http://otel-collector.kagenti-system:8335"
             - name: TELEMETRY__PHOENIX_URL
@@ -371,7 +369,7 @@ spec:
             - name: agentstack-providers
               mountPath: /app/config
               readOnly: true
-            {{- with .Values.volumeMounts }}
+            {{- with .Values.server.volumeMounts }}
               {{- toYaml . | nindent 12 }}
             {{- end }}
       volumes:
@@ -383,18 +381,18 @@ spec:
         - name: agentstack-providers
           secret:
             secretName: agentstack-providers-secret
-        {{- with .Values.volumes }}
+        {{- with .Values.server.volumes }}
           {{- toYaml . | nindent 8 }}
         {{- end }}
-      {{- with .Values.nodeSelector }}
+      {{- with .Values.server.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.affinity }}
+      {{- with .Values.server.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.tolerations }}
+      {{- with .Values.server.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}

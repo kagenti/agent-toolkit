@@ -169,7 +169,8 @@ uv run alembic "${alembic_vars[@]}"
 
 ["agentstack-server:migrations:generate"]
 dir = "{{config_root}}/apps/agentstack-server"
-run = "{{ mise_bin }} run agentstack-server:migrations:alembic revision --autogenerate"
+usage = 'arg "<message>"'
+run = "{{ mise_bin }} run agentstack-server:migrations:alembic revision --autogenerate --message \"${usage_message}\""
 
 # dev
 
@@ -244,10 +245,18 @@ kubectl create namespace ambassador --dry-run=client -o yaml | kubectl apply -f 
 kubectl label namespace ambassador pod-security.kubernetes.io/enforce=privileged --overwrite
 kubectl label namespace ambassador pod-security.kubernetes.io/warn=privileged --overwrite
 kubectl label namespace ambassador pod-security.kubernetes.io/audit=privileged --overwrite
+# Allow privileged pods in the workload namespace so the traffic-agent sidecar can be injected
+kubectl label namespace "$NAMESPACE" pod-security.kubernetes.io/enforce=privileged --overwrite
+kubectl label namespace "$NAMESPACE" pod-security.kubernetes.io/warn=privileged --overwrite
+kubectl label namespace "$NAMESPACE" pod-security.kubernetes.io/audit=privileged --overwrite
 # Grant privileged SCC to the deployment SA so Telepresence traffic-agent sidecar can be injected
 SA=$(kubectl get deploy agentstack-server -n "$NAMESPACE" -o jsonpath='{.spec.template.spec.serviceAccountName}')
-echo "Granting privileged SCC to SA: system:serviceaccount:${NAMESPACE}:${SA}"
-kubectl patch scc privileged --type=json -p "[{\"op\":\"add\",\"path\":\"/users/-\",\"value\":\"system:serviceaccount:${NAMESPACE}:${SA}\"}]" 2>&1 || echo "SCC patch skipped (may already exist)"
+SA="${SA:-default}"
+SCC_USER="system:serviceaccount:${NAMESPACE}:${SA}"
+echo "Granting privileged SCC to SA: ${SCC_USER}"
+if ! kubectl get scc privileged -o jsonpath='{.users}' | grep -q "$SCC_USER"; then
+    kubectl get scc privileged -o json | jq --arg user "$SCC_USER" '.users = ((.users // []) + [$user] | unique)' | kubectl replace -f -
+fi
 
 # Create telepresence values file to handle MicroShift restricted SCC
 TP_VALUES=$(mktemp)
@@ -261,10 +270,14 @@ securityContext:
     drop:
     - ALL
   readOnlyRootFilesystem: true
+agent:
+  securityContext:
+    runAsNonRoot: false
+    allowPrivilegeEscalation: true
 EOF
 
 tele="telepresence --use .*${NAMESPACE}.*"
-$tele helm install --values "$TP_VALUES" || true
+$tele helm upgrade --values "$TP_VALUES" || $tele helm install --values "$TP_VALUES" || true
 rm "$TP_VALUES"
 $tele connect --namespace "$NAMESPACE"
 $tele replace agentstack-server --port 18333:8333

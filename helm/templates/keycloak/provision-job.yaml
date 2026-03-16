@@ -1,4 +1,4 @@
-{{- if and .Values.auth.enabled .Values.auth.provisionKeycloak }}
+{{- if and .Values.auth.enabled .Values.auth.keycloakProvisionJob.enabled }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -21,15 +21,15 @@ spec:
       restartPolicy: OnFailure
       containers:
         - name: keycloak-provision
-          image: "{{ .Values.keycloak.image.repository }}:{{ .Values.keycloak.image.tag }}"
-          imagePullPolicy: {{ .Values.keycloak.image.pullPolicy }}
+          image: "{{ .Values.auth.keycloakProvisionJob.image.repository }}:{{ .Values.auth.keycloakProvisionJob.image.tag }}"
+          imagePullPolicy: {{ .Values.auth.keycloakProvisionJob.image.pullPolicy }}
           command:
             - /bin/bash
             - -ec
             - |
               # Wait for Keycloak to be ready by attempting login
               echo "Waiting for Keycloak to be ready..."
-              until /opt/keycloak/bin/kcadm.sh config credentials --server {{ regexReplaceAll "/realms/.*" (include "agentstack.oidc.internalIssuerUrl" .) "" | quote }} --realm master --user $KC_ADMIN_USER --password $KC_ADMIN_PASSWORD {{ if and .Values.keycloak.enabled (not .Values.keycloak.httpEnabled) }}--no-config --truststore /opt/keycloak/conf/server.crt.pem{{ end }}; do
+              until /opt/keycloak/bin/kcadm.sh config credentials --server {{ regexReplaceAll "/realms/.*" (include "agentstack.oidc.internalIssuerUrl" .) "" | quote }} --realm master --user $KC_ADMIN_USER --password $KC_ADMIN_PASSWORD; do
                 echo "Keycloak not ready or login failed... retrying in 5s"
                 sleep 5
               done
@@ -149,7 +149,7 @@ spec:
               done
 
               # Seed Users
-              {{- range .Values.keycloak.auth.seedAgentstackUsers }}
+              {{- range .Values.auth.keycloakProvisionJob.seedAgentstackUsers }}
               {{- $username := .username }}
               echo "Seeding user {{ $username }}..."
               USER_ID=$(/opt/keycloak/bin/kcadm.sh get users -r agentstack -q username={{ $username }} --fields id --format csv --noquotes)
@@ -195,7 +195,7 @@ spec:
             - name: HOME
               value: /tmp
             - name: KC_ADMIN_USER
-              value: {{ .Values.keycloak.auth.adminUser | quote }}
+              value: {{ .Values.auth.keycloakProvisionJob.adminUser | quote }}
             - name: KC_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -219,11 +219,4 @@ spec:
                   name: agentstack-ui-secret
                   key: agentstackUiClientSecret
             {{- end }}
-            {{- if .Values.keycloak.extraVolumeMounts }}
-            {{- toYaml .Values.keycloak.extraVolumeMounts | nindent 12 }}
-            {{- end }}
-      {{- if .Values.keycloak.extraVolumes }}
-      volumes:
-        {{- toYaml .Values.keycloak.extraVolumes | nindent 8 }}
-      {{- end }}
 {{- end }}

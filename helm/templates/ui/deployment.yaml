@@ -26,7 +26,6 @@ spec:
         {{- end }}
     spec:
       {{- include "agentstack.imagePullSecrets" . | nindent 6 }}
-      serviceAccountName: {{ include "agentstack.serviceAccountName" . }}
       {{- with .Values.ui.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
@@ -38,7 +37,7 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           image: "{{ .Values.ui.image.repository }}:{{ .Values.ui.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          imagePullPolicy: {{ .Values.ui.image.pullPolicy }}
           ports:
             - name: http
               containerPort: 8334
@@ -57,7 +56,7 @@ spec:
           {{- end }}
           env:
             - name: API_URL
-              value: "http://agentstack-server-svc:{{.Values.service.port}}"
+              value: "http://agentstack-server-svc:{{.Values.server.service.port}}"
             - name: APP_NAME
               value: {{ .Values.ui.appName | quote }}
             - name: FEATURE_FLAGS
@@ -98,7 +97,7 @@ spec:
             - name: OIDC_PROVIDER_EXTERNAL_ISSUER
               value: {{ include "agentstack.oidc.publicIssuerUrl" . | quote }}
             - name: OIDC_KEYCLOAK_LOGOUT
-              value: {{ .Values.keycloak.enabled | quote }}
+              value: "true"
           {{- else}}
             - name: OIDC_ENABLED
               value: "false"

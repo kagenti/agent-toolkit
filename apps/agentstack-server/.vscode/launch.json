@@ -6,6 +6,7 @@
             "type": "debugpy",
             "justMyCode": false,
             "request": "launch",
+            "console": "internalConsole",
             "module": "uvicorn",
             "args": [
                 "agentstack_server.application:app",

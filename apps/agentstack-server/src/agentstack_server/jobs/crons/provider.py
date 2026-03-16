@@ -49,7 +49,7 @@ async def sync_kagenti_agents(
 
     from agentstack_server.infrastructure.kagenti.client import KagentiClient
 
-    user = await user_service.get_user_by_email("admin@beeai.dev")
+    user = await user_service.get_user_by_email(configuration.admin_user_email)
     client = KagentiClient(configuration.kagenti)
 
     try:
@@ -127,6 +127,7 @@ async def sync_kagenti_agents(
 @inject
 async def refresh_provider_state(
     timestamp: int,
+    configuration: Configuration,
     provider_service: ProviderService,
     user_service: UserService,
 ):
@@ -138,7 +139,7 @@ async def refresh_provider_state(
         resp_card = None
         should_update = True
 
-        user = await user_service.get_user_by_email("admin@beeai.dev")
+        user = await user_service.get_user_by_email(configuration.admin_user_email)
 
         try:
             assert isinstance(provider.source, NetworkProviderLocation)

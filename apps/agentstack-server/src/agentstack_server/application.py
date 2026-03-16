@@ -49,6 +49,7 @@ from agentstack_server.jobs.crons.model_provider import check_model_provider_reg
 from agentstack_server.jobs.crons.provider import sync_kagenti_agents
 from agentstack_server.run_workers import run_workers
 from agentstack_server.service_layer.services.user_feedback import UserFeedbackService
+from agentstack_server.service_layer.services.users import UserService
 from agentstack_server.telemetry import INSTRUMENTATION_NAME, shutdown_telemetry
 
 logger = logging.getLogger(__name__)
@@ -206,6 +207,10 @@ def app(*, dependency_overrides: Container | None = None, enable_workers: bool =
         user_feedback = di[UserFeedbackService]
         try:
             register_telemetry()
+
+            # Ensure admin user exists
+            await di[UserService].ensure_user(email=configuration.admin_user_email)
+
             async with (
                 procrastinate_app.open_async(),
                 user_feedback,

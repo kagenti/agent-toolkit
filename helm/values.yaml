@@ -127,29 +127,11 @@ auth:
   nextauthDevUrl: ""
   apiUrl: "http://agentstack-api.localtest.me:8080"
 
-  # Set to false to skip the Keycloak provisioning job (e.g. when using a non-Keycloak OIDC provider)
-  provisionKeycloak: true
-
-# In agentstack-server this is used to determine the request origin and dynamically create agent card.
-# For example https://agentstack.example.com/api/v1/providers/{provider_id} will return an agent cart with URL for
-# https://agentstack.example.com, without respecting the headers, the URL would be "http://agentstack.example.com",
-# See https://www.uvicorn.org/settings/#application-interface
-trustProxyHeaders: false
-
-## Keycloak Configuration
-# Keycloak is an integral part of the application, it is deployed automatically when auth.enabled is set to true
-keycloak:
-  enabled: true
-
-  # This URL is used by server to validate tokens from keycloak
-  # WARNING: if the keycloak URL is internal, the server is configured to allow insecure issuer (http)
-  # CHANGE BOTH TO A PUBLIC KEYCLOAK URL FOR PRODUCTION
-  internalIssuerUrl: "http://keycloak:8336/realms/agentstack"
-  publicIssuerUrl: "http://localhost:8336/realms/agentstack"
-  replicaCount: 1
-  # Warning: set this to false if you want TLS in keycloak, make sure to provide certs in extraVolumes
-  httpEnabled: true
-  auth:
+  ## Keycloak provisioning job configuration
+  ## Keycloak itself is deployed externally (e.g. via kagenti-deps).
+  ## This job sets up the agentstack realm, clients, and seed users.
+  keycloakProvisionJob:
+    enabled: true
     adminUser: admin
     # a random password will be generated if empty, you can get it using
     # kubectl get secret keycloak-secret -o jsonpath="{.data.admin-password}" | base64 -d
@@ -162,99 +144,43 @@ keycloak:
       #   email: admin@beeai.dev
       #   roles: ["agentstack-admin"]
       #   enabled: true
-  image:
-    repository: ghcr.io/i-am-bee/agentstack/keycloak-themed
-    tag: 26.5.4
-    pullPolicy: IfNotPresent
-  service:
-    type: ClusterIP
-    port: 8336
-  uiClientSecret: ""
-  serverClientSecret: ""
-  persistence:
-    initSchemaContainer:
-      enabled: true
-    useDedicatedDatabase: false # Default to false (implies useSharedDatabase=true)
-    dedicatedDatabaseConfig:
-      host: ""
-      port: 5432
-      user: keycloak
-      password: ""
-      database: keycloak
-      schema: public
-      existingSecret: ""
-      ssl: true
-  resources:
-    limits:
-      cpu: 2000m
-      memory: 2000Mi
-    requests:
-      cpu: 500m
-      memory: 1700Mi
+    image:
+      repository: ghcr.io/i-am-bee/agentstack/keycloak-themed
+      tag: 26.5.4
+      pullPolicy: IfNotPresent
 
-  ## @param extraEnvVars Additional environment variables to pass to Keycloak
-  extraEnvVars: []
-  # - name: KC_HTTPS_CERTIFICATE_FILE
-  #   value: /opt/keycloak/conf/server.crt.pem
-  # - name: KC_HTTPS_CERTIFICATE_KEY_FILE
-  #   value: /opt/keycloak/conf/server.key.pem
+  ## OIDC Provider Configuration
+  ## @param auth.oidcProvider.issuerUrl OIDC issuer URL (internal, used by server for token validation)
+  ## @param auth.oidcProvider.publicIssuerUrl Public OIDC issuer URL (if different from issuerUrl)
+  ## @param auth.oidcProvider.name Display name of the provider
+  ## @param auth.oidcProvider.id ID of the provider (used for internal references)
+  ## @param auth.oidcProvider.rolesPath JSON path to roles in JWT claims
+  ## @param auth.oidcProvider.uiClientId Client ID for UI
+  ## @param auth.oidcProvider.uiClientSecret Client Secret for UI
+  ## @param auth.oidcProvider.uiClientSecretKey Key in existing secret for UI Client Secret
+  ## @param auth.oidcProvider.serverClientId Client ID for Server
+  ## @param auth.oidcProvider.serverClientSecret Client Secret for Server
+  ## @param auth.oidcProvider.serverClientSecretKey Key in existing secret for Server Client Secret
+  ## @param auth.oidcProvider.existingSecret Name of existing secret containing client secrets
+  oidcProvider:
+    issuerUrl: ""
+    publicIssuerUrl: "" # If empty, defaults to issuerUrl. Set when internal and public URLs differ.
+    name: "Keycloak"
+    id: "keycloak"
+    rolesPath: "realm_access.roles" # JSON path to roles in JWT claims (can be an array or a semicolon separated string)
+    uiClientId: "agentstack-ui"
+    uiClientSecret: ""
+    uiClientSecretKey: "uiClientSecret"
+    serverClientId: "agentstack-server"
+    serverClientSecret: ""
+    serverClientSecretKey: "serverClientSecret"
+    existingSecret: ""
 
-  ## @param extraVolumes Additional volumes to add to the pod
-  extraVolumes: []
-  # - name: keycloak-tls
-  #   secret:
-  #     secretName: keycloak-tls
-
-  ## @param extraVolumeMounts Additional volume mounts to add to the Keycloak container
-  extraVolumeMounts: []
-  # - name: keycloak-tls
-  #   mountPath: /opt/keycloak/conf/server.crt.pem
-  #   subPath: server.crt.pem
-  #   readOnly: true
-  # - name: keycloak-tls
-  #   mountPath: /opt/keycloak/conf/server.key.pem
-  #   subPath: server.key.pem
-  #   readOnly: true
-
-## External OIDC Provider Configuration
-## This is used when keycloak.enabled is set to false
-## @param externalOidcProvider.issuerUrl External OIDC issuer URL
-## @param externalOidcProvider.name Display name of the provider
-## @param externalOidcProvider.id ID of the provider (used for internal references)
-## @param externalOidcProvider.uiClientId Client ID for UI
-## @param externalOidcProvider.uiClientSecret Client Secret for UI
-## @param externalOidcProvider.uiClientSecretKey Key in existing secret for UI Client Secret
-## @param externalOidcProvider.serverClientId Client ID for Server
-## @param externalOidcProvider.serverClientSecret Client Secret for Server
-## @param externalOidcProvider.serverClientSecretKey Key in existing secret for Server Client Secret
-## @param externalOidcProvider.existingSecret Name of existing secret containing client secrets
-##
-externalOidcProvider:
-  issuerUrl: ""
-  publicIssuerUrl: "" # If empty, defaults to issuerUrl. Set when internal and public URLs differ (e.g., external Keycloak).
-  name: "OIDC"
-  id: "oidc"
-  rolesPath: "realm_access.roles" # JSON path to roles in JWT claims (can be an array or a semicolon separated string)
-  uiClientId: "agentstack-ui"
-  uiClientSecret: ""
-  uiClientSecretKey: "uiClientSecret"
-  serverClientId: "agentstack-server"
-  serverClientSecret: ""
-  serverClientSecretKey: "serverClientSecret"
-  existingSecret: ""
-
-
-cors:
-  enabled: false
-  allowOrigins: []
-  # - http://localhost:3000
-  # - https://my-ui.example.com
-  allowOriginRegex: ""
-  allowMethods:
-    - "*"
-  allowHeaders:
-    - "*"
-  allowCredentials: false
+# In agentstack-server this is used to determine the request origin and dynamically create agent card.
+# For example https://agentstack.example.com/api/v1/providers/{provider_id} will return an agent cart with URL for
+# https://agentstack.example.com, without respecting the headers, the URL would be "http://agentstack.example.com",
+# See https://www.uvicorn.org/settings/#application-interface
+trustProxyHeaders: false
 
 # --- EXTERNAL REGISTRIES ---
 # GitHub configuration for accessing private repositories
@@ -280,143 +206,128 @@ imagePullSecrets: []
 
 
 # -------- SERVER ----------
-# This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
-image:
-  repository: ghcr.io/i-am-bee/agentstack/agentstack-server
-  # This sets the pull policy for images.
-  pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
-  tag: ~
+server:
+  image:
+    repository: ghcr.io/i-am-bee/agentstack/agentstack-server
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: null
 
-# This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
-replicaCount: 1
+  replicaCount: 1
 
-# This is for setting Kubernetes Annotations to a Pod.
-# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
-podAnnotations: {}
-# This is for setting Kubernetes Labels to a Pod.
-# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
-podLabels: {}
+  podAnnotations: {}
+  podLabels: {}
 
-podSecurityContext: {}
-# fsGroup: 2000
+  podSecurityContext: {}
+  # fsGroup: 2000
 
-securityContext: {}
-# capabilities:
-#   drop:
-#   - ALL
-# readOnlyRootFilesystem: true
-# runAsNonRoot: true
-# runAsUser: 1000
-initContainers:
-  createVectorDbExtension: true
+  securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
 
-# This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/
-service:
-  # This sets the service type more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
-  type: ClusterIP
-  # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
-  port: 8333
-  nodePort: 8333
+  initContainers:
+    createVectorDbExtension: true
 
-resources:
-  requests:
-    memory: 300Mi
-#   cpu: 100m
-# limits:
-#   memory: 300Mi
-#   cpu: 100m
+  service:
+    type: ClusterIP
+    port: 8333
+    nodePort: 8333
 
-# This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
-ingress:
-  enabled: false
-  className: ""
-  annotations: {}
-  # kubernetes.io/ingress.class: nginx
-  # kubernetes.io/tls-acme: "true"
-  hosts:
-    - host: chart-example.local
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
+  resources:
+    requests:
+      memory: 300Mi
+  #   cpu: 100m
+  # limits:
+  #   memory: 300Mi
+  #   cpu: 100m
 
-# This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
-serviceAccount:
-  # Specifies whether a service account should be created
-  create: true
-  # Automatically mount a ServiceAccount's API credentials?
-  automount: true
-  # Annotations to add to the service account
-  annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
-  name: ""
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+    hosts:
+      - host: chart-example.local
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
 
-# This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
-livenessProbe:
-  httpGet:
-    path: /healthcheck
-    port: http
-  initialDelaySeconds: 5
-  failureThreshold: 5
-  periodSeconds: 30
-readinessProbe:
-  httpGet:
-    path: /healthcheck
-    port: http
-  initialDelaySeconds: 5
-  failureThreshold: 20
-  periodSeconds: 5
+  livenessProbe:
+    httpGet:
+      path: /healthcheck
+      port: http
+    initialDelaySeconds: 5
+    failureThreshold: 5
+    periodSeconds: 30
+  readinessProbe:
+    httpGet:
+      path: /healthcheck
+      port: http
+    initialDelaySeconds: 5
+    failureThreshold: 20
+    periodSeconds: 5
 
-# Additional volumes on the output Deployment definition.
-volumes: []
+  volumes: []
+  # - name: foo
+  #   secret:
+  #     secretName: mysecret
+  #     optional: false
 
-# - name: foo
-#   secret:
-#     secretName: mysecret
-#     optional: false
+  volumeMounts: []
+  # - name: foo
+  #   mountPath: "/etc/foo"
+  #   readOnly: true
 
-# Additional volumeMounts on the output Deployment definition.
-volumeMounts: []
-# - name: foo
-#   mountPath: "/etc/foo"
-#   readOnly: true
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
 
-nodeSelector: {}
+  # Uvicorn --timeout-keep-alive (in seconds)
+  uvicornTimeoutKeepAlive: 5
 
-tolerations: []
+  cors:
+    enabled: false
+    allowOrigins: []
+    # - http://localhost:3000
+    # - https://my-ui.example.com
+    allowOriginRegex: ""
+    allowMethods:
+      - "*"
+    allowHeaders:
+      - "*"
+    allowCredentials: false
 
-affinity: {}
-
-# Uvicorn --timeout-keep-alive (in seconds)
-uvicornTimeoutKeepAlive: 5
-
-rateLimit:
-  enabled: false
-  globalLimits:
-    - "20/second"
-    - "100/minute"
-  strategy: "sliding-window-counter"
-  roleBasedLimits:
-    user:
-      openai_chat_completion_tokens: []
-      # - "100000/minute"
-      openai_chat_completion_requests: []
-      # - "100/minute"
-      openai_embedding_inputs: []
-      # - "1000/minute"
-    developer:
-      openai_chat_completion_tokens: []
-      openai_chat_completion_requests: []
-      openai_embedding_inputs: []
-    admin:
-      openai_chat_completion_tokens: []
-      openai_chat_completion_requests: []
-      openai_embedding_inputs: []
+  rateLimit:
+    enabled: false
+    globalLimits:
+      - "20/second"
+      - "100/minute"
+    strategy: "sliding-window-counter"
+    roleBasedLimits:
+      user:
+        openai_chat_completion_tokens: []
+        # - "100000/minute"
+        openai_chat_completion_requests: []
+        # - "100/minute"
+        openai_embedding_inputs: []
+        # - "1000/minute"
+      developer:
+        openai_chat_completion_tokens: []
+        openai_chat_completion_requests: []
+        openai_embedding_inputs: []
+      admin:
+        openai_chat_completion_tokens: []
+        openai_chat_completion_requests: []
+        openai_embedding_inputs: []
 
 connector:
   presets:
@@ -443,7 +354,7 @@ ui:
   image:
     repository: ghcr.io/i-am-bee/agentstack/agentstack-ui
     pullPolicy: IfNotPresent
-    tag: ~
+    tag: null
     resources: {}
   service:
     type: ClusterIP

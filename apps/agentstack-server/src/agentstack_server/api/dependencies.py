@@ -157,7 +157,7 @@ async def authorized_user(
 
     # 2. Return admin user if auth is disabled
     if configuration.auth.disable_auth:
-        user = await user_service.get_user_by_email("admin@beeai.dev")
+        user = await user_service.get_user_by_email(configuration.admin_user_email)
         user.role = UserRole.ADMIN
         return AuthorizedUser(
             user=user,

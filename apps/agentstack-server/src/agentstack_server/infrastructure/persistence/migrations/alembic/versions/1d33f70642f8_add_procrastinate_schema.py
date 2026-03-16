@@ -1,13 +1,8 @@
-# Copyright 2025 © BeeAI a Series of LF Projects, LLC
-# SPDX-License-Identifier: Apache-2.0
+"""add procrastinate schema
 
-from __future__ import annotations
-
-"""Add procrastinate initial migrations
-
-Revision ID: 638be28ea3f9
-Revises: be5ec6ff3271
-Create Date: 2025-06-19 13:58:36.996259
+Revision ID: 1d33f70642f8
+Revises: 0e958e632a9d
+Create Date: 2026-03-16 10:06:15.274684
 
 """
 
@@ -20,10 +15,13 @@ from alembic import op
 from agentstack_server import get_configuration
 
 # revision identifiers, used by Alembic.
-revision: str = "638be28ea3f9"
-down_revision: str | None = "be5ec6ff3271"
+revision: str = "1d33f70642f8"
+down_revision: str | None = "0e958e632a9d"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
+
+
+# revision identifiers, used by Alembic.
 
 
 def upgrade() -> None:

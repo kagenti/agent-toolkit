@@ -179,7 +179,6 @@ def canonify_image_tag(t: str) -> str:
 
 async def detect_image_shas(
     vm_name: str,
-    platform: str,
     loaded_images: set[str],
     *,
     mode: typing.Literal["guest", "host"],
@@ -192,10 +191,7 @@ async def detect_image_shas(
                 if mode == "host"
                 else await run_in_vm(
                     vm_name,
-                    {
-                        "k3s": ["k3s", "ctr", "image", "ls"],
-                        "microshift": ["crictl", "--timeout=30s", "images"],
-                    }[platform],
+                    ["crictl", "--timeout=30s", "images"],
                     "Listing guest images",
                 )
             )
@@ -205,7 +201,7 @@ async def detect_image_shas(
         if (x := line.split())
         and len(x) >= 3
         and (x[1] != "<none>")
-        and (canon_tag := canonify_image_tag(x[0] if mode == "guest" and platform == "k3s" else f"{x[0]}:{x[1]}"))
+        and (canon_tag := canonify_image_tag(f"{x[0]}:{x[1]}"))
         in loaded_images
         and (sha := x[2])
     }
@@ -460,78 +456,56 @@ async def start_cmd(
                     "Setting up internal networking",
                 )
 
-        detected_platform: typing.Literal["k3s", "microshift"] | None = None
+        has_microshift = False
         try:
-            detected_platform = typing.cast(
-                typing.Literal["k3s", "microshift"],
-                (
-                    (
-                        await run_in_vm(
-                            vm_name,
-                            ["bash", "-c", "command -v k3s || command -v microshift"],
-                            "Detecting Kubernetes platform",
-                        )
-                    )
-                    .stdout.decode()
-                    .strip()
-                    .splitlines()[0]
-                    .split("/")[-1]
-                ),
+            await run_in_vm(
+                vm_name,
+                ["bash", "-c", "command -v microshift"],
+                "Detecting MicroShift",
             )
+            has_microshift = True
         except Exception:
             pass
 
-        match detected_platform:
-            case None:
-                await run_in_vm(
-                    vm_name,
-                    [
-                        "bash",
-                        "-c",
-                        textwrap.dedent("""\
-                            sysctl -w net.ipv4.ip_forward=1
-                            mkdir -p /tmp/microshift-install
-                            curl -fsSL "https://github.com/microshift-io/microshift/releases/download/4.21.0_g29f429c21_4.21.0_okd_scos.ec.15/microshift-debs-$(uname -m).tgz" | tar -xz -C /tmp/microshift-install &
-                            eatmydata apt-get update -y -q
-                            eatmydata apt-get install -y -q --no-install-recommends skopeo cri-o cri-tools containernetworking-plugins kubectl
-                            mkdir -p -m 777 /postgresql-data /seaweedfs-data /registry-data /redis-data
-                            systemctl enable --now crio
-                            wait
-                            eatmydata dpkg -i /tmp/microshift-install/microshift_*.deb /tmp/microshift-install/microshift-kindnet_*.deb
-                            rm -rf /tmp/microshift-install
-                            systemctl enable --now microshift
-                        """),
-                    ],
-                    "Installing MicroShift",
-                )
-            case "k3s":
-                await run_in_vm(
-                    vm_name,
-                    [
-                        "bash",
-                        "-c",
-                        "apt-get install -y -q skopeo; systemctl is-active --quiet k3s || systemctl enable --now k3s",
-                    ],
-                    "Refreshing existing k3s VM",
-                )
-            case "microshift":
-                await run_in_vm(
-                    vm_name,
-                    [
-                        "bash",
-                        "-c",
-                        "systemctl is-active --quiet crio && systemctl is-active --quiet microshift || systemctl enable --now crio && systemctl enable --now microshift",
-                    ],
-                    "Refreshing existing MicroShift VM",
-                )
+        if has_microshift:
+            await run_in_vm(
+                vm_name,
+                [
+                    "bash",
+                    "-c",
+                    "systemctl is-active --quiet crio && systemctl is-active --quiet microshift || systemctl enable --now crio && systemctl enable --now microshift",
+                ],
+                "Refreshing existing MicroShift VM",
+            )
+        else:
+            await run_in_vm(
+                vm_name,
+                [
+                    "bash",
+                    "-c",
+                    textwrap.dedent("""\
+                        sysctl -w net.ipv4.ip_forward=1
+                        mkdir -p /tmp/microshift-install
+                        curl -fsSL "https://github.com/microshift-io/microshift/releases/download/4.21.0_g29f429c21_4.21.0_okd_scos.ec.15/microshift-debs-$(uname -m).tgz" | tar -xz -C /tmp/microshift-install &
+                        eatmydata apt-get update -y -q
+                        eatmydata apt-get install -y -q --no-install-recommends skopeo cri-o cri-tools containernetworking-plugins kubectl
+                        mkdir -p -m 777 /postgresql-data /seaweedfs-data /registry-data /redis-data
+                        systemctl enable --now crio
+                        wait
+                        eatmydata dpkg -i /tmp/microshift-install/microshift_*.deb /tmp/microshift-install/microshift-kindnet_*.deb
+                        rm -rf /tmp/microshift-install
+                        systemctl enable --now microshift
+                    """),
+                ],
+                "Installing MicroShift",
+            )
 
-        platform: typing.Literal["k3s", "microshift"] = detected_platform or "microshift"
         await run_in_vm(
             vm_name,
             [
                 "bash",
                 "-c",
-                f"ln -sf {'/etc/rancher/k3s/k3s.yaml' if platform == 'k3s' else '/var/lib/microshift/resources/kubeadmin/kubeconfig'} /kubeconfig && chmod 644 /kubeconfig",
+                "ln -sf /var/lib/microshift/resources/kubeadmin/kubeconfig /kubeconfig && chmod 644 /kubeconfig",
             ],
             "Setting up kubeconfig symlink",
         )
@@ -582,10 +556,11 @@ async def start_cmd(
                     {
                         "encryptionKey": "Ovx8qImylfooq4-HNwOzKKDcXLZCB3c_m0JlB9eJBxc=",
                         "trustProxyHeaders": True,
-                        "localStorage": platform == "microshift",  # k3s uses local path provisioner instead
-                        "keycloak": {
-                            "enabled": False,
-                            "auth": {
+                        "localStorage": True,
+                        "auth": {
+                            "enabled": True,
+                            "keycloakProvisionJob": {
+                                "enabled": True,
                                 "adminUser": "admin",
                                 "adminPassword": "admin",
                                 "seedAgentstackUsers": [
@@ -600,32 +575,30 @@ async def start_cmd(
                                     }
                                 ],
                             },
-                        },
-                        "externalOidcProvider": {
-                            "issuerUrl": "http://keycloak-service.keycloak:8080/realms/agentstack",
-                            "publicIssuerUrl": "http://keycloak.localtest.me:8080/realms/agentstack",
-                            "name": "Keycloak",
-                            "id": "keycloak",
-                            "rolesPath": "realm_access.roles",
-                            "uiClientId": "agentstack-ui",
-                            "uiClientSecret": "agentstack-ui-secret",
-                            "serverClientId": "agentstack-server",
-                            "serverClientSecret": "agentstack-server-secret",
-                        },
-                        "auth": {
-                            "enabled": True,
-                            "provisionKeycloak": True,
                             "validateAudience": False,
                             "nextauthUrl": "http://agentstack.localtest.me:8080",
                             "apiUrl": "http://agentstack-api.localtest.me:8080",
+                            "oidcProvider": {
+                                "issuerUrl": "http://keycloak-service.keycloak:8080/realms/agentstack",
+                                "publicIssuerUrl": "http://keycloak.localtest.me:8080/realms/agentstack",
+                                "name": "Keycloak",
+                                "id": "keycloak",
+                                "rolesPath": "realm_access.roles",
+                                "uiClientId": "agentstack-ui",
+                                "uiClientSecret": "agentstack-ui-secret",
+                                "serverClientId": "agentstack-server",
+                                "serverClientSecret": "agentstack-server-secret",
+                            },
                         },
                         "features": {"uiLocalSetup": True},
                         "providerBuilds": {"enabled": True},
                         "disableProviderDownscaling": True,
-                        "cors": {
-                            "enabled": True,
-                            "allowOriginRegex": r"https?://(localhost|127\.0\.0\.1|[a-z0-9.-]*\.?localtest\.me)(:\d+)?",
-                            "allowCredentials": True,
+                        "server": {
+                            "cors": {
+                                "enabled": True,
+                                "allowOriginRegex": r"https?://(localhost|127\.0\.0\.1|[a-z0-9.-]*\.?localtest\.me)(:\d+)?",
+                                "allowCredentials": True,
+                            },
                         },
                     },
                     user_agentstack_values,
@@ -743,8 +716,8 @@ async def start_cmd(
         }
         # The post-renderer strips the x86-only Fedora postgres image and its reference
         # won't appear in helm template output, so no extra image additions needed.
-        # Add the keycloak-themed image: the agentstack chart has keycloak disabled
-        # (kagenti-deps deploys it), but we patch kagenti's keycloak to use our themed image.
+        # Add the keycloak-themed image: the agentstack chart only uses it in the provision job,
+        # but we also patch kagenti's keycloak to use our themed image.
         keycloak_image = (
             await run_in_vm(
                 vm_name,
@@ -752,8 +725,7 @@ async def start_cmd(
                     "bash", "-c",
                     "helm template agentstack /tmp/agentstack-chart.tgz"
                     " --values=/tmp/agentstack-values.yaml"
-                    " --set keycloak.enabled=true --set auth.enabled=true"
-                    " --show-only templates/keycloak/statefulset.yaml "
+                    " --show-only templates/keycloak/provision-job.yaml "
                     + " ".join(shlex.quote(f"--set={v}") for v in scoped_sets.get("agentstack", []))
                     + " | grep -m1 'image:.*keycloak' | sed 's/.*image: *//;s/\"//g' | tr -d ' '",
                 ],
@@ -764,18 +736,17 @@ async def start_cmd(
             loaded_images.add(keycloak_image)
         images_to_import_from_host, shas_guest_before = set[str](), {}
         if image_pull_mode in {ImagePullMode.host, ImagePullMode.hybrid}:
-            if platform == "microshift":
-                await run_in_vm(
-                    vm_name,
-                    ["timeout", "2m", "bash", "-c", "until crictl info >/dev/null 2>&1; do sleep 2; done"],
-                    "Waiting for CRI-O to be ready",
-                )
-            shas_guest_before = await detect_image_shas(vm_name, platform, loaded_images, mode="guest")
-            shas_host = await detect_image_shas(vm_name, platform, loaded_images, mode="host")
+            await run_in_vm(
+                vm_name,
+                ["timeout", "2m", "bash", "-c", "until crictl info >/dev/null 2>&1; do sleep 2; done"],
+                "Waiting for CRI-O to be ready",
+            )
+            shas_guest_before = await detect_image_shas(vm_name, loaded_images, mode="guest")
+            shas_host = await detect_image_shas(vm_name, loaded_images, mode="host")
             if image_pull_mode == ImagePullMode.host:
                 for image in loaded_images - shas_host.keys():
                     await run_command(["docker", "pull", image], f"Pulling image {image} on host")
-                shas_host = await detect_image_shas(vm_name, platform, loaded_images, mode="host")
+                shas_host = await detect_image_shas(vm_name, loaded_images, mode="host")
             images_to_import_from_host = dict(shas_host.items() - shas_guest_before.items()).keys() & loaded_images
             if images_to_import_from_host:
                 host_path, guest_path = detect_export_import_paths()
@@ -789,9 +760,7 @@ async def start_cmd(
                         [
                             "bash",
                             "-c",
-                            f"k3s ctr images import {guest_path}"
-                            if platform == "k3s"
-                            else "\n".join(
+                            "\n".join(
                                 f"skopeo copy docker-archive:{guest_path}:{img} containers-storage:{img} &"
                                 for img in images_to_import_from_host
                             )
@@ -806,9 +775,7 @@ async def start_cmd(
             for image in loaded_images - images_to_import_from_host:
                 await run_in_vm(
                     vm_name,
-                    ["k3s", "ctr", "image", "pull", image]
-                    if platform == "k3s"
-                    else [
+                    [
                         "skopeo",
                         "copy",
                         *(["--src-username", "x-access-token", "--src-password", github_token] if github_token and image.startswith("ghcr.io/") else []),
@@ -853,22 +820,21 @@ async def start_cmd(
         )
         # Create hostPath PVs (MicroShift has no dynamic storage provisioner)
         k8s_data = importlib.resources.files("agentstack_cli") / "data" / "k8s"
-        if platform == "microshift":
-            keycloak_pv_yaml = (k8s_data / "keycloak-postgres-pv.yaml").read_text()
+        keycloak_pv_yaml = (k8s_data / "keycloak-postgres-pv.yaml").read_text()
+        await run_in_vm(
+            vm_name,
+            ["bash", "-c", "mkdir -p /kagenti-keycloak-postgres-data && chmod 777 /kagenti-keycloak-postgres-data && kubectl --kubeconfig=/kubeconfig apply -f -"],
+            "Creating PV for kagenti Keycloak Postgres",
+            input=keycloak_pv_yaml.encode("utf-8"),
+        )
+        if any("components.otel.enabled=true" in v.lower() for v in scoped_sets.get("kagenti-deps", [])):
+            phoenix_pv_yaml = (k8s_data / "phoenix-data-pv.yaml").read_text()
             await run_in_vm(
                 vm_name,
-                ["bash", "-c", "mkdir -p /kagenti-keycloak-postgres-data && chmod 777 /kagenti-keycloak-postgres-data && kubectl --kubeconfig=/kubeconfig apply -f -"],
-                "Creating PV for kagenti Keycloak Postgres",
-                input=keycloak_pv_yaml.encode("utf-8"),
+                ["bash", "-c", "mkdir -p /phoenix-data && chmod 777 /phoenix-data && kubectl --kubeconfig=/kubeconfig apply -f -"],
+                "Creating PV for Phoenix data",
+                input=phoenix_pv_yaml.encode("utf-8"),
             )
-            if any("components.otel.enabled=true" in v.lower() for v in scoped_sets.get("kagenti-deps", [])):
-                phoenix_pv_yaml = (k8s_data / "phoenix-data-pv.yaml").read_text()
-                await run_in_vm(
-                    vm_name,
-                    ["bash", "-c", "mkdir -p /phoenix-data && chmod 777 /phoenix-data && kubectl --kubeconfig=/kubeconfig apply -f -"],
-                    "Creating PV for Phoenix data",
-                    input=phoenix_pv_yaml.encode("utf-8"),
-                )
         # Install a Helm 4 post-renderer plugin that strips the postgres-otel
         # StatefulSet from kagenti-deps (x86-only Fedora image) and patches Phoenix
         # to use SQLite instead of PostgreSQL for local dev.
@@ -1070,7 +1036,7 @@ async def start_cmd(
         )
         if shas_guest_before and (
             replaced_digests := set(shas_guest_before.values())
-            - set((await detect_image_shas(vm_name, platform, loaded_images, mode="guest")).values())
+            - set((await detect_image_shas(vm_name, loaded_images, mode="guest")).values())
         ):
             for pod in json.loads(
                 (
@@ -1106,18 +1072,17 @@ async def start_cmd(
                         ],
                         f"Removing pod with obsolete image {pod['metadata']['namespace']}/{pod['metadata']['name']}",
                     )
-        if platform == "microshift":
-            await run_in_vm(
-                vm_name,
-                [
-                    "timeout",
-                    "5m",
-                    "bash",
-                    "-c",
-                    "until kubectl --kubeconfig=/kubeconfig wait --for=condition=Ready pod -n openshift-dns -l dns.operator.openshift.io/daemonset-dns=default --timeout=2m; do sleep 5; done",
-                ],
-                "Waiting for DNS to be ready",
-            )
+        await run_in_vm(
+            vm_name,
+            [
+                "timeout",
+                "5m",
+                "bash",
+                "-c",
+                "until kubectl --kubeconfig=/kubeconfig wait --for=condition=Ready pod -n openshift-dns -l dns.operator.openshift.io/daemonset-dns=default --timeout=2m; do sleep 5; done",
+            ],
+            "Waiting for DNS to be ready",
+        )
         await run_in_vm(
             vm_name,
             ["bash"],
@@ -1257,29 +1222,12 @@ async def import_cmd(
         if (await detect_vm_status(vm_name)) != "running":
             console.error("Agent Stack platform is not running.")
             sys.exit(1)
-        platform = (
-            (
-                await run_in_vm(
-                    vm_name,
-                    [
-                        "bash",
-                        "-c",
-                        "systemctl is-active --quiet k3s && echo k3s || systemctl is-active --quiet microshift && echo microshift || exit 1",
-                    ],
-                    "Detecting Kubernetes platform",
-                )
-            )
-            .stdout.decode()
-            .strip()
-        )
         host_path, guest_path = detect_export_import_paths()
         try:
             await run_command(["docker", "image", "save", "-o", host_path, tag], f"Exporting image {tag} from Docker")
             await run_in_vm(
                 vm_name,
-                ["k3s", "ctr", "images", "import", guest_path]
-                if platform == "k3s"
-                else ["skopeo", "copy", f"docker-archive:{guest_path}:{tag}", f"containers-storage:{tag}"],
+                ["skopeo", "copy", f"docker-archive:{guest_path}:{tag}", f"containers-storage:{tag}"],
                 f"Importing image {tag} into Agent Stack platform",
             )
         finally:

@@ -250,7 +250,7 @@ class VectorStoresConfiguration(BaseModel):
 
 
 class TelemetryConfiguration(BaseModel):
-    collector_url: AnyUrl = AnyUrl("http://otel-collector.kagenti-system:4318")
+    collector_url: AnyUrl = AnyUrl("http://otel-collector.kagenti-system:8335")
 
     phoenix_url: AnyUrl | None = None
     phoenix_api_key: Secret[str] | None = None
@@ -487,6 +487,7 @@ class Configuration(BaseSettings):
     context: ContextConfiguration = Field(default_factory=ContextConfiguration)
     a2a_proxy: A2AProxyConfiguration = Field(default_factory=A2AProxyConfiguration)
     connector: ConnectorConfiguration = Field(default_factory=ConnectorConfiguration)
+    admin_user_email: str = "admin@beeai.dev"
     k8s_namespace: str | None = None
     k8s_kubeconfig: Path | None = None
     uvicorn_timeout_keep_alive: int = 5

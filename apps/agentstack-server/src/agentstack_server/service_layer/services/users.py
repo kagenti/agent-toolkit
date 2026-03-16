@@ -11,7 +11,7 @@ from kink import inject
 from agentstack_server.configuration import Configuration
 from agentstack_server.domain.models.user import User
 from agentstack_server.domain.repositories.env import EnvStoreEntity
-from agentstack_server.exceptions import UsageLimitExceededError
+from agentstack_server.exceptions import EntityNotFoundError, UsageLimitExceededError
 from agentstack_server.service_layer.unit_of_work import IUnitOfWorkFactory
 
 logger = logging.getLogger(__name__)
@@ -37,6 +37,12 @@ class UserService:
     async def get_user_by_email(self, email: str) -> User:
         async with self._uow() as uow:
             return await uow.users.get_by_email(email=email)
+
+    async def ensure_user(self, *, email: str) -> User:
+        try:
+            return await self.get_user_by_email(email)
+        except EntityNotFoundError:
+            return await self.create_user(email=email)
 
     async def delete_user(self, user_id: UUID) -> None:
         async with self._uow() as uow:
