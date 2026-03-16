@@ -166,7 +166,7 @@ ARCH=$(uname -m | sed -e 's/arm64/aarch64/' -e 's/amd64/x86_64/')
     --set agentstack:auth.nextauthDevUrl="http://localhost:3000" \
     --set agentstack:server.image.tag=local \
     --set agentstack:auth.keycloakProvisionJob.image.tag=local \
-    $UI_TAG "$@"
+    ${UI_TAG-} "$@"
 """
 
 ["agentstack:delete"]
