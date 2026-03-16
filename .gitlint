@@ -1,0 +1,9 @@
+[general]
+contrib=contrib-title-conventional-commits
+fail-without-commits=true
+
+[title-max-length]
+line-length=72
+
+[title-min-length]
+min-length=10

@@ -1,0 +1,9 @@
+# Default owners for everything
+* @kagenti/maintainers
+
+# Platform and CI
+.github/ @kagenti/platform
+
+# Documentation
+docs/ @kagenti/maintainers
+*.md @kagenti/maintainers

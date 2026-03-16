@@ -17,3 +17,9 @@ All commits must be signed off for DCO compliance (`git commit --signoff`).
 - When working in adk-server make sure you always test the behaviour using the adk-server debugging approach
 - All testing and linting can be done via `mise run check`
 - Formatting can be fixed via `mise run fix`
+
+## Code Style
+
+- Python 3.11+, `ruff` for linting and formatting
+- Line length: 120
+- Git hooks installed via `mise run common:setup:git-hooks`

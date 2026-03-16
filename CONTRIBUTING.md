@@ -1,6 +1,11 @@
-# Contributing
+# Contributing to Agent Toolkit
 
-## Development setup
+We are grateful for your interest in joining the Kagenti community and making
+a positive impact. Whether you're raising issues, enhancing documentation,
+fixing bugs, or developing new features, your contributions are essential to
+our success.
+
+## Development Setup
 
 ### Installation
 
@@ -11,10 +16,19 @@ don't need to install them yourself.
 Clone this project, then run these setup steps:
 
 ```sh
+git clone https://github.com/kagenti/agent-toolkit.git
+cd agent-toolkit
 brew install mise # more ways to install: https://mise.jdx.dev/installing-mise.html
 mise trust
 mise install
 brew install qemu # if not using Brew: install QEMU through some other package manager
+```
+
+Install pre-commit hooks:
+
+```bash
+pip install pre-commit
+make install-hooks
 ```
 
 After setup, you can use:
@@ -305,6 +319,29 @@ mise adk-ui:run
 mise adk-server:run
 ```
 
+## Pull Request Process
+
+1. Fork the repository
+2. Create a feature branch from `main`
+3. Make your changes with tests
+4. Run pre-commit hooks: `pre-commit run --all-files`
+5. Submit a pull request
+
+Smaller pull requests are typically easier to review and merge. If your pull
+request is large, collaborate with the maintainers to find the best way to
+divide it.
+
+## Commit Messages
+
+Use conventional commit format:
+
+- `feat:` New features
+- `fix:` Bug fixes
+- `docs:` Documentation changes
+- `chore:` Maintenance tasks
+- `refactor:` Code refactoring
+- `test:` Adding or updating tests
+
 ## Releasing
 
 Kagenti ADK is using `main` branch for next version development (integration branch) and `release-v*` branches for stable releases.
@@ -359,3 +396,20 @@ Try to follow this structure:
 Make sure to preview docs locally using: `mise docs:run`. This runs a development server which refreshes as you make changes to the `.mdx` files.
 
 Some code samples in docs are embedded from the `examples/` directory using [embedme](https://github.com/zakhenry/embedme) tags. For these, edit the example agent (not the `.mdx` file directly) and run `mise run docs:fix` to sync. See [Examples](#examples) for the full workflow.
+
+## Certificate of Origin
+
+All commits **must** include a `Signed-off-by` trailer (Developer Certificate
+of Origin). Use the `-s` flag when committing:
+
+```bash
+git commit -s -m "feat: add new feature"
+```
+
+By contributing to this project you agree to the
+[Developer Certificate of Origin](https://developercertificate.org/) (DCO).
+
+## Licensing
+
+Agent Toolkit is [Apache 2.0 licensed](LICENSE) and we accept contributions
+via GitHub pull requests.
