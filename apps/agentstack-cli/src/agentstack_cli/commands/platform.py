@@ -913,7 +913,7 @@ async def start_cmd(
                 "-c",
                 textwrap.dedent("""\
                     kubectl --kubeconfig=/kubeconfig -n keycloak set env statefulset/keycloak KC_HOSTNAME_BACKCHANNEL_DYNAMIC=true
-                    kubectl --kubeconfig=/kubeconfig -n keycloak rollout status statefulset/keycloak --timeout=300s
+                    kubectl --kubeconfig=/kubeconfig -n keycloak rollout status statefulset/keycloak --timeout=600s
                 """),
             ],
             "Enabling Keycloak backchannel dynamic hostname",
