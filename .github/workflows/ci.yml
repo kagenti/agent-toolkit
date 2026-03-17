@@ -123,7 +123,7 @@ jobs:
     timeout-minutes: 45
     runs-on: ubuntu-latest
     env:
-      ADK__HOME: ${{ github.workspace }}/.adk
+      KAGENTI__HOME: ${{ github.workspace }}/.kagenti
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/setup
@@ -155,7 +155,7 @@ jobs:
     timeout-minutes: 45
     runs-on: ubuntu-latest
     env:
-      ADK__HOME: ${{ github.workspace }}/.adk
+      KAGENTI__HOME: ${{ github.workspace }}/.kagenti
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/setup
