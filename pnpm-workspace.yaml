@@ -54,7 +54,6 @@ overrides:
 
 packages:
   - apps/agentstack-ui
-  - apps/beeai-web
   - apps/lint-config
   - apps/agentstack-sdk-ts
   - apps/agentstack-sdk-ts/examples/chat-ui
@@ -62,17 +61,17 @@ packages:
   - docs
 
 catalog:
-  '@carbon/icons-react': ^11.75.0
-  '@carbon/layout': ^11.48.0
-  '@carbon/react': ^1.101.0
-  '@carbon/styles': ^1.100.0
-  '@ibm/plex': ^6.4.1
-  '@svgr/webpack': ^8.1.0
-  '@tanstack/react-query': ^5.90.21
-  '@types/lodash': ^4.17.24
-  '@types/node': ^24.0.0
-  '@types/react': ^19.2.14
-  '@types/react-dom': ^19.2.3
+  "@carbon/icons-react": ^11.75.0
+  "@carbon/layout": ^11.48.0
+  "@carbon/react": ^1.101.0
+  "@carbon/styles": ^1.100.0
+  "@ibm/plex": ^6.4.1
+  "@svgr/webpack": ^8.1.0
+  "@tanstack/react-query": ^5.90.21
+  "@types/lodash": ^4.17.24
+  "@types/node": ^24.0.0
+  "@types/react": ^19.2.14
+  "@types/react-dom": ^19.2.3
   babel-plugin-react-compiler: 1.0.0
   clsx: ^2.1.1
   eslint: ^9.39.3

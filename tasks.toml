@@ -108,7 +108,6 @@ version=$(
     yq -r .version              apps/agentstack-sdk-ts/package.json
     yq -r .project.version      apps/agentstack-server/pyproject.toml
     yq -r .version              apps/agentstack-ui/package.json
-    yq -r .version              apps/beeai-web/package.json
     yq -r '.providers[].location | split(":")[-1]' agent-registry.yaml
   } | sort -u
 )

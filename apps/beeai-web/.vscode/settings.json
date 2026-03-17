@@ -1,9 +1,0 @@
-{
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit"
-  },
-  "search.exclude": {
-    ".next": true
-  },
-  "stylelint.validate": ["scss"]
-}
