@@ -1,6 +1,6 @@
-# Agent Stack Client SDK
+# Kagenti ADK Client SDK
 
-TypeScript/JavaScript client SDK for building applications that interact with Agent Stack agents.
+TypeScript/JavaScript client SDK for building applications that interact with Kagenti ADK agents.
 
 [![npm version](https://img.shields.io/npm/v/%40kagenti%2Fadk.svg?style=plastic)](https://www.npmjs.com/package/@kagenti/adk)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg?style=plastic)](https://opensource.org/licenses/Apache-2.0)
@@ -9,8 +9,8 @@ TypeScript/JavaScript client SDK for building applications that interact with Ag
 ## Overview
 
 The `@kagenti/adk` provides TypeScript and JavaScript tools for building client applications that communicate with
-agents deployed on Agent Stack. It includes utilities for handling the A2A (Agent2Agent) protocol, working with
-extensions, and calling the Agent Stack platform API.
+agents deployed on Kagenti ADK. It includes utilities for handling the A2A (Agent2Agent) protocol, working with
+extensions, and calling the Kagenti ADK platform API.
 
 ## Key Features
 
@@ -187,7 +187,7 @@ UI extensions (message metadata your UI can render):
 
 ## Documentation
 
-- [Agent Stack Documentation](https://github.com/kagenti/adk/blob/main/docs/stable)
+- [Kagenti ADK Documentation](https://github.com/kagenti/adk/blob/main/docs/stable)
 - [Getting Started](https://github.com/kagenti/adk/blob/main/docs/stable/custom-ui/getting-started.mdx)
 - [A2A Client Integration](https://github.com/kagenti/adk/blob/main/docs/stable/custom-ui/a2a-client.mdx)
 - [Agent Requirements](https://github.com/kagenti/adk/blob/main/docs/stable/custom-ui/agent-requirements.mdx)

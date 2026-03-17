@@ -72,7 +72,7 @@ export function createAutoregisterToAgentstack(options: AutoregistrationOptions)
 
     const location = createAgentCardUrl(normalizeDockerHost(host), port, selfRegistrationId);
 
-    console.log('Registering agent to the Agent Stack platform', { location });
+    console.log('Registering agent to the Kagenti ADK platform', { location });
 
     try {
       await withRetry(

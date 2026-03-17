@@ -18,7 +18,7 @@ server
       interaction_mode: InteractionMode.MultiTurn,
       user_greeting: 'Hello! How can I help you?',
       author: {
-        name: 'Agent Stack',
+        name: 'Kagenti ADK',
       },
     },
     handler: async function* (input) {
