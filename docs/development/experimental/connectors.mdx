@@ -98,10 +98,9 @@ Connector can be asynchronously disconnected at any time. This can happen for va
 
 Connector presets provide pre-configured settings for common MCP servers, simplifying the connector creation process. Presets can include:
 
-- **URL**: The MCP server endpoint (supports `http://`, `https://`, and `mcp+stdio://` schemes)
+- **URL**: The MCP server endpoint (supports `http://` and `https://` schemes)
 - **Client credentials**: Pre-configured OAuth `client_id` and `client_secret` for public clients
 - **Metadata**: Display information such as name and description
-- **Stdio configuration**: For `mcp+stdio://` URLs, container image and runtime settings for managed MCP servers
 
 ### Available Presets
 
@@ -156,49 +155,11 @@ connector:
         description: "Search, access and get insights on your Box content"
 ```
 
-#### Managed MCP Servers (stdio)
-
-For MCP servers that use stdio transport, Agent Stack can manage them as Kubernetes deployments using the `mcp+stdio://` scheme. The platform automatically:
-
-- Deploys the MCP server as a Kubernetes pod with a sidecar container running [supergateway](https://github.com/supercorp-ai/supergateway)
-- Exposes the stdio MCP server over Streamable HTTP transport via supergateway
-- Manages the deployment lifecycle (creates on connect, deletes on disconnect)
-- Handles authentication tokens via environment variables
-
-```yaml
-connector:
-  presets:
-    - url: "mcp+stdio://example-mcp"
-      metadata:
-        name: "Example MCP"
-        description: "Example stdio-based MCP server"
-      stdio:
-        image: "registry.example.com/mcp-server:latest"
-        command: ["node"]  # Optional: override container command
-        args: ["dist/index.js"]  # Optional: override container args
-        env:  # Optional: additional environment variables
-          LOG_LEVEL: "info"
-        access_token_env_name: "API_TOKEN"  # Optional: env var name to inject access token
-```
-
-The managed MCP architecture uses a sidecar pattern:
-- **MCP Server Container**: Runs your stdio-based MCP server
-- **Supergateway Sidecar**: Wraps the stdio interface and exposes it as Streamable HTTP at port 8080
-
-When a connector using a managed preset is connected, the platform:
-1. Creates a Kubernetes Deployment with both containers
-2. Creates a Kubernetes Service to expose the supergateway
-3. Waits for the deployment to become ready (up to 60 seconds)
-4. Proxies MCP requests to the managed service
-5. If an `accessToken` was provided in the connect request and the preset defines `access_token_env_name`, injects the token as an environment variable
-
-When disconnected, the platform cleans up the Deployment and Service resources.
-
 #### Configuration Details
 
 The presets are injected into the platform via the `CONNECTOR__PRESETS` environment variable, which is populated from a Kubernetes Secret created by Helm. This allows administrators to:
 
-- Add custom MCP server presets for their organization (both remote and managed)
+- Add custom MCP server presets for their organization
 - Modify or remove default presets
 - Configure client credentials for remote MCP servers with OAuth
 - Configure stdio container images and settings for managed MCP servers

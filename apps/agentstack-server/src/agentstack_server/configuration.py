@@ -290,29 +290,16 @@ class ManagedProviderConfiguration(BaseModel):
     )
 
 
-class ConnectorStdioPreset(BaseModel):
-    image: str
-    command: list[str] | None = None
-    args: list[str] | None = None
-    env: dict[str, str] = Field(default_factory=dict)
-    access_token_env_name: str | None = None
-
-
 class ConnectorPreset(BaseModel):
     url: AnyUrl
     client_id: str | None = None
     client_secret: str | None = None
     metadata: dict[str, str] | None = None
-    stdio: ConnectorStdioPreset | None = None
 
     @model_validator(mode="after")
     def validate_url_scheme(self):
-        if self.stdio is None:
-            if self.url.scheme not in ("http", "https"):
-                raise ValueError(f"Stdio is not configured, URL scheme must be http(s), got: {self.url.scheme}")
-        else:
-            if self.url.scheme != "mcp+stdio":
-                raise ValueError(f"Stdio is configured, URL scheme must be mcp+stdio, got: {self.url.scheme}")
+        if self.url.scheme not in ("http", "https"):
+            raise ValueError(f"URL scheme must be http(s), got: {self.url.scheme}")
         return self
 
 

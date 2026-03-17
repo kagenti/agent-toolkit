@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-import asyncio
 import logging
 from contextlib import AsyncExitStack
 from uuid import UUID
@@ -13,7 +12,7 @@ import httpx
 from authlib.oauth2 import OAuth2Error
 from fastapi import Request, status
 from fastapi.responses import StreamingResponse
-from httpx import AsyncClient, ConnectError, ReadError, RemoteProtocolError, TimeoutException
+from httpx import AsyncClient
 from kink import inject
 from mcp import ClientSession
 from mcp.client.streamable_http import streamablehttp_client
@@ -30,7 +29,6 @@ from agentstack_server.domain.models.connector import (
 from agentstack_server.domain.models.user import User
 from agentstack_server.exceptions import PlatformError
 from agentstack_server.service_layer.services.external_mcp_service import ExternalMcpService
-from agentstack_server.service_layer.services.managed_mcp_service import ManagedMcpService
 from agentstack_server.service_layer.unit_of_work import IUnitOfWorkFactory
 
 logger = logging.getLogger(__name__)
@@ -42,13 +40,11 @@ class ConnectorService:
         self,
         uow: IUnitOfWorkFactory,
         configuration: Configuration,
-        managed_mcp: ManagedMcpService,
         external_mcp: ExternalMcpService,
     ):
         self._uow = uow
         self._configuration = configuration
         self._proxy_client = httpx.AsyncClient(timeout=None)
-        self._managed_mcp = managed_mcp
         self._external_mcp = external_mcp
 
     async def create_connector(
@@ -68,16 +64,11 @@ class ConnectorService:
 
         preset = (
             next((p for p in self._configuration.connector.presets if str(p.url) == str(url)), None)
-            if match_preset or url.scheme == "mcp+stdio"
+            if match_preset
             else None
         )
-        if url.scheme not in ("http", "https", "mcp+stdio"):
+        if url.scheme not in ("http", "https"):
             raise PlatformError("Connector URL has an unsupported scheme", status_code=status.HTTP_400_BAD_REQUEST)
-        if not preset and url.scheme == "mcp+stdio":
-            raise PlatformError(
-                "Connector URL has mcp+stdio scheme but does not match a known connector preset",
-                status_code=status.HTTP_400_BAD_REQUEST,
-            )
 
         if preset:
             if not client_id:
@@ -162,9 +153,6 @@ class ConnectorService:
                 connector.auth = Authorization()
             connector.auth.token = Token(access_token=access_token, token_type="bearer")
 
-        if self._managed_mcp.is_managed(connector=connector) and (preset := self._find_preset(url=connector.url)):
-            await self._managed_mcp.deploy(connector=connector, preset=preset)
-
         try:
             await self.probe_connector(connector=connector)
             connector.transition(state=ConnectorState.connected)
@@ -193,9 +181,6 @@ class ConnectorService:
         connector.transition(
             state=ConnectorState.disconnected, disconnect_reason="Client request", disconnect_permanent=True
         )
-
-        if self._managed_mcp.is_managed(connector=connector):
-            await self._managed_mcp.undeploy(connector=connector)
 
         async with self._uow() as uow:
             await uow.connectors.update(connector=connector)
@@ -238,56 +223,25 @@ class ConnectorService:
     async def list_presets(self) -> list[ConnectorPreset]:
         return self._configuration.connector.presets
 
-    def _find_preset(self, *, url: AnyUrl) -> ConnectorPreset | None:
-        return next((p for p in self._configuration.connector.presets if str(p.url) == str(url)), None)
-
-    async def probe_connector(self, *, connector: Connector, max_retries: int = 5) -> None:
+    async def probe_connector(self, *, connector: Connector) -> None:
         def client_factory(headers=None, timeout=None, auth=None) -> AsyncClient:
             assert auth is None
             return self._external_mcp.create_http_client(connector=connector, headers=headers, timeout=timeout)
 
-        # For managed MCP servers, retry if connection fails as service might not be immediately ready
-        is_managed = self._managed_mcp.is_managed(connector=connector)
-        retry_delay = 2.0
-
-        last_error = None
-        for attempt in range(max_retries):
-            try:
-                async with (
-                    streamablehttp_client(
-                        (
-                            f"{self._managed_mcp.get_service_url(connector=connector)}/mcp"
-                            if is_managed
-                            else str(connector.url)
-                        ),
-                        httpx_client_factory=client_factory,
-                    ) as (read, write, _),
-                    ClientSession(read, write) as session,
-                ):
-                    await session.initialize()
-                    return  # Success, exit retry loop
-            except ExceptionGroup as excgroup:
-                last_error = excgroup.exceptions[0] if len(excgroup.exceptions) == 1 else excgroup
-
-                # Check if we should retry (only for managed MCP servers on connection errors)
-                should_retry = (
-                    attempt < max_retries - 1
-                    and is_managed
-                    and isinstance(last_error, (ReadError, ConnectError, RemoteProtocolError, TimeoutException))
-                )
-
-                if should_retry:
-                    logger.warning(
-                        f"Probe attempt {attempt + 1}/{max_retries} failed for managed MCP server {connector.url}, retrying in {retry_delay}s: {last_error}"
-                    )
-                    await asyncio.sleep(retry_delay)
-                    continue
-
-                # Not retrying, log and raise the error
-                logger.warning(f"Probe failed for MCP server {connector.url}: {last_error}")
-                if len(excgroup.exceptions) == 1:
-                    raise last_error from excgroup
-                raise excgroup from None
+        try:
+            async with (
+                streamablehttp_client(
+                    str(connector.url),
+                    httpx_client_factory=client_factory,
+                ) as (read, write, _),
+                ClientSession(read, write) as session,
+            ):
+                await session.initialize()
+        except ExceptionGroup as excgroup:
+            logger.warning(f"Probe failed for MCP server {connector.url}: {excgroup}")
+            if len(excgroup.exceptions) == 1:
+                raise excgroup.exceptions[0] from excgroup
+            raise excgroup from None
 
     async def mcp_proxy(self, *, connector_id: UUID, request: Request, user: User | None = None):
         connector = await self.read_connector(connector_id=connector_id, user=user)
@@ -306,11 +260,7 @@ class ConnectorService:
             response = await exit_stack.enter_async_context(
                 self._proxy_client.stream(
                     request.method,
-                    (
-                        f"{self._managed_mcp.get_service_url(connector=connector)}/mcp"
-                        if self._managed_mcp.is_managed(connector=connector)
-                        else str(connector.url)
-                    ),
+                    str(connector.url),
                     headers={
                         key: request.headers[key]
                         for key in ["accept", "content-type", "mcp-protocol-version", "mcp-session-id", "last-event-id"]

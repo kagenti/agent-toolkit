@@ -135,7 +135,6 @@ run = "true" # Empty tests in case there are no tests
 ["agentstack:start"]
 depends = [
   "agentstack-server:build",
-  "supergateway:build",
   "microshift-vm:build:qemu",
 ]
 raw = true

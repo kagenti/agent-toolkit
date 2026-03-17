@@ -5,11 +5,8 @@ from __future__ import annotations
 
 import functools
 import logging
-import pathlib
 from collections.abc import Callable
 
-import anyio
-import kr8s
 import procrastinate
 from kink import Container, di
 from limits.aio.storage import MemoryStorage, RedisStorage, Storage
@@ -27,7 +24,6 @@ from agentstack_server.infrastructure.persistence.unit_of_work import SqlAlchemy
 from agentstack_server.infrastructure.text_extraction.docling import DoclingTextExtractionBackend
 from agentstack_server.jobs.procrastinate import create_app
 from agentstack_server.service_layer.cache import ICacheFactory
-from agentstack_server.service_layer.services.managed_mcp_service import ManagedMcpService
 from agentstack_server.service_layer.unit_of_work import IUnitOfWorkFactory
 from agentstack_server.utils.utils import async_to_sync_isolated
 
@@ -47,18 +43,6 @@ def setup_database_engine(config: Configuration) -> AsyncEngine:
         sqlalchemy_instrumentor.instrument(engine=engine.sync_engine)
 
     return engine
-
-
-async def setup_kubernetes_client(namespace: str | None = None, kubeconfig: pathlib.Path | str | dict | None = None):
-    if namespace is None:
-        ns_path = anyio.Path("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
-        if await ns_path.exists():
-            namespace = (await ns_path.read_text()).strip()
-
-    async def api_factory():
-        return await kr8s.asyncio.Api(bypass_factory=True, namespace=namespace, kubeconfig=kubeconfig)
-
-    return api_factory
 
 
 def setup_rate_limiter_storage(config: Configuration) -> Storage:
@@ -86,17 +70,6 @@ async def bootstrap_dependencies(dependency_overrides: Container | None = None):
     di._aliases.clear()  # reset aliases
 
     _set_di(Configuration, get_configuration())
-    kr8s_api_factory = await setup_kubernetes_client(
-        di[Configuration].k8s_namespace,
-        di[Configuration].k8s_kubeconfig,
-    )
-    _set_di(
-        ManagedMcpService,
-        ManagedMcpService(
-            configuration=di[Configuration],
-            api_factory=kr8s_api_factory,
-        ),
-    )
     _set_di(
         IUnitOfWorkFactory,
         SqlAlchemyUnitOfWorkFactory(setup_database_engine(di[Configuration]), di[Configuration]),
