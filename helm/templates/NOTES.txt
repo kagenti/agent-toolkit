@@ -23,7 +23,7 @@ Getting started:
 
   {{- if .Values.ui.enabled }}
   # port-forward the UI
-  kubectl port-forward svc/agentstack-ui-svc 8334:{{.Values.ui.service.port}} &
+  kubectl port-forward svc/adk-ui-svc 8334:{{.Values.ui.service.port}} &
   {{- end }}
 
 {{- end }}

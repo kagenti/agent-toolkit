@@ -98,7 +98,6 @@ contextTokenPermissions:
     vector_stores: ["*"]
     context_data: ["*"]
 
-
 defaultLLMModel: ""
 defaultEmbeddingModel: ""
 modelProviders: []
@@ -177,7 +176,7 @@ auth:
     name: "Keycloak"
     id: "keycloak"
     rolesPath: "realm_access.roles" # JSON path to roles in JWT claims (can be an array or a semicolon separated string)
-    uiClientId: "agentstack-ui"
+    uiClientId: "adk-ui"
     uiClientSecret: ""
     uiClientSecretKey: "uiClientSecret"
     serverClientId: "adk-server"
@@ -212,7 +211,6 @@ github:
 
 # This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
-
 
 # -------- SERVER ----------
 server:
@@ -382,8 +380,6 @@ ui:
   readinessProbe: {}
 
 # ----- INFRASTRUCTURE ------
-
-
 
 ## PostgreSQL chart configuration
 ## ref: https://github.com/CloudPirates-io/helm-charts/tree/main/charts/postgres

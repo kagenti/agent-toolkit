@@ -6,7 +6,7 @@ trigger: always_on
 
 ## SCSS Modules - MANDATORY
 
-**CRITICAL**: When creating or modifying React components in `agentstack-ui`, you MUST use SCSS modules for styling. **NEVER use inline styles**.
+**CRITICAL**: When creating or modifying React components in `adk-ui`, you MUST use SCSS modules for styling. **NEVER use inline styles**.
 
 ### Rules
 

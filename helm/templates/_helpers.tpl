@@ -409,7 +409,7 @@ Return the OIDC UI Client Secret Name
 {{- if .Values.auth.oidcProvider.existingSecret -}}
     {{- print .Values.auth.oidcProvider.existingSecret -}}
 {{- else -}}
-    {{- print "agentstack-ui-secret" -}}
+    {{- print "adk-ui-secret" -}}
 {{- end -}}
 {{- end -}}
 
@@ -463,7 +463,7 @@ Return the OIDC UI Client Secret Value
 */}}
 {{- define "agentstack.oidc.uiClientSecretValue" -}}
 {{- $uiClientSecret := .Values.auth.oidcProvider.uiClientSecret -}}
-{{- $secret := (lookup "v1" "Secret" .Release.Namespace "agentstack-ui-secret") -}}
+{{- $secret := (lookup "v1" "Secret" .Release.Namespace "adk-ui-secret") -}}
 {{- if and $secret $secret.data (hasKey $secret.data "agentstackUiClientSecret") -}}
     {{- $uiClientSecret = index $secret.data "agentstackUiClientSecret" | b64dec -}}
 {{- end -}}

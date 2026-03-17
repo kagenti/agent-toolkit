@@ -51,7 +51,7 @@ export function App() {
 
   return (
     <main className="app">
-      <h1 className="heading">Agent Stack Chat Example</h1>
+      <h1 className="heading">Kagenti ADK Chat Example</h1>
 
       <div className="meta">
         <p>

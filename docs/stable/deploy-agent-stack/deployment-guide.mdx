@@ -190,7 +190,7 @@ externalOidcProvider:
   id: "my-idp" # Optional ID used internally
   rolesPath: "realm_access.roles" # JSON path to roles in JWT claims (can be an array or a semicolon separated string)
 
-  uiClientId: "agentstack-ui"
+  uiClientId: "adk-ui"
   serverClientId: "adk-server"
 
   # Secrets can be provided directly or via existing secrets
@@ -239,7 +239,7 @@ Without verified emails, authentication will fail with "Verified email not found
 
   **Clients:**
   - `adk-server`: Backend service client (Confidential, Service Accounts enabled).
-  - `agentstack-ui`: Frontend UI client (Confidential, Standard Flow).
+  - `adk-ui`: Frontend UI client (Confidential, Standard Flow).
   - `kagenti-adk`: Command Line Interface client (Public, Standard Flow).
 
   **Roles:**
@@ -255,7 +255,7 @@ To move beyond local port-forwarding, you must expose the following services usi
 
 | Service| Internal Target | Purpose |
 |--------|-----------------|---------|
-|<b>UI Endpoint</b>|`agentstack-ui-svc`| Access to the web interface (includes API proxy).
+|<b>UI Endpoint</b>|`adk-ui-svc`| Access to the web interface (includes API proxy).
 |<b>API Endpoint (optional)</b>  | `adk-server-svc`| Direct server API access; Required for CLI usage.
 |<b>Auth Endpoint (optional)</b>  | `agentstack-keycloak`| Required for UI and CLI authentication if using Keycloak.
 

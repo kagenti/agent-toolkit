@@ -35,7 +35,7 @@ spec:
             {{- end }}
             backend:
               service:
-                name: agentstack-ui-svc
+                name: adk-ui-svc
                 port:
                   number: {{ $.Values.ui.service.port }}
           {{- end }}

@@ -133,7 +133,7 @@ includes = [
     "apps/adk-cli/tasks.toml",
     "apps/adk-py/tasks.toml",
     "apps/adk-server/tasks.toml",
-    "apps/agentstack-ui/tasks.toml",
+    "apps/adk-ui/tasks.toml",
     "apps/adk-ts/tasks.toml",
     "apps/microshift-vm/tasks.toml",
     "agents/tasks.toml",
