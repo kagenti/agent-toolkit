@@ -62,7 +62,7 @@ class SqlAlchemyProviderRepository(IProviderRepository):
             "source": str(provider.source.root),
             "source_type": provider.source_type,
             "origin": provider.origin,
-            "agent_card": provider.agent_card.model_dump(mode="json"),
+            "agent_card": provider.agent_card,
             "created_at": provider.created_at,
             "updated_at": provider.updated_at,
             "created_by": provider.created_by,

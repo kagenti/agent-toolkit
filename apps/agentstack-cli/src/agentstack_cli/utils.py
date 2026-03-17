@@ -1,7 +1,6 @@
 # Copyright 2025 © BeeAI a Series of LF Projects, LLC
 # SPDX-License-Identifier: Apache-2.0
 
-
 from __future__ import annotations
 
 import contextlib
@@ -13,7 +12,7 @@ import subprocess
 import sys
 import time
 from collections import Counter
-from collections.abc import AsyncIterator, Mapping, MutableMapping
+from collections.abc import AsyncIterator, Iterable, Mapping, MutableMapping
 from contextlib import asynccontextmanager
 from contextvars import ContextVar
 from copy import deepcopy
@@ -302,6 +301,28 @@ def verbosity(verbose: bool, show_success_status: bool = True):
         SHOW_SUCCESS_STATUS.reset(token_command_status)
 
 
+def print_log(line, ansi_mode=False, out_console: Console | None = None):
+    if line.get("error"):
+
+        class CustomError(Exception): ...
+
+        CustomError.__name__ = line["error"]["type"]
+
+        raise CustomError(line["error"]["detail"])
+
+    def decode(text: str):
+        return Text.from_ansi(text) if ansi_mode else text
+
+    match line:
+        case {"stream": "stderr"}:
+            (out_console or err_console).print(decode(line["message"]))
+        case {"stream": "stdout"}:
+            (out_console or console).print(decode(line["message"]))
+        case {"event": "[DONE]"}:
+            return
+        case _:
+            (out_console or console).print(line)
+
 
 # ! This pattern is taken from agentstack_server.utils.github.GithubUrl, make sure to keep it in sync
 github_url_verbose_pattern = r"""
@@ -453,3 +474,7 @@ def merge(destination: MutableMapping[str, Any], *sources: Mapping[str, Any]) ->
     :return:
     """
     return functools.reduce(_deepmerge, sources, destination)
+
+
+def pick(dict: Mapping[str, Any], keys: Iterable[str]) -> dict[str, Any]:
+    return {key: value for key, value in dict.items() if key in keys}

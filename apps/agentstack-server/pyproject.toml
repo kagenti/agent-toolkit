@@ -70,6 +70,7 @@ dev = [
 
 [tool.uv.sources]
 agentstack-sdk = { path = "../agentstack-sdk-py", editable = true }
+a2a-sdk = { git = "https://github.com/a2aproject/a2a-python.git", rev = "1.0-dev" }
 
 [project.scripts]
 agentstack-server = "agentstack_server:serve"

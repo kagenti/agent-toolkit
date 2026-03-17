@@ -8,11 +8,13 @@ import builtins
 import typing
 import urllib.parse
 from contextlib import asynccontextmanager
+from typing import Any, Self
 from uuid import UUID
 
 import pydantic
 from a2a.client import ClientConfig, ClientFactory
 from a2a.types import AgentCard
+from google.protobuf.json_format import MessageToDict, ParseDict
 
 from agentstack_sdk.platform.client import PlatformClient, get_platform_client
 from agentstack_sdk.util.utils import filter_dict
@@ -22,7 +24,7 @@ class ProviderErrorMessage(pydantic.BaseModel):
     message: str
 
 
-class Provider(pydantic.BaseModel):
+class Provider(pydantic.BaseModel, arbitrary_types_allowed=True):
     id: str
     source: str
     origin: str
@@ -34,6 +36,11 @@ class Provider(pydantic.BaseModel):
     state: typing.Literal["online", "offline"] = "online"
     last_error: ProviderErrorMessage | None = None
     created_by: UUID
+
+    @pydantic.field_validator("agent_card", mode="before")
+    @classmethod
+    def parse_card(cls: Self, value: dict[str, Any]) -> AgentCard:
+        return ParseDict(value, AgentCard(), ignore_unknown_fields=True)
 
     @staticmethod
     async def create(
@@ -51,7 +58,7 @@ class Provider(pydantic.BaseModel):
                         json=filter_dict(
                             {
                                 "location": location,
-                                "agent_card": agent_card.model_dump(mode="json") if agent_card else None,
+                                "agent_card": MessageToDict(agent_card) if agent_card else None,
                                 "origin": origin,
                             }
                         ),
@@ -75,7 +82,7 @@ class Provider(pydantic.BaseModel):
         payload = filter_dict(
             {
                 "location": location,
-                "agent_card": agent_card.model_dump(mode="json") if agent_card else None,
+                "agent_card": MessageToDict(agent_card) if agent_card else None,
                 "origin": origin,
             }
         )
@@ -106,7 +113,7 @@ class Provider(pydantic.BaseModel):
                         url="/api/v1/providers/preview",
                         json={
                             "location": location,
-                            "agent_card": agent_card.model_dump(mode="json") if agent_card else None,
+                            "agent_card": MessageToDict(agent_card) if agent_card else None,
                         },
                     )
                 )
