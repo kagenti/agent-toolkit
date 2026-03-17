@@ -6,12 +6,12 @@
 import type { LLMDemands, LLMFulfillments } from '../../a2a/extensions/services/llm/types';
 import type { ContextToken } from '../../api/contexts/types';
 import { unwrapResult } from '../../api/core/client';
-import type { AgentStackClient } from '../../api/core/types';
+import type { AdkClient } from '../../api/core/types';
 import { ModelCapability } from '../../api/model-providers/types';
 
 const DEFAULT_SCORE_CUTOFF = 0.4;
 
-export const buildLLMExtensionFulfillmentResolver = (api: AgentStackClient, token: ContextToken) => {
+export const buildLLMExtensionFulfillmentResolver = (api: AdkClient, token: ContextToken) => {
   return async ({ llm_demands }: LLMDemands): Promise<LLMFulfillments> => {
     const allDemands = Object.keys(llm_demands);
     const fulfillmentPromises = allDemands.map(async (demandKey) => {

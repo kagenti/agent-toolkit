@@ -58,7 +58,7 @@ class CanvasEditRequest(pydantic.BaseModel, arbitrary_types_allowed=True):
 
 
 class CanvasExtensionSpec(NoParamsBaseExtensionSpec):
-    URI: str = "https://a2a-extensions.agentstack.beeai.dev/ui/canvas/v1"
+    URI: str = "https://a2a-extensions.adk.kagenti.dev/ui/canvas/v1"
 
 
 class CanvasExtensionServer(BaseExtensionServer[CanvasExtensionSpec, CanvasEditRequestMetadata]):

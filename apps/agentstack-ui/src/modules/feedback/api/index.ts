@@ -5,10 +5,10 @@
 
 import { type CreateUserFeedbackRequest, unwrapResult } from '@kagenti/adk';
 
-import { agentStackClient } from '#api/agentstack-client.ts';
+import { adkClient } from '#api/agentstack-client.ts';
 
 export async function sendFeedback(request: CreateUserFeedbackRequest) {
-  const response = await agentStackClient.createUserFeedback(request);
+  const response = await adkClient.createUserFeedback(request);
   const result = unwrapResult(response);
 
   return result;

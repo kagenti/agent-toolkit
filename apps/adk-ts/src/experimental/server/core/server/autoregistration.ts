@@ -125,7 +125,7 @@ export function createAutoregisterToAgentstack(options: AutoregistrationOptions)
         loadVariables().catch((error) => console.error('Error during variable reload:', error));
       }, VARIABLE_RELOAD_INTERVAL_MS);
     } catch (error) {
-      console.error(`Agent cannot be registered to agentstack server: ${getErrorMessage(error)}`);
+      console.error(`Agent cannot be registered to ADK server: ${getErrorMessage(error)}`);
     }
   }
 

@@ -55,7 +55,7 @@ class CitationMetadata(pydantic.BaseModel):
 
 
 class CitationExtensionSpec(NoParamsBaseExtensionSpec):
-    URI: str = "https://a2a-extensions.agentstack.beeai.dev/ui/citation/v1"
+    URI: str = "https://a2a-extensions.adk.kagenti.dev/ui/citation/v1"
 
 
 class CitationExtensionServer(BaseExtensionServer[CitationExtensionSpec, NoneType]):

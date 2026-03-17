@@ -9,7 +9,7 @@ import type { A2AServiceExtension, A2AUiExtension } from '../../../../core/exten
 import { oauthDemandsSchema, oauthFulfillmentsSchema, oauthRequestSchema } from './schemas';
 import type { OAuthDemands, OAuthFulfillments, OAuthRequest } from './types';
 
-export const OAUTH_EXTENSION_URI = 'https://a2a-extensions.agentstack.beeai.dev/auth/oauth/v1';
+export const OAUTH_EXTENSION_URI = 'https://a2a-extensions.adk.kagenti.dev/auth/oauth/v1';
 
 export const oauthExtension: A2AServiceExtension<typeof OAUTH_EXTENSION_URI, OAuthDemands, OAuthFulfillments> = {
   getUri: () => OAUTH_EXTENSION_URI,

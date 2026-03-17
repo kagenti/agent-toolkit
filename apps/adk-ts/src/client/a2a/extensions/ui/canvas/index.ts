@@ -9,7 +9,7 @@ import type { A2AUiExtension } from '../../../../core/extensions/types';
 import { canvasEditRequestSchema } from './schemas';
 import type { CanvasEditRequest } from './types';
 
-export const CANVAS_EXTENSION_URI = 'https://a2a-extensions.agentstack.beeai.dev/ui/canvas/v1';
+export const CANVAS_EXTENSION_URI = 'https://a2a-extensions.adk.kagenti.dev/ui/canvas/v1';
 
 export const canvasExtension: A2AUiExtension<typeof CANVAS_EXTENSION_URI, CanvasEditRequest> = {
   getUri: () => CANVAS_EXTENSION_URI,

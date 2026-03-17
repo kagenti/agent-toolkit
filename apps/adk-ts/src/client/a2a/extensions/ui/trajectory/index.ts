@@ -9,7 +9,7 @@ import type { A2AUiExtension } from '../../../../core/extensions/types';
 import { trajectoryMetadataSchema } from './schemas';
 import type { TrajectoryMetadata } from './types';
 
-export const TRAJECTORY_EXTENSION_URI = 'https://a2a-extensions.agentstack.beeai.dev/ui/trajectory/v1';
+export const TRAJECTORY_EXTENSION_URI = 'https://a2a-extensions.adk.kagenti.dev/ui/trajectory/v1';
 
 export const trajectoryExtension: A2AUiExtension<typeof TRAJECTORY_EXTENSION_URI, TrajectoryMetadata> = {
   getUri: () => TRAJECTORY_EXTENSION_URI,

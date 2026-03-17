@@ -23,6 +23,6 @@ export default defineConfig([
     entry: { index: 'src/index.ts' },
     format: ['iife'],
     outExtension: () => ({ js: '.umd.js' }),
-    globalName: 'AgentStackSDK',
+    globalName: 'KagentiADK',
   },
 ]);

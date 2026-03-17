@@ -73,7 +73,7 @@ class AgentRunSettings(BaseModel):
 
 @deprecated("Use FormServiceExtensionSpec.demand_settings() instead")
 class SettingsExtensionSpec(BaseExtensionSpec[SettingsRender | None]):
-    URI: str = "https://a2a-extensions.agentstack.beeai.dev/ui/settings/v1"
+    URI: str = "https://a2a-extensions.adk.kagenti.dev/ui/settings/v1"
 
 
 @deprecated("Use FormServiceExtensionServer.parse_settings_form() instead")

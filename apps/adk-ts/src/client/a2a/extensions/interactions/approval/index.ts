@@ -9,7 +9,7 @@ import type { A2AUiExtension } from '../../../../core/extensions/types';
 import { approvalRequestSchema, approvalResponseSchema } from './schemas';
 import type { ApprovalRequest, ApprovalResponse } from './types';
 
-export const APPROVAL_EXTENSION_URI = 'https://a2a-extensions.agentstack.beeai.dev/interactions/approval/v1';
+export const APPROVAL_EXTENSION_URI = 'https://a2a-extensions.adk.kagenti.dev/interactions/approval/v1';
 
 export const approvalExtension: A2AUiExtension<typeof APPROVAL_EXTENSION_URI, ApprovalRequest> = {
   getUri: () => APPROVAL_EXTENSION_URI,

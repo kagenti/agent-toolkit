@@ -9,7 +9,7 @@ import type { A2AUiExtension } from '../../../../core/extensions/types';
 import { agentDetailSchema } from './schemas';
 import type { AgentDetail } from './types';
 
-export const AGENT_DETAIL_EXTENSION_URI = 'https://a2a-extensions.agentstack.beeai.dev/ui/agent-detail/v1';
+export const AGENT_DETAIL_EXTENSION_URI = 'https://a2a-extensions.adk.kagenti.dev/ui/agent-detail/v1';
 
 export const agentDetailExtension: A2AUiExtension<typeof AGENT_DETAIL_EXTENSION_URI, AgentDetail> = {
   getUri: () => AGENT_DETAIL_EXTENSION_URI,

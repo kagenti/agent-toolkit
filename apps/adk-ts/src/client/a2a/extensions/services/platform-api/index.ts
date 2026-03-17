@@ -5,7 +5,7 @@
 
 import type { ContextToken } from '../../../../api/contexts/types';
 
-export const PLATFORM_API_EXTENSION_URI = 'https://a2a-extensions.agentstack.beeai.dev/services/platform_api/v1';
+export const PLATFORM_API_EXTENSION_URI = 'https://a2a-extensions.adk.kagenti.dev/services/platform_api/v1';
 
 export const platformApiExtension = (metadata: Record<string, unknown>, contextToken: ContextToken) => {
   return {

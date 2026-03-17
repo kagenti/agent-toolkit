@@ -7,7 +7,7 @@ import type { A2AServiceExtension } from '../../../../core/extensions/types';
 import { settingsDemandsSchema, settingsFulfillmentsSchema } from './schemas';
 import type { SettingsDemands, SettingsFulfillments } from './types';
 
-export const SETTINGS_EXTENSION_URI = 'https://a2a-extensions.agentstack.beeai.dev/ui/settings/v1';
+export const SETTINGS_EXTENSION_URI = 'https://a2a-extensions.adk.kagenti.dev/ui/settings/v1';
 
 /**
  * @deprecated Use the form extension with `form_demands.settings_form`.

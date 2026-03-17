@@ -166,6 +166,9 @@ export const buildA2AClient = async <UIGenericPart = never>({
 
               const parts: (UIMessagePart | UIGenericPart)[] = handleStatusUpdate(statusUpdate, onStatusUpdate);
 
+              if (!taskId) {
+                throw new Error(`Illegal State - taskId missing on status-update event`);
+              }
               messageSubject.next({ type: RunResultType.Parts, parts, taskId });
             })
             .with({ artifactUpdate: P.nonNullable }, ({ artifactUpdate }) => {
@@ -173,6 +176,9 @@ export const buildA2AClient = async <UIGenericPart = never>({
 
               const parts = handleArtifactUpdate(artifactUpdate);
 
+              if (!taskId) {
+                throw new Error(`Illegal State - taskId missing on artifact-update event`);
+              }
               messageSubject.next({ type: RunResultType.Parts, parts, taskId });
             })
             .with({ message: P.nonNullable }, ({ message }) => {

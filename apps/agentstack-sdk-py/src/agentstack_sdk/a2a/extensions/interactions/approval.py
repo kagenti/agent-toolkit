@@ -116,7 +116,7 @@ class ApprovalExtensionParams(BaseModel):
 
 
 class ApprovalExtensionSpec(BaseExtensionSpec[ApprovalExtensionParams]):
-    URI: str = "https://a2a-extensions.agentstack.beeai.dev/interactions/approval/v1"
+    URI: str = "https://a2a-extensions.adk.kagenti.dev/interactions/approval/v1"
 
 
 class ApprovalExtensionMetadata(BaseModel):

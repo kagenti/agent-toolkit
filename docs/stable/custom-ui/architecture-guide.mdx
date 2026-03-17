@@ -10,7 +10,7 @@ If you are building your own user interface, start with the reference implementa
 
 This page explains the approach used in that example and how to extend it into a full custom UI.
 
-The example is intentionally minimal: it runs against one provider/agent at a time, with `VITE_AGENTSTACK_PROVIDER_ID` set manually in `.env`.
+The example is intentionally minimal: it runs against one provider/agent at a time, with `VITE_ADK_PROVIDER_ID` set manually in `.env`.
 This keeps the core SDK flow easy to follow before you add provider discovery, routing, and richer UI state.
 
 It uses React, TypeScript, and Vite for a clean demonstration and fast local iteration.
@@ -20,7 +20,7 @@ This example assumes the following runtime setup:
 
 - Your Agent Stack server is running and reachable.
 - The server has at least one provider/agent available.
-- `VITE_AGENTSTACK_PROVIDER_ID` matches an existing provider in that server.
+- `VITE_ADK_PROVIDER_ID` matches an existing provider in that server.
 - When running from the Vite dev server (`http://localhost:5173`), CORS on the Agent Stack server allows that origin.
 
 If your server cannot allow the frontend origin directly, you can route requests through a frontend proxy, but proxy configuration is intentionally out of scope for this basic example.
@@ -45,18 +45,18 @@ The example keeps runtime configuration in environment variables and injects the
 `.env` values:
 
 ```bash
-VITE_AGENTSTACK_BASE_URL="http://localhost:8333"
-VITE_AGENTSTACK_PROVIDER_ID="your-provider-id"
+VITE_ADK_BASE_URL="http://localhost:8333"
+VITE_ADK_PROVIDER_ID="your-provider-id"
 ```
 
-- `VITE_AGENTSTACK_BASE_URL`: URL of your actual Agent Stack server instance
-- `VITE_AGENTSTACK_PROVIDER_ID`: provider/agent ID the example will call
+- `VITE_ADK_BASE_URL`: URL of your actual Agent Stack server instance
+- `VITE_ADK_PROVIDER_ID`: provider/agent ID the example will call
 
 In the example code, these values are read as:
 
 ```typescript
-const BASE_URL = import.meta.env.VITE_AGENTSTACK_BASE_URL;
-const PROVIDER_ID = import.meta.env.VITE_AGENTSTACK_PROVIDER_ID;
+const BASE_URL = import.meta.env.VITE_ADK_BASE_URL;
+const PROVIDER_ID = import.meta.env.VITE_ADK_PROVIDER_ID;
 ```
 
 ## 2. Create a context and context token
@@ -182,7 +182,7 @@ Related guides:
 
 ## Implementation checklist
 
-1. Configure `VITE_AGENTSTACK_BASE_URL` and `VITE_AGENTSTACK_PROVIDER_ID`
+1. Configure `VITE_ADK_BASE_URL` and `VITE_ADK_PROVIDER_ID`
 2. Create `context` and `contextToken`
 3. Build authenticated A2A client
 4. Resolve agent card demands to metadata
@@ -198,15 +198,15 @@ pnpm install
 pnpm dev
 ```
 
-Update `.env` with a valid `VITE_AGENTSTACK_BASE_URL` and `VITE_AGENTSTACK_PROVIDER_ID` before starting.
+Update `.env` with a valid `VITE_ADK_BASE_URL` and `VITE_ADK_PROVIDER_ID` before starting.
 
 ## Troubleshooting
 
 - **`Missing required environment variables.` on startup**
-  `VITE_AGENTSTACK_BASE_URL` or `VITE_AGENTSTACK_PROVIDER_ID` is missing. Check your `.env` file and restart `pnpm dev`.
+  `VITE_ADK_BASE_URL` or `VITE_ADK_PROVIDER_ID` is missing. Check your `.env` file and restart `pnpm dev`.
 
 - **Network errors when creating context/token**
-  `VITE_AGENTSTACK_BASE_URL` is wrong, unreachable, or points to a different environment. Verify the server URL and that the Agent Stack API is running.
+  `VITE_ADK_BASE_URL` is wrong, unreachable, or points to a different environment. Verify the server URL and that the Agent Stack API is running.
 
 - **CORS errors in the browser console**
   The Agent Stack server must allow the frontend origin (for Vite dev, `http://localhost:5173`). Update server CORS settings or use a proxy.
@@ -218,7 +218,7 @@ Update `.env` with a valid `VITE_AGENTSTACK_BASE_URL` and `VITE_AGENTSTACK_PROVI
   The token grants may be too narrow for the provider/agent. Recheck `grant_global_permissions` and `grant_context_permissions` in Step 2.
 
 - **Provider not found / invalid provider ID errors**
-  `VITE_AGENTSTACK_PROVIDER_ID` must match an existing provider on the target server. Confirm the ID in your Agent Stack instance.
+  `VITE_ADK_PROVIDER_ID` must match an existing provider on the target server. Confirm the ID in your Agent Stack instance.
 
 - **UI shows little or no useful output even though requests succeed**
   This example intentionally aggregates only text parts. Agents that return files, data parts, citations, forms, or artifacts need additional rendering logic (see **[Agent Responses](./agent-responses)** and **[A2A Client Integration](./a2a-client)**).

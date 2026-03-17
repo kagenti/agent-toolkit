@@ -54,4 +54,4 @@ export type ApiResult<T> = ApiSuccess<T> | ApiFailure;
 
 export type CallApi = <T>(params: ApiParams<T>) => Promise<ApiResult<T>>;
 
-export type AgentStackClient = ReturnType<typeof buildApiClient>;
+export type AdkClient = ReturnType<typeof buildApiClient>;

@@ -15,9 +15,9 @@ undefined = _Undefined.undefined
 Undefined: TypeAlias = Literal[_Undefined.undefined]  # noqa: UP040
 
 # A2A platform constants
-AGENT_DETAIL_EXTENSION_URI: Final[str] = "https://a2a-extensions.agentstack.beeai.dev/ui/agent-detail/v1"
+AGENT_DETAIL_EXTENSION_URI: Final[str] = "https://a2a-extensions.adk.kagenti.dev/ui/agent-detail/v1"
 SELF_REGISTRATION_EXTENSION_URI: Final[str] = (
-    "https://a2a-extensions.agentstack.beeai.dev/services/platform-self-registration/v1"
+    "https://a2a-extensions.adk.kagenti.dev/services/platform-self-registration/v1"
 )
 
 MODEL_API_KEY_SECRET_NAME = "MODEL_API_KEY"

@@ -11,32 +11,32 @@ import type {
 } from '@kagenti/adk';
 import { unwrapResult } from '@kagenti/adk';
 
-import { agentStackClient } from '#api/agentstack-client.ts';
+import { adkClient } from '#api/agentstack-client.ts';
 import { fetchEntity } from '#api/utils.ts';
 
 export async function listProviders(request: ListProvidersRequest = {}) {
-  const response = await agentStackClient.listProviders(request);
+  const response = await adkClient.listProviders(request);
   const result = unwrapResult(response);
 
   return result;
 }
 
 export async function createProvider(request: CreateProviderRequest) {
-  const response = await agentStackClient.createProvider(request);
+  const response = await adkClient.createProvider(request);
   const result = unwrapResult(response);
 
   return result;
 }
 
 export async function readProvider(request: ReadProviderRequest) {
-  const response = await agentStackClient.readProvider(request);
+  const response = await adkClient.readProvider(request);
   const result = unwrapResult(response);
 
   return result;
 }
 
 export async function deleteProvider(request: DeleteProviderRequest) {
-  const response = await agentStackClient.deleteProvider(request);
+  const response = await adkClient.deleteProvider(request);
   const result = unwrapResult(response);
 
   return result;

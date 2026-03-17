@@ -7,7 +7,7 @@ import type { ExtensionSpec } from '../../../core/extensions/types';
 import type { PlatformSelfRegistrationExtensionFulfillments, PlatformSelfRegistrationExtensionParams } from './types';
 
 export const PLATFORM_SELF_REGISTRATION_EXTENSION_URI =
-  'https://a2a-extensions.agentstack.beeai.dev/services/platform-self-registration/v1';
+  'https://a2a-extensions.adk.kagenti.dev/services/platform-self-registration/v1';
 
 export class PlatformSelfRegistrationExtensionSpec implements ExtensionSpec<
   PlatformSelfRegistrationExtensionParams,
