@@ -196,25 +196,6 @@ jobs:
           cache-from: type=registry,ref=ghcr.io/${{ github.repository }}/supergateway:cache
           cache-to: type=registry,ref=ghcr.io/${{ github.repository }}/supergateway:cache,mode=max
 
-      - run: mise run 'keycloak-theme:build:*'
-      - id: keycloak-version
-        run: |
-          KEYCLOAK_VERSION=$(grep -oP 'FROM quay.io/keycloak/keycloak:\K[0-9.]+' ./apps/keycloak-theme/Dockerfile)
-          echo "version=$KEYCLOAK_VERSION" >> $GITHUB_OUTPUT
-      - uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
-        with:
-          context: ./apps/keycloak-theme
-          file: ./apps/keycloak-theme/Dockerfile
-          push: true
-          platforms: linux/amd64,linux/arm64
-          tags: |
-            ghcr.io/${{ github.repository }}/keycloak-themed:${{ github.sha }}
-            ghcr.io/${{ github.repository }}/keycloak-themed:${{ steps.keycloak-version.outputs.version }}
-            quay.io/beeai/keycloak-themed:${{ github.sha }}
-            quay.io/beeai/keycloak-themed:${{ steps.keycloak-version.outputs.version }}
-          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}/keycloak-themed:cache
-          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}/keycloak-themed:cache,mode=max
-
       - run: mise run 'agentstack-ui:build:*'
       - uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
         with:

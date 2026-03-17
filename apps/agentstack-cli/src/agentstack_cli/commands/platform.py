@@ -714,26 +714,6 @@ async def start_cmd(
             .stdout.decode()
             .splitlines()
         }
-        # The post-renderer strips the x86-only Fedora postgres image and its reference
-        # won't appear in helm template output, so no extra image additions needed.
-        # Add the keycloak-themed image: the agentstack chart only uses it in the provision job,
-        # but we also patch kagenti's keycloak to use our themed image.
-        keycloak_image = (
-            await run_in_vm(
-                vm_name,
-                [
-                    "bash", "-c",
-                    "helm template agentstack /tmp/agentstack-chart.tgz"
-                    " --values=/tmp/agentstack-values.yaml"
-                    " --show-only templates/keycloak/provision-job.yaml "
-                    + " ".join(shlex.quote(f"--set={v}") for v in scoped_sets.get("agentstack", []))
-                    + " | grep -m1 'image:.*keycloak' | sed 's/.*image: *//;s/\"//g' | tr -d ' '",
-                ],
-                "Resolving keycloak image from agentstack chart",
-            )
-        ).stdout.decode().strip()
-        if keycloak_image:
-            loaded_images.add(keycloak_image)
         images_to_import_from_host, shas_guest_before = set[str](), {}
         if image_pull_mode in {ImagePullMode.host, ImagePullMode.hybrid}:
             await run_in_vm(
@@ -870,7 +850,7 @@ async def start_cmd(
                 "python3", "-c",
                 "import os; "
                 "p='/tmp/helm-plugin-patch-postgres/run.sh'; "
-                f"open(p,'wb').write(b'\\x23\\x21/bin/bash\\nset -e\\nexport AGENTSTACK_KEYCLOAK_IMAGE={shlex.quote(keycloak_image)}\\nexec python3 /tmp/helm-plugin-patch-postgres/patch.py\\n'); "
+                "open(p,'wb').write(b'\\x23\\x21/bin/bash\\nset -e\\nexec python3 /tmp/helm-plugin-patch-postgres/patch.py\\n'); "
                 "os.chmod(p, 0o755)",
             ],
             "Writing post-renderer entrypoint",

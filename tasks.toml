@@ -136,7 +136,6 @@ run = "true" # Empty tests in case there are no tests
 depends = [
   "agentstack-server:build",
   "supergateway:build",
-  "keycloak-theme:build",
   "microshift-vm:build:qemu",
 ]
 raw = true
@@ -164,7 +163,6 @@ ARCH=$(uname -m | sed -e 's/arm64/aarch64/' -e 's/amd64/x86_64/')
     --image-pull-mode="$PULL_MODE" \
     --set agentstack:auth.nextauthDevUrl="http://localhost:3000" \
     --set agentstack:server.image.tag=local \
-    --set agentstack:auth.keycloakProvisionJob.image.tag=local \
     ${UI_TAG-} "$@"
 """
 
