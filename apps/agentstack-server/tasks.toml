@@ -353,7 +353,7 @@ agentstack:
           name: Test MCP Server
 ' > "$CONFIG_FILE"
 
-{{ mise_bin }} run agentstack:start -v --vm-name=${VM_NAME} --skip-login -f "$CONFIG_FILE" --set agentstack:ui.enabled=false
+{{ mise_bin }} run agentstack:start -v --vm-name=${VM_NAME} --skip-login -f "$CONFIG_FILE" --set agentstack:ui.enabled=false --set kagenti:components.ui.enabled=false
 
 eval "$( {{ mise_bin }} run agentstack:shell --vm-name="$VM_NAME" )"
 
@@ -367,7 +367,7 @@ export TEST_AGENT_IMAGE
 export DB_URL="postgresql+asyncpg://agentstack-user:password@localhost:5432/agentstack"
 export LLM_API_BASE="${LLM_API_BASE:-http://host.docker.internal:11434/v1}"
 
-kubectl port-forward svc/postgresql 5432:5432 2>/dev/null 1>&2 &
+kubectl port-forward -n agentstack svc/postgresql 5432:5432 2>/dev/null 1>&2 &
 uv run pytest -m e2e --ignore=tests/e2e/examples
 result=$?
 
@@ -427,7 +427,7 @@ agentstack:
           name: Test MCP Server
 ' > "$CONFIG_FILE"
 
-{{ mise_bin }} run agentstack:start --vm-name=${VM_NAME} --skip-login -f "$CONFIG_FILE" --set agentstack:ui.enabled=false
+{{ mise_bin }} run agentstack:start --vm-name=${VM_NAME} --skip-login -f "$CONFIG_FILE" --set agentstack:ui.enabled=false --set kagenti:components.ui.enabled=false
 
 
 eval "$( {{ mise_bin }} run agentstack:shell --vm-name="$VM_NAME" )"
@@ -478,7 +478,8 @@ VM_NAME=integration-test-run
 {{ mise_bin }} run agentstack:start \
     --vm-name="$VM_NAME" \
     --set agentstack:redis.enabled=true \
-    --set agentstack:ui.enabled=false
+    --set agentstack:ui.enabled=false \
+    --set kagenti:components.ui.enabled=false
 
 eval "$( {{ mise_bin }} run agentstack:shell --vm-name="$VM_NAME" )"
 
