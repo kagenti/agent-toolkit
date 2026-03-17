@@ -18,7 +18,6 @@
    the agentstack helm chart's collector config.
 """
 
-import os
 import re
 import sys
 
@@ -101,16 +100,6 @@ for doc in docs:
         doc = re.sub(
             r"image: arizephoenix/phoenix:version-[\d.]+",
             "image: arizephoenix/phoenix:version-12.31.2",
-            doc,
-        )
-
-    # Patch Keycloak: replace upstream image with agentstack-themed build.
-    # The target image is passed via AGENTSTACK_KEYCLOAK_IMAGE env var from run.sh.
-    keycloak_image = os.environ.get("AGENTSTACK_KEYCLOAK_IMAGE")
-    if keycloak_image and "namespace: keycloak" in doc and ("kind: StatefulSet" in doc or "kind: Job" in doc):
-        doc = re.sub(
-            r"image: [^\s]*keycloak[^\s]*",
-            f"image: {keycloak_image}",
             doc,
         )
 

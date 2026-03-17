@@ -145,7 +145,7 @@ auth:
       #   roles: ["agentstack-admin"]
       #   enabled: true
     image:
-      repository: ghcr.io/i-am-bee/agentstack/keycloak-themed
+      repository: quay.io/keycloak/keycloak
       tag: 26.5.4
       pullPolicy: IfNotPresent
 

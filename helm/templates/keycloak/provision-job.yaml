@@ -44,10 +44,6 @@ spec:
                 /opt/keycloak/bin/kcadm.sh create realms -s realm=agentstack -s enabled=true
               fi
 
-              # Set Login Theme
-              echo "Setting login theme to 'agentstack'..."
-              /opt/keycloak/bin/kcadm.sh update realms/agentstack -s loginTheme=agentstack
-
               # Create Roles
               echo "Creating Roles..."
               if ! /opt/keycloak/bin/kcadm.sh get roles/agentstack-admin -r agentstack > /dev/null 2>&1; then
