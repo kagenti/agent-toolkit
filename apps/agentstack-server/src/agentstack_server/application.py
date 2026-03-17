@@ -32,8 +32,6 @@ from agentstack_server.api.routes.contexts import router as contexts_router
 from agentstack_server.api.routes.files import router as files_router
 from agentstack_server.api.routes.model_providers import router as model_providers_router
 from agentstack_server.api.routes.openai import router as openai_router
-from agentstack_server.api.routes.provider_builds import router as provider_builds_router
-from agentstack_server.api.routes.provider_discovery import router as provider_discovery_router
 from agentstack_server.api.routes.providers import router as provider_router
 from agentstack_server.api.routes.user import router as user_router
 from agentstack_server.api.routes.user_feedback import router as user_feedback_router
@@ -48,9 +46,10 @@ from agentstack_server.exceptions import (
     RateLimitExceededError,
 )
 from agentstack_server.jobs.crons.model_provider import check_model_provider_registry, update_model_state_and_cache
-from agentstack_server.jobs.crons.provider import check_registry
+from agentstack_server.jobs.crons.provider import sync_kagenti_agents
 from agentstack_server.run_workers import run_workers
 from agentstack_server.service_layer.services.user_feedback import UserFeedbackService
+from agentstack_server.service_layer.services.users import UserService
 from agentstack_server.telemetry import INSTRUMENTATION_NAME, shutdown_telemetry
 
 logger = logging.getLogger(__name__)
@@ -126,8 +125,6 @@ def mount_routes(app: FastAPI):
     server_router.include_router(users_router, prefix="/users", tags=["users"])
     server_router.include_router(a2a_router, prefix="/a2a", tags=["a2a"])
     server_router.include_router(provider_router, prefix="/providers", tags=["providers"])
-    server_router.include_router(provider_discovery_router, prefix="/providers/discovery", tags=["provider_discovery"])
-    server_router.include_router(provider_builds_router, prefix="/provider_builds", tags=["provider_builds"])
     server_router.include_router(model_providers_router, prefix="/model_providers", tags=["model_providers"])
     server_router.include_router(configuration_router, prefix="/configurations", tags=["configurations"])
     server_router.include_router(files_router, prefix="/files", tags=["files"])
@@ -210,6 +207,10 @@ def app(*, dependency_overrides: Container | None = None, enable_workers: bool =
         user_feedback = di[UserFeedbackService]
         try:
             register_telemetry()
+
+            # Ensure admin user exists
+            await di[UserService].ensure_user(email=configuration.admin_user_email)
+
             async with (
                 procrastinate_app.open_async(),
                 user_feedback,
@@ -217,7 +218,7 @@ def app(*, dependency_overrides: Container | None = None, enable_workers: bool =
             ):
                 # Force initial synchronization job
                 with suppress(AlreadyEnqueued):
-                    await check_registry.defer_async(timestamp=int(time.time()))
+                    await sync_kagenti_agents.defer_async(timestamp=int(time.time()))
                 with suppress(AlreadyEnqueued):
                     await check_model_provider_registry.defer_async(timestamp=int(time.time()))
                 with suppress(AlreadyEnqueued):

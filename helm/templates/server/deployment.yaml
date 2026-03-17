@@ -1,0 +1,398 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agentstack-server
+  labels:
+    app: agentstack-server
+    {{- include "agentstack.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.server.replicaCount }}
+  selector:
+    matchLabels:
+      app: agentstack-server
+      {{- include "agentstack.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/secrets: {{ include (printf "%s/templates/server/secrets.yaml" .Chart.Name) . | sha256sum }}
+      {{- with .Values.server.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        app: agentstack-server
+        {{- include "agentstack.labels" . | nindent 8 }}
+        {{- with .Values.server.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- if .Values.server.hostNetwork }}
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      {{- end }}
+      {{- include "agentstack.imagePullSecrets" . | nindent 6 }}
+      {{- with .Values.server.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      initContainers:
+        {{- if .Values.server.initContainers.createVectorDbExtension }}
+        - name: create-pgvector-extension
+          image: "{{ .Values.server.image.repository }}:{{ .Values.server.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.server.image.pullPolicy }}
+          workingDir: "/app/"
+          command: [ "create-vector-extension" ]
+          {{- with .Values.server.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          env:
+            - name: AUTH__DISABLE_AUTH
+              value: "true"
+            - name: LOGGING__LEVEL_SQLALCHEMY
+              value: INFO
+            - name: PERSISTENCE__ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: agentstack-secret
+                  key: encryptionKey
+            - name: PERSISTENCE__DB_URL
+              valueFrom:
+                secretKeyRef:
+                  key: sqlConnectionSuperuser
+                  name: {{ include "agentstack.databaseSecretName" . }}
+            {{- if include "agentstack.databaseSslEnabled" . }}
+            - name: PERSISTENCE__DB_USE_SSL
+              value: "true"
+            {{- if .Values.externalDatabase.sslRootCert }}
+            - name: PERSISTENCE__DB_SSL_CERT
+              value: /app/db.crt
+            {{- end }}
+            {{- end }}
+          {{- if and (include "agentstack.databaseSslEnabled" .) .Values.externalDatabase.sslRootCert }}
+          volumeMounts:
+            - name: db-ssl-cert
+              mountPath: /app/db.crt
+              subPath: sslRootCert
+              readOnly: true
+          {{- end }}
+        {{- end }}
+        - name: run-migrations
+          image: "{{ .Values.server.image.repository }}:{{ .Values.server.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.server.image.pullPolicy }}
+          workingDir: "/app/"
+          command: [ "migrate" ]
+          {{- with .Values.server.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          env:
+            - name: AUTH__DISABLE_AUTH
+              value: "true"
+            - name: LOGGING__LEVEL_SQLALCHEMY
+              value: INFO
+            - name: PERSISTENCE__ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: agentstack-secret
+                  key: encryptionKey
+            - name: PERSISTENCE__DB_URL
+              valueFrom:
+                secretKeyRef:
+                  key: sqlConnection
+                  name: {{ include "agentstack.databaseSecretName" . }}
+            {{- if include "agentstack.databaseSslEnabled" . }}
+            - name: PERSISTENCE__DB_USE_SSL
+              value: "true"
+            {{- if .Values.externalDatabase.sslRootCert }}
+            - name: PERSISTENCE__DB_SSL_CERT
+              value: /app/db.crt
+            {{- end }}
+            {{- end }}
+          {{- if and (include "agentstack.databaseSslEnabled" .) .Values.externalDatabase.sslRootCert }}
+          volumeMounts:
+            - name: db-ssl-cert
+              mountPath: /app/db.crt
+              subPath: sslRootCert
+              readOnly: true
+          {{- end }}
+        - name: create-buckets
+          image: "{{ .Values.server.image.repository }}:{{ .Values.server.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.server.image.pullPolicy }}
+          workingDir: "/app/"
+          command: [ "create-buckets" ]
+          {{- with .Values.server.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          env:
+            - name: AUTH__DISABLE_AUTH
+              value: "true"
+            - name: PERSISTENCE__ENCRYPTION_KEY
+              value: "dummy"
+            # Object Storage Configuration
+            - name: OBJECT_STORAGE__ENDPOINT_URL
+              value: {{ include "agentstack.s3.endpoint" . | quote }}
+            - name: OBJECT_STORAGE__ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "agentstack.s3.secretName" . }}
+                  key: s3AccessKeyId
+            - name: OBJECT_STORAGE__ACCESS_KEY_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "agentstack.s3.secretName" . }}
+                  key: s3AccessKeySecret
+            - name: OBJECT_STORAGE__BUCKET_NAME
+              value: {{ include "agentstack.s3.bucket" . | quote }}
+            - name: OBJECT_STORAGE__REGION
+              value: {{ include "agentstack.s3.region" . | quote }}
+            - name: OBJECT_STORAGE__USE_SSL
+              value: {{ ternary "true" "false" (eq (include "agentstack.s3.protocol" .) "https") | quote}}
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- with .Values.server.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.server.image.repository }}:{{ .Values.server.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.server.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8333
+              protocol: TCP
+          {{- with .Values.server.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.server.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.server.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          env:
+            {{/* see https://fastapi.tiangolo.com/deployment/https/?h=forwarded+allow+ips#proxy-forwarded-headers */}}
+            - name: TRUST_PROXY_HEADERS
+              value: {{ .Values.trustProxyHeaders | quote }}
+            {{- if .Values.server.cors.enabled }}
+            - name: CORS__ENABLED
+              value: {{ .Values.server.cors.enabled | quote }}
+            - name: CORS__ALLOW_ORIGINS
+              value: {{ .Values.server.cors.allowOrigins | toJson | quote }}
+            - name: CORS__ALLOW_ORIGIN_REGEX
+              value: {{ .Values.server.cors.allowOriginRegex | quote }}
+            - name: CORS__ALLOW_METHODS
+              value: {{ .Values.server.cors.allowMethods | toJson | quote }}
+            - name: CORS__ALLOW_HEADERS
+              value: {{ .Values.server.cors.allowHeaders | toJson | quote }}
+            - name: CORS__ALLOW_CREDENTIALS
+              value: {{ .Values.server.cors.allowCredentials | quote }}
+            {{- end }}
+            - name: A2A_PROXY__REQUESTS_EXPIRE_AFTER_DAYS
+              value: {{ .Values.a2aProxyRequestsExpireAfterDays | quote }}
+            - name: CONTEXT__RESOURCES_EXPIRE_AFTER_DAYS
+              value: {{ .Values.contextResourcesExpireAfterDays | quote }}
+            - name: TEXT_EXTRACTION__ENABLED
+              value: {{ .Values.docling.enabled | quote }}
+            {{- if .Values.github.auths }}
+            - name: GITHUB_REGISTRY_CONFIG_JSON
+              valueFrom:
+                secretKeyRef:
+                  name: agentstack-secret
+                  key: .githubconfigjson
+            {{- end }}
+            - name: MODEL_PROVIDER_REGISTRY__LOCATIONS__FILE
+              value: file:///app/config/model_providers_registry.yaml
+            {{- if .Values.defaultLLMModel }}
+            - name: MODEL_PROVIDER__DEFAULT_LLM_MODEL
+              value: {{ .Values.defaultLLMModel | quote }}
+            {{- end }}
+            {{- if .Values.defaultEmbeddingModel }}
+            - name: MODEL_PROVIDER__DEFAULT_EMBEDDING_MODEL
+              value: {{ .Values.defaultEmbeddingModel | quote }}
+            {{- end }}
+            - name: PERSISTENCE__ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: agentstack-secret
+                  key: encryptionKey
+            - name: PERSISTENCE__DB_URL
+              valueFrom:
+                secretKeyRef:
+                  key: sqlConnection
+                  name: {{ include "agentstack.databaseSecretName" . }}
+            {{- if include "agentstack.databaseSslEnabled" . }}
+            - name: PERSISTENCE__DB_USE_SSL
+              value: "true"
+            {{- if .Values.externalDatabase.sslRootCert }}
+            - name: PERSISTENCE__DB_SSL_CERT
+              value: /app/db.crt
+            {{- end }}
+            {{- end }}
+            - name: AUTH__JWT_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: jwtPrivateKey
+                  name: agentstack-secret
+            - name: AUTH__JWT_PUBLIC_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: jwtPublicKey
+                  name: agentstack-secret
+            {{- if .Values.auth.enabled }}
+            - name: AUTH__DISABLE_AUTH
+              value: "false"
+            - name: AUTH__BASIC__ENABLED
+              value: {{ .Values.auth.basic.enabled | quote }}
+            - name: AUTH__OIDC__ENABLED
+              value: "true"
+            - name: AUTH__OIDC__VALIDATE_AUDIENCE
+              value: {{ .Values.auth.validateAudience | quote }}
+            - name: AUTH__OIDC__NAME
+              value: {{ include "agentstack.oidc.providerName" . | quote }}
+            - name: AUTH__OIDC__ISSUER
+              value: {{ include "agentstack.oidc.internalIssuerUrl" . | quote }}
+            - name: AUTH__OIDC__EXTERNAL_ISSUER
+              value: {{ include "agentstack.oidc.publicIssuerUrl" . | quote }}
+            - name: AUTH__OIDC__INSECURE_TRANSPORT
+              value: {{ hasPrefix "http://" (include "agentstack.oidc.internalIssuerUrl" . | default "") | quote }}
+            - name: AUTH__OIDC__CLIENT_ID
+              value: {{ include "agentstack.oidc.serverClientId" . | quote }}
+            - name: AUTH__OIDC__ROLES_PATH
+              value: {{ include "agentstack.oidc.rolesPath" . | quote }}
+            - name: AUTH__OIDC__CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: {{ include "agentstack.oidc.serverClientSecretKey" . }}
+                  name: {{ include "agentstack.oidc.serverClientSecretName" . }}
+            {{- else }}
+            - name: AUTH__DISABLE_AUTH
+              value: "true"
+            {{- end }}
+            # Kagenti Configuration
+            {{- if .Values.kagenti.enabled }}
+            - name: KAGENTI__ENABLED
+              value: "true"
+            - name: KAGENTI__API_URL
+              value: {{ .Values.kagenti.apiUrl | quote }}
+            - name: KAGENTI__AUTH_TOKEN_URL
+              value: {{ include "agentstack.oidc.internalIssuerUrl" . | trimSuffix "/" }}/protocol/openid-connect/token
+            - name: KAGENTI__CLIENT_ID
+              value: {{ include "agentstack.oidc.serverClientId" . | quote }}
+            - name: KAGENTI__CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: {{ include "agentstack.oidc.serverClientSecretKey" . }}
+                  name: {{ include "agentstack.oidc.serverClientSecretName" . }}
+            - name: KAGENTI__NAMESPACES
+              value: {{ .Values.kagenti.namespaces | toJson | quote }}
+            {{- else }}
+            - name: KAGENTI__ENABLED
+              value: "false"
+            {{- end }}
+            - name: GENERATE_CONVERSATION_TITLE__ENABLED
+              value: {{ .Values.generateConversationTitle.enabled | quote }}
+            - name: GENERATE_CONVERSATION_TITLE__MODEL
+              value: {{ .Values.generateConversationTitle.model | quote }}
+            - name: GENERATE_CONVERSATION_TITLE__PROMPT
+              value: {{ .Values.generateConversationTitle.prompt | quote }}
+            # Object Storage Configuration
+            - name: OBJECT_STORAGE__ENDPOINT_URL
+              value: {{ include "agentstack.s3.endpoint" . | quote }}
+            - name: OBJECT_STORAGE__ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "agentstack.s3.secretName" . }}
+                  key: s3AccessKeyId
+            - name: OBJECT_STORAGE__ACCESS_KEY_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "agentstack.s3.secretName" . }}
+                  key: s3AccessKeySecret
+            - name: OBJECT_STORAGE__BUCKET_NAME
+              value: {{ include "agentstack.s3.bucket" . | quote }}
+            - name: OBJECT_STORAGE__REGION
+              value: {{ include "agentstack.s3.region" . | quote }}
+            - name: OBJECT_STORAGE__USE_SSL
+              value: {{ ternary "true" "false" (eq (include "agentstack.s3.protocol" .) "https") | quote}}
+            # Redis Configuration
+            - name: REDIS__ENABLED
+              value: {{ include "agentstack.redis.enabled" . | quote }}
+            {{- if eq (include "agentstack.redis.enabled" .) "true" }}
+            - name: REDIS__HOST
+              value: {{ include "agentstack.redis.host" . | quote }}
+            - name: REDIS__PORT
+              value: {{ include "agentstack.redis.port" . | quote }}
+            {{- if or .Values.redis.enabled .Values.externalRedis.existingSecret .Values.externalRedis.password }}
+            - name: REDIS__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "agentstack.redis.secretName" . }}
+                  key: {{ include "agentstack.redis.secretPasswordKey" . }}
+            {{- end }}
+            {{- end }}
+            - name: RATE_LIMIT__ENABLED
+              value: {{ .Values.server.rateLimit.enabled | quote }}
+            - name: RATE_LIMIT__STRATEGY
+              value: {{ .Values.server.rateLimit.strategy | quote }}
+            - name: RATE_LIMIT__GLOBAL_LIMITS
+              value: {{ .Values.server.rateLimit.globalLimits | join "; " | quote }}
+            {{- range $role, $limits := .Values.server.rateLimit.roleBasedLimits }}
+            - name: RATE_LIMIT__ROLE_BASED_LIMITS__{{ $role | upper }}__OPENAI_CHAT_COMPLETION_TOKENS
+              value: {{ $limits.openai_chat_completion_tokens | join "; " | quote }}
+            - name: RATE_LIMIT__ROLE_BASED_LIMITS__{{ $role | upper }}__OPENAI_CHAT_COMPLETION_REQUESTS
+              value: {{ $limits.openai_chat_completion_requests | join "; " | quote }}
+            - name: RATE_LIMIT__ROLE_BASED_LIMITS__{{ $role | upper }}__OPENAI_EMBEDDING_INPUTS
+              value: {{ $limits.openai_embedding_inputs | join "; " | quote }}
+            {{- end }}
+            - name: CONNECTOR__PRESETS
+              valueFrom:
+                secretKeyRef:
+                  key: presets.json
+                  name: agentstack-connectors-secret
+            - name: UVICORN_TIMEOUT_KEEP_ALIVE
+              value: {{ .Values.server.uvicornTimeoutKeepAlive | quote }}
+            - name: TELEMETRY__COLLECTOR_URL
+              value: "http://otel-collector.kagenti-system:8335"
+            - name: TELEMETRY__PHOENIX_URL
+              value: "http://phoenix.kagenti-system:6006"
+
+          volumeMounts:
+            {{- if and (include "agentstack.databaseSslEnabled" .) .Values.externalDatabase.sslRootCert }}
+            - name: db-ssl-cert
+              mountPath: /app/db.crt
+              subPath: sslRootCert
+              readOnly: true
+            {{- end }}
+            - name: agentstack-providers
+              mountPath: /app/config
+              readOnly: true
+            {{- with .Values.server.volumeMounts }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+      volumes:
+        {{- if and (include "agentstack.databaseSslEnabled" .) .Values.externalDatabase.sslRootCert }}
+        - name: db-ssl-cert
+          secret:
+            secretName: agentstack-secret
+        {{- end }}
+        - name: agentstack-providers
+          secret:
+            secretName: agentstack-providers-secret
+        {{- with .Values.server.volumes }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.server.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.server.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.server.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

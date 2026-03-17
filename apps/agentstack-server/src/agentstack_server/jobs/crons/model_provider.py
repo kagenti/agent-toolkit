@@ -27,7 +27,7 @@ async def update_system_configuration(
     configuration: Configuration, configuration_service: ConfigurationService, user_service: UserService
 ):
     if configuration.model_provider.default_llm_model or configuration.model_provider.default_embedding_model:
-        user = await user_service.get_user_by_email("admin@beeai.dev")
+        user = await user_service.get_user_by_email(configuration.admin_user_email)
         existing_configuration = await configuration_service.get_system_configuration(user=user)
         default_llm_model = configuration.model_provider.default_llm_model or existing_configuration.default_llm_model
         default_embedding_model = (

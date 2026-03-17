@@ -45,20 +45,14 @@ ERROR: .Values.auth.jwtPublicKey is missing but .Values.auth.jwtPrivateKey is pr
 Please provide both keys or neither (to auto-generate them).
 ` -}}
   {{- end -}}
-  {{- if and (not .Values.keycloak.enabled) (empty .Values.externalOidcProvider.issuerUrl) -}}
+  {{- if empty .Values.auth.oidcProvider.issuerUrl -}}
   {{- fail `
-ERROR: Authentication is enabled (auth.enabled=true) but no provider is configured.
+ERROR: Authentication is enabled (auth.enabled=true) but no OIDC provider is configured.
 
-You must enable either Keycloak or provide an external OIDC provider:
-  1. Enable Keycloak (default):
-     keycloak:
-       enabled: true
-
-  2. Configure external OIDC provider:
-     keycloak:
-       enabled: false
-     externalOidcProvider:
-       issuerUrl: "https://your-oidc-provider.com"
+Please configure the OIDC provider:
+  auth:
+    oidcProvider:
+      issuerUrl: "https://your-oidc-provider.com"
 ` -}}
   {{- end -}}
 {{- end -}}
@@ -69,7 +63,7 @@ Validate that Redis is enabled when running multiple replicas.
 Redis is required for distributed rate limiting and caching to work correctly.
 */}}
 {{- define "agentstack.validate.redisForReplicas" -}}
-{{- if and (gt (int .Values.replicaCount) 1) (ne (include "agentstack.redis.enabled" .) "true") -}}
+{{- if and (gt (int .Values.server.replicaCount) 1) (ne (include "agentstack.redis.enabled" .) "true") -}}
 {{- fail `
 ERROR: Redis is required when running multiple replicas (replicaCount > 1).
 

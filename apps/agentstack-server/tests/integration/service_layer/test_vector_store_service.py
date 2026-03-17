@@ -37,8 +37,15 @@ async def vector_store_service(uow_factory, low_limit_config):
 
 @pytest.fixture
 async def test_user(uow_factory) -> User:
+    email = "test-vector-store@beeai.dev"
     async with uow_factory() as uow:
-        return await uow.users.get_by_email(email="user@beeai.dev")
+        try:
+            return await uow.users.get_by_email(email=email)
+        except Exception:
+            user = User(email=email)
+            await uow.users.create(user=user)
+            await uow.commit()
+            return user
 
 
 @pytest.fixture

@@ -1,8 +1,6 @@
 -- Procrastinate Schema
 
--- NOTE: this is executed as part of the migration python script
--- (due to ibm cloud change of search_path after thiscommand)
--- CREATE EXTENSION IF NOT EXISTS plpgsql;
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
 -- Enums
 
@@ -25,7 +23,8 @@ CREATE TYPE procrastinate_job_event_type AS ENUM (
     'cancelled', -- todo -> cancelled
     'abort_requested', -- not a state transition, but set in a separate field
     'aborted', -- doing -> aborted (only allowed when abort_requested field is set)
-    'scheduled' -- not a state transition, but recording when a task is scheduled for
+    'scheduled', -- not a state transition, but recording when a task is scheduled for
+    'retried' -- Manually retried failed job
 );
 
 -- Composite Types
@@ -206,15 +205,30 @@ BEGIN
         SELECT jobs.*
             FROM procrastinate_jobs AS jobs
             WHERE
-                -- reject the job if its lock has earlier jobs
+                -- reject the job if its lock has earlier or higher priority jobs
                 NOT EXISTS (
                     SELECT 1
-                        FROM procrastinate_jobs AS earlier_jobs
+                        FROM procrastinate_jobs AS other_jobs
                         WHERE
                             jobs.lock IS NOT NULL
-                            AND earlier_jobs.lock = jobs.lock
-                            AND earlier_jobs.status IN ('todo', 'doing')
-                            AND earlier_jobs.id < jobs.id)
+                            AND other_jobs.lock = jobs.lock
+                            AND (
+                                -- job with same lock is already running
+                                other_jobs.status = 'doing'
+                                OR
+                                -- job with same lock is waiting and has higher priority (or same priority but was queued first)
+                                (
+                                    other_jobs.status = 'todo'
+                                    AND (
+                                        other_jobs.priority > jobs.priority
+                                        OR (
+                                        other_jobs.priority = jobs.priority
+                                        AND other_jobs.id < jobs.id
+                                        )
+                                    )
+                                )
+                            )
+                )
                 AND jobs.status = 'todo'
                 AND (target_queue_names IS NULL OR jobs.queue_name = ANY( target_queue_names ))
                 AND (jobs.scheduled_at IS NULL OR jobs.scheduled_at <= now())
@@ -227,7 +241,7 @@ BEGIN
         WHERE procrastinate_jobs.id = candidate.id
         RETURNING procrastinate_jobs.* INTO found_jobs;
 
-	RETURN found_jobs;
+ RETURN found_jobs;
 END;
 $$;
 
@@ -331,6 +345,46 @@ BEGIN
 END;
 $$;
 
+CREATE FUNCTION procrastinate_retry_job_v2(
+    job_id bigint,
+    retry_at timestamp with time zone,
+    new_priority integer,
+    new_queue_name character varying,
+    new_lock character varying
+) RETURNS void LANGUAGE plpgsql AS $$
+DECLARE
+    _job_id bigint;
+    _abort_requested boolean;
+    _current_status procrastinate_job_status;
+BEGIN
+    SELECT status, abort_requested FROM procrastinate_jobs
+    WHERE id = job_id AND status IN ('doing', 'failed')
+    FOR UPDATE
+    INTO _current_status, _abort_requested;
+    IF _current_status = 'doing' AND _abort_requested THEN
+        UPDATE procrastinate_jobs
+        SET status = 'failed'::procrastinate_job_status
+        WHERE id = job_id AND status = 'doing'
+        RETURNING id INTO _job_id;
+    ELSE
+        UPDATE procrastinate_jobs
+        SET status = 'todo'::procrastinate_job_status,
+            attempts = attempts + 1,
+            scheduled_at = retry_at,
+            priority = COALESCE(new_priority, priority),
+            queue_name = COALESCE(new_queue_name, queue_name),
+            lock = COALESCE(new_lock, lock)
+        WHERE id = job_id AND status IN ('doing', 'failed')
+        RETURNING id INTO _job_id;
+    END IF;
+
+    IF _job_id IS NULL THEN
+        RAISE 'Job was not found or has an invalid status to retry (job id: %)', job_id;
+    END IF;
+
+END;
+$$;
+
 CREATE FUNCTION procrastinate_notify_queue_job_inserted_v1()
     RETURNS trigger
     LANGUAGE plpgsql
@@ -399,6 +453,9 @@ BEGIN
             WHEN OLD.status = 'doing'::procrastinate_job_status
                 AND NEW.status = 'aborted'::procrastinate_job_status
                 THEN 'aborted'::procrastinate_job_event_type
+            WHEN OLD.status = 'failed'::procrastinate_job_status
+                AND NEW.status = 'todo'::procrastinate_job_status
+                THEN 'retried'::procrastinate_job_event_type
             ELSE NULL
         END as event_type
     )
