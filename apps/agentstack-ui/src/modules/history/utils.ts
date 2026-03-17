@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { Artifact, ContextHistory, Message } from 'agentstack-sdk';
+import type { Artifact, ContextHistory, Message } from '@kagenti/adk';
 import { v4 as uuid } from 'uuid';
 
 import { processMessageMetadata, processParts } from '#api/a2a/part-processors.ts';

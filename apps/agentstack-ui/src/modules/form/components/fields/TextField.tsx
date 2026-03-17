@@ -4,7 +4,7 @@
  */
 
 import { TextInput } from '@carbon/react';
-import type { TextField } from 'agentstack-sdk';
+import type { TextField } from '@kagenti/adk';
 import { useId } from 'react';
 import { useFormContext } from 'react-hook-form';
 

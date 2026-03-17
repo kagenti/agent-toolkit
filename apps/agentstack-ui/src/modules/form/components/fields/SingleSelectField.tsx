@@ -4,7 +4,7 @@
  */
 
 import { Select, SelectItem } from '@carbon/react';
-import type { SingleSelectField } from 'agentstack-sdk';
+import type { SingleSelectField } from '@kagenti/adk';
 import { useId } from 'react';
 import { useFormContext } from 'react-hook-form';
 

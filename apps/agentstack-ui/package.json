@@ -23,7 +23,7 @@
     "@next/bundle-analyzer": "16.1.6",
     "@radix-ui/react-slot": "^1.2.4",
     "@tanstack/react-query": "catalog:",
-    "agentstack-sdk": "workspace:*",
+    "@kagenti/adk": "workspace:*",
     "cacheable": "2.3.3",
     "clsx": "catalog:",
     "date-fns": "4.1.0",

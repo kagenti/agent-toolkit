@@ -4,7 +4,7 @@
  */
 
 import { Toggle } from '@carbon/react';
-import type { CheckboxField, CheckboxGroupField, CheckboxGroupFieldValue } from 'agentstack-sdk';
+import type { CheckboxField, CheckboxGroupField, CheckboxGroupFieldValue } from '@kagenti/adk';
 import { useController } from 'react-hook-form';
 
 import { getFieldName } from '#modules/form/utils.ts';

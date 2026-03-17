@@ -4,7 +4,7 @@
  */
 
 import { useMutation } from '@tanstack/react-query';
-import type { CreateFileResponse } from 'agentstack-sdk';
+import type { CreateFileResponse } from '@kagenti/adk';
 
 import { uploadFile } from '..';
 import type { UploadFileParams } from '../types';

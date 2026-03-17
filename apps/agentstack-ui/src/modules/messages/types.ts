@@ -10,7 +10,7 @@ import type {
   SecretDemands,
   Task,
   TaskArtifactUpdateEvent,
-} from 'agentstack-sdk';
+} from '@kagenti/adk';
 
 import type { UICanvasEditRequestParams } from '#modules/canvas/types.ts';
 import type { RunFormValues } from '#modules/form/types.ts';

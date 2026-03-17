@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { type User, UserRole } from 'agentstack-sdk';
+import { type User, UserRole } from '@kagenti/adk';
 
 export function isUserAdminOrDev(user: User | undefined) {
   if (!user) {

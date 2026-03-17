@@ -1,6 +1,6 @@
 # Streaming Extension — Technical Specification
 
-> Extension URI: `https://a2a-extensions.agentstack.beeai.dev/ui/streaming/v1`
+> Extension URI: `https://a2a-extensions.adk.kagenti.dev/ui/streaming/v1`
 
 ## Motivation
 
@@ -28,6 +28,7 @@ Client Request:
 If the client does not request the extension, the server skips streaming patches entirely — no metadata is sent, no bandwidth is wasted. The agent code is identical in both cases; the SDK handles this transparently via `StreamingExtensionServer.current()` returning `None` when the extension is not active.
 
 This means:
+
 - **Non-streaming clients** get only the final COMPLETED message with the full text — exactly like a standard A2A agent
 - **Streaming-capable clients** opt in and receive incremental patches during WORKING state
 - **Agent developers** don't need to handle either case — the SDK does it automatically
@@ -81,6 +82,7 @@ TaskStatusUpdateEvent {
 ```
 
 Key properties:
+
 - Token-level updates are **metadata-only** (no `message` field on WORKING events)
 - The single `message` on the COMPLETED event is the canonical, complete message
 - The task store only sees **one message per agent turn**
@@ -116,13 +118,25 @@ The extension uses [RFC 6902 (JSON Patch)](https://datatracker.ietf.org/doc/html
 The first event in each accumulation cycle carries a root replace:
 
 ```json
-{ "op": "replace", "path": "", "value": { "message_id": "abc-123", "parts": [{ "text": "Hello" }] } }
+{
+  "op": "replace",
+  "path": "",
+  "value": { "message_id": "abc-123", "parts": [{ "text": "Hello" }] }
+}
 ```
 
 Or with metadata:
 
 ```json
-{ "op": "replace", "path": "", "value": { "message_id": "abc-123", "parts": [], "metadata": { "ext://key": "val" } } }
+{
+  "op": "replace",
+  "path": "",
+  "value": {
+    "message_id": "abc-123",
+    "parts": [],
+    "metadata": { "ext://key": "val" }
+  }
+}
 ```
 
 ### `str_ins` — Stream text tokens
@@ -148,7 +162,11 @@ New parts are appended using the JSON Patch `-` (end-of-array) syntax:
 Metadata updates are sent as **incremental diffs**, not full replacements. The diff is computed server-side using `make_patch(old_metadata, new_metadata)` which generates precise JSON Patch operations:
 
 ```json
-{ "op": "add", "path": "/metadata/ext:~1~1trajectory/1", "value": { "title": "Step 2" } }
+{
+  "op": "add",
+  "path": "/metadata/ext:~1~1trajectory/1",
+  "value": { "title": "Step 2" }
+}
 ```
 
 > **Note on JSON Pointer escaping:** Keys containing `/` are escaped as `~1` per [RFC 6901](https://datatracker.ietf.org/doc/html/rfc6901). A URI like `ext://trajectory` becomes `ext:~1~1trajectory` in a JSON Pointer path (two slashes → two `~1`). This is standard behavior handled automatically by the JSON Patch library.
@@ -177,6 +195,7 @@ Agent yields: `"Hello"`, `" world"`, `Part(text="[sep]")`, `Metadata({"ext://tra
 ```
 
 Final draft:
+
 ```json
 {
   "message_id": "abc-123",
@@ -217,13 +236,13 @@ async for delta, task in streaming.stream(client.send_message(msg)):
 
 ### Delta Types
 
-| Type | Description | Fields |
-|------|-------------|--------|
-| `TextDelta` | A text chunk appended to an existing text part | `part_index: int`, `delta: str` |
-| `PartDelta` | A new part was added to the message | `part_index: int`, `part: dict` |
-| `MetadataDelta` | Incremental metadata update (only new/changed data) | `metadata: dict` |
-| `ArtifactDelta` | An artifact update event | `event: TaskArtifactUpdateEvent` |
-| `StateChange` | A task state transition | `state: int`, `message: Message \| None` |
+| Type            | Description                                         | Fields                                   |
+| --------------- | --------------------------------------------------- | ---------------------------------------- |
+| `TextDelta`     | A text chunk appended to an existing text part      | `part_index: int`, `delta: str`          |
+| `PartDelta`     | A new part was added to the message                 | `part_index: int`, `part: dict`          |
+| `MetadataDelta` | Incremental metadata update (only new/changed data) | `metadata: dict`                         |
+| `ArtifactDelta` | An artifact update event                            | `event: TaskArtifactUpdateEvent`         |
+| `StateChange`   | A task state transition                             | `state: int`, `message: Message \| None` |
 
 ### How MetadataDelta stays incremental
 
@@ -284,6 +303,7 @@ async def run(ctx: RunContext):
 ```
 
 The agent developer doesn't think about patches, metadata encoding, or extension negotiation. The SDK:
+
 1. Detects yield types and routes them through the state machine
 2. Generates optimal patches for each transition
 3. Sends patches as metadata only if the client requested the streaming extension

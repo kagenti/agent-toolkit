@@ -15,7 +15,7 @@ dir = "{{config_root}}/apps/agentstack-ui"
 
 ["agentstack-ui:check:tsc"]
 extends = "node:check:tsc"
-depends = ["common:setup:pnpm", "agentstack-sdk-ts:build"]
+depends = ["common:setup:pnpm", "adk-ts:build"]
 dir = "{{config_root}}/apps/agentstack-ui"
 run = "pnpm tsc --noEmit -p tsconfig.check.json"
 
@@ -58,7 +58,7 @@ dir = "{{config_root}}/apps/agentstack-ui"
 run = "pnpm next start"
 
 ["agentstack-ui:run:dev"]
-depends = ["common:setup:pnpm", "agentstack-sdk-ts:build"]
+depends = ["common:setup:pnpm", "adk-ts:build"]
 env.NODE_OPTIONS = "--no-experimental-global-navigator"
 dir = "{{config_root}}/apps/agentstack-ui"
 # Using --webpack because Turbopack doesn’t yet support some required features (e.g. the ::highlight() CSS rule).
@@ -72,7 +72,7 @@ dir = "{{config_root}}"
 run = "docker build -t ghcr.io/i-am-bee/agentstack/agentstack-ui:local -f ./apps/agentstack-ui/Dockerfile --load ."
 
 ["agentstack-ui:build:nextjs"]
-depends = ["common:setup:pnpm", "agentstack-sdk-ts:build"]
+depends = ["common:setup:pnpm", "adk-ts:build"]
 dir = "{{config_root}}/apps/agentstack-ui"
 env.NODE_OPTIONS = "--no-experimental-global-navigator"
 run = """

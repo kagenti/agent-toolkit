@@ -14,7 +14,7 @@ import type {
   SettingsValues,
   SingleSelectField,
   SingleSelectFieldValue,
-} from 'agentstack-sdk';
+} from '@kagenti/adk';
 import mapValues from 'lodash/mapValues';
 import { match } from 'ts-pattern';
 

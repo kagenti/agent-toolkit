@@ -12,7 +12,7 @@ The `buildApiClient` function creates a type safe HTTP client for interacting wi
 Create an API client by calling `buildApiClient` with configuration options:
 
 ```typescript
-import { buildApiClient } from "agentstack-sdk";
+import { buildApiClient } from "@kagenti/adk";
 
 const api = buildApiClient({
   baseUrl: "https://your-agentstack-instance.com",
@@ -30,7 +30,7 @@ const api = buildApiClient({
 In many applications, you will want to add authentication headers to requests:
 
 ```typescript
-import { buildApiClient, createAuthenticatedFetch } from "agentstack-sdk";
+import { buildApiClient, createAuthenticatedFetch } from "@kagenti/adk";
 
 const authFetch = createAuthenticatedFetch("token-value");
 
@@ -45,7 +45,7 @@ const api = buildApiClient({
 All API methods return a `Promise<ApiResult<T>>`:
 
 ```typescript
-import { unwrapResult } from "agentstack-sdk";
+import { unwrapResult } from "@kagenti/adk";
 
 const result = await api.readUser();
 
@@ -62,7 +62,7 @@ const user = unwrapResult(await api.readUser());
 `unwrapResult` also accepts an optional Zod schema if you want to validate against a more specific or stricter response shape:
 
 ```typescript
-import { unwrapResult } from "agentstack-sdk";
+import { unwrapResult } from "@kagenti/adk";
 
 const connectors = unwrapResult(await api.listConnectors(), stricterListConnectorsResponseSchema);
 ```
@@ -72,7 +72,7 @@ const connectors = unwrapResult(await api.listConnectors(), stricterListConnecto
 When you use `unwrapResult`, API errors throw `ApiErrorException`. Use the helper guards to handle specific cases:
 
 ```typescript
-import { isHttpError, isValidationError } from "agentstack-sdk";
+import { isHttpError, isValidationError } from "@kagenti/adk";
 
 try {
   unwrapResult(await api.readUser());
@@ -255,7 +255,7 @@ if (result.ok && result.data) {
 #### Example: Match Model Providers
 
 ```typescript
-import { ModelCapability } from "agentstack-sdk";
+import { ModelCapability } from "@kagenti/adk";
 
 const matches = unwrapResult(
   await api.matchModelProviders({

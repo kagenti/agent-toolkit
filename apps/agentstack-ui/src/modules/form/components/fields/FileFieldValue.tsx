@@ -4,7 +4,7 @@
  */
 
 import { FormGroup } from '@carbon/react';
-import type { FileField, FormFieldValue } from 'agentstack-sdk';
+import type { FileField, FormFieldValue } from '@kagenti/adk';
 
 import { getFileIdFromFilePlatformUrl } from '#api/a2a/utils.ts';
 import { FileCard } from '#modules/files/components/FileCard.tsx';

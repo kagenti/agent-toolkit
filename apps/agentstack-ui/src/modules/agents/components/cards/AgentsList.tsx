@@ -5,7 +5,7 @@
 
 'use client';
 
-import type { ListProvidersResponse } from 'agentstack-sdk';
+import type { ListProvidersResponse } from '@kagenti/adk';
 
 import { SkeletonItems } from '#components/SkeletonItems/SkeletonItems.tsx';
 import { useListAgents } from '#modules/agents/api/queries/useListAgents.ts';

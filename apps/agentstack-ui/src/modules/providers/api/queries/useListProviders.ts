@@ -4,7 +4,7 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import type { ListProvidersRequest } from 'agentstack-sdk';
+import type { ListProvidersRequest } from '@kagenti/adk';
 
 import { listProviders } from '..';
 import { providerKeys } from '../keys';

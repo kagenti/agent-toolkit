@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { createAuthenticatedFetch, getAgentCardPath } from 'agentstack-sdk';
+import { createAuthenticatedFetch, getAgentCardPath } from '@kagenti/adk';
 
 import { UnauthenticatedError } from '#api/errors.ts';
 import { getBaseUrl } from '#utils/api/getBaseUrl.ts';

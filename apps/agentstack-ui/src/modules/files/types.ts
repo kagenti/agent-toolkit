@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { CreateFileResponse } from 'agentstack-sdk';
+import type { CreateFileResponse } from '@kagenti/adk';
 
 export interface FileEntity {
   id: string;

@@ -89,7 +89,7 @@ class EmbeddingServiceExtensionParams(pydantic.BaseModel):
 
 
 class EmbeddingServiceExtensionSpec(BaseExtensionSpec[EmbeddingServiceExtensionParams]):
-    URI: str = "https://a2a-extensions.agentstack.beeai.dev/services/embedding/v1"
+    URI: str = "https://a2a-extensions.adk.kagenti.dev/services/embedding/v1"
 
     @classmethod
     def single_demand(

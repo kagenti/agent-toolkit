@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { ListContextHistoryRequest, ListContextsRequest } from 'agentstack-sdk';
+import type { ListContextHistoryRequest, ListContextsRequest } from '@kagenti/adk';
 
 export const LIST_CONTEXTS_DEFAULT_QUERY: ListContextsRequest['query'] = { limit: 10, include_empty: false };
 

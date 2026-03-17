@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { FormField, FormFieldValue } from 'agentstack-sdk';
+import type { FormField, FormFieldValue } from '@kagenti/adk';
 import type { CSSProperties } from 'react';
 import { match, P } from 'ts-pattern';
 

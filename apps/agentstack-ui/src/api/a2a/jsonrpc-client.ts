@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { AgentCard, Message, StreamResponse, Task } from 'agentstack-sdk';
-import { agentCardSchema, streamResponseSchema } from 'agentstack-sdk';
+import type { AgentCard, Message, StreamResponse, Task } from '@kagenti/adk';
+import { agentCardSchema, streamResponseSchema } from '@kagenti/adk';
 import { EventSourceParserStream } from 'eventsource-parser/stream';
 import { v4 as uuid } from 'uuid';
 

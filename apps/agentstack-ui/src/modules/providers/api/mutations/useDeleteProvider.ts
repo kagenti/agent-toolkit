@@ -4,7 +4,7 @@
  */
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { ListProvidersResponse } from 'agentstack-sdk';
+import type { ListProvidersResponse } from '@kagenti/adk';
 
 import { providerKeys } from '#modules/providers/api/keys.ts';
 

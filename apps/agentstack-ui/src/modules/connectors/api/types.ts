@@ -8,7 +8,7 @@ import {
   connectorSchema as sdkConnectorSchema,
   listConnectorPresetsResponseSchema as sdkListConnectorPresetsResponseSchema,
   listConnectorsResponseSchema as sdkListConnectorsResponseSchema,
-} from 'agentstack-sdk';
+} from '@kagenti/adk';
 import z from 'zod';
 
 export const connectorMetadataSchema = z

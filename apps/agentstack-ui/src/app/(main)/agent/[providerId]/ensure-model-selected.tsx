@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { handleAgentCard } from 'agentstack-sdk';
+import { handleAgentCard } from '@kagenti/adk';
 import type { ReactElement } from 'react';
 
 import { handleApiError } from '#app/(auth)/rsc.tsx';

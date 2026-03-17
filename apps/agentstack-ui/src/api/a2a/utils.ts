@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { FilePart, Message, Part, TextPart } from 'agentstack-sdk';
+import type { FilePart, Message, Part, TextPart } from '@kagenti/adk';
 import {
   type Citation,
   citationExtension,
@@ -11,7 +11,7 @@ import {
   extractUiExtensionData,
   trajectoryExtension,
   type TrajectoryMetadata,
-} from 'agentstack-sdk';
+} from '@kagenti/adk';
 import truncate from 'lodash/truncate';
 import { v4 as uuid } from 'uuid';
 

@@ -4,7 +4,7 @@
  */
 
 import { DatePicker, DatePickerInput } from '@carbon/react';
-import type { DateField } from 'agentstack-sdk';
+import type { DateField } from '@kagenti/adk';
 import { useId } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 

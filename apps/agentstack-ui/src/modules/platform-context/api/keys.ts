@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { ListContextHistoryRequest, ListContextsRequest } from 'agentstack-sdk';
+import type { ListContextHistoryRequest, ListContextsRequest } from '@kagenti/adk';
 
 export const contextKeys = {
   all: () => ['contexts'] as const,

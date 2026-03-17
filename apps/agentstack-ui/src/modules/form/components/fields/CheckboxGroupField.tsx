@@ -4,7 +4,7 @@
  */
 
 import { CheckboxGroup } from '@carbon/react';
-import type { CheckboxGroupField, CheckboxGroupFieldValue } from 'agentstack-sdk';
+import type { CheckboxGroupField, CheckboxGroupFieldValue } from '@kagenti/adk';
 import { useController, useFormContext } from 'react-hook-form';
 
 import { REQUIRED_GROUP_ERROR_MESSAGE } from '#modules/form/constants.ts';

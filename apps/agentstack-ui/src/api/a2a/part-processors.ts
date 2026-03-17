@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { Artifact, FilePart, Message, Part, TextPart } from 'agentstack-sdk';
+import type { Artifact, FilePart, Message, Part, TextPart } from '@kagenti/adk';
 import { v4 as uuid } from 'uuid';
 
 import type { UIFilePart, UIMessagePart, UISourcePart, UITextPart } from '#modules/messages/types.ts';

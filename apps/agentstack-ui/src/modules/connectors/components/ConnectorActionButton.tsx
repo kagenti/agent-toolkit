@@ -6,7 +6,7 @@
 import type { CarbonIconType } from '@carbon/icons-react';
 import { Credentials, Link, Unlink } from '@carbon/icons-react';
 import { IconButton } from '@carbon/react';
-import { ConnectorState } from 'agentstack-sdk';
+import { ConnectorState } from '@kagenti/adk';
 import { useMemo } from 'react';
 import { match } from 'ts-pattern';
 

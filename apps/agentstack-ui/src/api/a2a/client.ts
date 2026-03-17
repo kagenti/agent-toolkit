@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { Task, TaskArtifactUpdateEvent, TaskStatusUpdateEvent } from 'agentstack-sdk';
-import { extractTextFromMessage, handleAgentCard, handleTaskStatusUpdate, resolveUserMetadata } from 'agentstack-sdk';
+import type { Task, TaskArtifactUpdateEvent, TaskStatusUpdateEvent } from '@kagenti/adk';
+import { extractTextFromMessage, handleAgentCard, handleTaskStatusUpdate, resolveUserMetadata } from '@kagenti/adk';
 import { defaultIfEmpty, filter, lastValueFrom, Subject } from 'rxjs';
 import { match, P } from 'ts-pattern';
 
@@ -166,6 +166,9 @@ export const buildA2AClient = async <UIGenericPart = never>({
 
               const parts: (UIMessagePart | UIGenericPart)[] = handleStatusUpdate(statusUpdate, onStatusUpdate);
 
+              if (!taskId) {
+                throw new Error(`Illegal State - taskId missing on status-update event`);
+              }
               messageSubject.next({ type: RunResultType.Parts, parts, taskId });
             })
             .with({ artifactUpdate: P.nonNullable }, ({ artifactUpdate }) => {
@@ -173,6 +176,9 @@ export const buildA2AClient = async <UIGenericPart = never>({
 
               const parts = handleArtifactUpdate(artifactUpdate);
 
+              if (!taskId) {
+                throw new Error(`Illegal State - taskId missing on artifact-update event`);
+              }
               messageSubject.next({ type: RunResultType.Parts, parts, taskId });
             })
             .with({ message: P.nonNullable }, ({ message }) => {

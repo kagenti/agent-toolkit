@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { unwrapResult } from 'agentstack-sdk';
+import { unwrapResult } from '@kagenti/adk';
 
-import { agentStackClient } from '#api/agentstack-client.ts';
+import { adkClient } from '#api/agentstack-client.ts';
 
 export async function readSystemConfiguration() {
-  const response = await agentStackClient.readSystemConfiguration();
+  const response = await adkClient.readSystemConfiguration();
   const result = unwrapResult(response);
 
   return result;

@@ -173,5 +173,5 @@ async def test_external_a2a_agent(external_a2a_server):
     assert len(provider.agent_card.capabilities.extensions) == 1
     assert (
         provider.agent_card.capabilities.extensions[0].uri
-        == "https://a2a-extensions.agentstack.beeai.dev/ui/agent-detail/v1"
+        == "https://a2a-extensions.adk.kagenti.dev/ui/agent-detail/v1"
     )

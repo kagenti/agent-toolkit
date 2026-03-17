@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { SingleSelectField, SingleSelectFieldValue } from 'agentstack-sdk';
+import type { SingleSelectField, SingleSelectFieldValue } from '@kagenti/adk';
 import { useController } from 'react-hook-form';
 
 import { RadioSelect } from '#components/RadioSelect/RadioSelect.tsx';

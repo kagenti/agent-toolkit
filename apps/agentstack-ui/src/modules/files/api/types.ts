@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { CreateFileRequest } from 'agentstack-sdk';
+import type { CreateFileRequest } from '@kagenti/adk';
 
 import type { FileEntity } from '../types';
 

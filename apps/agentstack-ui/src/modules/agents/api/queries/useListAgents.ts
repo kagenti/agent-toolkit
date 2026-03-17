@@ -4,7 +4,11 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import { type ListProvidersRequest, type ListProvidersResponse, ProviderState } from 'agentstack-sdk';
+import {
+  type ListProvidersRequest,
+  type ListProvidersResponse,
+  ProviderState,
+} from '@kagenti/adk';
 
 import { buildAgent, isAgentUiSupported, sortAgentsByName, sortProvidersBy } from '#modules/agents/utils.ts';
 import { listProviders } from '#modules/providers/api/index.ts';

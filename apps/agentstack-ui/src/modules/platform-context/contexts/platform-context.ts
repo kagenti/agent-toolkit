@@ -4,7 +4,7 @@
  */
 
 import type { UseMutateAsyncFunction } from '@tanstack/react-query';
-import type { Context, CreateContextRequest, ListContextHistoryResponse } from 'agentstack-sdk';
+import type { Context, CreateContextRequest, ListContextHistoryResponse } from '@kagenti/adk';
 import { createContext } from 'react';
 
 import type { Agent } from '#modules/agents/api/types.ts';

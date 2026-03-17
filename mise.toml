@@ -135,7 +135,7 @@ includes = [
     "apps/agentstack-server/tasks.toml",
     "apps/agentstack-ui/tasks.toml",
     "apps/keycloak-theme/tasks.toml",
-    "apps/agentstack-sdk-ts/tasks.toml",
+    "apps/adk-ts/tasks.toml",
     "apps/supergateway/tasks.toml",
     "apps/microshift-vm/tasks.toml",
     "agents/tasks.toml",

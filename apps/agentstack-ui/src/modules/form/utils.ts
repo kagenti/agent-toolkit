@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { FormField } from 'agentstack-sdk';
+import type { FormField } from '@kagenti/adk';
 import keyBy from 'lodash/keyBy';
 import mapValues from 'lodash/mapValues';
 import { match } from 'ts-pattern';

@@ -4,7 +4,7 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import type { TaskStatusUpdateEvent } from 'agentstack-sdk';
+import type { TaskStatusUpdateEvent } from '@kagenti/adk';
 
 import { buildA2AClient } from '#api/a2a/client.ts';
 

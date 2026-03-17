@@ -9,7 +9,7 @@ import type {
   Fulfillments,
   SettingsFormRender,
   SettingsFormValues,
-} from 'agentstack-sdk';
+} from '@kagenti/adk';
 import { createContext } from 'react';
 
 import type { RunFormValues } from '#modules/form/types.ts';

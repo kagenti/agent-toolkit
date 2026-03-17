@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { AgentDetail, Provider } from 'agentstack-sdk';
+import type { AgentDetail, Provider } from '@kagenti/adk';
 
 type AgentCard = Provider['agent_card'];
 type AgentCardProvider = AgentCard['provider'];

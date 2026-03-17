@@ -82,7 +82,7 @@ class ToolCallExtensionParams(BaseModel):
 
 
 class ToolCallExtensionSpec(BaseExtensionSpec[ToolCallExtensionParams]):
-    URI: str = "https://a2a-extensions.agentstack.beeai.dev/tools/call/v1"
+    URI: str = "https://a2a-extensions.adk.kagenti.dev/tools/call/v1"
 
 
 class ToolCallExtensionMetadata(BaseModel):
