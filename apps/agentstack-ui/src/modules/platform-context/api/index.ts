@@ -9,8 +9,8 @@ import type {
   DeleteContextRequest,
   ListContextHistoryRequest,
   ListContextsRequest,
-} from 'agentstack-sdk';
-import { type MatchModelProvidersRequest, unwrapResult } from 'agentstack-sdk';
+} from '@kagenti/adk';
+import { type MatchModelProvidersRequest, unwrapResult } from '@kagenti/adk';
 
 import { agentStackClient } from '#api/agentstack-client.ts';
 import { fetchEntity } from '#api/utils.ts';

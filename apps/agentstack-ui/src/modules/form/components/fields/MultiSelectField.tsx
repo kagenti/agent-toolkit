@@ -4,7 +4,7 @@
  */
 
 import { FormGroup, OperationalTag } from '@carbon/react';
-import type { MultiSelectField } from 'agentstack-sdk';
+import type { MultiSelectField } from '@kagenti/adk';
 import clsx from 'clsx';
 import { Controller, useFormContext } from 'react-hook-form';
 

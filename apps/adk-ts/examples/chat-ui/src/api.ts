@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { buildApiClient, unwrapResult } from 'agentstack-sdk';
+import { buildApiClient, unwrapResult } from '@kagenti/adk';
 
 import { BASE_URL, PROVIDER_ID } from './constants';
 

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { AgentDetailContributor } from 'agentstack-sdk';
+import type { AgentDetailContributor } from '@kagenti/adk';
 
 import { ExternalLink } from '#components/MarkdownContent/components/ExternalLink.tsx';
 import { Tooltip } from '#components/Tooltip/Tooltip.tsx';

@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { Task, TaskArtifactUpdateEvent, TaskStatusUpdateEvent } from 'agentstack-sdk';
-import { extractTextFromMessage, handleAgentCard, handleTaskStatusUpdate, resolveUserMetadata } from 'agentstack-sdk';
+import type { Task, TaskArtifactUpdateEvent, TaskStatusUpdateEvent } from '@kagenti/adk';
+import { extractTextFromMessage, handleAgentCard, handleTaskStatusUpdate, resolveUserMetadata } from '@kagenti/adk';
 import { defaultIfEmpty, filter, lastValueFrom, Subject } from 'rxjs';
 import { match, P } from 'ts-pattern';
 

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { type CreateUserFeedbackRequest, unwrapResult } from 'agentstack-sdk';
+import { type CreateUserFeedbackRequest, unwrapResult } from '@kagenti/adk';
 
 import { agentStackClient } from '#api/agentstack-client.ts';
 

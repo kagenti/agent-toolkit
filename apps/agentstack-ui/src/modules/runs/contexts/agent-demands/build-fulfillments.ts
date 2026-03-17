@@ -12,8 +12,8 @@ import type {
   MCPFulfillments,
   SettingsDemands,
   SettingsFormValues,
-} from 'agentstack-sdk';
-import { ConnectorState, MCPTransportType } from 'agentstack-sdk';
+} from '@kagenti/adk';
+import { ConnectorState, MCPTransportType } from '@kagenti/adk';
 
 import { transformSettingsFormValuesToLegacySettingsValues } from '#modules/runs/settings/utils.ts';
 import { BASE_URL } from '#utils/constants.ts';

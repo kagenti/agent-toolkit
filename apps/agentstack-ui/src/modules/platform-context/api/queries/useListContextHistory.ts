@@ -4,7 +4,7 @@
  */
 
 import { useInfiniteQuery } from '@tanstack/react-query';
-import type { ListContextHistoryRequest, ListContextHistoryResponse } from 'agentstack-sdk';
+import type { ListContextHistoryRequest, ListContextHistoryResponse } from '@kagenti/adk';
 
 import type { PartialBy } from '#@types/utils.ts';
 import { isNotNull } from '#utils/helpers.ts';

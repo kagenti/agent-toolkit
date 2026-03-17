@@ -5,7 +5,7 @@
 
 'use client';
 
-import { InteractionMode } from 'agentstack-sdk';
+import { InteractionMode } from '@kagenti/adk';
 
 import type { Agent } from '#modules/agents/api/types.ts';
 import { usePlatformContext } from '#modules/platform-context/contexts/index.ts';

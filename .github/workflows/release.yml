@@ -97,8 +97,8 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/setup
         with:
-          install_vm_deps: 'build'
-          save_cache: 'true'
+          install_vm_deps: "build"
+          save_cache: "true"
       - id: version
         run: |
           echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
@@ -151,7 +151,7 @@ jobs:
           fi
       - uses: ./.github/actions/setup
         with:
-          install_vm_deps: 'run'
+          install_vm_deps: "run"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: mise run common:check:version
@@ -227,7 +227,7 @@ jobs:
         with:
           packages-dir: apps/agentstack-cli/dist
 
-      - working-directory: apps/agentstack-sdk-ts
+      - working-directory: apps/adk-ts
         run: npm publish --tag ${{ steps.version.outputs.npmTag }}
 
       - run: |

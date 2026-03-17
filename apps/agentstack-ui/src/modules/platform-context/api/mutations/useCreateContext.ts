@@ -4,7 +4,7 @@
  */
 
 import { useMutation } from '@tanstack/react-query';
-import type { Context } from 'agentstack-sdk';
+import type { Context } from '@kagenti/adk';
 
 import { createContext } from '..';
 import { contextKeys } from '../keys';

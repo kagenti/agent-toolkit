@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ApiErrorException, isApiError, isHttpError } from 'agentstack-sdk';
+import { ApiErrorException, isApiError, isHttpError } from '@kagenti/adk';
 
 import type { QueryMetadataError } from '#contexts/QueryProvider/types.ts';
 import type { Toast } from '#contexts/Toast/toast-context.ts';

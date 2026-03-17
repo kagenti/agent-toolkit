@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 'use client';
-import type { ListContextHistoryResponse } from 'agentstack-sdk';
+import type { ListContextHistoryResponse } from '@kagenti/adk';
 import { type PropsWithChildren, useCallback, useState } from 'react';
 
 import type { Agent } from '#modules/agents/api/types.ts';

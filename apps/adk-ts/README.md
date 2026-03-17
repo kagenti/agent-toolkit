@@ -2,13 +2,13 @@
 
 TypeScript/JavaScript client SDK for building applications that interact with Agent Stack agents.
 
-[![npm version](https://img.shields.io/npm/v/agentstack-sdk.svg?style=plastic)](https://www.npmjs.com/package/agentstack-sdk)
+[![npm version](https://img.shields.io/npm/v/%40kagenti%2Fadk.svg?style=plastic)](https://www.npmjs.com/package/@kagenti/adk)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg?style=plastic)](https://opensource.org/licenses/Apache-2.0)
 [![LF AI & Data](https://img.shields.io/badge/LF%20AI%20%26%20Data-0072C6?style=plastic&logo=linuxfoundation&logoColor=white)](https://lfaidata.foundation/projects/)
 
 ## Overview
 
-The `agentstack-sdk` provides TypeScript and JavaScript tools for building client applications that communicate with
+The `@kagenti/adk` provides TypeScript and JavaScript tools for building client applications that communicate with
 agents deployed on Agent Stack. It includes utilities for handling the A2A (Agent2Agent) protocol, working with
 extensions, and calling the Agent Stack platform API.
 
@@ -22,7 +22,7 @@ extensions, and calling the Agent Stack platform API.
 ## Installation
 
 ```bash
-npm install agentstack-sdk @a2a-js/sdk
+npm install @kagenti/adk @a2a-js/sdk
 ```
 
 ## Quickstart
@@ -38,7 +38,7 @@ import {
   resolveUserMetadata,
   type TaskStatusUpdateType,
   type Fulfillments,
-} from 'agentstack-sdk';
+} from '@kagenti/adk';
 import {
   ClientFactory,
   ClientFactoryOptions,
@@ -46,7 +46,7 @@ import {
   JsonRpcTransportFactory,
 } from '@a2a-js/sdk/client';
 
-const baseUrl = 'https://your-agentstack-instance.com'; // or http://localhost:8333 for local development
+const baseUrl = 'https://your-adk-instance.com'; // or http://localhost:8333 for local development
 const accessToken = '<user-access-token>';
 
 const api = buildApiClient({
@@ -187,26 +187,26 @@ UI extensions (message metadata your UI can render):
 
 ## Documentation
 
-- [Agent Stack Documentation](https://agentstack.beeai.dev)
-- [Getting Started](https://agentstack.beeai.dev/stable/custom-ui/getting-started)
-- [A2A Client Integration](https://agentstack.beeai.dev/stable/custom-ui/a2a-client)
-- [Agent Requirements](https://agentstack.beeai.dev/stable/custom-ui/agent-requirements)
-- [Platform API Client](https://agentstack.beeai.dev/stable/custom-ui/platform-api-client)
+- [Agent Stack Documentation](https://github.com/kagenti/adk/blob/main/docs/stable)
+- [Getting Started](https://github.com/kagenti/adk/blob/main/docs/stable/custom-ui/getting-started.mdx)
+- [A2A Client Integration](https://github.com/kagenti/adk/blob/main/docs/stable/custom-ui/a2a-client.mdx)
+- [Agent Requirements](https://github.com/kagenti/adk/blob/main/docs/stable/custom-ui/agent-requirements.mdx)
+- [Platform API Client](https://github.com/kagenti/adk/blob/main/docs/stable/custom-ui/platform-api-client.mdx)
 
 ## Resources
 
-- [GitHub Repository](https://github.com/i-am-bee/agentstack)
-- [npm Package](https://www.npmjs.com/package/agentstack-sdk)
+- [GitHub Repository](https://github.com/kagenti/adk)
+- [npm Package](https://www.npmjs.com/package/@kagenti/adk)
 
 ## Contributing
 
 Contributions are welcome! Please see the
-[Contributing Guide](https://github.com/i-am-bee/agentstack/blob/main/CONTRIBUTING.md) for details.
+[Contributing Guide](https://github.com/kagenti/adk/blob/main/CONTRIBUTING.md) for details.
 
 ## Support
 
-- [GitHub Issues](https://github.com/i-am-bee/agentstack/issues)
-- [GitHub Discussions](https://github.com/i-am-bee/agentstack/discussions)
+- [GitHub Issues](https://github.com/kagenti/adk/issues)
+- [GitHub Discussions](https://github.com/kagenti/adk/discussions)
 
 ---
 

@@ -4,8 +4,8 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import type { EmbeddingDemands, LLMDemands } from 'agentstack-sdk';
-import { ModelCapability } from 'agentstack-sdk';
+import type { EmbeddingDemands, LLMDemands } from '@kagenti/adk';
+import { ModelCapability } from '@kagenti/adk';
 import { useEffect } from 'react';
 
 import { useApp } from '#contexts/App/index.ts';

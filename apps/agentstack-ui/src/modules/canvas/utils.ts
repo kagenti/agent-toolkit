@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { CanvasEditRequest } from 'agentstack-sdk';
+import type { CanvasEditRequest } from '@kagenti/adk';
 import { v4 as uuid } from 'uuid';
 
 import type { UIMessagePart } from '#modules/messages/types.ts';

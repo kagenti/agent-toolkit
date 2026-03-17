@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { ListProviderVariablesRequest } from 'agentstack-sdk';
+import type { ListProviderVariablesRequest } from '@kagenti/adk';
 
 export const providerVariableKeys = {
   all: () => ['providers', 'variables'] as const,

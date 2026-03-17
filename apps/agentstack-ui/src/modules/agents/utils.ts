@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { Provider } from 'agentstack-sdk';
-import { agentDetailExtension, extractUiExtensionData, InteractionMode } from 'agentstack-sdk';
+import type { Provider } from '@kagenti/adk';
+import { agentDetailExtension, extractUiExtensionData, InteractionMode } from '@kagenti/adk';
 import uniq from 'lodash/uniq';
 import uniqWith from 'lodash/uniqWith';
 

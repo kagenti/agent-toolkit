@@ -15,7 +15,7 @@ This guide shows how to catch and handle both error types in your UI.
 All API methods return `ApiResult<T>`. You can branch on `result.ok` or use `unwrapResult` and catch errors.
 
 ```typescript
-import { buildApiClient, unwrapResult } from "agentstack-sdk";
+import { buildApiClient, unwrapResult } from "@kagenti/adk";
 
 const api = buildApiClient({ baseUrl: "https://your-agentstack-instance.com" });
 
@@ -33,7 +33,7 @@ const user = unwrapResult(await api.readUser());
 Use the guard helpers to match specific error types.
 
 ```typescript
-import { isHttpError, isNetworkError, isParseError, isValidationError } from "agentstack-sdk";
+import { isHttpError, isNetworkError, isParseError, isValidationError } from "@kagenti/adk";
 
 try {
   unwrapResult(await api.readUser());
@@ -61,7 +61,7 @@ try {
 When tasks fail or are rejected, agents can emit an error extension payload. Read it with `extractUiExtensionData` and display a user facing message.
 
 ```typescript
-import { errorExtension, extractUiExtensionData } from "agentstack-sdk";
+import { errorExtension, extractUiExtensionData } from "@kagenti/adk";
 
 const readError = extractUiExtensionData(errorExtension);
 const errorMetadata = readError(event.status.message?.metadata);

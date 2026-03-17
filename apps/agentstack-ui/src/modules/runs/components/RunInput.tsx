@@ -5,7 +5,7 @@
 
 import { InlineLoading } from '@carbon/react';
 import { useMergeRefs } from '@floating-ui/react';
-import { InteractionMode, ProviderState } from 'agentstack-sdk';
+import { InteractionMode, ProviderState } from '@kagenti/adk';
 import clsx from 'clsx';
 import { useRef, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';

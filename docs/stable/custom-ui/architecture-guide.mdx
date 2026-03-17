@@ -5,8 +5,8 @@ description: Practical approach to building a custom Agent Stack UI using the ch
 
 If you are building your own user interface, start with the reference implementation:
 
-- [chat-ui example source](https://github.com/i-am-bee/agentstack/tree/main/apps/agentstack-sdk-ts/examples/chat-ui)
-- Local path in this monorepo: `apps/agentstack-sdk-ts/examples/chat-ui`
+- [chat-ui example source](https://github.com/i-am-bee/agentstack/tree/main/apps/adk-ts/examples/chat-ui)
+- Local path in this monorepo: `apps/adk-ts/examples/chat-ui`
 
 This page explains the approach used in that example and how to extend it into a full custom UI.
 
@@ -64,7 +64,7 @@ const PROVIDER_ID = import.meta.env.VITE_AGENTSTACK_PROVIDER_ID;
 Before sending messages, create a conversation context and a token scoped for agent access:
 
 ```typescript
-import { buildApiClient, unwrapResult } from "agentstack-sdk";
+import { buildApiClient, unwrapResult } from "@kagenti/adk";
 
 const api = buildApiClient({ baseUrl: BASE_URL });
 
@@ -99,7 +99,7 @@ import {
   DefaultAgentCardResolver,
   JsonRpcTransportFactory,
 } from "@a2a-js/sdk/client";
-import { createAuthenticatedFetch, getAgentCardPath } from "agentstack-sdk";
+import { createAuthenticatedFetch, getAgentCardPath } from "@kagenti/adk";
 
 const fetchImpl = createAuthenticatedFetch(contextToken.token);
 
@@ -119,7 +119,7 @@ const client = await factory.createFromUrl(BASE_URL, agentCardPath);
 Read the agent card and resolve demand fulfillments before the first message:
 
 ```typescript
-import { buildLLMExtensionFulfillmentResolver, handleAgentCard } from "agentstack-sdk";
+import { buildLLMExtensionFulfillmentResolver, handleAgentCard } from "@kagenti/adk";
 
 const agentCard = await client.getAgentCard();
 const { resolveMetadata } = handleAgentCard(agentCard);
@@ -192,7 +192,7 @@ Related guides:
 ## Run the reference example
 
 ```bash
-cd apps/agentstack-sdk-ts/examples/chat-ui
+cd apps/adk-ts/examples/chat-ui
 cp .env.example .env
 pnpm install
 pnpm dev

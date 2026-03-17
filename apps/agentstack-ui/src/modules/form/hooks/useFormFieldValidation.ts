@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { FormField } from 'agentstack-sdk';
+import type { FormField } from '@kagenti/adk';
 import get from 'lodash/get';
 import type { FormState, RegisterOptions } from 'react-hook-form';
 

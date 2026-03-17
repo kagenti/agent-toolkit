@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { CreateProviderRequest } from 'agentstack-sdk';
+import type { CreateProviderRequest } from '@kagenti/adk';
 
 import type { ProviderSource } from '#modules/providers/types.ts';
 

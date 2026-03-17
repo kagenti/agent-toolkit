@@ -9,7 +9,7 @@ import {
   DefaultAgentCardResolver,
   JsonRpcTransportFactory,
 } from '@a2a-js/sdk/client';
-import { type ContextToken, createAuthenticatedFetch, getAgentCardPath } from 'agentstack-sdk';
+import { type ContextToken, createAuthenticatedFetch, getAgentCardPath } from '@kagenti/adk';
 import { useEffect, useState } from 'react';
 
 import { createContext, createContextToken } from './api';

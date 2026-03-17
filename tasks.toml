@@ -105,7 +105,7 @@ version=$(
     yq -r .appVersion           helm/Chart.yaml
     yq -r .project.version      apps/agentstack-cli/pyproject.toml
     yq -r .project.version      apps/agentstack-sdk-py/pyproject.toml
-    yq -r .version              apps/agentstack-sdk-ts/package.json
+    yq -r .version              apps/adk-ts/package.json
     yq -r .project.version      apps/agentstack-server/pyproject.toml
     yq -r .version              apps/agentstack-ui/package.json
     yq -r '.providers[].location | split(":")[-1]' agent-registry.yaml

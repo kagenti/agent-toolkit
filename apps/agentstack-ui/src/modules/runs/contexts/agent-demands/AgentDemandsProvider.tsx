@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { FormFulfillments, SettingsFormRender, SettingsFormValues } from 'agentstack-sdk';
-import { ModelCapability } from 'agentstack-sdk';
+import type { FormFulfillments, SettingsFormRender, SettingsFormValues } from '@kagenti/adk';
+import { ModelCapability } from '@kagenti/adk';
 import mapValues from 'lodash/mapValues';
 import { type PropsWithChildren, useCallback, useMemo, useRef, useState } from 'react';
 

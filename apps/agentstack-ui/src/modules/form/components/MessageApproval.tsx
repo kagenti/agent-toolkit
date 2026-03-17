@@ -4,8 +4,8 @@
  */
 
 import { Button } from '@carbon/react';
-import type { ToolCallApprovalRequest } from 'agentstack-sdk';
-import { ApprovalDecision } from 'agentstack-sdk';
+import type { ToolCallApprovalRequest } from '@kagenti/adk';
+import { ApprovalDecision } from '@kagenti/adk';
 import isEmpty from 'lodash/isEmpty';
 import { useCallback, useMemo, useState } from 'react';
 

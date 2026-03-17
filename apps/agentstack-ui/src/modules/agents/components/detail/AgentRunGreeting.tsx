@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { InteractionMode } from 'agentstack-sdk';
+import { InteractionMode } from '@kagenti/adk';
 
 import type { Agent } from '../../api/types';
 import { AgentWelcomeMessage } from './AgentWelcomeMessage';

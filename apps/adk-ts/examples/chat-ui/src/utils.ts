@@ -4,7 +4,7 @@
  */
 
 import type { Client } from '@a2a-js/sdk/client';
-import { buildLLMExtensionFulfillmentResolver, type ContextToken, handleAgentCard, type Message } from 'agentstack-sdk';
+import { buildLLMExtensionFulfillmentResolver, type ContextToken, handleAgentCard, type Message } from '@kagenti/adk';
 
 import { api } from './api';
 import type { ChatMessage } from './types';

@@ -4,7 +4,7 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import type { ContextToken } from 'agentstack-sdk';
+import type { ContextToken } from '@kagenti/adk';
 
 import { useApp } from '#contexts/App/index.ts';
 import type { Agent } from '#modules/agents/api/types.ts';

@@ -12,7 +12,7 @@ See **[Agent Requirements](./agent-requirements)** for the fulfillment and UI me
 `buildMessageBuilder` returns a function that resolves agent demands and builds a user message with metadata.
 
 ```typescript
-import { buildMessageBuilder } from "agentstack-sdk";
+import { buildMessageBuilder } from "@kagenti/adk";
 
 const buildMessage = buildMessageBuilder(agentCard);
 
@@ -42,7 +42,7 @@ const message = await buildMessage(
 Use `resolveUserMetadata` when the user responds to forms, approvals, or canvas requests.
 
 ```typescript
-import { resolveUserMetadata } from "agentstack-sdk";
+import { resolveUserMetadata } from "@kagenti/adk";
 
 const metadata = await resolveUserMetadata({
   form: { name: "Ada" },

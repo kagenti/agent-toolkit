@@ -9,7 +9,7 @@ If you only need the fast path, start with **[Getting Started](./getting-started
 
 ## Prereqs
 
-- **Packages installed**: `agentstack-sdk` and `@a2a-js/sdk`
+- **Packages installed**: `@kagenti/adk` and `@a2a-js/sdk`
 - **Platform base URL** and **provider ID**
 - **CORS enabled on the server** for your frontend origin when running in a browser (or use a same-origin proxy). See **[Cross-Origin Resource Sharing Configuration](../deploy-agent-stack/deployment-guide#cross-origin-resource-sharing-configuration)**.
 - **User access token** (for platform API calls)
@@ -32,7 +32,7 @@ In the next steps, you’ll wire up a full A2A message flow: resolve initial age
 Fetch the agent card, inspect demands, and build the **initial** fulfillments. To keep the rest of this guide working without extra complexity, focus on the most common requirement: **LLM access** via the platform OpenAI‑compatible proxy. We map each LLM demand key to a model the user picked in your UI, then resolve the metadata that gets attached to your first message.
 
 ```typescript
-import { handleAgentCard, type Fulfillments } from "agentstack-sdk";
+import { handleAgentCard, type Fulfillments } from "@kagenti/adk";
 
 const card = await client.getAgentCard();
 const { resolveMetadata, demands } = handleAgentCard(card);
@@ -92,7 +92,7 @@ const stream = client.sendMessageStream({
 Use `handleTaskStatusUpdate` to detect form requests and capture the task ID so you can continue the same task. Render streamed output from `status-update` events, and keep `message` as a fallback.
 
 ```typescript
-import { handleTaskStatusUpdate, type TaskStatusUpdateType } from "agentstack-sdk";
+import { handleTaskStatusUpdate, type TaskStatusUpdateType } from "@kagenti/adk";
 
 let taskId: string | undefined;
 
@@ -141,7 +141,7 @@ For rendering message parts and metadata (such as citations), see **[Agent Respo
 Convert the user responses into A2A metadata and send a follow-up message for the same task.
 
 ```typescript
-import { resolveUserMetadata } from "agentstack-sdk";
+import { resolveUserMetadata } from "@kagenti/adk";
 
 // Form values follow the SDK schemas: each field is { type, value }.
 const formValues = {
@@ -237,7 +237,7 @@ Tasks can fail at any point during streaming. Failed or rejected updates arrive 
 - Update the UI to a terminal error state and stop streaming.
 
 ```typescript
-import { errorExtension, extractUiExtensionData } from "agentstack-sdk";
+import { errorExtension, extractUiExtensionData } from "@kagenti/adk";
 
 const readError = extractUiExtensionData(errorExtension);
 

@@ -17,13 +17,13 @@ The SDK also exports A2A protocol types and Zod schemas so your UI can stay in s
 ### 1. Install
 
 ```bash
-npm i agentstack-sdk @a2a-js/sdk
+npm i @kagenti/adk @a2a-js/sdk
 ```
 
 ### 2. Create the platform API client
 
 ```typescript
-import { buildApiClient, createAuthenticatedFetch } from "agentstack-sdk";
+import { buildApiClient, createAuthenticatedFetch } from "@kagenti/adk";
 
 const baseUrl = "https://your-agentstack-instance.com";
 
@@ -90,7 +90,7 @@ import {
   DefaultAgentCardResolver,
   JsonRpcTransportFactory,
 } from "@a2a-js/sdk/client";
-import { createAuthenticatedFetch, getAgentCardPath } from "agentstack-sdk";
+import { createAuthenticatedFetch, getAgentCardPath } from "@kagenti/adk";
 
 const fetchImpl = createAuthenticatedFetch(contextToken.token);
 
@@ -161,10 +161,10 @@ graph TB
 
 The SDK is split into focused entrypoints:
 
-1. `agentstack-sdk` for everything
-2. `agentstack-sdk/api` for platform API client, schemas, and types
-3. `agentstack-sdk/core` for extension helpers and A2A interaction utilities
-4. `agentstack-sdk/extensions` for A2A extension definitions and types
+1. `@kagenti/adk` for everything
+2. `@kagenti/adk/api` for platform API client, schemas, and types
+3. `@kagenti/adk/core` for extension helpers and A2A interaction utilities
+4. `@kagenti/adk/extensions` for A2A extension definitions and types
 
 ## Protocol Types and Schemas
 

@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { ListProviderVariablesRequest, UpdateProviderVariablesRequest } from 'agentstack-sdk';
-import { unwrapResult } from 'agentstack-sdk';
+import type { ListProviderVariablesRequest, UpdateProviderVariablesRequest } from '@kagenti/adk';
+import { unwrapResult } from '@kagenti/adk';
 
 import { agentStackClient } from '#api/agentstack-client.ts';
 

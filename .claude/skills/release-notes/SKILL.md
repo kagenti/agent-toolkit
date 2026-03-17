@@ -78,7 +78,7 @@ This release brings a major TypeScript SDK restructuring, a new Canvas agent, co
 ## Major Changes
 
 ### Breaking: TypeScript SDK Restructuring
-The `agentstack-sdk-ts` has been completely refactored with a new modular architecture. The API client is now organized into dedicated subdirectories (`auth`, `services`, `ui`, `configuration`, `connectors`, etc.) with proper `schemas.ts` and `types.ts` files. A new `buildApiClient` core function with `unwrapResult` utility provides standardized response handling. Error handling is now structured with `ApiErrorException` and specific error types (Http, Network, Parse, Validation). All consumers of the TS SDK need to update imports and usage patterns.
+The `adk-ts` has been completely refactored with a new modular architecture. The API client is now organized into dedicated subdirectories (`auth`, `services`, `ui`, `configuration`, `connectors`, etc.) with proper `schemas.ts` and `types.ts` files. A new `buildApiClient` core function with `unwrapResult` utility provides standardized response handling. Error handling is now structured with `ApiErrorException` and specific error types (Http, Network, Parse, Validation). All consumers of the TS SDK need to update imports and usage patterns.
 
 ### New Canvas Agent
 A new agent for multi-turn artifact editing is now available. Users can select and modify specific sections of text content, enabling precise iterative refinement of generated artifacts.

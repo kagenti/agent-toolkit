@@ -13,7 +13,7 @@ import type {
   MultiSelectField,
   SingleSelectField,
   TextField,
-} from 'agentstack-sdk';
+} from '@kagenti/adk';
 import { useMemo } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';

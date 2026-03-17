@@ -8,8 +8,8 @@ import type {
   CreateConnectorRequest,
   DeleteConnectorRequest,
   DisconnectConnectorRequest,
-} from 'agentstack-sdk';
-import { unwrapResult } from 'agentstack-sdk';
+} from '@kagenti/adk';
+import { unwrapResult } from '@kagenti/adk';
 
 import { agentStackClient } from '#api/agentstack-client.ts';
 import { BASE_URL } from '#utils/constants.ts';

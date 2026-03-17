@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { AgentDetailTool } from 'agentstack-sdk';
+import type { AgentDetailTool } from '@kagenti/adk';
 
 import { LineClampText } from '#components/LineClampText/LineClampText.tsx';
 

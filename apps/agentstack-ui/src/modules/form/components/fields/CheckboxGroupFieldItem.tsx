@@ -4,7 +4,7 @@
  */
 
 import { Checkbox } from '@carbon/react';
-import type { CheckboxField, CheckboxGroupField } from 'agentstack-sdk';
+import type { CheckboxField, CheckboxGroupField } from '@kagenti/adk';
 import { useFormContext } from 'react-hook-form';
 
 import { useFormFieldValidation } from '#modules/form/hooks/useFormFieldValidation.ts';

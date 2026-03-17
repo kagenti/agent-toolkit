@@ -4,7 +4,7 @@
  */
 
 import { SkeletonText } from '@carbon/react';
-import type { AgentDetailContributor } from 'agentstack-sdk';
+import type { AgentDetailContributor } from '@kagenti/adk';
 
 import classes from './AgentAuthor.module.scss';
 

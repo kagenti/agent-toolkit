@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { FormRender } from 'agentstack-sdk';
+import type { FormRender } from '@kagenti/adk';
 
 import { Container } from '#components/layouts/Container.tsx';
 import { FormRenderer } from '#modules/form/components/FormRenderer.tsx';

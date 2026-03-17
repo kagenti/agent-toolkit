@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 'use client';
-import type { ApprovalDecision, FormRender } from 'agentstack-sdk';
+import type { ApprovalDecision, FormRender } from '@kagenti/adk';
 import { createContext } from 'react';
 
 import type { AgentA2AClient } from '#api/a2a/types.ts';

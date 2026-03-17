@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { ContextHistory } from 'agentstack-sdk';
+import type { ContextHistory } from '@kagenti/adk';
 import {
   contextSchema as sdkContextSchema,
   listContextsResponseSchema as sdkListContextsResponseSchema,
   patchContextMetadataRequestSchema as sdkPatchContextMetadataRequestSchema,
-} from 'agentstack-sdk';
+} from '@kagenti/adk';
 import z from 'zod';
 
 export enum TitleGenerationState {

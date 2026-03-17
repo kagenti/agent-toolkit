@@ -8,8 +8,8 @@ import type {
   DeleteProviderRequest,
   ListProvidersRequest,
   ReadProviderRequest,
-} from 'agentstack-sdk';
-import { unwrapResult } from 'agentstack-sdk';
+} from '@kagenti/adk';
+import { unwrapResult } from '@kagenti/adk';
 
 import { agentStackClient } from '#api/agentstack-client.ts';
 import { fetchEntity } from '#api/utils.ts';

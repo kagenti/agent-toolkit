@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { handleAgentCard } from 'agentstack-sdk';
+import { handleAgentCard } from '@kagenti/adk';
 import type { PropsWithChildren } from 'react';
 import { useCallback, useMemo } from 'react';
 import { useLocalStorage } from 'usehooks-ts';

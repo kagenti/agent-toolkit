@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { TextField } from 'agentstack-sdk';
+import type { TextField } from '@kagenti/adk';
 import { useMemo } from 'react';
 
 import { useMessages } from '#modules/messages/contexts/Messages/index.ts';

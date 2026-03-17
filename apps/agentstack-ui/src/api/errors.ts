@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { isHttpError } from 'agentstack-sdk';
+import { isHttpError } from '@kagenti/adk';
 
 import type { A2AErrorMetadata } from './types';
 

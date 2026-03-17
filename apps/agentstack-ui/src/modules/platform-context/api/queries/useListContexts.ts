@@ -4,7 +4,7 @@
  */
 
 import { useInfiniteQuery } from '@tanstack/react-query';
-import type { ListContextsRequest } from 'agentstack-sdk';
+import type { ListContextsRequest } from '@kagenti/adk';
 
 import { isNotNull } from '#utils/helpers.ts';
 

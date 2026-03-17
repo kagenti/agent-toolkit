@@ -13,8 +13,8 @@
       "path": "apps/agentstack-sdk-py",
     },
     {
-      "name": "agentstack-sdk-ts",
-      "path": "apps/agentstack-sdk-ts",
+      "name": "adk-ts",
+      "path": "apps/adk-ts",
     },
     {
       "name": "agentstack-cli",
@@ -42,11 +42,11 @@
     },
     {
       "name": "agent-deepagents-content-builder",
-      "path": "agents/deepagents_content_builder"
+      "path": "agents/deepagents_content_builder",
     },
     {
       "name": "langgraph-reflection",
-      "path": "agents/langgraph_reflection"
+      "path": "agents/langgraph_reflection",
     },
     {
       "name": "agent-canvas",
@@ -72,9 +72,6 @@
     },
   },
   "extensions": {
-    "recommendations": [
-      "meta.pyrefly",
-      "charliermarsh.ruff"
-    ],
+    "recommendations": ["meta.pyrefly", "charliermarsh.ruff"],
   },
 }

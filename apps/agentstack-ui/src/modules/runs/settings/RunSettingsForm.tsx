@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { SettingsFormRender, SettingsFormValues } from 'agentstack-sdk';
+import type { SettingsFormRender, SettingsFormValues } from '@kagenti/adk';
 import { useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';

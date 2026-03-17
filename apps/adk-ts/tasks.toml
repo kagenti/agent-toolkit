@@ -1,0 +1,44 @@
+# check
+
+["adk-ts:check"]
+depends = ["adk-ts:check:*"]
+
+["adk-ts:check:prettier"]
+extends = "node:check:prettier"
+depends = ["common:setup:pnpm"]
+dir = "{{config_root}}/apps/adk-ts"
+
+["adk-ts:check:eslint"]
+extends = "node:check:eslint"
+depends = ["common:setup:pnpm"]
+dir = "{{config_root}}/apps/adk-ts"
+
+["adk-ts:check:tsc"]
+extends = "node:check:tsc"
+depends = ["common:setup:pnpm"]
+dir = "{{config_root}}/apps/adk-ts"
+run = "pnpm tsc --noEmit -p tsconfig.check.json"
+
+# fix
+
+["adk-ts:fix"]
+depends = ["adk-ts:fix:*"]
+
+["adk-ts:fix:prettier"]
+extends = "node:fix:prettier"
+depends = ["common:setup:pnpm"]
+dir = "{{config_root}}/apps/adk-ts"
+
+["adk-ts:fix:lint"]
+extends = "node:fix:eslint"
+depends = ["common:setup:pnpm"]
+dir = "{{config_root}}/apps/adk-ts"
+
+# build
+
+["adk-ts:build"]
+depends = ["common:setup:pnpm"]
+dir = "{{config_root}}/apps/adk-ts"
+run = "pnpm build"
+sources = ["src/**/*", "package.json", "tsconfig.json"]
+outputs = { auto = true }

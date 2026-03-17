@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { Provider } from 'agentstack-sdk';
+import type { Provider } from '@kagenti/adk';
 
 import { DeleteButton } from '#components/DeleteButton/DeleteButton.tsx';
 

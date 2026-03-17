@@ -1,5 +1,5 @@
 {
-  "name": "agentstack-sdk",
+  "name": "@kagenti/adk",
   "author": "IBM Corp.",
   "version": "0.7.1",
   "type": "module",
@@ -13,7 +13,7 @@
   "source": "src/index.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/i-am-bee/agentstack"
+    "url": "https://github.com/kagenti/adk"
   },
   "exports": {
     ".": {

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { contextPermissionsGrantSchema, globalPermissionsGrantSchema } from 'agentstack-sdk';
+import { contextPermissionsGrantSchema, globalPermissionsGrantSchema } from '@kagenti/adk';
 import z from 'zod';
 
 export const contextTokenPermissionsSchema = z.object({
