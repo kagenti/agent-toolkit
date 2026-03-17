@@ -146,7 +146,7 @@ auth:
       #   enabled: true
     image:
       repository: quay.io/keycloak/keycloak
-      tag: 26.5.4
+      tag: 26.3.3
       pullPolicy: IfNotPresent
 
   ## OIDC Provider Configuration
