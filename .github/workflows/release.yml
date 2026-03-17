@@ -180,17 +180,17 @@ jobs:
       - run: echo '${{ secrets.GITHUB_TOKEN }}' | helm registry login --username '${{ github.actor }}' --password-stdin ghcr.io
       - run: helm push ./helm/dist/adk-*.tgz 'oci://ghcr.io/${{ github.repository }}/chart'
 
-      - run: mise run adk-sdk-py:build
+      - run: mise run adk-py:build
       - uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          packages-dir: apps/adk-sdk-py/dist
+          packages-dir: apps/adk-py/dist
 
       - run: mise run adk-cli:build
       - uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: apps/adk-cli/dist
 
-      - working-directory: apps/adk-sdk-ts
+      - working-directory: apps/adk-ts
         run: npm publish --tag ${{ steps.version.outputs.npmTag }}
 
       - run: |
