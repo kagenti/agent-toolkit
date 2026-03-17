@@ -24,7 +24,7 @@ class ProviderErrorMessage(pydantic.BaseModel):
     message: str
 
 
-class Provider(pydantic.BaseModel):
+class Provider(pydantic.BaseModel, arbitrary_types_allowed=True):
     id: str
     source: str
     origin: str

@@ -341,7 +341,7 @@ CONFIG_FILE="/tmp/config_e2e_test_$(date +%s).yaml"
 echo '
 agentstack:
   ui:
-    enabled: false
+    enabled: true
   docling:
     enabled: true
   connector:
@@ -353,7 +353,7 @@ agentstack:
           name: Test MCP Server
 ' > "$CONFIG_FILE"
 
-{{ mise_bin }} run agentstack:start -v --vm-name=${VM_NAME} --skip-login -f "$CONFIG_FILE" --set agentstack:ui.enabled=false --set kagenti:components.ui.enabled=false
+{{ mise_bin }} run agentstack:start -v --vm-name=${VM_NAME} --skip-login -f "$CONFIG_FILE"
 
 eval "$( {{ mise_bin }} run agentstack:shell --vm-name="$VM_NAME" )"
 
@@ -427,7 +427,7 @@ agentstack:
           name: Test MCP Server
 ' > "$CONFIG_FILE"
 
-{{ mise_bin }} run agentstack:start --vm-name=${VM_NAME} --skip-login -f "$CONFIG_FILE" --set agentstack:ui.enabled=false --set kagenti:components.ui.enabled=false
+{{ mise_bin }} run agentstack:start --vm-name=${VM_NAME} --skip-login -f "$CONFIG_FILE"
 
 
 eval "$( {{ mise_bin }} run agentstack:shell --vm-name="$VM_NAME" )"
@@ -478,8 +478,7 @@ VM_NAME=integration-test-run
 {{ mise_bin }} run agentstack:start \
     --vm-name="$VM_NAME" \
     --set agentstack:redis.enabled=true \
-    --set agentstack:ui.enabled=false \
-    --set kagenti:components.ui.enabled=false
+    --set agentstack:ui.enabled=false
 
 eval "$( {{ mise_bin }} run agentstack:shell --vm-name="$VM_NAME" )"
 

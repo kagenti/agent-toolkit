@@ -143,9 +143,17 @@ class Server:
         if self_registration:
             from agentstack_sdk.a2a.extensions.services.platform import _PlatformSelfRegistrationExtensionServer
 
-            self._self_registration_client = (
-                self_registration_client_factory() if self_registration_client_factory else None
-            )
+            if self_registration_client_factory:
+                self._self_registration_client = self_registration_client_factory()
+            else:
+                # Use basic auth (admin:admin) for local dev self-registration
+                self._self_registration_client = PlatformClient(
+                    base_url=self._platform_url,
+                    auth=(
+                        os.getenv("PLATFORM_USERNAME", "admin"),
+                        os.getenv("PLATFORM_PASSWORD", "admin"),
+                    ),
+                )
             self._self_registration_id = urllib.parse.quote(self_registration_id or self._agent.initial_card.name)
             from agentstack_sdk.a2a.extensions.services.platform import (
                 _PlatformSelfRegistrationExtensionParams,
