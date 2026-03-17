@@ -19,9 +19,9 @@ jobs:
     name: mise setup
     runs-on: ubuntu-latest
     outputs:
-      agentstack-server: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.agentstack-server == 'true' }}
-      agentstack-cli: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.agentstack-cli == 'true' }}
-      agentstack-sdk-py: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.agentstack-sdk-py == 'true' }}
+      adk-server: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.adk-server == 'true' }}
+      adk-cli: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.adk-cli == 'true' }}
+      adk-sdk-py: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.adk-sdk-py == 'true' }}
       helm: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.helm == 'true' }}
       examples: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.examples == 'true' }}
     steps:
@@ -33,9 +33,9 @@ jobs:
         id: filter
         with:
           filters: |
-            agentstack-server: 'apps/agentstack-server/**'
-            agentstack-cli: 'apps/agentstack-cli/**'
-            agentstack-sdk-py: 'apps/agentstack-sdk-py/**'
+            adk-server: 'apps/adk-server/**'
+            adk-cli: 'apps/adk-cli/**'
+            adk-sdk-py: 'apps/adk-sdk-py/**'
             helm: 'helm/**'
             examples: 'examples/**'
             microshift-vm: 'apps/microshift-vm/**'
@@ -85,14 +85,14 @@ jobs:
       - if: steps.cache-check.outputs.cache-hit != 'true'
         run: mise run microshift-vm:build:qemu
 
-  agentstack-server-test-integration:
-    name: mise agentstack-server:test:integration
+  adk-server-test-integration:
+    name: mise adk-server:test:integration
     needs: [setup, microshift-vm-build-qemu]
     if: >-
       always() &&
       needs.microshift-vm-build-qemu.result != 'failure' &&
-      (needs.setup.outputs.agentstack-server == 'true' ||
-      needs.setup.outputs.agentstack-cli == 'true')
+      (needs.setup.outputs.adk-server == 'true' ||
+      needs.setup.outputs.adk-cli == 'true')
     timeout-minutes: 45
     runs-on: ubuntu-latest
     steps:
@@ -103,27 +103,27 @@ jobs:
           install_vm_deps: 'run'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: mise run agentstack-server:test:integration
+      - run: mise run adk-server:test:integration
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           LLM_API_BASE: "${{ secrets.OPENAI_API_BASE }}"
           LLM_MODEL: "${{ vars.OPENAI_MODEL }}"
           LLM_API_KEY: "${{ secrets.OPENAI_API_KEY }}"
 
-  agentstack-server-test-e2e:
-    name: mise agentstack-server:test:e2e
+  adk-server-test-e2e:
+    name: mise adk-server:test:e2e
     needs: [setup, microshift-vm-build-qemu]
     if: >-
       always() &&
       needs.microshift-vm-build-qemu.result != 'failure' &&
-      (needs.setup.outputs.agentstack-server == 'true' ||
-      needs.setup.outputs.agentstack-cli == 'true' ||
-      needs.setup.outputs.agentstack-sdk-py == 'true' ||
+      (needs.setup.outputs.adk-server == 'true' ||
+      needs.setup.outputs.adk-cli == 'true' ||
+      needs.setup.outputs.adk-sdk-py == 'true' ||
       needs.setup.outputs.helm == 'true')
     timeout-minutes: 45
     runs-on: ubuntu-latest
     env:
-      AGENTSTACK__HOME: ${{ github.workspace }}/.agentstack
+      ADK__HOME: ${{ github.workspace }}/.adk
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/setup
@@ -132,7 +132,7 @@ jobs:
           install_vm_deps: 'run'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: mise run agentstack-server:test:e2e
+      - run: mise run adk-server:test:e2e
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           LLM_API_BASE: "${{ secrets.OPENAI_API_BASE }}"
@@ -140,14 +140,14 @@ jobs:
           EMBEDDING_MODEL: "${{ vars.OPENAI_EMBEDDING_MODEL }}"
           LLM_API_KEY: "${{ secrets.OPENAI_API_KEY }}"
 
-  agentstack-server-test-e2e-examples:
-    name: mise agentstack-server:test:e2e-examples
+  adk-server-test-e2e-examples:
+    name: mise adk-server:test:e2e-examples
     needs: [setup, microshift-vm-build-qemu]
     if: >-
       always() &&
       needs.microshift-vm-build-qemu.result != 'failure' &&
-      (needs.setup.outputs.agentstack-server == 'true' ||
-      needs.setup.outputs.agentstack-sdk-py == 'true' ||
+      (needs.setup.outputs.adk-server == 'true' ||
+      needs.setup.outputs.adk-sdk-py == 'true' ||
       needs.setup.outputs.examples == 'true' ||
       needs.setup.outputs.helm == 'true') &&
       (github.event_name != 'pull_request' ||
@@ -155,7 +155,7 @@ jobs:
     timeout-minutes: 45
     runs-on: ubuntu-latest
     env:
-      AGENTSTACK__HOME: ${{ github.workspace }}/.agentstack
+      ADK__HOME: ${{ github.workspace }}/.adk
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/setup
@@ -164,7 +164,7 @@ jobs:
           install_vm_deps: 'run'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: mise run agentstack-server:test:e2e-examples
+      - run: mise run adk-server:test:e2e-examples
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           LLM_API_BASE: "${{ secrets.OPENAI_API_BASE }}"
@@ -172,10 +172,10 @@ jobs:
           EMBEDDING_MODEL: "${{ vars.OPENAI_EMBEDDING_MODEL }}"
           LLM_API_KEY: "${{ secrets.OPENAI_API_KEY }}"
 
-  agentstack-sdk-py-test-all:
-    name: "mise agentstack-sdk-py:test-all --python=${{ matrix.python }}"
+  adk-sdk-py-test-all:
+    name: "mise adk-sdk-py:test-all --python=${{ matrix.python }}"
     needs: setup
-    if: needs.setup.outputs.agentstack-sdk-py == 'true'
+    if: needs.setup.outputs.adk-sdk-py == 'true'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -190,4 +190,4 @@ jobs:
           install_vm_deps: 'run'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: mise run agentstack-sdk-py:test-all --python=${{ matrix.python }}
+      - run: mise run adk-sdk-py:test-all --python=${{ matrix.python }}
