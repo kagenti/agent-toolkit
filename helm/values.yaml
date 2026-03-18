@@ -377,55 +377,28 @@ ui:
 
 
 ## PostgreSQL chart configuration
-## ref: https://github.com/bitnami/charts/blob/main/bitnami/postgresql/values.yaml
+## ref: https://github.com/CloudPirates-io/helm-charts/tree/main/charts/postgres
 ## @param postgresql.enabled Switch to enable or disable the PostgreSQL helm chart
-## @param postgresql.auth.enablePostgresUser Assign a password to the "postgres" admin user. Otherwise, remote access will be blocked for this user
-## @param postgresql.auth.username Name for a custom user to create
-## @param postgresql.auth.password Password for the custom user to create
-## @param postgresql.auth.database Name for a custom database to create
-## @param postgresql.auth.existingSecret Name of existing secret to use for PostgreSQL credentials
-## @param postgresql.architecture PostgreSQL architecture (`standalone` or `replication`)
+## @param postgresql.auth.username Name for the admin user (POSTGRES_USER)
+## @param postgresql.auth.password Password for the admin user (POSTGRES_PASSWORD)
+## @param postgresql.auth.database Name for the default database (POSTGRES_DB)
+## @param postgresql.customUser.name Name for an additional application user
+## @param postgresql.customUser.password Password for the application user
+## @param postgresql.customUser.database Database for the application user
 ##
 postgresql:
   enabled: true
   fullnameOverride: "postgresql"
-  global:
-    security:
-      allowInsecureImages: true
   image:
-    registry: ghcr.io
-    repository: kagenti/bitnami/postgresql-pgvector
-    tag: 17.6.0@sha256:2af2dbe1216541ecfab4dc0552ef332034e6ac1e7aa2f4124417145b196ed17a
+    registry: mirror.gcr.io
+    repository: pgvector/pgvector
+    tag: pg17
   auth:
-    postgresPassword: "admin-password"
-    enablePostgresUser: true
     username: agentstack-user
     password: "password"
     database: agentstack
-    existingSecret: ""
-    # TODO: bug - broken update password script: https://github.com/bitnami/charts/pull/34527
-    usePasswordFiles: false
-  passwordUpdateJob:
-    enabled: false
-  architecture: standalone
-  primary:
-    ## PostgreSQL Primary resource requests and limits
-    ## ref: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/
-    ## @param postgresql.primary.resourcesPreset Set container resources according to one common preset (allowed values: none, nano, micro, small, medium, large, xlarge, 2xlarge). This is ignored if primary.resources is set (primary.resources is recommended for production).
-    ## More information: https://github.com/bitnami/charts/blob/main/bitnami/common/templates/_resources.tpl#L15
-    ##
-    resourcesPreset: "small"
-    ## @param postgresql.primary.resources Set container requests and limits for different resources like CPU or memory (essential for production workloads)
-    ## Example:
-    ## resources:
-    ##   requests:
-    ##     cpu: 2
-    ##     memory: 512Mi
-    ##   limits:
-    ##     cpu: 3
-    ##     memory: 1024Mi
-    ##
-    resources: {}
+  persistence:
+    size: 4Gi
 ## External PostgreSQL configuration
 ## All of these values are only used when postgresql.enabled is set to false
 ## @param externalDatabase.host Database host (ignored if externalDatabase.sqlConnection is set)

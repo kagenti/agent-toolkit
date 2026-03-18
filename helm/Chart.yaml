@@ -6,15 +6,11 @@ type: application
 version: 0.7.1
 appVersion: 0.7.1
 dependencies:
-  - name: common
-    repository: oci://registry-1.docker.io/bitnamicharts
-    tags:
-      - bitnami-common
-    version: 2.x.x
   - condition: postgresql.enabled
-    name: postgresql
-    repository: oci://registry-1.docker.io/bitnamicharts
-    version: 16.x.x
+    name: postgres
+    alias: postgresql
+    repository: oci://registry-1.docker.io/cloudpirates
+    version: 0.18.x
   - condition: seaweedfs.enabled
     name: seaweedfs
     repository: https://seaweedfs.github.io/seaweedfs/helm

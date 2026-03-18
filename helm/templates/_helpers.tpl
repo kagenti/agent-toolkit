@@ -54,26 +54,14 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 
 {{/*
 *** DATABASE CONFIGURATION ***
-(bitnami-style helpers: https://github.com/bitnami/charts/blob/main/bitnami/airflow/templates/_helpers.tpl)
 */}}
 
-{{/*
-Create a default fully qualified postgresql name.
-We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
-*/}}
-{{- define "agentstack.postgresql.fullname" -}}
-{{- include "common.names.dependency.fullname" (dict "chartName" "postgresql" "chartValues" .Values.postgresql "context" $) -}}
-{{- end -}}
 {{/*
 Return the PostgreSQL Hostname
 */}}
 {{- define "agentstack.databaseHost" -}}
 {{- if .Values.postgresql.enabled }}
-    {{- if eq .Values.postgresql.architecture "replication" }}
-        {{- printf "%s-%s" (include "agentstack.postgresql.fullname" .) "primary" | trunc 63 | trimSuffix "-" -}}
-    {{- else -}}
-        {{- print (include "agentstack.postgresql.fullname" .) -}}
-    {{- end -}}
+    {{- print (.Values.postgresql.fullnameOverride | default "postgresql") -}}
 {{- else -}}
     {{- print .Values.externalDatabase.host -}}
 {{- end -}}
@@ -84,7 +72,7 @@ Return the PostgreSQL Port
 */}}
 {{- define "agentstack.databasePort" -}}
 {{- if .Values.postgresql.enabled }}
-    {{- print .Values.postgresql.primary.service.ports.postgresql -}}
+    {{- print (.Values.postgresql.service.port | default 5432) -}}
 {{- else -}}
     {{- printf "%d" (.Values.externalDatabase.port | int ) -}}
 {{- end -}}
@@ -106,18 +94,18 @@ Return the PostgreSQL User
 */}}
 {{- define "agentstack.databaseUser" -}}
 {{- if .Values.postgresql.enabled }}
-    {{- print .Values.postgresql.auth.username -}}
+    {{- print (.Values.postgresql.auth.username | default "postgres") -}}
 {{- else -}}
     {{- print .Values.externalDatabase.user -}}
 {{- end -}}
 {{- end -}}
 
 {{/*
-Return the PostgreSQL Admin Password
+Return the PostgreSQL Admin User
 */}}
 {{- define "agentstack.databaseAdminUser" -}}
 {{- if .Values.postgresql.enabled }}
-    {{- printf "postgres" -}}
+    {{- print (.Values.postgresql.auth.username | default "postgres") -}}
 {{- else -}}
     {{- print .Values.externalDatabase.adminUser -}}
 {{- end -}}
@@ -139,7 +127,7 @@ Return the PostgreSQL Admin Password
 */}}
 {{- define "agentstack.databaseAdminPassword" -}}
 {{- if .Values.postgresql.enabled }}
-    {{- print .Values.postgresql.auth.postgresPassword -}}
+    {{- print .Values.postgresql.auth.password -}}
 {{- else -}}
     {{- print .Values.externalDatabase.adminPassword -}}
 {{- end -}}
@@ -151,11 +139,7 @@ Return the PostgreSQL Secret Name
 */}}
 {{- define "agentstack.databaseSecretName" -}}
 {{- if .Values.postgresql.enabled }}
-    {{- if .Values.postgresql.auth.existingSecret -}}
-    {{- print .Values.postgresql.auth.existingSecret -}}
-    {{- else -}}
     {{- print "agentstack-secret" -}}
-    {{- end -}}
 {{- else if .Values.externalDatabase.existingSecret -}}
     {{- print .Values.externalDatabase.existingSecret -}}
 {{- else -}}
@@ -305,7 +289,7 @@ Create a default fully qualified redis name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
 {{- define "agentstack.redis.fullname" -}}
-{{- include "common.names.dependency.fullname" (dict "chartName" "redis" "chartValues" .Values.redis "context" $) -}}
+{{- print (.Values.redis.fullnameOverride | default "redis") -}}
 {{- end -}}
 
 {{/*
