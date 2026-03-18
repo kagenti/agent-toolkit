@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/component: postgresql-storage
 spec:
   capacity:
-    storage: {{ .Values.postgresql.primary.persistence.size | default "8Gi" }}
+    storage: {{ .Values.postgresql.persistence.size | default "8Gi" }}
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
