@@ -549,8 +549,8 @@ async def start_cmd(
                                 "rolesPath": "realm_access.roles",
                                 "uiClientId": "agentstack-ui",
                                 "uiClientSecret": "agentstack-ui-secret",
-                                "serverClientId": "agentstack-server",
-                                "serverClientSecret": "agentstack-server-secret",
+                                "serverClientId": "adk-server",
+                                "serverClientSecret": "adk-server-secret",
                             },
                         },
                         "features": {"uiLocalSetup": True},
@@ -866,7 +866,7 @@ async def start_cmd(
                         - "agentstack-api.localtest.me"
                       rules:
                         - backendRefs:
-                            - name: agentstack-server-svc
+                            - name: adk-server-svc
                               port: 8333
                     ---
                     apiVersion: gateway.networking.k8s.io/v1

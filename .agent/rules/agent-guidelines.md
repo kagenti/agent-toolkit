@@ -10,7 +10,7 @@ This document contains critical instructions for working with the AgentStack mon
 ## 1. Architecture Overview
 The platform consists of multiple K8s microservices:
 
-### AgentStack Server (`agentstack-server`)
+### AgentStack Server (`adk-server`)
 - **Core Orchestrator**: Manages APIs for agents, files, vector stores, and permissions (Context Service/JWT).
 - **Cluster Management**: Uses `kr8s` client to create K8s objects (deployments, services, secrets, build jobs, MCP servers).
 - **Infrastructure Integrations**:
@@ -25,7 +25,7 @@ The platform consists of multiple K8s microservices:
 - **Permission System**: We use role-based permissions with caveats, this is described in detail in `docs/development/custom-ui/permissions-and-tokens.mdx`
 
 ### AgentStack UI (`agentstack-ui`)
-- JavaScript frontend communicating with `agentstack-server`.
+- JavaScript frontend communicating with `adk-server`.
 - **Development**: Runs locally on `localhost:3000` or inside the cluster.
 
 ### Kagenti ADK (`adk-py`)
@@ -43,14 +43,14 @@ The platform consists of multiple K8s microservices:
 
 ## 3. Development Environment ("Dev Mode")
 The "dev mode" stack is complex, utilizing **Lima** (VM), **Kubernetes**, and **Telepresence**.
-- **Startup**: It takes ~10 minutes to start (`mise run agentstack-server:dev:start`).
+- **Startup**: It takes ~10 minutes to start (`mise run adk-server:dev:start`).
 - **Your Role**: **Do not attempt to start the stack yourself.** Ask the developer to ensure it is running if you need it.
 - **Verification**: Run `curl localhost:8333/healthcheck` to see if the stack is up.
 - **Database Access**: `agentstack-user:password@postgresql:5432/agentstack` (only available in dev mode).
 
 ## 4. Testing Strategies
 
-### agentstack-server
+### adk-server
 - **Dependencies**: Relies heavily on the full "dev mode" stack (infrastructure + server).
 - **E2E/Integration Tests**: 
   - **Never** run these via `mise`.
@@ -65,9 +65,9 @@ The "dev mode" stack is complex, utilizing **Lima** (VM), **Kubernetes**, and **
 ## 5. Database Migrations
 - **Stack**: SQLAlchemy Core + Alembic.
 - **Workflow**:
-  1. **Generate**: `mise run agentstack-server:migrations:generate` (must be in dev mode). **Never write migrations from scratch.**
+  1. **Generate**: `mise run adk-server:migrations:generate` (must be in dev mode). **Never write migrations from scratch.**
   2. **Modify**: specific migration files after generation if needed.
-  3. **Execute**: `mise run agentstack-server:migrations:run` (in dev mode).
+  3. **Execute**: `mise run adk-server:migrations:run` (in dev mode).
 
 ## 6. Helm Chart Development
 - **Templating**: Always use `--set encryptionKey="dummy"` when running `helm template` to avoid intentional failures.

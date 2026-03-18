@@ -1,15 +1,15 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: agentstack-server
+  name: adk-server
   labels:
-    app: agentstack-server
+    app: adk-server
     {{- include "agentstack.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.server.replicaCount }}
   selector:
     matchLabels:
-      app: agentstack-server
+      app: adk-server
       {{- include "agentstack.selectorLabels" . | nindent 6 }}
   template:
     metadata:
@@ -19,7 +19,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        app: agentstack-server
+        app: adk-server
         {{- include "agentstack.labels" . | nindent 8 }}
         {{- with .Values.server.podLabels }}
         {{- toYaml . | nindent 8 }}

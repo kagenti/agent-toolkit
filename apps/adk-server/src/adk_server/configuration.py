@@ -1,0 +1,539 @@
+# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# SPDX-License-Identifier: Apache-2.0
+
+from __future__ import annotations
+
+import base64
+import logging
+import os
+import ssl
+from collections import defaultdict
+from datetime import timedelta
+from functools import cache, cached_property
+from pathlib import Path
+from textwrap import dedent
+from typing import Any, Literal, cast
+
+from authlib.jose import jwt
+from limits import RateLimitItem, parse_many
+from pydantic import AnyUrl, BaseModel, Field, HttpUrl, Secret, ValidationError, field_validator, model_validator
+from pydantic_core.core_schema import ValidationInfo
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
+
+from adk_server.domain.models.registry import ModelProviderRegistryLocation
+
+logger = logging.getLogger(__name__)
+
+
+class LoggingConfiguration(BaseModel):
+    level: int = logging.INFO
+    level_uvicorn: int = Field(default=logging.FATAL, validate_default=True)
+    level_sqlalchemy: int = Field(default=None, validate_default=True)
+    level_procrastinate: int = Field(default=logging.INFO, validate_default=True)
+
+    @model_validator(mode="after")
+    def level_uvicorn_validator(self):
+        if self.level == logging.DEBUG:
+            self.level_uvicorn = logging.WARNING
+        return self
+
+    @field_validator("level_sqlalchemy", mode="before")
+    @classmethod
+    def level_sqlalchemy_validator(cls, v: str | int | None, info: ValidationInfo):
+        if v is not None:
+            return cls.validate_level(v)
+        return logging.INFO if cls.validate_level(info.data["level"]) == logging.DEBUG else logging.WARNING
+
+    @field_validator("level", "level_uvicorn", "level_procrastinate", mode="before")
+    @classmethod
+    def validate_level(cls, v: str | int | None):
+        if isinstance(v, int):
+            return v
+        elif isinstance(v, str):
+            return logging.getLevelNamesMapping()[v.upper()]
+
+
+class OCIRegistryConfiguration(BaseModel, extra="allow"):
+    username: str | None = None
+    password: Secret[str] | None = None
+    auth_header: Secret[str] | None = None
+    insecure: bool = False
+
+    @property
+    def protocol(self):
+        return "http" if self.insecure else "https"
+
+    @property
+    def basic_auth_str(self) -> str | None:
+        if self.auth_header:
+            return self.auth_header.get_secret_value()
+        if self.username and self.password:
+            return base64.b64encode(f"{self.username}:{self.password.get_secret_value()}".encode()).decode()
+        return None
+
+
+class ModelProviderRegistryConfiguration(BaseModel):
+    locations: dict[str, ModelProviderRegistryLocation] = Field(default_factory=dict)
+    sync_period_cron: str = Field(default="*/10 * * * *")  # every 10 minutes
+
+
+class ModelProviderConfiguration(BaseModel):
+    update_models_period_cron: str = Field(default="0 */1 * * *")  # every hour
+    default_llm_model: str | None = None
+    default_embedding_model: str | None = None
+
+
+class KagentiConfiguration(BaseModel):
+    enabled: bool = True
+    api_url: str = "http://kagenti-api.localtest.me:8080"
+    sync_period_cron: str = "* * * * * */5"  # every 5 seconds
+    # Kubernetes namespaces to scan for kagenti agents.
+    # The kagenti API requires an explicit namespace per request (no wildcard).
+    namespaces: list[str] = ["team1"]
+    # OAuth2 client credentials for authenticating to kagenti API.
+    # Defaults to reusing the adk-server OIDC client (same realm).
+    # The adk-server service account needs kagenti-viewer role assigned in Keycloak.
+    auth_token_url: str = "http://keycloak-service.keycloak:8080/realms/agentstack/protocol/openid-connect/token"
+    client_id: str = "adk-server"
+    client_secret: Secret[str] = Secret("adk-server-secret")
+
+
+class OidcProvider(BaseModel):
+    name: str
+    issuer: AnyUrl
+    external_issuer: AnyUrl
+    client_id: str
+    client_secret: Secret[str]
+
+    def __hash__(self):
+        return hash(
+            self.name + str(self.issuer) + str(self.external_issuer) + self.client_id
+        )  # Enables auth caching per provider
+
+
+class OidcConfiguration(BaseModel):
+    # enabled: bool = False  <-- Removed
+
+    # Flattened configuration allows setting a single provider via environment variables
+    # e.g., AGENTSTACK__AUTH__OIDC__NAME="Keycloak"
+    name: str = "Keycloak"
+    issuer: AnyUrl = HttpUrl("http://keycloak-service.keycloak:8080/realms/agentstack")
+    external_issuer: AnyUrl = HttpUrl("http://keycloak.localtest.me:8080/realms/agentstack")
+    client_id: str = "adk-server"
+    client_secret: Secret[str] = Secret("adk-server-secret")
+    insecure_transport: bool = False
+
+    scope: list[str] = ["openid", "email", "profile"]
+    roles_path: str = "realm_access.roles"
+    validate_audience: bool = True
+
+    @property
+    def provider(self) -> OidcProvider:
+        return OidcProvider(
+            name=self.name,
+            issuer=self.issuer,
+            external_issuer=self.external_issuer,
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+        )
+
+    @model_validator(mode="after")
+    def validate_auth(self):
+        if self.insecure_transport:
+            if self.issuer.scheme != "http":
+                raise ValueError("Insecure transport is only allowed when the issuer URL uses http:// scheme!")
+
+            os.environ["AUTHLIB_INSECURE_TRANSPORT"] = "1"
+            logger.warning(
+                "Oauth Authentication is enabled with insecure transport! "
+                + "Using mTLS (using istio service mesh) or exposing keycloak publicly is highly recommended!"
+            )
+        return self
+
+
+class BasicAuthConfiguration(BaseModel):
+    enabled: bool = True
+
+
+class AuthConfiguration(BaseModel):
+    jwt_private_key: Secret[str] = Secret("dummy")
+    jwt_public_key: Secret[str] = Secret("dummy")
+    disable_auth: bool = False
+    oidc: OidcConfiguration = Field(default_factory=OidcConfiguration)
+    basic: BasicAuthConfiguration = Field(default_factory=BasicAuthConfiguration)
+
+    @model_validator(mode="after")
+    def set_default_jwt_keys(self):
+        if self.jwt_private_key.get_secret_value() == "dummy" or self.jwt_public_key.get_secret_value() == "dummy":
+            logger.warning("JWT private and public keys are not set. Generating default keys.")
+            from authlib.jose import JsonWebKey
+
+            key = JsonWebKey.generate_key("RSA", 4096, is_private=True)
+            self.jwt_private_key = Secret(key.as_pem(is_private=True).decode("utf-8"))
+            self.jwt_public_key = Secret(key.as_pem(is_private=False).decode("utf-8"))
+        else:
+            try:
+                # Verify that the keys are matching
+                token = jwt.encode({"alg": "RS256"}, {"test": "payload"}, self.jwt_private_key.get_secret_value())
+                jwt.decode(token, self.jwt_public_key.get_secret_value())
+            except Exception as e:
+                raise ValueError(f"JWT private and public keys do not match or are invalid: {e}") from e
+        return self
+
+
+class ObjectStorageConfiguration(BaseModel):
+    endpoint_url: AnyUrl = AnyUrl("http://seaweedfs-all-in-one:9009")
+    access_key_id: Secret[str] = Secret("agentstack-admin-user")
+    access_key_secret: Secret[str] = Secret("agentstack-admin-password")
+    bucket_name: str = "agentstack-files"
+    region: str = "us-east-1"
+    use_ssl: bool = False
+    storage_limit_per_user_bytes: int = 1 * (1024 * 1024 * 1024)  # 1GiB
+    max_single_file_size: int = 100 * (1024 * 1024)  # 100 MiB
+
+
+class RedisConfiguration(BaseModel):
+    enabled: bool = False
+    host: str = "redis"
+    port: int = 6379
+    password: Secret[str] = Secret("redis-password")
+    use_ssl: bool = False
+    ssl_cert_reqs: str = "required"
+    ssl_ca_certs: Path | None = None
+    rate_limit_db: int = 15
+    cache_db: int = 14
+
+    @property
+    def rate_limit_db_url(self) -> Secret[str]:
+        scheme = "rediss" if self.use_ssl else "redis"
+        auth = f":{self.password.get_secret_value()}@" if self.password else ""
+        return Secret(f"{scheme}://{auth}{self.host}:{self.port}/{self.rate_limit_db}")
+
+    @property
+    def cache_db_url(self) -> Secret[str]:
+        scheme = "rediss" if self.use_ssl else "redis"
+        auth = f":{self.password.get_secret_value()}@" if self.password else ""
+        return Secret(f"{scheme}://{auth}{self.host}:{self.port}/{self.cache_db}")
+
+
+class PersistenceConfiguration(BaseModel):
+    db_use_ssl: bool = False
+    db_ssl_cert: Path | None = None
+    db_url: Secret[AnyUrl] = Secret(AnyUrl("postgresql+asyncpg://agentstack-user:password@postgresql:5432/agentstack"))
+    encryption_key: Secret[str] | None = None
+    finished_requests_remove_after_sec: int = int(timedelta(minutes=30).total_seconds())
+    stale_requests_remove_after_sec: int = int(timedelta(hours=1).total_seconds())
+    vector_db_schema: str = Field(default="vector_db", pattern=r"^[a-zA-Z0-9_]+$")
+    procrastinate_schema: str = Field(default="procrastinate", pattern=r"^[a-zA-Z0-9_]+$")
+    variable_store_limit_per_users: int = 100
+
+    def create_async_engine(self, **kwargs: Any) -> AsyncEngine:
+        kwargs = kwargs.copy()
+        connect_args = kwargs.pop("connect_args", {}).copy()
+        ssl_context = None
+        if self.db_use_ssl:
+            ssl_context = ssl.create_default_context()
+            # Some root certificates (e.g. ibmclouddb) do not contain the required extensions:
+            # Error: CA certificate does not include key usage extension
+            # Since python 3.13 the default verify flags include VERIFY_X509_STRICT:
+            # https://docs.python.org/3/whatsnew/3.13.html#ssl
+            ssl_context.verify_flags &= ~ssl.VERIFY_X509_STRICT
+            ssl_context.load_verify_locations(cafile=self.db_ssl_cert)
+            ssl_context.verify_mode = ssl.CERT_REQUIRED
+        connect_args["ssl"] = ssl_context
+        return create_async_engine(str(self.db_url.get_secret_value()), connect_args=connect_args, **kwargs)
+
+
+class VectorStoresConfiguration(BaseModel):
+    storage_limit_per_user_bytes: int = 1 * (1024 * 1024 * 1024)  # 1GiB
+
+
+class TelemetryConfiguration(BaseModel):
+    collector_url: AnyUrl = AnyUrl("http://otel-collector.kagenti-system:8335")
+
+    phoenix_url: AnyUrl | None = None
+    phoenix_api_key: Secret[str] | None = None
+
+
+class GithubAppConfiguration(BaseModel):
+    type: Literal["app"] = "app"
+    app_id: int
+    installation_id: int
+    private_key: Secret[str]
+
+
+class GithubPATConfiguration(BaseModel):
+    type: Literal["pat"] = "pat"
+    token: Secret[str]
+
+
+class GithubConfigJson(BaseModel):
+    auths: dict[str, GithubAppConfiguration | GithubPATConfiguration] = Field(default_factory=dict)
+
+
+class DockerConfigJsonAuth(BaseModel, extra="allow"):
+    auth: Secret[str] | None = None
+    username: str | None = None
+    password: Secret[str] | None = None
+    insecure: bool = False
+
+
+class DockerConfigJson(BaseModel):
+    auths: dict[str, DockerConfigJsonAuth] = Field(default_factory=dict)
+
+
+class ManagedProviderConfiguration(BaseModel):
+    self_registration_use_local_network: bool = Field(
+        default=False,
+        description="Which network to use for self-registered providers - should be False when running in cluster",
+    )
+
+
+class ConnectorPreset(BaseModel):
+    url: AnyUrl
+    client_id: str | None = None
+    client_secret: str | None = None
+    metadata: dict[str, str] | None = None
+
+    @model_validator(mode="after")
+    def validate_url_scheme(self):
+        if self.url.scheme not in ("http", "https"):
+            raise ValueError(f"URL scheme must be http(s), got: {self.url.scheme}")
+        return self
+
+
+class ConnectorConfiguration(BaseModel):
+    presets: list[ConnectorPreset] = Field(default_factory=list)
+
+
+class DoclingExtractionConfiguration(BaseModel):
+    backend: Literal["docling"] = "docling"
+    enabled: bool = False
+    docling_service_url: str = "http://docling-serve:15001"
+    processing_timeout_sec: int = int(timedelta(minutes=5).total_seconds())
+
+
+class ContextConfiguration(BaseModel):
+    resources_expire_after_days: int = 0  # Expires files and vector_stores attached to a context
+
+
+class A2AProxyConfiguration(BaseModel):
+    # Expires a2a_request_tasks and a2a_request_contexts (WARNING: has security implications!)
+    requests_expire_after_days: int = 14
+
+
+class GenerateConversationTitleConfiguration(BaseModel):
+    enabled: bool = True
+    model: str | Literal["default"] = "default"
+    prompt: str = dedent(
+        """\
+        YOUR INSTRUCTIONS:
+        Write a short descriptive title for the conversation (max 100 characters).
+        Return only the title verbatim with no commentary or explanation.
+        Do not use markdown or any formatting.
+        Do not use emojis.
+        Do not use code blocks.
+        The title should be plain text only.
+
+        CONVERSATION CONTENT:
+        ```
+        {% if titleHint %}
+        Title hint:
+        {{ titleHint }}
+        {% endif %}
+
+        User message:
+        {{ text }}
+
+        {% if files %}
+        Attached files:
+        {% for file in files %}
+        - {{ file.name or 'Unnamed file' }}{% if file.mimeType %} ({{ file.mimeType }}){% endif %}
+        {% endfor %}
+        {% endif %}
+        ```
+        """
+    )
+
+
+class RoleRateLimits(BaseModel, arbitrary_types_allowed=True):
+    openai_chat_completion_tokens: list[RateLimitItem] | str | None = Field(
+        default_factory=list,
+        description="List of rate limit strings (e.g., '100000/minute')",
+    )
+    openai_chat_completion_requests: list[RateLimitItem] | str | None = Field(
+        default_factory=list, description="List of rate limit strings (e.g., '100/minute')"
+    )
+    openai_embedding_inputs: list[RateLimitItem] | str | None = Field(
+        default_factory=list,
+        description="List of rate limit strings (e.g., '1000/minute')",
+    )
+
+    @field_validator(
+        "openai_chat_completion_tokens",
+        "openai_chat_completion_requests",
+        "openai_embedding_inputs",
+        mode="before",
+    )
+    @classmethod
+    def validate_limits(cls, limits: str | list[RateLimitItem] | None) -> list[RateLimitItem] | None:
+        if not limits:
+            return []
+        return parse_many(limits) if isinstance(limits, str) else limits
+
+    @cached_property
+    def openai_chat_completion_tokens_parsed(self) -> list[RateLimitItem]:
+        return sorted(cast(list[RateLimitItem], self.openai_chat_completion_tokens))
+
+    @cached_property
+    def openai_chat_completion_requests_parsed(self) -> list[RateLimitItem]:
+        return sorted(cast(list[RateLimitItem], self.openai_chat_completion_requests))
+
+    @cached_property
+    def openai_embedding_inputs_parsed(self) -> list[RateLimitItem]:
+        return sorted(cast(list[RateLimitItem], self.openai_embedding_inputs))
+
+
+class RoleBasedRateLimitConfiguration(BaseModel):
+    user: RoleRateLimits = Field(default_factory=RoleRateLimits)
+    developer: RoleRateLimits = Field(default_factory=RoleRateLimits)
+    admin: RoleRateLimits = Field(default_factory=RoleRateLimits)
+
+
+class RateLimitConfiguration(BaseModel, arbitrary_types_allowed=True):
+    enabled: bool = False
+    strategy: Literal["sliding-window-counter", "fixed-window", "moving-window"] = "sliding-window-counter"
+    global_limits: list[RateLimitItem] | str | None = Field(
+        default_factory=lambda: parse_many("20/second; 100/minute"),
+        description="List of rate limit strings (e.g., '20/second', '100/minute')",
+    )
+    role_based_limits: RoleBasedRateLimitConfiguration = Field(default_factory=RoleBasedRateLimitConfiguration)
+
+    @field_validator("global_limits", mode="before")
+    @classmethod
+    def validate_limits(cls, limits: str | list[RateLimitItem] | None) -> list[RateLimitItem] | None:
+        if not limits:
+            return []
+        return parse_many(limits) if isinstance(limits, str) else limits
+
+    @cached_property
+    def global_limits_parsed(self) -> list[RateLimitItem]:
+        return sorted(cast(list[RateLimitItem], self.global_limits))
+
+
+class CORSConfiguration(BaseModel):
+    enabled: bool = False
+    allow_origins: list[str] = Field(default_factory=list, description="List of allowed origins for CORS")
+    allow_origin_regex: str | None = Field(default=None, description="Regex for allowed origins for CORS")
+    allow_methods: list[str] = Field(default_factory=lambda: ["*"], description="List of allowed methods for CORS")
+    allow_headers: list[str] = Field(default_factory=lambda: ["*"], description="List of allowed headers for CORS")
+    allow_credentials: bool = Field(default=False, description="Whether to allow credentials for CORS")
+
+    @field_validator("allow_origin_regex", mode="before")
+    @classmethod
+    def validate_allow_origin_regex(cls, v: str | None) -> str | None:
+        return v or None
+
+    @model_validator(mode="after")
+    def validate_cors(self):
+        if self.enabled and not self.allow_origins and not self.allow_origin_regex:
+            logger.warning("CORS is enabled, but no origins are specified in 'allow_origins' or 'allow_origin_regex'")
+        if "*" in self.allow_origins and self.allow_credentials:
+            raise ValueError("allow_origins cannot be '*' when allow_credentials is True")
+        return self
+
+
+class Configuration(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=".env", env_file_encoding="utf-8", env_nested_delimiter="__", extra="ignore"
+    )
+
+    auth: AuthConfiguration = Field(default_factory=AuthConfiguration)
+    logging: LoggingConfiguration = Field(default_factory=LoggingConfiguration)
+    cors: CORSConfiguration = Field(default_factory=CORSConfiguration)
+    generate_conversation_title: GenerateConversationTitleConfiguration = Field(
+        default_factory=GenerateConversationTitleConfiguration
+    )
+    kagenti: KagentiConfiguration = Field(default_factory=KagentiConfiguration)
+    model_provider_registry: ModelProviderRegistryConfiguration = Field(
+        default_factory=ModelProviderRegistryConfiguration
+    )
+    model_provider: ModelProviderConfiguration = Field(default_factory=ModelProviderConfiguration)
+    oci_registry: dict[str, OCIRegistryConfiguration] = Field(default_factory=dict)
+    oci_registry_docker_config_json: dict[int, DockerConfigJson] = {}
+    github_registry_config_json: GithubConfigJson = Field(default_factory=GithubConfigJson)
+    github_registry: dict[str, GithubPATConfiguration | GithubAppConfiguration] = Field(default_factory=dict)
+    telemetry: TelemetryConfiguration = Field(default_factory=TelemetryConfiguration)
+    persistence: PersistenceConfiguration = Field(default_factory=PersistenceConfiguration)
+    redis: RedisConfiguration = Field(default_factory=RedisConfiguration)
+    rate_limit: RateLimitConfiguration = Field(default_factory=RateLimitConfiguration)
+    object_storage: ObjectStorageConfiguration = Field(default_factory=ObjectStorageConfiguration)
+    vector_stores: VectorStoresConfiguration = Field(default_factory=VectorStoresConfiguration)
+    text_extraction: DoclingExtractionConfiguration = Field(default_factory=DoclingExtractionConfiguration)
+    context: ContextConfiguration = Field(default_factory=ContextConfiguration)
+    a2a_proxy: A2AProxyConfiguration = Field(default_factory=A2AProxyConfiguration)
+    connector: ConnectorConfiguration = Field(default_factory=ConnectorConfiguration)
+    admin_user_email: str = "admin@beeai.dev"
+    k8s_namespace: str | None = None
+    k8s_kubeconfig: Path | None = None
+    uvicorn_timeout_keep_alive: int = 5
+
+    provider: ManagedProviderConfiguration = Field(default_factory=ManagedProviderConfiguration)
+
+    platform_service_url: str = "adk-server-svc:8333"
+    port: int = 8333
+    trust_proxy_headers: bool = False
+
+    @model_validator(mode="after")
+    def _oci_registry_defaultdict(self):
+        oci_registry = defaultdict(OCIRegistryConfiguration)
+        oci_registry.update(self.oci_registry)
+        self.oci_registry = oci_registry
+        for docker_config_json in self.oci_registry_docker_config_json.values():
+            try:
+                aliases = set()
+                for registry, conf in docker_config_json.auths.items():
+                    if "://" in registry:
+                        url = AnyUrl(registry)
+                        aliases.add(f"{url.host}:{url.port}" if url.port else url.host)
+                        if url.port == 443 or (url.port == 80 and conf.insecure):
+                            aliases.add(url.host)
+                    else:
+                        aliases.add(registry.strip("/"))
+                    if any(alias in {"index.docker.io", "docker.io"} for alias in aliases):
+                        aliases.add("docker.io")
+                    for alias in aliases:
+                        if not alias:
+                            continue
+                        self.oci_registry[alias].username = conf.username
+                        self.oci_registry[alias].password = conf.password
+                        self.oci_registry[alias].auth_header = conf.auth
+                        self.oci_registry[alias].insecure = conf.insecure
+            except ValueError as e:
+                logger.error(f"Failed to parse .dockerconfigjson: {e}. Some agent images might not work correctly.")
+        return self
+
+    @model_validator(mode="after")
+    def _github_registry_config(self):
+        try:
+            for registry, conf in self.github_registry_config_json.auths.items():
+                self.github_registry[registry] = conf
+        except ValueError as e:
+            logger.error(f"Failed to parse .githubconfigjson: {e}. GitHub access might not work correctly.")
+        return self
+
+
+
+@cache
+def get_configuration() -> Configuration:
+    """Get cached configuration"""
+    try:
+        return Configuration()
+    except ValidationError as ex:
+        from adk_server.logging_config import configure_logging
+
+        configure_logging(configuration=LoggingConfiguration(level=logging.ERROR))
+
+        logging.error(f"Improperly configured, Error: {ex!r}")
+        raise ValueError("Improperly configured, make sure to supply all required variables") from ex

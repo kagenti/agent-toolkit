@@ -1,0 +1,92 @@
+# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# SPDX-License-Identifier: Apache-2.0
+from __future__ import annotations
+
+from typing import Literal
+from uuid import UUID
+
+from pydantic import AwareDatetime, BaseModel, Field, RootModel, field_validator
+
+from adk_server.api.schema.common import PaginationQuery
+from adk_server.domain.models.common import Metadata, MetadataPatch
+from adk_server.domain.models.context import ContextHistoryItemData
+
+
+class ContextCreateRequest(BaseModel):
+    """Request schema for context creation."""
+
+    metadata: Metadata | None = None
+    provider_id: UUID | None = None
+
+
+class ContextUpdateRequest(BaseModel):
+    """Request schema for context update."""
+
+    metadata: Metadata | None = None
+
+
+class ContextPatchMetadataRequest(BaseModel):
+    """Request schema for patching context metadata."""
+
+    metadata: MetadataPatch
+
+
+class ContextListQuery(PaginationQuery):
+    include_empty: bool = True
+    provider_id: UUID | None = None
+
+
+class ContextPermissionsGrant(BaseModel):
+    files: list[Literal["read", "write", "extract", "*"]] = Field(default_factory=list)
+    vector_stores: list[Literal["read", "write", "*"]] = Field(default_factory=list)
+    context_data: list[Literal["read", "write", "*"]] = Field(default_factory=list)
+
+
+class GlobalPermissionGrant(BaseModel):
+    files: list[Literal["read", "write", "extract", "*"]] = Field(default_factory=list)
+    feedback: list[Literal["write"]] = Field(default_factory=list)
+    vector_stores: list[Literal["read", "write", "*"]] = Field(default_factory=list)
+
+    # openai proxy
+    llm: list[Literal["*"] | str] = Field(default_factory=list)
+    embeddings: list[Literal["*"] | str] = Field(default_factory=list)
+    model_providers: list[Literal["read", "write", "*"]] = Field(default_factory=list)
+
+    a2a_proxy: list[Literal["*"]] | list[UUID] = Field(default_factory=list)
+
+    # agent providers
+    providers: list[Literal["read", "write", "*"]] = Field(default_factory=list)
+
+    contexts: list[Literal["read", "write", "*"]] = Field(default_factory=list)
+    context_data: list[Literal["read", "write", "*"]] = Field(default_factory=list)
+
+    connectors: list[Literal["read", "write", "proxy", "*"]] = Field(default_factory=list)
+
+    @field_validator("a2a_proxy", mode="after")
+    @classmethod
+    def validate_a2a_proxy(cls, v: list[Literal["*"]] | list[UUID]) -> list[Literal["*"]] | list[UUID]:
+        if "*" in v and len(v) > 1:
+            raise ValueError("a2a_proxy cannot be a mix of * and UUIDs")
+        return v
+
+
+class ContextTokenCreateRequest(BaseModel):
+    grant_global_permissions: GlobalPermissionGrant = Field(
+        default_factory=GlobalPermissionGrant,
+        description="Global permissions granted by the token. Must be subset of the users permissions",
+    )
+    grant_context_permissions: ContextPermissionsGrant = Field(
+        default_factory=ContextPermissionsGrant,
+        description="Context permissions granted by the token. Must be subset of the users permissions",
+    )
+
+
+class ContextTokenResponse(BaseModel):
+    """Response schema for context token generation."""
+
+    token: str
+    expires_at: AwareDatetime | None
+
+
+class ContextHistoryItemCreateRequest(RootModel[ContextHistoryItemData]):
+    root: ContextHistoryItemData

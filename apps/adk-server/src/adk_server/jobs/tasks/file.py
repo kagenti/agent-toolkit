@@ -1,0 +1,19 @@
+# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# SPDX-License-Identifier: Apache-2.0
+
+from __future__ import annotations
+
+from uuid import UUID
+
+from kink import di
+from procrastinate import Blueprint, JobContext
+
+from adk_server.jobs.queues import Queues
+from adk_server.service_layer.services.files import FileService
+
+blueprint = Blueprint()
+
+
+@blueprint.task(queue=str(Queues.TEXT_EXTRACTION), pass_context=True)
+async def extract_text(context: JobContext, file_id: str):
+    await di[FileService].extract_text(file_id=UUID(file_id), job_id=str(context.job.id))

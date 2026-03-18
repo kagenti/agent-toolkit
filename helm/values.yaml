@@ -171,12 +171,12 @@ auth:
     uiClientId: "agentstack-ui"
     uiClientSecret: ""
     uiClientSecretKey: "uiClientSecret"
-    serverClientId: "agentstack-server"
+    serverClientId: "adk-server"
     serverClientSecret: ""
     serverClientSecretKey: "serverClientSecret"
     existingSecret: ""
 
-# In agentstack-server this is used to determine the request origin and dynamically create agent card.
+# In adk-server this is used to determine the request origin and dynamically create agent card.
 # For example https://agentstack.example.com/api/v1/providers/{provider_id} will return an agent cart with URL for
 # https://agentstack.example.com, without respecting the headers, the URL would be "http://agentstack.example.com",
 # See https://www.uvicorn.org/settings/#application-interface

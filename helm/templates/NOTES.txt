@@ -13,13 +13,13 @@ Getting started:
 {{- else if contains "LoadBalancer" .Values.server.service.type }}
 
      NOTE: It may take a few minutes for the LoadBalancer IP to be available.
-           You can watch its status by running 'kubectl get --namespace {{ .Release.Namespace }} svc -w agentstack-server-svc'
-  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} --agentstack-server-svc --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+           You can watch its status by running 'kubectl get --namespace {{ .Release.Namespace }} svc -w adk-server-svc'
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} --adk-server-svc --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
   echo http://$SERVICE_IP:{{ .Values.server.service.port }}
 {{- else if contains "ClusterIP" .Values.server.service.type }}
 
   # port-forward the API
-  kubectl port-forward svc/agentstack-server-svc 8333:{{.Values.server.service.port}} &
+  kubectl port-forward svc/adk-server-svc 8333:{{.Values.server.service.port}} &
 
   {{- if .Values.ui.enabled }}
   # port-forward the UI

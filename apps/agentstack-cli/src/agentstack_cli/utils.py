@@ -324,7 +324,7 @@ def print_log(line, ansi_mode=False, out_console: Console | None = None):
             (out_console or console).print(line)
 
 
-# ! This pattern is taken from agentstack_server.utils.github.GithubUrl, make sure to keep it in sync
+# ! This pattern is taken from adk_server.utils.github.GithubUrl, make sure to keep it in sync
 github_url_verbose_pattern = r"""
         ^
         (?:git\+)?                              # Optional git+ prefix
