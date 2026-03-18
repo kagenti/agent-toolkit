@@ -151,7 +151,7 @@ async def run_in_vm(
         )
     if detect_driver() == "lima":
         return await run_command(
-            [detect_limactl(), "shell", f"--tty={sys.stdin.isatty()}", vm_name, "--", "sudo", *command],
+            [detect_limactl(), "shell", f"--tty={sys.stdin.isatty()}", vm_name, "--", "sudo", "-E", *command],
             message,
             env={"LIMA_HOME": str(Configuration().lima_home)} | vm_env,
             cwd="/",
