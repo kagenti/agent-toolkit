@@ -5,7 +5,7 @@ description: "Learn how your agent can report formatted errors to the UI."
 
 The Error extension provides a standardized way to report errors from your agent to the UI.
 
-The Agent Stack SDK automatically handles exceptions raised within your agent function and uses the Error extension to report them. **No configuration is required** for standard error reporting.
+The Kagenti ADK automatically handles exceptions raised within your agent function and uses the Error extension to report them. **No configuration is required** for standard error reporting.
 
 ## Standard Error Reporting
 
@@ -13,7 +13,7 @@ Simply raise exceptions in your agent code. The SDK will catch them and use the 
 
 ```python
 from a2a.types import Message
-from agentstack_sdk.server import Server
+from kagenti_adk.server import Server
 
 server = Server()
 
@@ -38,12 +38,12 @@ from typing import Annotated
 
 from a2a.types import Message
 
-from agentstack_sdk.a2a.extensions.ui.error import (
+from kagenti_adk.a2a.extensions.ui.error import (
     ErrorExtensionParams,
     ErrorExtensionServer,
     ErrorExtensionSpec,
 )
-from agentstack_sdk.server import Server
+from kagenti_adk.server import Server
 
 server = Server()
 
@@ -125,4 +125,4 @@ async def context_error_agent(
 
 For more examples, see:
 
-- [error_agent.py](https://github.com/i-am-bee/agentstack/blob/main/apps/agentstack-sdk-py/examples/error_agent.py)
+- [error_agent.py](https://github.com/kagenti/adk/blob/main/apps/adk-py/examples/error_agent.py)

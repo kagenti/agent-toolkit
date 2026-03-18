@@ -19,7 +19,7 @@ from deepagents.backends.protocol import (
 )
 from deepagents.backends.utils import FileInfo, GrepMatch, format_content_with_line_numbers
 
-from agentstack_sdk.platform import File
+from kagenti_adk.platform import File
 
 
 class AgentStackBackend(BackendProtocol):

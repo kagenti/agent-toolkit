@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import httpx
 import pytest
-from agentstack_sdk.platform import VectorStore, VectorStoreItem
+from kagenti_adk.platform import VectorStore, VectorStoreItem
 
 pytestmark = pytest.mark.e2e
 

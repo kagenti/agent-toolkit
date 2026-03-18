@@ -16,7 +16,7 @@ Agent Stack gives you everything you need to run agents as backend services: LLM
 | **Integrations** | - External integrations via MCP protocol (APIs, Slack, Google Drive, etc.) with OAuth |
 | **Security** | - Secrets management for API keys and credentials<br />- OAuth support for secure external integrations |
 | **Agent Stack Deployment** | - Helm chart for Kubernetes with customizable storage, databases, and authentication |
-| **Framework Interoperability** | - Build agents using LangGraph, CrewAI, or your own framework<br />- Agents are automatically exposed as A2A-compatible agents<br />- `agentstack-sdk` handles runtime service requests and agent-to-agent communication |
+| **Framework Interoperability** | - Build agents using LangGraph, CrewAI, or your own framework<br />- Agents are automatically exposed as A2A-compatible agents<br />- `kagenti-adk` handles runtime service requests and agent-to-agent communication |
 
 
 ## Get running in one command
@@ -74,7 +74,7 @@ Agent Stack lets you take an agent you already have and expose it as a service b
 Here’s an example wrapping a simple agent function:
 
 ```shell
-uv add agentstack-sdk
+uv add kagenti-adk
 ```
 
 ```python
@@ -82,9 +82,9 @@ import os
 
 from a2a.types import Message
 from a2a.utils.message import get_message_text
-from agentstack_sdk.server import Server
-from agentstack_sdk.server.context import RunContext
-from agentstack_sdk.a2a.types import AgentMessage
+from kagenti_adk.server import Server
+from kagenti_adk.server.context import RunContext
+from kagenti_adk.a2a.types import AgentMessage
 
 server = Server()
 

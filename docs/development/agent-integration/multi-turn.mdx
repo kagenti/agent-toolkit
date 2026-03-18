@@ -28,9 +28,9 @@ import os
 
 from a2a.types import Message
 from a2a.utils.message import get_message_text
-from agentstack_sdk.a2a.types import AgentMessage
-from agentstack_sdk.server import Server
-from agentstack_sdk.server.context import RunContext
+from kagenti_adk.a2a.types import AgentMessage
+from kagenti_adk.server import Server
+from kagenti_adk.server.context import RunContext
 
 server = Server()
 
@@ -92,10 +92,10 @@ import os
 
 from a2a.types import Message
 from a2a.utils.message import get_message_text
-from agentstack_sdk.a2a.types import AgentMessage
-from agentstack_sdk.server import Server
-from agentstack_sdk.server.context import RunContext
-from agentstack_sdk.server.store.platform_context_store import PlatformContextStore
+from kagenti_adk.a2a.types import AgentMessage
+from kagenti_adk.server import Server
+from kagenti_adk.server.context import RunContext
+from kagenti_adk.server.store.platform_context_store import PlatformContextStore
 
 server = Server()
 
@@ -201,11 +201,11 @@ from typing import Annotated
 
 from a2a.types import Message, Role
 from a2a.utils.message import get_message_text
-from agentstack_sdk.a2a.extensions import LLMServiceExtensionServer, LLMServiceExtensionSpec
-from agentstack_sdk.a2a.types import AgentMessage
-from agentstack_sdk.server import Server
-from agentstack_sdk.server.context import RunContext
-from agentstack_sdk.server.store.platform_context_store import PlatformContextStore
+from kagenti_adk.a2a.extensions import LLMServiceExtensionServer, LLMServiceExtensionSpec
+from kagenti_adk.a2a.types import AgentMessage
+from kagenti_adk.server import Server
+from kagenti_adk.server.context import RunContext
+from kagenti_adk.server.store.platform_context_store import PlatformContextStore
 from beeai_framework.adapters.agentstack.backend.chat import AgentStackChatModel
 from beeai_framework.agents.requirement import RequirementAgent
 from beeai_framework.agents.requirement.requirements.conditional import ConditionalRequirement
@@ -305,8 +305,8 @@ By default, conversation history is stored in memory and is lost when the agent 
 
 ```python
 import os
-from agentstack_sdk.server import Server
-from agentstack_sdk.server.store.platform_context_store import PlatformContextStore
+from kagenti_adk.server import Server
+from kagenti_adk.server.store.platform_context_store import PlatformContextStore
 
 server = Server()
 
@@ -353,8 +353,8 @@ from uuid import UUID
 from typing import Any
 
 from a2a.types import Message, Part, Role, TextPart
-from agentstack_sdk.platform.context import Context
-from agentstack_sdk.server.context import RunContext
+from kagenti_adk.platform.context import Context
+from kagenti_adk.server.context import RunContext
 
 async def edit_message_in_context(run_context: RunContext, id: UUID, new_text: str, metadata: dict[str, Any] | None = None):
     # Step 1: Delete from this message onwards

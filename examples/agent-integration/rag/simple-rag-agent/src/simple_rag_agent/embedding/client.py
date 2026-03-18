@@ -1,7 +1,7 @@
 # Copyright 2025 © BeeAI a Series of LF Projects, LLC
 # SPDX-License-Identifier: Apache-2.0
 
-from agentstack_sdk.a2a.extensions import EmbeddingServiceExtensionServer
+from kagenti_adk.a2a.extensions import EmbeddingServiceExtensionServer
 from openai import AsyncOpenAI
 
 

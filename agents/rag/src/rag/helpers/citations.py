@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 import re
-from agentstack_sdk.a2a.extensions import Citation
+from kagenti_adk.a2a.extensions import Citation
 
 
 def extract_citations(text: str) -> tuple[list[Citation], str]:

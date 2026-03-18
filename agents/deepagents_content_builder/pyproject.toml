@@ -7,7 +7,7 @@ authors = [
 ]
 requires-python = ">=3.11"
 dependencies = [
-    "agentstack-sdk",
+    "kagenti-adk",
     "cachetools>=6.2.5",
     "deepagents>=0.3.5",
     "google-genai>=1.0.0",
@@ -26,7 +26,7 @@ dev = []
 line-length = 120
 
 [tool.uv.sources]
-agentstack-sdk = { path = "../../apps/agentstack-sdk-py", editable = true }
+kagenti-adk = { path = "../../apps/adk-py", editable = true }
 
 [project.scripts]
 server = "content_builder.agent:serve"

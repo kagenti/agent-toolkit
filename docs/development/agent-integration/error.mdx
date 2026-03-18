@@ -5,7 +5,7 @@ description: "Learn how your agent can report formatted errors to the UI."
 
 The Error extension provides a standardized way to report errors from your agent to the UI.
 
-The Agent Stack SDK automatically handles exceptions raised within your agent function and uses the Error extension to report them. **No configuration is required** for standard error reporting.
+The Kagenti ADK automatically handles exceptions raised within your agent function and uses the Error extension to report them. **No configuration is required** for standard error reporting.
 
 ## Standard Error Reporting
 
@@ -19,8 +19,8 @@ Simply raise exceptions in your agent code. The SDK will catch them and use the 
 import os
 
 from a2a.types import Message
-from agentstack_sdk.server import Server
-from agentstack_sdk.server.context import RunContext
+from kagenti_adk.server import Server
+from kagenti_adk.server.context import RunContext
 
 server = Server()
 
@@ -53,12 +53,12 @@ import os
 from typing import Annotated
 
 from a2a.types import Message
-from agentstack_sdk.a2a.extensions import (
+from kagenti_adk.a2a.extensions import (
     ErrorExtensionParams,
     ErrorExtensionServer,
     ErrorExtensionSpec,
 )
-from agentstack_sdk.server import Server
+from kagenti_adk.server import Server
 
 server = Server()
 
@@ -116,8 +116,8 @@ The Error extension supports `ExceptionGroup` to report multiple errors at once.
 import os
 
 from a2a.types import Message
-from agentstack_sdk.server import Server
-from agentstack_sdk.server.context import RunContext
+from kagenti_adk.server import Server
+from kagenti_adk.server.context import RunContext
 
 server = Server()
 
@@ -149,12 +149,12 @@ import os
 from typing import Annotated, cast
 
 from a2a.types import Message
-from agentstack_sdk.a2a.extensions import (
+from kagenti_adk.a2a.extensions import (
     ErrorExtensionParams,
     ErrorExtensionServer,
     ErrorExtensionSpec,
 )
-from agentstack_sdk.server import Server
+from kagenti_adk.server import Server
 from pydantic import JsonValue
 
 server = Server()
@@ -191,4 +191,4 @@ if __name__ == "__main__":
 
 For more examples, see:
 
-- [error_agent.py](https://github.com/i-am-bee/agentstack/blob/main/apps/agentstack-sdk-py/examples/error_agent.py)
+- [error_agent.py](https://github.com/kagenti/adk/blob/main/apps/adk-py/examples/error_agent.py)

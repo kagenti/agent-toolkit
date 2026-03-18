@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import openai
 import pytest
-from agentstack_sdk.platform.context import Context, Permissions
+from kagenti_adk.platform.context import Context, Permissions
 
 pytestmark = pytest.mark.e2e
 

@@ -7,8 +7,8 @@ import typing
 from datetime import datetime
 
 import typer
-from agentstack_sdk.platform import User
-from agentstack_sdk.platform.user import UserRole
+from kagenti_adk.platform import User
+from kagenti_adk.platform.user import UserRole
 from rich.table import Column
 
 from agentstack_cli.async_typer import AsyncTyper, console, create_table

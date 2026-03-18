@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from typing import List, Literal
 
-from agentstack_sdk.platform import File
+from kagenti_adk.platform import File
 from beeai_framework.emitter import Emitter
 from beeai_framework.tools import JSONToolOutput, Tool, ToolRunOptions
 from pydantic import BaseModel, Field, create_model

@@ -16,8 +16,8 @@ import pytest
 from a2a.client import Client, ClientEvent
 from a2a.types import AgentCard, Task
 from a2a.utils.constants import AGENT_CARD_WELL_KNOWN_PATH
-from agentstack_sdk.platform import Provider
-from agentstack_sdk.platform.context import Context, ContextPermissions, ContextToken, Permissions
+from kagenti_adk.platform import Provider
+from kagenti_adk.platform.context import Context, ContextPermissions, ContextToken, Permissions
 from google.protobuf.json_format import ParseDict
 from pydantic import Secret
 from tenacity import retry, stop_after_delay, wait_fixed

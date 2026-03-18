@@ -6,7 +6,7 @@ import logging
 
 import pytest
 from a2a.types import AgentCapabilities, AgentCard
-from agentstack_sdk.platform import Provider
+from kagenti_adk.platform import Provider
 from httpx import HTTPError
 
 pytestmark = pytest.mark.e2e

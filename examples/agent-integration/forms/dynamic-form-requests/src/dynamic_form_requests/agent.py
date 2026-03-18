@@ -6,13 +6,13 @@ from typing import Annotated
 
 from a2a.types import Message
 from a2a.utils.message import get_message_text
-from agentstack_sdk.a2a.extensions import (
+from kagenti_adk.a2a.extensions import (
     FormRender,
     TextField,
     FormRequestExtensionServer,
     FormRequestExtensionSpec,
 )
-from agentstack_sdk.server import Server
+from kagenti_adk.server import Server
 from pydantic import BaseModel
 
 server = Server()

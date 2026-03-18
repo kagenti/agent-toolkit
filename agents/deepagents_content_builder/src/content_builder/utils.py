@@ -13,7 +13,7 @@ from langchain_openai import ChatOpenAI
 from pydantic import SecretStr
 from a2a.types import Role, Message as A2AMessage
 from langchain.messages import AIMessage, HumanMessage
-from agentstack_sdk.a2a.extensions import LLMFulfillment
+from kagenti_adk.a2a.extensions import LLMFulfillment
 
 
 @dataclasses.dataclass

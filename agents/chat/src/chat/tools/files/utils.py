@@ -11,8 +11,8 @@ import pydantic
 from a2a.types import Message, Role
 from beeai_framework.backend import AnyMessage, AssistantMessage, UserMessage
 
-from agentstack_sdk.platform import File
-from agentstack_sdk.util.file import PlatformFileUrl
+from kagenti_adk.platform import File
+from kagenti_adk.util.file import PlatformFileUrl
 from chat.tools.files.model import FileChatInfo
 
 

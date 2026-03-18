@@ -20,9 +20,9 @@ from a2a.server.apps import A2AStarletteApplication
 from a2a.server.request_handlers import DefaultRequestHandler
 from a2a.server.tasks import InMemoryTaskStore
 from a2a.types import SendMessageRequest, AgentCapabilities, AgentCard, AgentInterface, AgentSkill, Role, Task, TaskState
-from agentstack_sdk.a2a.extensions import LLMFulfillment, LLMServiceExtensionClient, LLMServiceExtensionSpec
-from agentstack_sdk.platform import ModelProvider, Provider
-from agentstack_sdk.platform.context import Context, ContextPermissions, Permissions
+from kagenti_adk.a2a.extensions import LLMFulfillment, LLMServiceExtensionClient, LLMServiceExtensionSpec
+from kagenti_adk.platform import ModelProvider, Provider
+from kagenti_adk.platform.context import Context, ContextPermissions, Permissions
 
 pytestmark = pytest.mark.e2e
 

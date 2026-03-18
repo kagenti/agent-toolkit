@@ -11,8 +11,8 @@ from typing import Any, AsyncGenerator, Protocol
 
 from openai.types import CreateEmbeddingResponse
 
-from agentstack_sdk.a2a.extensions import TrajectoryExtensionServer
-from agentstack_sdk.platform import File, VectorStore, VectorStoreItem
+from kagenti_adk.a2a.extensions import TrajectoryExtensionServer
+from kagenti_adk.platform import File, VectorStore, VectorStoreItem
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from rag.helpers.trajectory import TrajectoryEvent
 from tenacity import AsyncRetrying, retry_if_exception_type, stop_after_delay, wait_fixed

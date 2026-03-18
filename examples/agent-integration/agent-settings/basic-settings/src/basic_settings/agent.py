@@ -6,7 +6,7 @@ from collections.abc import AsyncGenerator
 from typing import Annotated
 
 from a2a.types import Message
-from agentstack_sdk.a2a.extensions import (
+from kagenti_adk.a2a.extensions import (
     CheckboxField,
     CheckboxGroupField,
     OptionItem,
@@ -15,9 +15,9 @@ from agentstack_sdk.a2a.extensions import (
     FormServiceExtensionServer,
     FormServiceExtensionSpec,
 )
-from agentstack_sdk.a2a.types import RunYield
-from agentstack_sdk.server import Server
-from agentstack_sdk.server.context import RunContext
+from kagenti_adk.a2a.types import RunYield
+from kagenti_adk.server import Server
+from kagenti_adk.server.context import RunContext
 from pydantic import BaseModel
 
 

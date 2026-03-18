@@ -7,16 +7,16 @@ import os
 from typing import Annotated
 
 from a2a.types import DataPart, FilePart, FileWithUri, Message, Part, TextPart
-from agentstack_sdk.a2a.extensions import (
+from kagenti_adk.a2a.extensions import (
     EmbeddingServiceExtensionServer,
     EmbeddingServiceExtensionSpec,
     PlatformApiExtensionServer,
     PlatformApiExtensionSpec,
 )
-from agentstack_sdk.a2a.types import AgentMessage
-from agentstack_sdk.platform import File, PlatformFileUrl, VectorStore
-from agentstack_sdk.server import Server
-from agentstack_sdk.server.context import RunContext
+from kagenti_adk.a2a.types import AgentMessage
+from kagenti_adk.platform import File, PlatformFileUrl, VectorStore
+from kagenti_adk.server import Server
+from kagenti_adk.server.context import RunContext
 
 from .embedding.client import get_embedding_client
 from .embedding.embed import embed_chunks

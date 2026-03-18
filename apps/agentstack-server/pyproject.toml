@@ -63,13 +63,13 @@ dev = [
     "pytest-subtests>=0.14.1",
     "reportlab>=4.4.2",
     "ruff>=0.8.5",
-    "agentstack-sdk",
+    "kagenti-adk",
     "python-keycloak>=7.0.2",
     "pyrefly>=0.52.0",
 ]
 
 [tool.uv.sources]
-agentstack-sdk = { path = "../agentstack-sdk-py", editable = true }
+kagenti-adk = { path = "../adk-py", editable = true }
 a2a-sdk = { git = "https://github.com/a2aproject/a2a-python.git", rev = "1.0-dev" }
 
 [project.scripts]

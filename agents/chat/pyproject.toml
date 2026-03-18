@@ -11,7 +11,7 @@ dependencies = [
     "tiktoken>=0.12.0",  # constraint for beeai-framework dependency (first version with musl arm64 wheel)
     "fastuuid>=0.14.0",  # constraint for beeai-framework dependency (first version with musl arm64 wheel)
     "openai>=1.107.1",
-    "agentstack-sdk",
+    "kagenti-adk",
     "openinference-instrumentation-beeai>=0.1.14",
     "pydantic-settings>=2.9.0",
     "uvicorn>=0.37.0,<0.38.0",
@@ -21,7 +21,7 @@ dependencies = [
 line-length = 120
 
 [tool.uv.sources]
-agentstack-sdk = { path = "../../apps/agentstack-sdk-py", editable = true }
+kagenti-adk = { path = "../../apps/adk-py", editable = true }
 
 [project.scripts]
 server = "chat.agent:serve"

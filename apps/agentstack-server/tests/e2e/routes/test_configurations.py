@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 import pytest
-from agentstack_sdk.platform import ModelProvider, SystemConfiguration
+from kagenti_adk.platform import ModelProvider, SystemConfiguration
 
 pytestmark = pytest.mark.e2e
 

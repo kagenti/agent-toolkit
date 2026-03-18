@@ -13,7 +13,7 @@ from datetime import datetime
 
 import httpx
 import typer
-from agentstack_sdk.platform import (
+from kagenti_adk.platform import (
     ModelCapability,
     ModelProvider,
     ModelProviderType,

@@ -219,7 +219,7 @@ Here is an example how you can create a context and generate a custom token with
 
 <CodeGroup>
     ```python Python SDK expandable
-    from agentstack_sdk.platform.context import Context, Permissions, ContextPermissions
+    from kagenti_adk.platform.context import Context, Permissions, ContextPermissions
 
     # Create a context
     providers = await Provider.list()
@@ -292,7 +292,7 @@ Here is an example how you can create a context and generate a custom token with
 
 ### Using Context Tokens in Agent Runs
 
-When calling an agent using the Agent Stack SDK, you pass the context token through extension configurations. Here's a complete example:
+When calling an agent using the Kagenti ADK, you pass the context token through extension configurations. Here's a complete example:
 
 ```python Full Agent Run Client Example expandable
 from datetime import timedelta
@@ -301,9 +301,9 @@ import httpx
 from a2a.client import ClientConfig, ClientFactory
 from a2a.types import Message, Part, Role, TextPart
 
-from agentstack_sdk.platform import ModelProvider, Provider, ModelCapability
-from agentstack_sdk.platform.context import Permissions, ContextPermissions, Context
-from agentstack_sdk.a2a.extensions import (
+from kagenti_adk.platform import ModelProvider, Provider, ModelCapability
+from kagenti_adk.platform.context import Permissions, ContextPermissions, Context
+from kagenti_adk.a2a.extensions import (
     LLMServiceExtensionClient,
     LLMServiceExtensionSpec,
     EmbeddingServiceExtensionClient,
@@ -403,17 +403,17 @@ async def call_agent(
 
 ### Inside Your Agent
 
-When you declare the `PlatformApiExtensionServer` in your agent function, the Agent Stack SDK automatically authenticates your platform API calls using the context token that was passed through the extension metadata.
+When you declare the `PlatformApiExtensionServer` in your agent function, the Kagenti ADK automatically authenticates your platform API calls using the context token that was passed through the extension metadata.
 
 ```python expandable
 from typing import Annotated
 
 from a2a.types import Message
 
-from agentstack_sdk.a2a.extensions import PlatformApiExtensionServer, PlatformApiExtensionSpec
-from agentstack_sdk.platform import File
-from agentstack_sdk.server import Server
-from agentstack_sdk.server.context import RunContext
+from kagenti_adk.a2a.extensions import PlatformApiExtensionServer, PlatformApiExtensionSpec
+from kagenti_adk.platform import File
+from kagenti_adk.server import Server
+from kagenti_adk.server.context import RunContext
 
 server = Server()
 

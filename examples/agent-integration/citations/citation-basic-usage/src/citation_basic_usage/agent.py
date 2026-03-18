@@ -5,9 +5,9 @@ import os
 from typing import Annotated
 
 from a2a.types import Message
-from agentstack_sdk.a2a.extensions import Citation, CitationExtensionServer, CitationExtensionSpec
-from agentstack_sdk.server import Server
-from agentstack_sdk.server.context import RunContext
+from kagenti_adk.a2a.extensions import Citation, CitationExtensionServer, CitationExtensionSpec
+from kagenti_adk.server import Server
+from kagenti_adk.server.context import RunContext
 
 server = Server()
 

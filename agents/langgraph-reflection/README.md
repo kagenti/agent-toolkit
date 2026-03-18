@@ -22,7 +22,7 @@ Follow these steps to convert a standard LangGraph [reflection agent](https://gi
 
 ### Prerequisites
 
-- [AgentStack SDK](https://agentstack.beeai.dev/stable/introduction/quickstart) installed.
+- [Kagenti ADK](https://agentstack.beeai.dev/stable/introduction/quickstart) installed.
 - Understanding of the original `reflection.py` logic.
 
 ### Integration Process
@@ -32,7 +32,7 @@ Follow these steps to convert a standard LangGraph [reflection agent](https://gi
 Instead of running top-level script logic, you need to wrap it in an AgentStack `Server`.
 
 ```python
-from agentstack_sdk.server import Server
+from kagenti_adk.server import Server
 server = Server()
 ```
 
@@ -41,7 +41,7 @@ server = Server()
 Decorate your main agent function with `@server.agent()`. Provide a name, description, and UI details.
 
 ```python
-from agentstack_sdk.a2a.extensions import AgentDetail
+from kagenti_adk.a2a.extensions import AgentDetail
 
 @server.agent(
     name="Reflection Agent",
@@ -62,7 +62,7 @@ Use extensions to request an LLM and provide progress updates (trajectory). This
 
 ```python
 from typing import Annotated
-from agentstack_sdk.a2a.extensions import (
+from kagenti_adk.a2a.extensions import (
     LLMServiceExtensionSpec,
     LLMServiceExtensionServer,
     TrajectoryExtensionServer,

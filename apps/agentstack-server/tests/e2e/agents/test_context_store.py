@@ -8,12 +8,12 @@ from collections.abc import AsyncGenerator, AsyncIterator
 import pytest
 from a2a.client import Client, ClientEvent, create_text_message_object
 from a2a.types import SendMessageRequest, Message, Role, Task
-from agentstack_sdk.a2a.extensions import PlatformApiExtensionClient, PlatformApiExtensionSpec
-from agentstack_sdk.a2a.types import RunYield
-from agentstack_sdk.platform.context import Context, ContextPermissions, ContextToken, Permissions
-from agentstack_sdk.server import Server
-from agentstack_sdk.server.context import RunContext
-from agentstack_sdk.server.store.platform_context_store import PlatformContextStore
+from kagenti_adk.a2a.extensions import PlatformApiExtensionClient, PlatformApiExtensionSpec
+from kagenti_adk.a2a.types import RunYield
+from kagenti_adk.platform.context import Context, ContextPermissions, ContextToken, Permissions
+from kagenti_adk.server import Server
+from kagenti_adk.server.context import RunContext
+from kagenti_adk.server.store.platform_context_store import PlatformContextStore
 
 pytestmark = pytest.mark.e2e
 

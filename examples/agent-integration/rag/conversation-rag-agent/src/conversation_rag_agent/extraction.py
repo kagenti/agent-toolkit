@@ -3,7 +3,7 @@
 
 import asyncio
 
-from agentstack_sdk.platform import File
+from kagenti_adk.platform import File
 
 
 async def extract_file(file: File):

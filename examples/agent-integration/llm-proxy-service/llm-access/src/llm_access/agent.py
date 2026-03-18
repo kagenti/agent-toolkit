@@ -6,9 +6,9 @@ from typing import Annotated
 
 from a2a.types import Message
 from a2a.utils.message import get_message_text
-from agentstack_sdk.a2a.extensions import LLMServiceExtensionServer, LLMServiceExtensionSpec
-from agentstack_sdk.a2a.types import AgentMessage
-from agentstack_sdk.server import Server
+from kagenti_adk.a2a.extensions import LLMServiceExtensionServer, LLMServiceExtensionSpec
+from kagenti_adk.a2a.types import AgentMessage
+from kagenti_adk.server import Server
 
 server = Server()
 

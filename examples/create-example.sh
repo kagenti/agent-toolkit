@@ -32,14 +32,14 @@ name="$(basename "$path")"
 snake_name="${name//-/_}"
 
 # Compute relative SDK path based on directory depth
-# From examples/<path>/ we need to reach <repo>/apps/agentstack-sdk-py
+# From examples/<path>/ we need to reach <repo>/apps/adk-py
 # That's (number of segments in path + 1) levels up
 IFS='/' read -ra segments <<< "$path"
 sdk_path=""
 for ((i = 0; i <= ${#segments[@]}; i++)); do
     sdk_path="../$sdk_path"
 done
-sdk_path="${sdk_path}apps/agentstack-sdk-py"
+sdk_path="${sdk_path}apps/adk-py"
 
 if [[ -e "$target_dir" ]]; then
     echo "Error: $target_dir already exists" >&2

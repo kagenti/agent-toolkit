@@ -7,7 +7,7 @@ from beeai_framework.emitter import Emitter
 from beeai_framework.tools import JSONToolOutput, Tool, ToolRunOptions
 from pydantic import BaseModel, Field
 
-from agentstack_sdk.platform import File
+from kagenti_adk.platform import File
 from chat.tools.files.model import FileChatInfo
 
 

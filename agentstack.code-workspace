@@ -9,8 +9,8 @@
       "path": "apps/agentstack-server",
     },
     {
-      "name": "agentstack-sdk-py",
-      "path": "apps/agentstack-sdk-py",
+      "name": "adk-py",
+      "path": "apps/adk-py",
     },
     {
       "name": "adk-ts",

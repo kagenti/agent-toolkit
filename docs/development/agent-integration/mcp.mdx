@@ -44,11 +44,11 @@ This GitHub MCP Agent uses the connector-based approach. It requires pre-configu
 For information on pre-configuration, see [Experimental/MCP Connectors](../experimental/connectors).
 </Tip>
 
-Here's an example of how to setup the GitHub connector using the Agent Stack SDK (use your own personal access token where noted in the example code):
+Here's an example of how to setup the GitHub connector using the Kagenti ADK (use your own personal access token where noted in the example code):
 
 ```python
 import asyncio
-from agentstack_sdk.platform import Connector, ConnectorState
+from kagenti_adk.platform import Connector, ConnectorState
 
 async def main():
     connector = await Connector.create(url="https://api.githubcopilot.com/mcp")
@@ -73,9 +73,9 @@ from collections.abc import AsyncGenerator
 from typing import Annotated
 
 from a2a.types import Message
-from agentstack_sdk.a2a.extensions import MCPServiceExtensionServer, MCPServiceExtensionSpec
-from agentstack_sdk.a2a.types import RunYield
-from agentstack_sdk.server import Server
+from kagenti_adk.a2a.extensions import MCPServiceExtensionServer, MCPServiceExtensionSpec
+from kagenti_adk.a2a.types import RunYield
+from kagenti_adk.server import Server
 from mcp import ClientSession
 
 server = Server()
@@ -153,8 +153,8 @@ import os
 from typing import Annotated
 
 import pydantic
-from agentstack_sdk.a2a.extensions import OAuthExtensionServer, OAuthExtensionSpec
-from agentstack_sdk.server import Server
+from kagenti_adk.a2a.extensions import OAuthExtensionServer, OAuthExtensionSpec
+from kagenti_adk.server import Server
 from mcp import ClientSession
 from mcp.client.streamable_http import streamablehttp_client
 

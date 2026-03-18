@@ -5,9 +5,9 @@ import os
 from textwrap import dedent
 
 from a2a.types import AgentSkill, Message
-from agentstack_sdk.a2a.extensions import AgentDetail, AgentDetailContributor, AgentDetailTool
-from agentstack_sdk.server import Server
-from agentstack_sdk.server.context import RunContext
+from kagenti_adk.a2a.extensions import AgentDetail, AgentDetailContributor, AgentDetailTool
+from kagenti_adk.server import Server
+from kagenti_adk.server.context import RunContext
 
 server = Server()
 

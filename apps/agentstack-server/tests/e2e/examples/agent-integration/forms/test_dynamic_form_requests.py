@@ -8,7 +8,7 @@ from uuid import uuid4
 import pytest
 from a2a.client.helpers import create_text_message_object
 from a2a.types import SendMessageRequest, Message, Role, TaskState
-from agentstack_sdk.a2a.extensions import (
+from kagenti_adk.a2a.extensions import (
     FormResponse,
     TextFieldValue,
     FormRequestExtensionClient,

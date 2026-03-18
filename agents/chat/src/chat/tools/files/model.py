@@ -8,7 +8,7 @@ from enum import StrEnum
 from a2a.types import Role
 from pydantic import BaseModel, computed_field
 
-from agentstack_sdk.platform import File
+from kagenti_adk.platform import File
 
 
 class OriginType(StrEnum):

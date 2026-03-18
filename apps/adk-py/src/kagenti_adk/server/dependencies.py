@@ -1,0 +1,121 @@
+# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# SPDX-License-Identifier: Apache-2.0
+
+
+from __future__ import annotations
+
+import inspect
+import typing
+from collections import Counter
+from collections.abc import AsyncIterator, Callable
+from contextlib import AbstractAsyncContextManager, asynccontextmanager
+from inspect import isclass
+from typing import Annotated, Any, TypeAlias, Unpack, get_args, get_origin
+
+from a2a.server.agent_execution.context import RequestContext
+from a2a.types import Message
+from typing_extensions import Doc
+
+from kagenti_adk.a2a.extensions.base import BaseExtensionServer, BaseExtensionSpec
+from kagenti_adk.server.context import RunContext
+
+Dependency: TypeAlias = Callable[[Message, RunContext, RequestContext], Any] | BaseExtensionServer[Any, Any]
+
+
+# Inspired by fastapi.Depends
+class Depends:
+    extension: BaseExtensionServer[Any, Any] | None = None
+
+    def __init__(
+        self,
+        dependency: Annotated[
+            Dependency,
+            Doc(
+                """
+                A "dependable" callable (like a function).
+                Don't call it directly, Kagenti ADK will call it for you, just pass the object directly.
+                """
+            ),
+        ],
+    ):
+        self._dependency_callable: Dependency = dependency
+        if isinstance(dependency, BaseExtensionServer):
+            self.extension = dependency
+
+    def __call__(
+        self, message: Message, context: RunContext, request_context: RequestContext
+    ) -> AbstractAsyncContextManager[Dependency]:
+        instance = self._dependency_callable(message, context, request_context)
+
+        @asynccontextmanager
+        async def lifespan() -> AsyncIterator[Dependency]:
+            if self.extension or hasattr(instance, "lifespan"):
+                async with instance.lifespan():
+                    yield instance
+            else:
+                yield instance
+
+        return lifespan()
+
+
+def extract_dependencies(fn: Callable[..., Any]) -> dict[str, Depends]:
+    sign = inspect.signature(fn)
+    type_hints = typing.get_type_hints(fn, include_extras=True)
+    dependencies = {}
+    seen_keys = set()
+
+    def process_args(name: str, args: tuple[Any, ...]) -> None:
+        if len(args) > 1:
+            dep_type, spec, *rest = args
+            # extension_param: Annotated[some_type, Depends(some_callable)]
+            if isinstance(spec, Depends):
+                dependencies[name] = spec
+            # extension_param: Annotated[BaseExtensionServer, BaseExtensionSpec()]
+            elif (
+                isclass(dep_type) and issubclass(dep_type, BaseExtensionServer) and isinstance(spec, BaseExtensionSpec)
+            ):
+                dependencies[name] = Depends(dep_type(spec, *rest))
+
+    for name, param in sign.parameters.items():
+        seen_keys.add(name)
+        annotation = type_hints.get(name, param.annotation)
+
+        if get_origin(annotation) is Annotated:
+            args = get_args(annotation)
+            process_args(name, args)
+
+        elif inspect.isclass(annotation):
+            # message: Message
+            if annotation == Message:
+                dependencies[name] = Depends(lambda message, _run_context, _request_context: message)
+            # context: Context
+            elif annotation == RunContext:
+                dependencies[name] = Depends(lambda _message, run_context, _request_context: run_context)
+            # extension: BaseExtensionServer = BaseExtensionSpec()
+            # TODO: this does not get past linters, should we enable it or somehow fix the typing?
+            # elif issubclass(annotation, BaseExtensionServer) and isinstance(param.default, BaseExtensionSpec):
+            #     dependencies[name] = Depends(annotation(param.default))
+        elif param.kind is inspect.Parameter.VAR_KEYWORD:
+            origin = get_origin(annotation)
+            if origin is Unpack:
+                seen_keys.discard(name)
+                (typed_dict,) = get_args(annotation)
+                # For TypedDict, get_type_hints on the TypedDict class should resolve its annotations
+                typed_dict_hints = typing.get_type_hints(typed_dict, include_extras=True)
+                for field_name, field_type in typed_dict_hints.items():
+                    seen_keys.add(field_name)
+                    if get_origin(field_type) is Annotated:
+                        args = get_args(field_type)
+                        process_args(field_name, args)
+
+    missing_keys = seen_keys.difference(dependencies.keys())
+    if missing_keys:
+        raise TypeError(f"The agent function contains extra parameters with unknown type annotation: {missing_keys}")
+    if reserved_names := {param for param in dependencies if param.startswith("__")}:
+        raise TypeError(f"User-defined dependencies cannot start with double underscore: {reserved_names}")
+
+    extension_deps = Counter(dep.extension.spec.URI for dep in dependencies.values() if dep.extension)
+    if duplicate_uris := {k for k, v in extension_deps.items() if v > 1}:
+        raise TypeError(f"Duplicate extension URIs found in the agent function: {duplicate_uris}")
+
+    return dependencies

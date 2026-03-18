@@ -7,9 +7,9 @@ import os
 from typing import Annotated
 
 import a2a.types
-import agentstack_sdk.a2a.extensions
+import kagenti_adk.a2a.extensions
 from a2a.types import Message
-from agentstack_sdk.a2a.extensions import (
+from kagenti_adk.a2a.extensions import (
     CheckboxField,
     DateField,
     FileField,
@@ -21,12 +21,12 @@ from agentstack_sdk.a2a.extensions import (
     FormServiceExtensionServer,
     FormServiceExtensionSpec,
 )
-from agentstack_sdk.server import Server
-from agentstack_sdk.server.middleware.platform_auth_backend import PlatformAuthBackend
+from kagenti_adk.server import Server
+from kagenti_adk.server.middleware.platform_auth_backend import PlatformAuthBackend
 from pydantic import BaseModel
 
-agent_detail_extension_spec = agentstack_sdk.a2a.extensions.AgentDetailExtensionSpec(
-    params=agentstack_sdk.a2a.extensions.AgentDetail(
+agent_detail_extension_spec = kagenti_adk.a2a.extensions.AgentDetailExtensionSpec(
+    params=kagenti_adk.a2a.extensions.AgentDetail(
         interaction_mode="multi-turn",
     )
 )

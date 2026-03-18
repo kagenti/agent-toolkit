@@ -5,7 +5,7 @@ FROM python:3.14-alpine3.23@sha256:faee120f7885a06fcc9677922331391fa690d911c020a
 ARG RELEASE_VERSION="main"
 RUN apk add bash git nodejs npm curl
 COPY ./agents/chat/ /app/agents/chat
-COPY ./apps/agentstack-sdk-py/ /app/apps/agentstack-sdk-py/
+COPY ./apps/adk-py/ /app/apps/adk-py/
 WORKDIR /app/agents/chat
 RUN --mount=type=cache,target=/tmp/.cache/uv \
     --mount=type=bind,from=uv,source=/uv,target=/bin/uv \

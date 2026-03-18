@@ -6,8 +6,8 @@ from __future__ import annotations
 import uuid
 
 import pytest
-from agentstack_sdk.a2a.types import AgentMessage
-from agentstack_sdk.platform.context import Context
+from kagenti_adk.a2a.types import AgentMessage
+from kagenti_adk.platform.context import Context
 from httpx import HTTPStatusError
 
 pytestmark = pytest.mark.e2e
@@ -192,7 +192,7 @@ async def test_context_update_and_patch(subtests):
 async def test_context_provider_filtering(subtests):
     """Test creating contexts with provider_id and filtering by provider_id."""
     from a2a.types import AgentCard
-    from agentstack_sdk.platform import Provider
+    from kagenti_adk.platform import Provider
 
     provider1 = None
     provider2 = None

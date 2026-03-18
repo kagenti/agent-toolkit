@@ -7,10 +7,10 @@ from uuid import uuid4
 
 import pytest
 from a2a.types import SendMessageRequest, Message, Role, TaskState
-from agentstack_sdk.a2a.extensions import PlatformApiExtensionClient, PlatformApiExtensionSpec
-from agentstack_sdk.platform import File
-from agentstack_sdk.platform.context import ContextPermissions, Permissions
-from agentstack_sdk.util.file import load_file
+from kagenti_adk.a2a.extensions import PlatformApiExtensionClient, PlatformApiExtensionSpec
+from kagenti_adk.platform import File
+from kagenti_adk.platform.context import ContextPermissions, Permissions
+from kagenti_adk.util.file import load_file
 
 from tests.e2e.examples.conftest import run_example
 

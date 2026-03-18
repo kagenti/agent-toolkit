@@ -33,14 +33,14 @@ from typing import Annotated
 
 from a2a.types import Message, TextPart
 
-from agentstack_sdk.a2a.extensions import LLMServiceExtensionServer, LLMServiceExtensionSpec
-from agentstack_sdk.a2a.extensions.ui.canvas import (
+from kagenti_adk.a2a.extensions import LLMServiceExtensionServer, LLMServiceExtensionSpec
+from kagenti_adk.a2a.extensions.ui.canvas import (
     CanvasExtensionServer,
     CanvasExtensionSpec,
 )
-from agentstack_sdk.a2a.types import AgentArtifact
-from agentstack_sdk.server import Server
-from agentstack_sdk.server.context import RunContext
+from kagenti_adk.a2a.types import AgentArtifact
+from kagenti_adk.server import Server
+from kagenti_adk.server.context import RunContext
 
 server = Server()
 
@@ -123,7 +123,7 @@ if __name__ == "__main__":
 
 <Steps>
 <Step title="Import the canvas extension">
-Import `CanvasExtensionServer` and `CanvasExtensionSpec` from `agentstack_sdk.a2a.extensions.ui.canvas`.
+Import `CanvasExtensionServer` and `CanvasExtensionSpec` from `kagenti_adk.a2a.extensions.ui.canvas`.
 </Step>
 
 <Step title='Inject the extension'>
@@ -182,5 +182,5 @@ Create a new artifact with your changes.
 
 For more examples, see:
 
-- [canvas_ui_code_agent.py](https://github.com/i-am-bee/agentstack/blob/main/apps/agentstack-sdk-py/examples/canvas_ui_code_agent.py)
-- [canvas_ui_test_agent.py](https://github.com/i-am-bee/agentstack/blob/main/apps/agentstack-sdk-py/examples/canvas_ui_test_agent.py)
+- [canvas_ui_code_agent.py](https://github.com/kagenti/adk/blob/main/apps/adk-py/examples/canvas_ui_code_agent.py)
+- [canvas_ui_test_agent.py](https://github.com/kagenti/adk/blob/main/apps/adk-py/examples/canvas_ui_test_agent.py)

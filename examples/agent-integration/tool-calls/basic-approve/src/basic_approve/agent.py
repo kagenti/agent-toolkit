@@ -4,14 +4,14 @@ import os
 from typing import Annotated, Any
 
 from a2a.types import Message, TextPart
-from agentstack_sdk.a2a.extensions import (
+from kagenti_adk.a2a.extensions import (
     ApprovalExtensionParams,
     ApprovalExtensionServer,
     ApprovalExtensionSpec,
     ToolCallApprovalRequest,
 )
-from agentstack_sdk.server import Server
-from agentstack_sdk.server.context import RunContext
+from kagenti_adk.server import Server
+from kagenti_adk.server.context import RunContext
 from beeai_framework.adapters.mcp.serve.server import _tool_factory
 from beeai_framework.agents.requirement import RequirementAgent
 from beeai_framework.agents.requirement.requirements.ask_permission import AskPermissionRequirement

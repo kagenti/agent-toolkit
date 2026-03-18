@@ -11,9 +11,9 @@ run = "pnpm dev"
 depends = ["docs:check:*"]
 
 ["docs:check:pyrefly"]
-depends = ["agentstack-sdk-py:build"]
+depends = ["adk-py:build"]
 dir = "{{config_root}}"
-sources = ["docs/development/**/*.md", "docs/development/**/*.mdx", "apps/agentstack-sdk-py/dist/agentstack_sdk-*.whl"]
+sources = ["docs/development/**/*.md", "docs/development/**/*.mdx", "apps/adk-py/dist/kagenti_adk-*.whl"]
 outputs = { auto=true }
 run = """
 #!/usr/bin/env bash
@@ -45,7 +45,7 @@ uv venv --quiet "$TMPDIR/venv"
 source "$TMPDIR/venv/bin/activate"
 
 uv pip install --quiet \
-  apps/agentstack-sdk-py/dist/agentstack_sdk-*.whl \
+  apps/adk-py/dist/kagenti_adk-*.whl \
   langchain_text_splitters \
   beeai-framework \
   openai \

@@ -2,7 +2,7 @@
 
 ["agentstack-server:setup"]
 extends = "python:setup"
-depends = ["agentstack-sdk-py:setup"]
+depends = ["adk-py:setup"]
 dir = "{{config_root}}/apps/agentstack-server"
 
 # check

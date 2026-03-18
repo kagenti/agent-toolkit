@@ -4,7 +4,7 @@ FROM ghcr.io/astral-sh/uv:${UV_VERSION} AS uv
 FROM python:3.14-alpine3.23@sha256:faee120f7885a06fcc9677922331391fa690d911c020abb9e8025ff3d908e510
 ARG RELEASE_VERSION="main"
 COPY ./agents/canvas/ /app/agents/canvas
-COPY ./apps/agentstack-sdk-py/ /app/apps/agentstack-sdk-py/
+COPY ./apps/adk-py/ /app/apps/adk-py/
 WORKDIR /app/agents/canvas
 RUN --mount=type=cache,target=/tmp/.cache/uv \
     --mount=type=bind,from=uv,source=/uv,target=/bin/uv \

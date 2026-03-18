@@ -8,8 +8,8 @@ import typing
 
 import pydantic
 import typer
-from agentstack_sdk.platform.connector import Connector, ConnectorState
-from agentstack_sdk.platform.types import Metadata
+from kagenti_adk.platform.connector import Connector, ConnectorState
+from kagenti_adk.platform.types import Metadata
 from InquirerPy import inquirer
 from InquirerPy.base.control import Choice
 

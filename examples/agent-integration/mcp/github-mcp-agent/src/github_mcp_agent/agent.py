@@ -7,9 +7,9 @@ from collections.abc import AsyncGenerator
 from typing import Annotated
 
 from a2a.types import Message
-from agentstack_sdk.a2a.extensions import MCPServiceExtensionServer, MCPServiceExtensionSpec
-from agentstack_sdk.a2a.types import RunYield
-from agentstack_sdk.server import Server
+from kagenti_adk.a2a.extensions import MCPServiceExtensionServer, MCPServiceExtensionSpec
+from kagenti_adk.a2a.types import RunYield
+from kagenti_adk.server import Server
 from mcp import ClientSession
 
 server = Server()

@@ -26,7 +26,7 @@ Scan the original code for: `open()`, `pathlib.Path.read_*()`, `with open(...)`,
 
 ## Replacing File Inputs
 
-1. Add a `FileField` (from `agentstack_sdk.a2a.extensions`) to the form with appropriate `accept` MIME types matching the original agent's supported file types. Use `FileInfo` in the Pydantic model (`list[FileInfo] | None`).
+1. Add a `FileField` (from `kagenti_adk.a2a.extensions`) to the form with appropriate `accept` MIME types matching the original agent's supported file types. Use `FileInfo` in the Pydantic model (`list[FileInfo] | None`).
 2. Parse the form via `form.parse_initial_form(model=...)` (same as Step 6).
 3. Resolve `FileInfo.uri` (an `agentstack://` URI) to a `File` object: extract the file ID using `PlatformFileUrl(file.uri)`, then call `File.get(file_id)`.
 4. Load file content via `file.load_content()` (raw bytes) or `file.load_text_content()` (extracted text).
@@ -89,7 +89,7 @@ from pydantic import BaseModel
 from typing import Annotated
 
 from a2a.types import Message
-from agentstack_sdk.a2a.extensions import (
+from kagenti_adk.a2a.extensions import (
     FileField,
     FileInfo,
     FormRender,
@@ -98,7 +98,7 @@ from agentstack_sdk.a2a.extensions import (
     PlatformApiExtensionServer,
     PlatformApiExtensionSpec,
 )
-from agentstack_sdk.platform import File, PlatformFileUrl
+from kagenti_adk.platform import File, PlatformFileUrl
 
 
 class UploadForm(BaseModel):
