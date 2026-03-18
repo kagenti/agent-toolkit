@@ -148,7 +148,9 @@ if [[ ! "$*" =~ 'ui.enabled=false' ]]; then
     UI_TAG="--set agentstack:ui.image.tag=local"
 fi
 
-if [[ -n "${CI-}" ]]; then
+if [[ -n "${AGENTSTACK__RUNNING_INSIDE_VM-}" ]]; then
+  PULL_MODE="skip"
+elif [[ -n "${CI-}" ]]; then
   PULL_MODE="hybrid"
 elif [[ -n "${SKIP_PULL-}" ]]; then
   PULL_MODE="skip"
@@ -156,9 +158,13 @@ else
   PULL_MODE="host"
 fi
 
-ARCH=$(uname -m | sed -e 's/arm64/aarch64/' -e 's/amd64/x86_64/')
+if [[ -z "${AGENTSTACK__RUNNING_INSIDE_VM-}" ]]; then
+  ARCH=$(uname -m | sed -e 's/arm64/aarch64/' -e 's/amd64/x86_64/')
+  LIMA_IMAGE_FLAG="--lima-image={{config_root}}/apps/microshift-vm/dist/$ARCH/microshift-vm-$ARCH.qcow2"
+fi
+
 {{ mise_bin }} run agentstack-cli:run -- platform start -v \
-    --lima-image={{config_root}}/apps/microshift-vm/dist/$ARCH/microshift-vm-$ARCH.qcow2 \
+    ${LIMA_IMAGE_FLAG-} \
     --image-pull-mode="$PULL_MODE" \
     --set agentstack:auth.nextauthDevUrl="http://localhost:3000" \
     --set agentstack:server.image.tag=local \
@@ -549,80 +555,69 @@ brew upgrade mise || mise self-update || true
 
 ["yolobox"]
 dir = "{{ config_root }}"
-description = "experimental dev VM (requires macOS >=15, CPU >=M3)"
+depends = ["microshift-vm:build:qemu"]
 usage = 'arg "[name]"'
 run = '''
 #!/usr/bin/env bash
 set -euxo pipefail
 VM_NAME="yolobox${usage_name:+-$usage_name}"
-export REPO=$(basename $(pwd))
 
 cleanup() {
   limactl stop -f "$VM_NAME" || true
   git remote remove "$VM_NAME" 2>/dev/null || true
   perl -i -ne "print unless m|\QInclude ${LIMA_HOME:-$HOME/.lima}/$VM_NAME/ssh.config\E|" "$HOME/.ssh/config" || true
+  rm -f "$LIMA_YAML"
 }
 trap cleanup EXIT
 
-if limactl create template:ubuntu --yes --name "$VM_NAME" --plain --vm-type=vz --rosetta --memory 36 --cpus 4 --set '.nestedVirtualization=true'; then
+ARCH=$(uname -m | sed -e 's/arm64/aarch64/;s/amd64/x86_64/')
+LIMA_YAML=$(mktemp)
+cat >"$LIMA_YAML" <<YAML
+images:
+  - location: "{{config_root}}/apps/microshift-vm/dist/$ARCH/microshift-vm-$ARCH.qcow2"
+    arch: "$ARCH"
+memory: 8GiB
+cpus: 4
+plain: true
+YAML
+
+mkdir -p "$HOME/.ssh"
+grep -qF "Include ${LIMA_HOME:-$HOME/.lima}/$VM_NAME/ssh.config" "$HOME/.ssh/config" 2>/dev/null \
+  || printf "\nInclude ${LIMA_HOME:-$HOME/.lima}/$VM_NAME/ssh.config" >> "$HOME/.ssh/config"
+
+if limactl create "$LIMA_YAML" --yes --name "$VM_NAME"; then
   limactl start "$VM_NAME"
   limactl shell "$VM_NAME" bash -c "
     set -euxo pipefail
-    export DEBIAN_FRONTEND=noninteractive
-    export GITHUB_TOKEN="${GITHUB_TOKEN-}"
-    
+
     # Git
-    sudo mkdir -p /git/$REPO
-    sudo chown \$(id -u):\$(id -g) /git/$REPO
-    cd /git/$REPO
+    sudo mkdir -p /git/adk
+    sudo chown \$(id -u):\$(id -g) /git/adk
+    cd /git/adk
     git init --initial-branch=\"$(git branch --show-current)\"
     git config receive.denyCurrentBranch updateInstead
     git config user.name \"$(git config user.name)\"
     git config user.email \"$(git config user.email)\"
-    
+
     # Mise
     curl https://mise.run | sh
     eval \"\$(\$HOME/.local/bin/mise activate bash)\"
     echo 'eval \"\$(\$HOME/.local/bin/mise activate bash)\"' >> \$HOME/.bashrc
-
-    # Docker
-    sudo mkdir -p /etc/systemd/system/docker.socket.d
-    printf '[Socket]\nSocketUser='\$USER | sudo tee /etc/systemd/system/docker.socket.d/override.conf
-    curl -fsSL https://get.docker.com | sh
-    
-    # Lima & Virtualization Support
-    sudo apt-get update -qq
-    sudo apt-get install -qqy --no-install-recommends ovmf qemu-system-aarch64 qemu-efi-aarch64 qemu-utils ipxe-qemu xorriso
-    sudo modprobe kvm
-    sudo chmod 666 /dev/kvm
-    mise use -g lima@2.0.3
-
-    # Extra tools
-    mise use -g kubectl@latest
   "
-  git remote add "$VM_NAME" "ssh://lima-$VM_NAME:/git/$REPO"
-  git push "$VM_NAME" $(git branch --show-current):$(git branch --show-current)
 else
   limactl start "$VM_NAME"
 fi
-limactl shell "$VM_NAME" bash -c "cd /git/$REPO && mise trust && mise install"
-mkdir -p "$HOME/.ssh"
-printf "\nInclude ${LIMA_HOME:-$HOME/.lima}/$VM_NAME/ssh.config" >> "$HOME/.ssh/config"
-code --new-window --wait --folder-uri "vscode-remote://ssh-remote+lima-$VM_NAME/git/$REPO"
+git remote add "$VM_NAME" "ssh://lima-$VM_NAME:/git/adk" || true
+git push "$VM_NAME" $(git branch --show-current):$(git branch --show-current) || true
+limactl shell "$VM_NAME" bash -c "
+  set -euxo pipefail
+  export GITHUB_TOKEN="${GITHUB_TOKEN:-$(gh auth token || true)}"
+  cd /git/adk
+  mise trust
+  mise install
+"
+code --new-window --wait --folder-uri "vscode-remote://ssh-remote+lima-$VM_NAME/git/adk"
 '''
-
-["yolobox:delete"]
-dir = "{{ config_root }}"
-usage = 'arg "[name]"'
-run = """
-#!/usr/bin/env bash
-set -euxo pipefail
-VM_NAME="yolobox${usage_name:+-$usage_name}"
-grep -Fxv "Include ${LIMA_HOME:-$HOME/.lima}/$VM_NAME/ssh.config" "$HOME/.ssh/config" > "$HOME/.ssh/config.tmp" || true
-mv "$HOME/.ssh/config.tmp" "$HOME/.ssh/config"
-git remote remove "$VM_NAME" 2>/dev/null || true
-limactl delete -f "$VM_NAME"
-"""
 
 # security
 

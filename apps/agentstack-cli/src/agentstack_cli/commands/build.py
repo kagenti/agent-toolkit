@@ -61,29 +61,41 @@ async def build_agent(
 
         # Push to the in-cluster registry via NodePort (localhost:30500)
         from agentstack_cli.commands.platform import detect_export_import_paths, detect_vm_status, run_in_vm
+        from agentstack_cli.configuration import Configuration
 
         if (await detect_vm_status(vm_name)) != "running":
             console.error("Agent Stack platform is not running.")
             raise typer.Exit(1)
 
-        host_path, guest_path = detect_export_import_paths()
-        try:
+        if Configuration().running_inside_vm:
             await run_command(
-                ["docker", "image", "save", "-o", host_path, build_tag],
-                f"Exporting image {build_tag} from Docker",
-            )
-            await run_in_vm(
-                vm_name,
                 [
-                    "skopeo", "copy",
-                    f"docker-archive:{guest_path}",
+                    "sudo", "skopeo", "copy",
+                    f"containers-storage:{build_tag}",
                     f"docker://localhost:{REGISTRY_NODEPORT}/{image_name}",
                     "--dest-tls-verify=false",
                 ],
                 "Pushing image to platform registry",
             )
-        finally:
-            await anyio.Path(host_path).unlink(missing_ok=True)
+        else:
+            host_path, guest_path = detect_export_import_paths()
+            try:
+                await run_command(
+                    ["docker", "image", "save", "-o", host_path, build_tag],
+                    f"Exporting image {build_tag} from Docker",
+                )
+                await run_in_vm(
+                    vm_name,
+                    [
+                        "skopeo", "copy",
+                        f"docker-archive:{guest_path}",
+                        f"docker://localhost:{REGISTRY_NODEPORT}/{image_name}",
+                        "--dest-tls-verify=false",
+                    ],
+                    "Pushing image to platform registry",
+                )
+            finally:
+                await anyio.Path(host_path).unlink(missing_ok=True)
 
         console.success(
             f"Image pushed to platform registry.\n"

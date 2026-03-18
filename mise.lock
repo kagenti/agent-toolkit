@@ -222,6 +222,7 @@ backend = "aqua:lima-vm/lima"
 [tools.lima."platforms.linux-arm64"]
 checksum = "sha256:d0f9c30b82fdbd06b5c951b76bf3378b68cc658aebfe243f777949e131b6ea28"
 url = "https://github.com/lima-vm/lima/releases/download/v2.0.3/lima-2.0.3-Linux-aarch64.tar.gz"
+provenance = "github-attestations"
 
 [tools.lima."platforms.linux-arm64-musl"]
 checksum = "sha256:d0f9c30b82fdbd06b5c951b76bf3378b68cc658aebfe243f777949e131b6ea28"
