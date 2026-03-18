@@ -5,10 +5,10 @@ import os
 from typing import Annotated
 
 from a2a.types import FilePart, Message
-from agentstack_sdk.a2a.extensions import PlatformApiExtensionServer, PlatformApiExtensionSpec
-from agentstack_sdk.platform import File
-from agentstack_sdk.server import Server
-from agentstack_sdk.util.file import load_file
+from kagenti_adk.a2a.extensions import PlatformApiExtensionServer, PlatformApiExtensionSpec
+from kagenti_adk.platform import File
+from kagenti_adk.server import Server
+from kagenti_adk.util.file import load_file
 
 server = Server()
 

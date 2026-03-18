@@ -14,12 +14,12 @@ from langgraph.graph import END, StateGraph, START
 from langgraph.graph.message import add_messages
 from langgraph.checkpoint.memory import InMemorySaver
 
-from agentstack_sdk.server import Server
+from kagenti_adk.server import Server
 from a2a.types import Message
 from a2a.utils.message import get_message_text
-from agentstack_sdk.server.context import RunContext
+from kagenti_adk.server.context import RunContext
 
-from agentstack_sdk.a2a.extensions import (
+from kagenti_adk.a2a.extensions import (
     LLMServiceExtensionSpec,
     LLMServiceExtensionServer,
     TrajectoryExtensionServer,

@@ -11,7 +11,7 @@ from beeai_framework.tools import JSONToolOutput, Tool, ToolRunOptions, ToolInpu
 from chat.tools.files.model import FileChatInfo
 from pydantic import BaseModel, Field, create_model
 
-from agentstack_sdk.platform import File
+from kagenti_adk.platform import File
 
 
 class FileReaderToolResult(BaseModel):

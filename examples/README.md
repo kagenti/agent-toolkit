@@ -89,7 +89,7 @@ The template files in `.template/` use `%{...}` placeholders:
 | `%{EXAMPLE_NAME}` | Project name (kebab-case) | `basic-history` |
 | `%{EXAMPLE_DESCRIPTION}` | Description | `Example demonstrating basic history.` |
 | `%{EXAMPLE_NAME_SNAKE_CASE}` | Python package name | `basic_history` |
-| `%{SDK_PATH}` | Relative path to SDK | `../../../../apps/agentstack-sdk-py` |
+| `%{SDK_PATH}` | Relative path to SDK | `../../../../apps/adk-py` |
 
 The directory `src/example_name/` and the function name `example_name` in `agent.py` are also renamed to the snake_case name.
 
@@ -106,6 +106,6 @@ E2E example tests run **separately** from the core e2e tests to avoid slowing do
 
 ### When they run in CI
 
-- **On push to `main`** — automatically, when files change in `apps/agentstack-server/`, `apps/agentstack-sdk-py/`, or `examples/`.
+- **On push to `main`** — automatically, when files change in `apps/agentstack-server/`, `apps/adk-py/`, or `examples/`.
 - **On pull requests** — add the `e2e-examples` label to the PR. Tests will run when the label is added and on every subsequent push.
 - **Manually** — trigger the `e2e-examples-test` workflow via GitHub Actions.

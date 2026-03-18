@@ -33,7 +33,7 @@ Add the `default_input_modes` parameter to your agent decorator to allow users t
 
 <Step title="Import the Platform API and Embedding Service extensions">
 Import `PlatformApiExtensionServer`, `PlatformApiExtensionSpec`,
-`EmbeddingServiceExtensionServer` and `EmbeddingServiceExtensionSpec` from `agentstack_sdk.a2a.extensions`.
+`EmbeddingServiceExtensionServer` and `EmbeddingServiceExtensionSpec` from `kagenti_adk.a2a.extensions`.
 </Step>
 
 <Step title="Inject the extensions">
@@ -71,7 +71,7 @@ Agent Stack uses [docling](https://docling-project.github.io/docling/) for extra
 [supported formats](https://docling-project.github.io/docling/usage/supported_formats/).
 
 ```python
-from agentstack_sdk.server import Server
+from kagenti_adk.server import Server
 
 # File formats supported by the text-extraction service (docling)
 default_input_modes = [
@@ -114,16 +114,16 @@ from typing import Annotated
 
 from a2a.types import Message, Part, DataPart, FilePart, TextPart, FileWithUri
 
-from agentstack_sdk.server import Server
-from agentstack_sdk.a2a.extensions import (
+from kagenti_adk.server import Server
+from kagenti_adk.a2a.extensions import (
     PlatformApiExtensionServer,
     PlatformApiExtensionSpec,
     EmbeddingServiceExtensionServer,
     EmbeddingServiceExtensionSpec,
 )
-from agentstack_sdk.a2a.types import AgentMessage
-from agentstack_sdk.server.context import RunContext
-from agentstack_sdk.util.file import PlatformFileUrl
+from kagenti_adk.a2a.types import AgentMessage
+from kagenti_adk.server.context import RunContext
+from kagenti_adk.util.file import PlatformFileUrl
 
 # File formats supported by the text-extraction service (docling)
 default_input_modes = [
@@ -176,7 +176,7 @@ the result. After extraction is completed, the `extraction` object will contain
 
 import asyncio
 
-from agentstack_sdk.platform import File
+from kagenti_adk.platform import File
 
 
 async def extract_file(file: File):
@@ -229,7 +229,7 @@ to create an `AsyncOpenAI` client:
 # Copyright 2025 © BeeAI a Series of LF Projects, LLC
 # SPDX-License-Identifier: Apache-2.0
 
-from agentstack_sdk.a2a.extensions import EmbeddingServiceExtensionServer
+from kagenti_adk.a2a.extensions import EmbeddingServiceExtensionServer
 from openai import AsyncOpenAI
 
 
@@ -256,7 +256,7 @@ Now we can use this client to generate embeddings for our chunks and create vect
 # Copyright 2025 © BeeAI a Series of LF Projects, LLC
 # SPDX-License-Identifier: Apache-2.0
 
-from agentstack_sdk.platform import File, VectorStoreItem
+from kagenti_adk.platform import File, VectorStoreItem
 from openai import AsyncOpenAI
 
 
@@ -294,7 +294,7 @@ it in advance, we will create a test embedding request to calculate the dimensio
 # Copyright 2025 © BeeAI a Series of LF Projects, LLC
 # SPDX-License-Identifier: Apache-2.0
 
-from agentstack_sdk.platform import VectorStore
+from kagenti_adk.platform import VectorStore
 from openai import AsyncOpenAI
 
 
@@ -321,7 +321,7 @@ query. The following function will retrieve five document chunks most similar to
 # Copyright 2025 © BeeAI a Series of LF Projects, LLC
 # SPDX-License-Identifier: Apache-2.0
 
-from agentstack_sdk.platform import VectorStore, VectorStoreSearchResult
+from kagenti_adk.platform import VectorStore, VectorStoreSearchResult
 from openai import AsyncOpenAI
 
 
@@ -358,15 +358,15 @@ from collections.abc import AsyncGenerator
 from typing import Annotated
 
 from a2a.types import FilePart, FileWithUri, Message, TextPart
-from agentstack_sdk.a2a.extensions import (
+from kagenti_adk.a2a.extensions import (
     EmbeddingServiceExtensionServer,
     EmbeddingServiceExtensionSpec,
     PlatformApiExtensionServer,
     PlatformApiExtensionSpec,
 )
-from agentstack_sdk.a2a.types import RunYield
-from agentstack_sdk.platform import File, PlatformFileUrl
-from agentstack_sdk.server import Server
+from kagenti_adk.a2a.types import RunYield
+from kagenti_adk.platform import File, PlatformFileUrl
+from kagenti_adk.server import Server
 
 from .embedding.client import get_embedding_client
 from .embedding.embed import embed_chunks
@@ -470,16 +470,16 @@ import os
 from typing import Annotated
 
 from a2a.types import DataPart, FilePart, FileWithUri, Message, Part, TextPart
-from agentstack_sdk.a2a.extensions import (
+from kagenti_adk.a2a.extensions import (
     EmbeddingServiceExtensionServer,
     EmbeddingServiceExtensionSpec,
     PlatformApiExtensionServer,
     PlatformApiExtensionSpec,
 )
-from agentstack_sdk.a2a.types import AgentMessage
-from agentstack_sdk.platform import File, PlatformFileUrl, VectorStore
-from agentstack_sdk.server import Server
-from agentstack_sdk.server.context import RunContext
+from kagenti_adk.a2a.types import AgentMessage
+from kagenti_adk.platform import File, PlatformFileUrl, VectorStore
+from kagenti_adk.server import Server
+from kagenti_adk.server.context import RunContext
 
 from .embedding.client import get_embedding_client
 from .embedding.embed import embed_chunks

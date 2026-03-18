@@ -7,7 +7,7 @@ authors = [
 ]
 requires-python = ">=3.11"
 dependencies = [
-    "agentstack-sdk",
+    "kagenti-adk",
     "langchain-openai>=0.1.0",
     "langgraph>=0.2.0",
 ]
@@ -19,7 +19,7 @@ dev = []
 line-length = 120
 
 [tool.uv.sources]
-agentstack-sdk = { path = "../../apps/agentstack-sdk-py", editable = true }
+kagenti-adk = { path = "../../apps/adk-py", editable = true }
 
 [project.scripts]
 server = "langgraph_reflection.agent:run"

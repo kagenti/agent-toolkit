@@ -33,7 +33,7 @@ Add the `default_input_modes` parameter to your agent decorator to allow users t
 
 <Step title="Import the Platform API and Embedding Service extensions">
 Import `PlatformApiExtensionServer`, `PlatformApiExtensionSpec`,
-`EmbeddingServiceExtensionServer` and `EmbeddingServiceExtensionSpec` from `agentstack_sdk.a2a.extensions`.
+`EmbeddingServiceExtensionServer` and `EmbeddingServiceExtensionSpec` from `kagenti_adk.a2a.extensions`.
 </Step>
 
 <Step title="Inject the extensions">
@@ -71,7 +71,7 @@ Agent Stack uses [docling](https://docling-project.github.io/docling/) for extra
 [supported formats](https://docling-project.github.io/docling/usage/supported_formats/).
 
 ```python
-from agentstack_sdk.server import Server
+from kagenti_adk.server import Server
 
 # File formats supported by the text-extraction service (docling)
 default_input_modes = [
@@ -114,16 +114,16 @@ from typing import Annotated
 
 from a2a.types import Message, Part, DataPart, FilePart, TextPart, FileWithUri
 
-from agentstack_sdk.server import Server
-from agentstack_sdk.a2a.extensions import (
+from kagenti_adk.server import Server
+from kagenti_adk.a2a.extensions import (
     PlatformApiExtensionServer,
     PlatformApiExtensionSpec,
     EmbeddingServiceExtensionServer,
     EmbeddingServiceExtensionSpec,
 )
-from agentstack_sdk.a2a.types import AgentMessage
-from agentstack_sdk.server.context import RunContext
-from agentstack_sdk.util.file import PlatformFileUrl
+from kagenti_adk.a2a.types import AgentMessage
+from kagenti_adk.server.context import RunContext
+from kagenti_adk.util.file import PlatformFileUrl
 
 # File formats supported by the text-extraction service (docling)
 default_input_modes = [
@@ -169,7 +169,7 @@ the result. After extraction is completed, the `extraction` object will contain
 `extracted_files`, which is a list of extracted files in different formats.
 
 ```python
-from agentstack_sdk.platform import File, Extraction
+from kagenti_adk.platform import File, Extraction
 import asyncio
 
 async def extract_file(file: File):
@@ -212,7 +212,7 @@ to create an `AsyncOpenAI` client:
 
 ```python
 from openai import AsyncOpenAI
-from agentstack_sdk.a2a.extensions import EmbeddingServiceExtensionServer
+from kagenti_adk.a2a.extensions import EmbeddingServiceExtensionServer
 
 def get_embedding_client(
     embedding: EmbeddingServiceExtensionServer,
@@ -237,7 +237,7 @@ Now we can use this client to generate embeddings for our chunks and create vect
 
 ```python
 from openai import AsyncOpenAI
-from agentstack_sdk.platform import VectorStoreItem, File
+from kagenti_adk.platform import VectorStoreItem, File
 
 
 async def embed_chunks(
@@ -270,7 +270,7 @@ it in advance, we will create a test embedding request to calculate the dimensio
 
 ```python
 from openai import AsyncOpenAI
-from agentstack_sdk.platform import VectorStore
+from kagenti_adk.platform import VectorStore
 
 
 async def create_vector_store(embedding_client: AsyncOpenAI, embedding_model: str):
@@ -294,7 +294,7 @@ query. The following function will retrieve five document chunks most similar to
 
 ```python
 from openai import AsyncOpenAI
-from agentstack_sdk.platform import VectorStore, VectorStoreSearchResult
+from kagenti_adk.platform import VectorStore, VectorStoreSearchResult
 
 async def search_vector_store(
     vector_store: VectorStore,

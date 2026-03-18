@@ -15,7 +15,7 @@ from contextlib import asynccontextmanager
 
 import pydantic
 import pydantic_settings
-from agentstack_sdk.platform import PlatformClient, use_platform_client
+from kagenti_adk.platform import PlatformClient, use_platform_client
 from pydantic import SecretStr
 
 from agentstack_cli.auth_manager import AuthManager

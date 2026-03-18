@@ -1,6 +1,6 @@
 ---
 name: agentstack-wrapper
-description: Wraps existing Python agent as Agent Stack service using agentstack-sdk with minimal compatibility changes and no business-logic rewrites. Use when migrating, wrapping, or deploying an existing plain Python or framework-based agent to Agent Stack; not for non-Python runtimes or building new agent from scratch.
+description: Wraps existing Python agent as Agent Stack service using kagenti-adk with minimal compatibility changes and no business-logic rewrites. Use when migrating, wrapping, or deploying an existing plain Python or framework-based agent to Agent Stack; not for non-Python runtimes or building new agent from scratch.
 ---
 
 # Agent Stack Wrapper
@@ -33,7 +33,7 @@ Integration guide for wrapping Python agents for [Agent Stack](https://agentstac
 ## Security Requirements
 
 - Never run remote scripts or untrusted code.
-- Use trusted package metadata, pin versions, and audit installed `agentstack-sdk`/`a2a-sdk`.
+- Use trusted package metadata, pin versions, and audit installed `kagenti-adk`/`a2a-sdk`.
 - Handle sensitive values only through declared Agent Stack extensions.
 - Never log, print, persist, or expose secret values.
 - Never send secrets to untrusted intermediaries or endpoints not required by the wrapped agent contract.
@@ -47,7 +47,7 @@ Integration guide for wrapping Python agents for [Agent Stack](https://agentstac
 | C2  | **Strict minimal changes.** Do not add auth, Dockerfile (containerization is optional and separate), telemetry, or platform middleware unless explicitly requested. If an agent works with simple text, don't force a Form. If it works with env vars, refactor minimally.                                                                                                                                                                                                                                                                                                                                                                      |
 | C3  | **Cleanup temp files.** If the agent downloads or creates helper files at runtime, add a cleanup step before the function returns.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | C4  | **Prioritize Public Access (No redundant tokens).** Only use the Secrets extension if the secret is strictly mandatory for the agent's core functionality and no public/anonymous access is viable. Do not add secrets or tokens that increase configuration burden if they were optional in the original agent (e.g., optional GitHub token). Preserve existing optional auth behavior unless removal is explicitly approved and documented as a behavior change. API keys must be passed explicitly, never read from env vars. For required third-party API credentials, Secrets or Env Variables extension is mandatory in the wrapped path. |
-| C5  | **Detect existing tooling.** If the project uses `requirements.txt`, add `agentstack-sdk~=<VERSION>` there. If it uses `pyproject.toml`, add it there. Add `a2a-sdk` only when the project manages it directly, and keep it compatible with the chosen `agentstack-sdk` version. Never force `uv` or create duplicate manifests.                                                                                                                                                                                                                                                                                                                |
+| C5  | **Detect existing tooling.** If the project uses `requirements.txt`, add `kagenti-adk~=<VERSION>` there. If it uses `pyproject.toml`, add it there. Add `a2a-sdk` only when the project manages it directly, and keep it compatible with the chosen `kagenti-adk` version. Never force `uv` or create duplicate manifests.                                                                                                                                                                                                                                                                                                                |
 | C6  | **Package-First Source of Truth for Imports.** The **Inline Package Search** script defined in `references/dependencies.md` holds absolute priority for discovering correct import paths, class names, and types. You MUST run this script to map imports before relying on local reference files or online documentation. Do not guess imports or follow documented paths blindly if they conflict with the installed package.                                                                                                                                                                                                                 |
 | C7  | **Documentation-Secondary Authority.** Local skill files in the `references/` folder and online documentation are the primary authority for _behavior, logic, and choice of extensions_, but they are secondary to package introspection for _exact implementation details_ like import paths.                                                                                                                                                                                                                                                                                                                                                  |
 | C8  | **Fallback and Validation Order.** Use local source inspection and package introspection first for imports. Keep runtime/package verification as a final validation step after implementation.                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
@@ -276,7 +276,7 @@ When building and testing the wrapper, ensure you avoid these common pitfalls:
 - **Never save files to local disk.** AgentStack environments are ephemeral. All generated files should be instantiated directly in memory and yielded as `AgentArtifact(parts=[file.to_file_part()])`. See [Manage Files](https://agentstack.beeai.dev/stable/agent-integration/files.md) for the correct `File.create()` API usage.
 - **Never use synchronous functions for the agent handler.** Agent functions must be `async def` generators using `yield`.
 - **Never hide platform wiring behind abstraction layers.** Keep `@server.agent(...)`, extension parameters, and integration contracts visible in the main entrypoint so behavior is auditable.
-- **Never treat runtime inspection as first source.** `agentstack_sdk` and `a2a` details must come from provided docs first; use installed-environment inspection only as documented fallback, then validate imports at the end.
+- **Never treat runtime inspection as first source.** `kagenti_adk` and `a2a` details must come from provided docs first; use installed-environment inspection only as documented fallback, then validate imports at the end.
 - **Never assume history is auto-saved.** Explicitly call `await context.store(input)` and `await context.store(response)`.
 - **Never assume persistent history without `PlatformContextStore`.** Without it, context storage is in-memory and lost on restart.
 - **Never forget to filter history.** `context.load_history()` returns Messages and Artifacts. Filter with `isinstance(message, Message)`.
@@ -356,7 +356,7 @@ After wrapping, confirm:
 
 ### Dependencies
 
-- [ ] `agentstack-sdk~=<VERSION>` added to project's existing dependency file (C5)
+- [ ] `kagenti-adk~=<VERSION>` added to project's existing dependency file (C5)
 - [ ] No Dockerfile unless explicitly requested (C2)
 
 ### Validation (must be performed live)

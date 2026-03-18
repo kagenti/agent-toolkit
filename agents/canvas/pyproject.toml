@@ -7,7 +7,7 @@ authors = [
 ]
 requires-python = ">=3.14,<3.15"
 dependencies = [
-    "agentstack-sdk",
+    "kagenti-adk",
     "openai>=1.107.1",
     "openinference-instrumentation-beeai>=0.1.14",
     "pydantic-settings>=2.9.0",
@@ -18,7 +18,7 @@ dependencies = [
 line-length = 120
 
 [tool.uv.sources]
-agentstack-sdk = { path = "../../apps/agentstack-sdk-py", editable = true }
+kagenti-adk = { path = "../../apps/adk-py", editable = true }
 
 [project.scripts]
 server = "canvas.agent:serve"

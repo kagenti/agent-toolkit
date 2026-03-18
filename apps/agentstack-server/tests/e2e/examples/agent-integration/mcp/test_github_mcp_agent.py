@@ -14,7 +14,7 @@ import pytest
 import uvicorn
 from a2a.client.helpers import create_text_message_object
 from a2a.types import SendMessageRequest, TaskState
-from agentstack_sdk.a2a.extensions import (
+from kagenti_adk.a2a.extensions import (
     MCPFulfillment,
     MCPServiceExtensionClient,
     MCPServiceExtensionSpec,

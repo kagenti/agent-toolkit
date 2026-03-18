@@ -11,7 +11,7 @@ from typing import Any
 
 import async_lru
 import pytest
-from agentstack_sdk.platform import ModelProviderType
+from kagenti_adk.platform import ModelProviderType
 from kink import di
 from pydantic import Secret, computed_field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict

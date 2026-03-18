@@ -5,7 +5,7 @@ description: "Migrate from ACP (Agent Communication Protocol) to A2A (Agent2Agen
 
 ## Quick Migration Checklist
 
-✅ Update dependencies: `acp_sdk` → `agentstack_sdk`
+✅ Update dependencies: `acp_sdk` → `kagenti_adk`
 
 ✅ Update imports and function signature
 
@@ -37,22 +37,22 @@ from acp_sdk.models.platform import PlatformUIAnnotation, PlatformUIType, AgentT
 **New (A2A)**
 
 ```toml
-dependencies = ["agentstack-sdk>=0.4.0"]
+dependencies = ["kagenti-adk>=0.4.0"]
 ```
 
 ```py
 from a2a.types import AgentSkill, Message
-from agentstack_sdk.server import Server
-from agentstack_sdk.server.context import RunContext
-from agentstack_sdk.a2a.extensions import (
+from kagenti_adk.server import Server
+from kagenti_adk.server.context import RunContext
+from kagenti_adk.a2a.extensions import (
     AgentDetail, AgentDetailTool, 
     CitationExtensionServer, CitationExtensionSpec, 
     TrajectoryExtensionServer, TrajectoryExtensionSpec,
     LLMServiceExtensionServer, LLMServiceExtensionSpec
 )
-from agentstack_sdk.a2a.extensions.services.platform import PlatformApiExtensionServer, PlatformApiExtensionSpec
-from agentstack_sdk.a2a.types import AgentMessage, AgentArtifact
-from agentstack_sdk.util.file import load_file
+from kagenti_adk.a2a.extensions.services.platform import PlatformApiExtensionServer, PlatformApiExtensionSpec
+from kagenti_adk.a2a.types import AgentMessage, AgentArtifact
+from kagenti_adk.util.file import load_file
 ```
 
 ### 2. Update Agent Decorator & Function Signature
@@ -158,7 +158,7 @@ user_msg = input[-1].parts[0].content if input else "Hello"
 Use `PlatformApiExtensionServer` in your agent to get access to files.
 
 ```py
-from agentstack_sdk.a2a.extensions.services.platform import (
+from kagenti_adk.a2a.extensions.services.platform import (
     PlatformApiExtensionServer,
     PlatformApiExtensionSpec,
 )
@@ -182,7 +182,7 @@ for part in message.parts:
 
 # Simple file processing (if needed)
 if uploaded_files:
-    from agentstack_sdk.util.file import load_file
+    from kagenti_adk.util.file import load_file
     
     for file_part in uploaded_files:
         async with load_file(file_part) as loaded_content:

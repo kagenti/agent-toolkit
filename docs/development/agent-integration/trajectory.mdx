@@ -19,9 +19,9 @@ from time import sleep
 from typing import Annotated
 
 from a2a.types import Message
-from agentstack_sdk.a2a.extensions import TrajectoryExtensionServer, TrajectoryExtensionSpec
-from agentstack_sdk.server import Server
-from agentstack_sdk.server.context import RunContext
+from kagenti_adk.a2a.extensions import TrajectoryExtensionServer, TrajectoryExtensionSpec
+from kagenti_adk.server import Server
+from kagenti_adk.server.context import RunContext
 
 server = Server()
 
@@ -54,7 +54,7 @@ if __name__ == "__main__":
 
 <Steps>
 <Step title="Import the trajectory extension">
-Import `TrajectoryExtensionServer` and `TrajectoryExtensionSpec` from `agentstack_sdk.a2a.extensions`.
+Import `TrajectoryExtensionServer` and `TrajectoryExtensionSpec` from `kagenti_adk.a2a.extensions`.
 </Step>
 
 <Step title="Inject the extension">
@@ -185,4 +185,4 @@ yield trajectory.trajectory_metadata(
 
 ## Example: Advanced Usage
 
-For a more advanced example, see [trajectory_agent.py](https://github.com/i-am-bee/agentstack/blob/main/apps/agentstack-sdk-py/examples/trajectory_agent.py).
+For a more advanced example, see [trajectory_agent.py](https://github.com/kagenti/adk/blob/main/apps/adk-py/examples/trajectory_agent.py).

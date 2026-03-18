@@ -5,8 +5,8 @@ import os
 from typing import Annotated
 
 import pydantic
-from agentstack_sdk.a2a.extensions import OAuthExtensionServer, OAuthExtensionSpec
-from agentstack_sdk.server import Server
+from kagenti_adk.a2a.extensions import OAuthExtensionServer, OAuthExtensionSpec
+from kagenti_adk.server import Server
 from mcp import ClientSession
 from mcp.client.streamable_http import streamablehttp_client
 

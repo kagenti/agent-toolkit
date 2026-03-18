@@ -13,8 +13,8 @@ import httpx
 import pytest
 from a2a.client import Client, ClientConfig, ClientEvent, ClientFactory
 from a2a.types import AgentCard, Task
-from agentstack_sdk.platform import ModelProvider, SystemConfiguration, use_platform_client
-from agentstack_sdk.platform.context import ContextToken
+from kagenti_adk.platform import ModelProvider, SystemConfiguration, use_platform_client
+from kagenti_adk.platform.context import ContextToken
 from keycloak import KeycloakAdmin
 
 logger = logging.getLogger(__name__)

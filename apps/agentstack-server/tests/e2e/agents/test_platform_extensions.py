@@ -10,16 +10,16 @@ from uuid import uuid4
 import pytest
 from a2a.client import Client, create_text_message_object
 from a2a.types import SendMessageRequest, Message, Role, TaskState
-from agentstack_sdk.a2a.extensions.services.platform import (
+from kagenti_adk.a2a.extensions.services.platform import (
     PlatformApiExtensionClient,
     PlatformApiExtensionServer,
     PlatformApiExtensionSpec,
 )
-from agentstack_sdk.a2a.types import RunYield
-from agentstack_sdk.platform import File, Provider
-from agentstack_sdk.platform.context import Context, ContextPermissions, ContextToken, Permissions
-from agentstack_sdk.server import Server
-from agentstack_sdk.util.file import load_file
+from kagenti_adk.a2a.types import RunYield
+from kagenti_adk.platform import File, Provider
+from kagenti_adk.platform.context import Context, ContextPermissions, ContextToken, Permissions
+from kagenti_adk.server import Server
+from kagenti_adk.util.file import load_file
 from tenacity import AsyncRetrying, stop_after_delay, wait_fixed
 
 pytestmark = pytest.mark.e2e

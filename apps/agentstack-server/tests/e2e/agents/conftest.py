@@ -11,10 +11,10 @@ from typing import Any
 import pytest
 from a2a.client import Client
 from a2a.types import AgentCard
-from agentstack_sdk.platform import PlatformClient, Provider
-from agentstack_sdk.platform.context import ContextToken
-from agentstack_sdk.server import Server
-from agentstack_sdk.server.store.context_store import ContextStore
+from kagenti_adk.platform import PlatformClient, Provider
+from kagenti_adk.platform.context import ContextToken
+from kagenti_adk.server import Server
+from kagenti_adk.server.store.context_store import ContextStore
 from tenacity import AsyncRetrying, stop_after_attempt, wait_fixed
 
 from tests.conftest import Configuration

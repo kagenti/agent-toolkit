@@ -1,0 +1,340 @@
+# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# SPDX-License-Identifier: Apache-2.0
+
+from __future__ import annotations
+
+import asyncio
+import functools
+import os
+import re
+import urllib.parse
+from collections.abc import AsyncGenerator, Awaitable, Callable
+from configparser import RawConfigParser
+from contextlib import asynccontextmanager, nullcontext, suppress
+from datetime import timedelta
+from ssl import CERT_NONE
+from typing import IO, Any, Literal
+
+import uvicorn
+import uvicorn.config as uvicorn_config
+from a2a.server.agent_execution import RequestContextBuilder
+from a2a.server.events import QueueManager
+from a2a.server.tasks import PushNotificationConfigStore, PushNotificationSender, TaskStore
+from fastapi import FastAPI
+from fastapi.applications import AppType
+from fastapi.responses import PlainTextResponse
+from google.protobuf.json_format import MessageToDict
+from httpx import HTTPError, HTTPStatusError
+from starlette.authentication import AuthenticationError
+from starlette.middleware.authentication import AuthenticationMiddleware
+from starlette.requests import HTTPConnection
+from starlette.types import Lifespan
+from tenacity import AsyncRetrying, retry_if_exception_type, stop_after_attempt, wait_exponential
+
+from kagenti_adk.platform import get_platform_client
+from kagenti_adk.platform.client import PlatformClient
+from kagenti_adk.platform.provider import Provider
+from kagenti_adk.server.agent import Agent
+from kagenti_adk.server.agent import agent as agent_decorator
+from kagenti_adk.server.constants import DEFAULT_IMPLICIT_EXTENSIONS
+from kagenti_adk.server.store.context_store import ContextStore
+from kagenti_adk.server.telemetry import configure_telemetry as configure_telemetry_func
+from kagenti_adk.server.utils import cancel_task
+from kagenti_adk.types import SdkAuthenticationBackend
+from kagenti_adk.util.logging import configure_logger as configure_logger_func
+from kagenti_adk.util.logging import logger
+
+
+class Server:
+    def __init__(self) -> None:
+        self._agent: Agent | None = None
+        self.server: uvicorn.Server | None = None
+        self._context_store: ContextStore | None = None
+        self._self_registration_client: PlatformClient | None = None
+        self._self_registration_id: str | None = None
+        self._provider_id: str | None = None
+
+    @functools.wraps(agent_decorator)
+    def agent(self, *args, **kwargs) -> Callable:
+        if self._agent:
+            raise ValueError("Server can have only one agent.")
+
+        def decorator(fn: Callable) -> Callable:
+            self._agent = agent_decorator(*args, **kwargs)(fn)
+            return fn
+
+        return decorator
+
+    async def serve(
+        self,
+        *,
+        configure_logger: bool = True,
+        configure_telemetry: bool = False,
+        self_registration: bool = True,
+        self_registration_id: str | None = None,
+        task_store: TaskStore | None = None,
+        context_store: ContextStore | None = None,
+        queue_manager: QueueManager | None = None,
+        task_timeout: timedelta = timedelta(minutes=10),
+        push_config_store: PushNotificationConfigStore | None = None,
+        push_sender: PushNotificationSender | None = None,
+        request_context_builder: RequestContextBuilder | None = None,
+        host: str = "127.0.0.1",
+        port: int = 10000,
+        url: str | None = None,
+        uds: str | None = None,
+        fd: int | None = None,
+        loop: Literal["none", "auto", "asyncio", "uvloop"] = "auto",
+        http: type[asyncio.Protocol] | uvicorn_config.HTTPProtocolType = "auto",
+        ws: type[asyncio.Protocol] | uvicorn_config.WSProtocolType = "auto",
+        ws_max_size: int = 16 * 1024 * 1024,
+        ws_max_queue: int = 32,
+        ws_ping_interval: float | None = 20.0,
+        ws_ping_timeout: float | None = 20.0,
+        ws_per_message_deflate: bool = True,
+        lifespan: uvicorn_config.LifespanType = "auto",
+        lifespan_fn: Lifespan[AppType] | None = None,
+        env_file: str | os.PathLike[str] | None = None,
+        log_config: dict[str, Any] | str | RawConfigParser | IO[Any] | None = uvicorn_config.LOGGING_CONFIG,
+        log_level: str | int | None = None,
+        access_log: bool = True,
+        use_colors: bool | None = None,
+        interface: uvicorn_config.InterfaceType = "auto",
+        reload: bool = False,
+        reload_dirs: list[str] | str | None = None,
+        reload_delay: float = 0.25,
+        reload_includes: list[str] | str | None = None,
+        reload_excludes: list[str] | str | None = None,
+        workers: int | None = None,
+        proxy_headers: bool = True,
+        server_header: bool = True,
+        date_header: bool = True,
+        forwarded_allow_ips: list[str] | str | None = None,
+        root_path: str = "",
+        limit_concurrency: int | None = None,
+        limit_max_requests: int | None = None,
+        backlog: int = 2048,
+        timeout_keep_alive: int = 5,
+        timeout_notify: int = 30,
+        timeout_worker_healthcheck: int = 5,
+        timeout_graceful_shutdown: int | None = None,
+        callback_notify: Callable[..., Awaitable[None]] | None = None,
+        ssl_keyfile: str | os.PathLike[str] | None = None,
+        ssl_certfile: str | os.PathLike[str] | None = None,
+        ssl_keyfile_password: str | None = None,
+        ssl_version: int = uvicorn_config.SSL_PROTOCOL_VERSION,
+        ssl_cert_reqs: int = CERT_NONE,
+        ssl_ca_certs: str | None = None,
+        ssl_ciphers: str = "TLSv1",
+        headers: list[tuple[str, str]] | None = None,
+        factory: bool = False,
+        h11_max_incomplete_event_size: int | None = None,
+        self_registration_client_factory: Callable[[], PlatformClient] | None = None,
+        auth_backend: SdkAuthenticationBackend | None = None,
+    ) -> None:
+        if self.server:
+            raise RuntimeError("The server is already running")
+        if not self._agent:
+            raise ValueError("Agent is not registered")
+
+        implicit_extensions = DEFAULT_IMPLICIT_EXTENSIONS.copy()
+
+        self_registration = False if self._production_mode else self_registration
+        if self_registration:
+            from kagenti_adk.a2a.extensions.services.platform import _PlatformSelfRegistrationExtensionServer
+
+            if self_registration_client_factory:
+                self._self_registration_client = self_registration_client_factory()
+            else:
+                # Use basic auth (admin:admin) for local dev self-registration
+                self._self_registration_client = PlatformClient(
+                    base_url=self._platform_url,
+                    auth=(
+                        os.getenv("PLATFORM_USERNAME", "admin"),
+                        os.getenv("PLATFORM_PASSWORD", "admin"),
+                    ),
+                )
+            self._self_registration_id = urllib.parse.quote(self_registration_id or self._agent.initial_card.name)
+            from kagenti_adk.a2a.extensions.services.platform import (
+                _PlatformSelfRegistrationExtensionParams,
+                _PlatformSelfRegistrationExtensionSpec,
+            )
+
+            implicit_extensions[_PlatformSelfRegistrationExtensionSpec.URI] = _PlatformSelfRegistrationExtensionServer(
+                _PlatformSelfRegistrationExtensionSpec(
+                    _PlatformSelfRegistrationExtensionParams(self_registration_id=self._self_registration_id)
+                )
+            )
+
+        if headers is None:
+            headers = [("server", "a2a")]
+        elif not any(k.lower() == "server" for k, _ in headers):
+            headers.append(("server", "a2a"))
+
+        import uvicorn
+
+        from kagenti_adk.server.app import create_app
+
+        @asynccontextmanager
+        async def _lifespan_fn(app: FastAPI) -> AsyncGenerator[None, None]:
+            async with self._self_registration_client or nullcontext():
+                register_task = asyncio.create_task(self._register_agent()) if self_registration else None
+
+                try:
+                    # pyrefly: ignore [bad-argument-type] -- probably bug in Pyrefly
+                    async with lifespan_fn(app) if lifespan_fn else nullcontext():
+                        yield
+                finally:
+                    if register_task:
+                        with suppress(Exception):
+                            await cancel_task(register_task)
+
+        app = create_app(
+            self._agent,
+            url=url.strip().rstrip("/") if url else f"http://{host}:{port}",
+            lifespan=_lifespan_fn,
+            implicit_extensions=implicit_extensions,
+            task_store=task_store,
+            context_store=context_store,
+            queue_manager=queue_manager,
+            push_config_store=push_config_store,
+            push_sender=push_sender,
+            task_timeout=task_timeout,
+            request_context_builder=request_context_builder,
+            auth_backend=auth_backend,
+        )
+
+        if auth_backend:
+
+            def on_error(connection: HTTPConnection, error: AuthenticationError) -> PlainTextResponse:
+                return PlainTextResponse("Unauthorized", status_code=401)
+
+            app.add_middleware(AuthenticationMiddleware, backend=auth_backend, on_error=on_error)
+
+        if configure_logger:
+            configure_logger_func(log_level)
+
+        if configure_telemetry:
+            configure_telemetry_func(app)
+
+        config = uvicorn.Config(
+            app=app,
+            host=host,
+            port=port,
+            uds=uds,
+            fd=fd,
+            loop=loop,
+            http=http,
+            ws=ws,
+            ws_max_size=ws_max_size,
+            ws_max_queue=ws_max_queue,
+            ws_ping_interval=ws_ping_interval,
+            ws_ping_timeout=ws_ping_timeout,
+            ws_per_message_deflate=ws_per_message_deflate,
+            lifespan=lifespan,
+            env_file=env_file,
+            log_config=log_config if not configure_logger else None,
+            log_level=log_level,
+            access_log=access_log,
+            use_colors=use_colors,
+            interface=interface,
+            reload=reload,
+            reload_dirs=reload_dirs,
+            reload_delay=reload_delay,
+            reload_includes=reload_includes,
+            reload_excludes=reload_excludes,
+            workers=workers,
+            proxy_headers=proxy_headers,
+            server_header=server_header,
+            date_header=date_header,
+            forwarded_allow_ips=forwarded_allow_ips,
+            root_path=root_path,
+            limit_concurrency=limit_concurrency,
+            limit_max_requests=limit_max_requests,
+            backlog=backlog,
+            timeout_keep_alive=timeout_keep_alive,
+            timeout_notify=timeout_notify,
+            timeout_graceful_shutdown=timeout_graceful_shutdown,
+            timeout_worker_healthcheck=timeout_worker_healthcheck,
+            callback_notify=callback_notify,
+            ssl_keyfile=ssl_keyfile,
+            ssl_certfile=ssl_certfile,
+            ssl_keyfile_password=ssl_keyfile_password,
+            ssl_version=ssl_version,
+            ssl_cert_reqs=ssl_cert_reqs,
+            ssl_ca_certs=ssl_ca_certs,
+            ssl_ciphers=ssl_ciphers,
+            headers=headers,
+            factory=factory,
+            h11_max_incomplete_event_size=h11_max_incomplete_event_size,
+        )
+        self.server = uvicorn.Server(config)
+        await self.server.serve()
+
+    @functools.wraps(serve)
+    def run(*args, **kwargs) -> None:
+        self = args[0]  # TODO(typing): resolve without hiding `self`
+        asyncio.run(self.serve(**kwargs))
+
+    @property
+    def should_exit(self) -> bool:
+        return self.server.should_exit if self.server else False
+
+    @should_exit.setter
+    def should_exit(self, value: bool) -> None:
+        if self.server:
+            self.server.should_exit = value
+
+    @property
+    def _platform_url(self) -> str:
+        return os.getenv("PLATFORM_URL", "http://agentstack-api.localtest.me:8080")
+
+    @property
+    def _production_mode(self) -> bool:
+        return os.getenv("PRODUCTION_MODE", "").lower() in ["true", "1"]
+
+    async def _register_agent(self) -> None:
+        """If not in PRODUCTION mode, register agent to the agentstack platform and provide missing env variables"""
+        assert self.server and self._agent
+        if self._production_mode:
+            logger.debug("Agent is not automatically registered in the production mode.")
+            return
+
+        host = re.sub(r"localhost|127\.0\.0\.1", "host.docker.internal", self.server.config.host)
+        provider_location = f"http://{host}:{self.server.config.port}#{self._self_registration_id}"
+        logger.info("Attempting to register agent to the agentstack platform")
+        auto_register_fail_message = "Agent can not be automatically registered to agentstack platform, try manual registration using `agentstack add`."
+        try:
+            async for attempt in AsyncRetrying(
+                stop=stop_after_attempt(10),
+                wait=wait_exponential(max=10),
+                retry=retry_if_exception_type(HTTPError),
+                reraise=True,
+            ):
+                with attempt:
+                    try:
+                        provider = await Provider.get_by_location(
+                            location=provider_location, client=self._self_registration_client
+                        )
+                        await provider.patch(agent_card=self._agent.card, client=self._self_registration_client)
+                    except HTTPStatusError as error:
+                        if error.response.status_code != 404:
+                            raise
+                        provider = await Provider.create(
+                            location=provider_location,
+                            client=self._self_registration_client,
+                            agent_card=self._agent.card,
+                        )
+                    self._provider_id = provider.id
+                    logger.debug("Agent registered to the agentstack server.")
+            logger.info("Agent registered successfully")
+        except HTTPStatusError as e:
+            with suppress(Exception):
+                if error_message := e.response.json().get("detail"):
+                    logger.info(f"{auto_register_fail_message} Error: {error_message}")
+                else:
+                    logger.info(f"{auto_register_fail_message} Error: {e}")
+        except HTTPError as e:
+            logger.info(f"Can not reach server, check if running on {get_platform_client().base_url} : {e}")
+        except Exception as e:
+            logger.info(f"{auto_register_fail_message} Error: {e}")

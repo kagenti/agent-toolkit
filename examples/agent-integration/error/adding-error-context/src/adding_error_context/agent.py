@@ -5,12 +5,12 @@ import os
 from typing import Annotated, cast
 
 from a2a.types import Message
-from agentstack_sdk.a2a.extensions import (
+from kagenti_adk.a2a.extensions import (
     ErrorExtensionParams,
     ErrorExtensionServer,
     ErrorExtensionSpec,
 )
-from agentstack_sdk.server import Server
+from kagenti_adk.server import Server
 from pydantic import JsonValue
 
 server = Server()

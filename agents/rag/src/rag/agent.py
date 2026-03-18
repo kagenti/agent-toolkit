@@ -11,7 +11,7 @@ from collections import defaultdict
 from typing import Annotated
 
 from a2a.types import AgentSkill, Message
-from agentstack_sdk.a2a.extensions import (
+from kagenti_adk.a2a.extensions import (
     AgentDetail,
     CitationExtensionServer,
     CitationExtensionSpec,
@@ -24,11 +24,11 @@ from agentstack_sdk.a2a.extensions import (
     PlatformApiExtensionServer,
     PlatformApiExtensionSpec,
 )
-from agentstack_sdk.a2a.types import AgentArtifact, AgentMessage
-from agentstack_sdk.server import Server
-from agentstack_sdk.server.context import RunContext
-from agentstack_sdk.server.middleware.platform_auth_backend import PlatformAuthBackend
-from agentstack_sdk.server.store.platform_context_store import PlatformContextStore
+from kagenti_adk.a2a.types import AgentArtifact, AgentMessage
+from kagenti_adk.server import Server
+from kagenti_adk.server.context import RunContext
+from kagenti_adk.server.middleware.platform_auth_backend import PlatformAuthBackend
+from kagenti_adk.server.store.platform_context_store import PlatformContextStore
 from beeai_framework.adapters.agentstack.backend.chat import AgentStackChatModel
 from beeai_framework.agents.requirement import RequirementAgent
 from beeai_framework.agents.requirement.utils._tool import FinalAnswerTool

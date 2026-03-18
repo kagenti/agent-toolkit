@@ -7,15 +7,15 @@ from collections.abc import AsyncGenerator
 from typing import Annotated
 
 from a2a.types import FilePart, FileWithUri, Message, TextPart
-from agentstack_sdk.a2a.extensions import (
+from kagenti_adk.a2a.extensions import (
     EmbeddingServiceExtensionServer,
     EmbeddingServiceExtensionSpec,
     PlatformApiExtensionServer,
     PlatformApiExtensionSpec,
 )
-from agentstack_sdk.a2a.types import RunYield
-from agentstack_sdk.platform import File, PlatformFileUrl
-from agentstack_sdk.server import Server
+from kagenti_adk.a2a.types import RunYield
+from kagenti_adk.platform import File, PlatformFileUrl
+from kagenti_adk.server import Server
 
 from .embedding.client import get_embedding_client
 from .embedding.embed import embed_chunks

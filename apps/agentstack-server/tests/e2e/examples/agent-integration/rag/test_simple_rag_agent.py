@@ -8,15 +8,15 @@ from uuid import uuid4
 
 import pytest
 from a2a.types import SendMessageRequest, Message, Part, Role, TaskState
-from agentstack_sdk.a2a.extensions import (
+from kagenti_adk.a2a.extensions import (
     EmbeddingFulfillment,
     EmbeddingServiceExtensionClient,
     EmbeddingServiceExtensionSpec,
     PlatformApiExtensionClient,
     PlatformApiExtensionSpec,
 )
-from agentstack_sdk.platform import File, ModelCapability, ModelProvider
-from agentstack_sdk.platform.context import ContextPermissions, Permissions
+from kagenti_adk.platform import File, ModelCapability, ModelProvider
+from kagenti_adk.platform.context import ContextPermissions, Permissions
 
 from tests.e2e.examples.conftest import run_example
 

@@ -1,7 +1,7 @@
 # Copyright 2025 © BeeAI a Series of LF Projects, LLC
 # SPDX-License-Identifier: Apache-2.0
 
-from agentstack_sdk.platform import File, VectorStoreItem
+from kagenti_adk.platform import File, VectorStoreItem
 from openai import AsyncOpenAI
 
 

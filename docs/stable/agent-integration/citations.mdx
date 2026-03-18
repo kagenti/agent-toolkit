@@ -21,13 +21,13 @@ Each citation requires:
 
 ```python
 from typing import Annotated
-from agentstack_sdk.a2a.extensions import (
+from kagenti_adk.a2a.extensions import (
     Citation,
     CitationExtensionServer,
     CitationExtensionSpec,
 )
-from agentstack_sdk.server import Server
-from agentstack_sdk.server.context import RunContext
+from kagenti_adk.server import Server
+from kagenti_adk.server.context import RunContext
 from a2a.types import Message
 
 server = Server()
@@ -55,7 +55,7 @@ async def research_agent(
 
 <Steps>
 <Step title="Import the citation extension">
-Import `CitationExtensionServer` and `CitationExtensionSpec` from `agentstack_sdk.a2a.extensions`.
+Import `CitationExtensionServer` and `CitationExtensionSpec` from `kagenti_adk.a2a.extensions`.
 </Step>
 
 <Step title="Inject the extension">
@@ -95,4 +95,4 @@ citations = [
 
 ## Example: Advanced Usage
 
-For a more advanced example, see [citation_agent.py](https://github.com/i-am-bee/agentstack/blob/main/apps/agentstack-sdk-py/examples/citation_agent.py).
+For a more advanced example, see [citation_agent.py](https://github.com/kagenti/adk/blob/main/apps/adk-py/examples/citation_agent.py).

@@ -37,7 +37,7 @@ Service extensions are optional by definition, so you should always check if the
 Import the `LLMServiceExtensionServer` and `LLMServiceExtensionSpec` from the SDK. You will use these within a type hint to let the platform know your agent requires LLM access.
 
 ```python
-from agentstack_sdk.a2a.extensions import LLMServiceExtensionServer, LLMServiceExtensionSpec
+from kagenti_adk.a2a.extensions import LLMServiceExtensionServer, LLMServiceExtensionSpec
 from a2a.types import Message
 from typing import Annotated
 
@@ -55,7 +55,7 @@ async def my_agent(
 Use `LLMServiceExtensionSpec.single_demand()` to request a model. By passing a suggested tuple, you tell the platform which model you'd prefer to use.
 
 ```python
-from agentstack_sdk.a2a.extensions import LLMServiceExtensionServer, LLMServiceExtensionSpec
+from kagenti_adk.a2a.extensions import LLMServiceExtensionServer, LLMServiceExtensionSpec
 from a2a.types import Message
 from typing import Annotated
 
@@ -87,7 +87,7 @@ Once the platform provides the extension, you can extract the OpenAI-compatible 
 from typing import Annotated
 from a2a.utils.message import get_message_text
 from a2a.types import Message
-from agentstack_sdk.a2a.extensions import LLMServiceExtensionServer, LLMServiceExtensionSpec
+from kagenti_adk.a2a.extensions import LLMServiceExtensionServer, LLMServiceExtensionSpec
 
 async def my_agent(
     input: Message,
@@ -136,9 +136,9 @@ from typing import Annotated
 
 from a2a.types import Message
 from a2a.utils.message import get_message_text
-from agentstack_sdk.a2a.extensions import LLMServiceExtensionServer, LLMServiceExtensionSpec
-from agentstack_sdk.a2a.types import AgentMessage
-from agentstack_sdk.server import Server
+from kagenti_adk.a2a.extensions import LLMServiceExtensionServer, LLMServiceExtensionSpec
+from kagenti_adk.a2a.types import AgentMessage
+from kagenti_adk.server import Server
 
 server = Server()
 

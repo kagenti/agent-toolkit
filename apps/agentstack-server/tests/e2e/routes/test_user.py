@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 import pytest
-from agentstack_sdk.platform import User
+from kagenti_adk.platform import User
 
 pytestmark = pytest.mark.e2e
 

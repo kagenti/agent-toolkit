@@ -10,7 +10,7 @@ dependencies = [
     "beeai-framework[duckduckgo,wikipedia,a2a]>=0.1.76",
     "tiktoken>=0.12.0",  # constraint for beeai-framework dependency (first version with musl arm64 wheel)
     "fastuuid>=0.14.0",  # constraint for beeai-framework dependency (first version with musl arm64 wheel)
-    "agentstack-sdk",
+    "kagenti-adk",
     "openai>=1.107.1",
     "openinference-instrumentation-beeai>=0.1.14",
     "pydantic-settings>=2.9.0",
@@ -23,7 +23,7 @@ dependencies = [
 line-length = 120
 
 [tool.uv.sources]
-agentstack-sdk = { path = "../../apps/agentstack-sdk-py", editable = true }
+kagenti-adk = { path = "../../apps/adk-py", editable = true }
 
 [project.scripts]
 server = "rag.agent:serve"

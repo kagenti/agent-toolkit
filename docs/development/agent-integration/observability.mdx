@@ -59,10 +59,10 @@ For telemetry to flow successfully, it must be enabled at three levels:
 ## Agent SDK Configuration
 Before configuring an observability platform, your agent code must be "telemetry-aware." This configuration applies to all implementations, whether you are using local Phoenix or a cloud provider like Langfuse.
 
-You must initialize instrumentation at the agent logic level and enable the export flag in the Agent Stack SDK:
+You must initialize instrumentation at the agent logic level and enable the export flag in the Kagenti ADK:
 
 ```python
-from agentstack_sdk.server import Server
+from kagenti_adk.server import Server
 # 1. Agent Level: Import your specific instrumentor
 # from openinference.instrumentation.beeai import BeeAIInstrumentor
 

@@ -23,12 +23,12 @@ import os
 from typing import Annotated
 
 from a2a.types import Message
-from agentstack_sdk.a2a.extensions.common.form import FormRender, TextField
-from agentstack_sdk.a2a.extensions.services.form import (
+from kagenti_adk.a2a.extensions.common.form import FormRender, TextField
+from kagenti_adk.a2a.extensions.services.form import (
     FormServiceExtensionServer,
     FormServiceExtensionSpec,
 )
-from agentstack_sdk.server import Server
+from kagenti_adk.server import Server
 from pydantic import BaseModel
 
 server = Server()
@@ -74,7 +74,7 @@ if __name__ == "__main__":
 
 <Steps>
 <Step title="Import the form extension">
-Import `FormServiceExtensionServer`, `FormServiceExtensionSpec`, `FormRender`, and field types from the Agent Stack SDK.
+Import `FormServiceExtensionServer`, `FormServiceExtensionSpec`, `FormRender`, and field types from the Kagenti ADK.
 </Step>
 
 <Step title="Define your form data model">
@@ -100,9 +100,9 @@ from typing import Annotated
 from a2a.types import Message
 from a2a.utils.message import get_message_text
 from pydantic import BaseModel
-from agentstack_sdk.server import Server
-from agentstack_sdk.a2a.extensions.common.form import FormRender, TextField
-from agentstack_sdk.a2a.extensions.ui.form_request import (
+from kagenti_adk.server import Server
+from kagenti_adk.a2a.extensions.common.form import FormRender, TextField
+from kagenti_adk.a2a.extensions.ui.form_request import (
     FormRequestExtensionServer,
     FormRequestExtensionSpec,
 )
@@ -158,7 +158,7 @@ if __name__ == "__main__":
 
 <Steps>
 <Step title="Import the request form extension">
-Import `FormRequestExtensionServer`, `FormRequestExtensionSpec`, `FormRender`, and field types from the Agent Stack SDK.
+Import `FormRequestExtensionServer`, `FormRequestExtensionSpec`, `FormRender`, and field types from the Kagenti ADK.
 </Step>
 
 <Step title="Define your form data model">
@@ -179,9 +179,9 @@ Call `await form_request.request_form(form=FormRender(...), model=YourModel)` wh
 Here's what you need to know to add form capabilities to your agent:
 
 **Import the form components**: 
-- For form fields and `FormRender`, import from `agentstack_sdk.a2a.extensions.common.form`
-- For initial forms, import `FormServiceExtensionServer` and `FormServiceExtensionSpec` from `agentstack_sdk.a2a.extensions.services.form`
-- For dynamic forms, import `FormRequestExtensionServer` and `FormRequestExtensionSpec` from `agentstack_sdk.a2a.extensions.ui.form_request`
+- For form fields and `FormRender`, import from `kagenti_adk.a2a.extensions.common.form`
+- For initial forms, import `FormServiceExtensionServer` and `FormServiceExtensionSpec` from `kagenti_adk.a2a.extensions.services.form`
+- For dynamic forms, import `FormRequestExtensionServer` and `FormRequestExtensionSpec` from `kagenti_adk.a2a.extensions.ui.form_request`
 
 **Inject the extension**: Add a form parameter to your agent function using the `Annotated` type hint.
 
@@ -232,7 +232,7 @@ The Agent Stack supports various field types for collecting different kinds of s
 Basic text input fields for collecting strings, names, descriptions, etc.
 
 ```python
-from agentstack_sdk.a2a.extensions.common.form import TextField
+from kagenti_adk.a2a.extensions.common.form import TextField
 
 TextField(
     id="username", 
@@ -249,7 +249,7 @@ TextField(
 Date input fields for collecting dates and timestamps.
 
 ```python
-from agentstack_sdk.a2a.extensions.common.form import DateField
+from kagenti_adk.a2a.extensions.common.form import DateField
 
 DateField(
     id="birth_date", 
@@ -265,7 +265,7 @@ DateField(
 File upload fields for collecting files from users.
 
 ```python
-from agentstack_sdk.a2a.extensions.common.form import FileField
+from kagenti_adk.a2a.extensions.common.form import FileField
 
 FileField(
     id="document", 
@@ -280,7 +280,7 @@ FileField(
 Single-select dropdown fields for choosing single option from a list.
 
 ```python
-from agentstack_sdk.a2a.extensions.common.form import OptionItem, SingleSelectField
+from kagenti_adk.a2a.extensions.common.form import OptionItem, SingleSelectField
 
 SingleSelectField(
     id="contact_method", 
@@ -301,7 +301,7 @@ SingleSelectField(
 Multi-select dropdown fields for choosing multiple options from a list.
 
 ```python
-from agentstack_sdk.a2a.extensions.common.form import OptionItem, MultiSelectField
+from kagenti_adk.a2a.extensions.common.form import OptionItem, MultiSelectField
 
 MultiSelectField(
     id="interests", 
@@ -322,7 +322,7 @@ MultiSelectField(
 Single checkbox fields for boolean values.
 
 ```python
-from agentstack_sdk.a2a.extensions.common.form import CheckboxField
+from kagenti_adk.a2a.extensions.common.form import CheckboxField
 
 CheckboxField(
     id="newsletter", 
@@ -339,7 +339,7 @@ CheckboxField(
 Control how your form appears using the `FormRender` configuration:
 
 ```python
-from agentstack_sdk.a2a.extensions.common.form import FormRender
+from kagenti_adk.a2a.extensions.common.form import FormRender
 
 FormRender(
     title="Form Title",
@@ -370,5 +370,5 @@ Use `col_span` on individual fields to control how they span across the grid. Fo
 
 For more examples, see:
 
-- [form_agent.py](https://github.com/i-am-bee/agentstack/blob/main/apps/agentstack-sdk-py/examples/form_agent.py)
-- [form_request_agent.py](https://github.com/i-am-bee/agentstack/blob/main/apps/agentstack-sdk-py/examples/form_request_agent.py)
+- [form_agent.py](https://github.com/kagenti/adk/blob/main/apps/adk-py/examples/form_agent.py)
+- [form_request_agent.py](https://github.com/kagenti/adk/blob/main/apps/adk-py/examples/form_request_agent.py)

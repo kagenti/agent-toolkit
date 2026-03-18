@@ -7,7 +7,7 @@ import os
 from typing import Annotated
 
 from a2a.types import Artifact, Message, TextPart
-from agentstack_sdk.a2a.extensions import (
+from kagenti_adk.a2a.extensions import (
     AgentDetail,
     AgentDetailContributor,
     CanvasExtensionServer,
@@ -15,10 +15,10 @@ from agentstack_sdk.a2a.extensions import (
     LLMServiceExtensionServer,
     LLMServiceExtensionSpec,
 )
-from agentstack_sdk.a2a.types import AgentArtifact
-from agentstack_sdk.server import Server
-from agentstack_sdk.server.context import RunContext
-from agentstack_sdk.server.middleware.platform_auth_backend import PlatformAuthBackend
+from kagenti_adk.a2a.types import AgentArtifact
+from kagenti_adk.server import Server
+from kagenti_adk.server.context import RunContext
+from kagenti_adk.server.middleware.platform_auth_backend import PlatformAuthBackend
 from openai import AsyncOpenAI
 from openai.types.chat import ChatCompletionMessageParam
 

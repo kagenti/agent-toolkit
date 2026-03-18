@@ -213,7 +213,7 @@ Final draft:
 The client provides a unified API that works identically whether the server supports streaming or not. This is the key design goal — consumer code doesn't branch on streaming support.
 
 ```python
-from agentstack_sdk.a2a.extensions.streaming import (
+from kagenti_adk.a2a.extensions.streaming import (
     StreamingExtensionClient, StreamingExtensionSpec,
     TextDelta, PartDelta, MetadataDelta, ArtifactDelta, StateChange,
 )

@@ -2,7 +2,7 @@
 
 ["agentstack-cli:setup"]
 extends = "python:setup"
-depends = ["agentstack-sdk-py:setup"]
+depends = ["adk-py:setup"]
 dir = "{{config_root}}/apps/agentstack-cli"
 
 # check
@@ -75,7 +75,7 @@ outputs = ["./src/agentstack_cli/data/helm-chart.tgz"]
 depends = [
   "agentstack-cli:setup",
   "agentstack-cli:build:*",
-  "agentstack-sdk-py:build",
+  "adk-py:build",
 ]
 dir = "{{config_root}}/apps/agentstack-cli"
 sources = ["src/**/*", "hatch_build.py", "pyproject.toml", "vendor/lima/**/*"]
@@ -113,7 +113,7 @@ uv run -m wheel pack "$tmpdir" --dest-dir ./dist >/dev/null
 rm -rf "$tmpdir"
 
 # Verify that the wheel works
-if ! uv tool run --isolated --from "$universal_wheel" --with ../agentstack-sdk-py/dist/agentstack_sdk-*-py3-none-any.whl -- agentstack version; then
+if ! uv tool run --isolated --from "$universal_wheel" --with ../adk-py/dist/kagenti_adk-*-py3-none-any.whl -- agentstack version; then
   echo "Failed to install $universal_wheel"
   exit 1
 fi

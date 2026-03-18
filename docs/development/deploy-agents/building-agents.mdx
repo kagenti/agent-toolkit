@@ -73,9 +73,9 @@ import os
 
 from a2a.types import Message
 from a2a.utils.message import get_message_text
-from agentstack_sdk.a2a.types import AgentMessage
-from agentstack_sdk.server import Server
-from agentstack_sdk.server.context import RunContext
+from kagenti_adk.a2a.types import AgentMessage
+from kagenti_adk.server import Server
+from kagenti_adk.server.context import RunContext
 
 server = Server()
 
@@ -129,7 +129,7 @@ Agents should be async and use `yield`. This allows the server to stream respons
 
 If you prefer not to use our starter template, you must ensure your project includes these core components to integrate correctly with the Agent Stack platform.
 - The SDK Inegration
-    - Add agentstack-sdk to your project dependencies.
+    - Add kagenti-adk to your project dependencies.
     - Your code must initialize a Server() instance from the SDK.
     - You need a designated function that calls server.run(host, port). This is what allows the platform (and Docker) to start your agent.
 - Agent logic remains the same as in the [Implement Your Agent Logic](#2-implement-your-agent-logic) section

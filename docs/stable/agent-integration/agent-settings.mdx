@@ -20,7 +20,7 @@ from typing import Annotated
 
 from a2a.types import Message
 
-from agentstack_sdk.a2a.extensions.ui.settings import (
+from kagenti_adk.a2a.extensions.ui.settings import (
     CheckboxField,
     CheckboxGroupField,
     CheckboxGroupFieldValue,
@@ -28,9 +28,9 @@ from agentstack_sdk.a2a.extensions.ui.settings import (
     SettingsExtensionSpec,
     SettingsRender,
 )
-from agentstack_sdk.a2a.types import RunYield
-from agentstack_sdk.server import Server
-from agentstack_sdk.server.context import RunContext
+from kagenti_adk.a2a.types import RunYield
+from kagenti_adk.server import Server
+from kagenti_adk.server.context import RunContext
 
 server = Server()
 
@@ -82,7 +82,7 @@ if __name__ == "__main__":
 
 <Steps>
 <Step title="Import the Settings extension">
-Import `SettingsExtensionServer`, `SettingsExtensionSpec`, `SettingsRender`, and field types from `agentstack_sdk.a2a.extensions.ui.settings`.
+Import `SettingsExtensionServer`, `SettingsExtensionSpec`, `SettingsRender`, and field types from `kagenti_adk.a2a.extensions.ui.settings`.
 </Step>
 <Step title="Inject the extension">
 Add a settings parameter to your agent function using the `Annotated` type hint with `SettingsExtensionServer` and `SettingsExtensionSpec`.
@@ -107,7 +107,7 @@ Agent Stack supports various field types for collecting different kinds of confi
 Single checkbox fields for boolean configuration options:
 
 ```python
-from agentstack_sdk.a2a.extensions.ui.settings import CheckboxField
+from kagenti_adk.a2a.extensions.ui.settings import CheckboxField
 
 CheckboxField(
     id="debug_mode", 
@@ -120,7 +120,7 @@ CheckboxField(
 Groups multiple checkboxes together for related boolean options:
 
 ```python
-from agentstack_sdk.a2a.extensions.ui.settings import CheckboxField, CheckboxGroupField
+from kagenti_adk.a2a.extensions.ui.settings import CheckboxField, CheckboxGroupField
 
 CheckboxGroupField(
     id="features",
@@ -143,7 +143,7 @@ CheckboxGroupField(
 Dropdown fields for choosing an option from a list:
 
 ```python
-from agentstack_sdk.a2a.extensions.ui.settings import OptionItem, SingleSelectField
+from kagenti_adk.a2a.extensions.ui.settings import OptionItem, SingleSelectField
 
 SingleSelectField(
     id="response_style",

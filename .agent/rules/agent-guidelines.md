@@ -28,7 +28,7 @@ The platform consists of multiple K8s microservices:
 - JavaScript frontend communicating with `agentstack-server`.
 - **Development**: Runs locally on `localhost:3000` or inside the cluster.
 
-### AgentStack SDK (`agentstack-sdk-py`)
+### Kagenti ADK (`adk-py`)
 - Python library for agents to interact with the server API.
 
 ### Infrastructure & Observability
@@ -58,9 +58,9 @@ The "dev mode" stack is complex, utilizing **Lima** (VM), **Kubernetes**, and **
   - Do not try to run the full suite; it takes too long.
 - **Unit/Dependency Checks**: You can use `uv run pytest` to check imports or specific logic that doesn't require the full stack.
 
-### agentstack-sdk-py
+### adk-py
 - **Independence**: Tests are completely independent of the dev stack/infrastructure.
-- **Execution**: Run freely using `uv run pytest` from the `apps/agentstack-sdk-py` directory.
+- **Execution**: Run freely using `uv run pytest` from the `apps/adk-py` directory.
 
 ## 5. Database Migrations
 - **Stack**: SQLAlchemy Core + Alembic.

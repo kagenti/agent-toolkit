@@ -6,7 +6,7 @@ from __future__ import annotations
 import pytest
 from a2a.client.helpers import create_text_message_object
 from a2a.types import SendMessageRequest, TaskState
-from agentstack_sdk.a2a.extensions import CanvasExtensionSpec
+from kagenti_adk.a2a.extensions import CanvasExtensionSpec
 
 from tests.e2e.examples.conftest import run_example
 

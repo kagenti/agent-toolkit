@@ -24,7 +24,7 @@ from a2a.types import (
     Role,
     TaskState,
 )
-from agentstack_sdk.a2a.extensions import (
+from kagenti_adk.a2a.extensions import (
     EmbeddingFulfillment,
     EmbeddingServiceExtensionClient,
     EmbeddingServiceExtensionSpec,
@@ -38,7 +38,7 @@ from agentstack_sdk.a2a.extensions import (
     TrajectoryExtensionClient,
     TrajectoryExtensionSpec,
 )
-from agentstack_sdk.a2a.extensions.common.form import (
+from kagenti_adk.a2a.extensions.common.form import (
     CheckboxField,
     CheckboxFieldValue,
     CheckboxGroupField,
@@ -60,30 +60,30 @@ from agentstack_sdk.a2a.extensions.common.form import (
 )
 
 # Legacy settings extension (deprecated - use FormServiceExtensionSpec.demand_settings instead)
-from agentstack_sdk.a2a.extensions.ui.settings import (
+from kagenti_adk.a2a.extensions.ui.settings import (
     AgentRunSettings,
     SettingsExtensionSpec,
     SettingsFieldValue,
     SettingsRender,
 )
-from agentstack_sdk.a2a.extensions.ui.settings import (
+from kagenti_adk.a2a.extensions.ui.settings import (
     CheckboxFieldValue as SettingsCheckboxFieldValue,
 )
-from agentstack_sdk.a2a.extensions.ui.settings import (
+from kagenti_adk.a2a.extensions.ui.settings import (
     CheckboxGroupField as SettingsCheckboxGroupField,
 )
-from agentstack_sdk.a2a.extensions.ui.settings import (
+from kagenti_adk.a2a.extensions.ui.settings import (
     CheckboxGroupFieldValue as SettingsCheckboxGroupFieldValue,
 )
-from agentstack_sdk.a2a.extensions.ui.settings import (
+from kagenti_adk.a2a.extensions.ui.settings import (
     SingleSelectField as SettingsSingleSelectField,
 )
-from agentstack_sdk.a2a.extensions.ui.settings import (
+from kagenti_adk.a2a.extensions.ui.settings import (
     SingleSelectFieldValue as SettingsSingleSelectFieldValue,
 )
-from agentstack_sdk.platform import File, ModelProvider, Provider, UserFeedback
-from agentstack_sdk.platform.context import Context, ContextPermissions, ContextToken, Permissions
-from agentstack_sdk.platform.model_provider import ModelCapability
+from kagenti_adk.platform import File, ModelProvider, Provider, UserFeedback
+from kagenti_adk.platform.context import Context, ContextPermissions, ContextToken, Permissions
+from kagenti_adk.platform.model_provider import ModelCapability
 from google.protobuf.json_format import MessageToDict
 from InquirerPy import inquirer
 from InquirerPy.base.control import Choice

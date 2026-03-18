@@ -25,9 +25,9 @@ Here we show server creation and agent registration:
 
 ```python
 from a2a.types import Message
-from agentstack_sdk.server import Server
-from agentstack_sdk.server.context import RunContext
-from agentstack_sdk.a2a.types import AgentMessage
+from kagenti_adk.server import Server
+from kagenti_adk.server.context import RunContext
+from kagenti_adk.a2a.types import AgentMessage
 
 server = Server()
 
@@ -49,14 +49,14 @@ Here's an example that incorporates multiple Server SDK capabilities:
 from typing import Annotated
 
 from a2a.types import Message
-from agentstack_sdk.a2a.extensions.common.form import FormRender, TextField
-from agentstack_sdk.a2a.extensions.ui.form_request import (
+from kagenti_adk.a2a.extensions.common.form import FormRender, TextField
+from kagenti_adk.a2a.extensions.ui.form_request import (
     FormRequestExtensionServer,
     FormRequestExtensionSpec,
 )
-from agentstack_sdk.a2a.types import AgentMessage
-from agentstack_sdk.server import Server
-from agentstack_sdk.server.context import RunContext
+from kagenti_adk.a2a.types import AgentMessage
+from kagenti_adk.server import Server
+from kagenti_adk.server.context import RunContext
 
 server = Server()
 
@@ -137,13 +137,13 @@ Service extensions use a dependency injection pattern where each run of the agen
 ```python
 from typing import Annotated
 from a2a.types import Message
-from agentstack_sdk.a2a.extensions import (
+from kagenti_adk.a2a.extensions import (
     LLMServiceExtensionServer,
     LLMServiceExtensionSpec,
 )
-from agentstack_sdk.a2a.types import AgentMessage
-from agentstack_sdk.server import Server
-from agentstack_sdk.server.context import RunContext
+from kagenti_adk.a2a.types import AgentMessage
+from kagenti_adk.server import Server
+from kagenti_adk.server.context import RunContext
 
 server = Server()
 

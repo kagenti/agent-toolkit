@@ -5,12 +5,12 @@ import os
 from typing import Annotated
 
 from a2a.types import Message, TextPart
-from agentstack_sdk.a2a.extensions import LLMServiceExtensionServer, LLMServiceExtensionSpec
-from agentstack_sdk.a2a.extensions.ui import CanvasEditRequest
-from agentstack_sdk.a2a.extensions import CanvasExtensionServer, CanvasExtensionSpec
-from agentstack_sdk.a2a.types import AgentArtifact
-from agentstack_sdk.server import Server
-from agentstack_sdk.server.context import RunContext
+from kagenti_adk.a2a.extensions import LLMServiceExtensionServer, LLMServiceExtensionSpec
+from kagenti_adk.a2a.extensions.ui import CanvasEditRequest
+from kagenti_adk.a2a.extensions import CanvasExtensionServer, CanvasExtensionSpec
+from kagenti_adk.a2a.types import AgentArtifact
+from kagenti_adk.server import Server
+from kagenti_adk.server.context import RunContext
 
 server = Server()
 
