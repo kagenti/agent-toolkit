@@ -11,6 +11,11 @@ run = '''
 #!/bin/bash
 set -euxo pipefail
 
+if [ "${AGENTSTACK__RUNNING_INSIDE_VM-}" = true ]; then
+  echo "Running inside VM, image not needed."
+  exit 0
+fi
+
 ARCH=${usage_arch:-$(uname -m | sed -e 's/arm64/aarch64/;s/amd64/x86_64/')}
 DIST_DIR="./dist/$ARCH"
 

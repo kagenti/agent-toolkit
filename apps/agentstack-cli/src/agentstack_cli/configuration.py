@@ -41,6 +41,8 @@ class Configuration(pydantic_settings.BaseSettings):
 
     kagenti_url: str = "http://kagenti-api.localtest.me:8080"
 
+    running_inside_vm: bool = False
+
     oidc_enabled: bool = False
     client_id: str | None = None
     client_secret: str | None = None

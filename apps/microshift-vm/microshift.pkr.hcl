@@ -38,6 +38,12 @@ variable "accelerator" {
   description = "QEMU accelerator (kvm on Linux, hvf on macOS)."
 }
 
+variable "ci" {
+  type        = string
+  default     = env("CI")
+  description = "Set to non-empty to enable CI minification in install.sh."
+}
+
 locals {
   qemu_binary     = var.arch == "x86_64" ? "qemu-system-x86_64" : "qemu-system-aarch64"
   image_url       = var.arch == "x86_64" ? "https://cdimage.debian.org/cdimage/cloud/trixie/latest/debian-13-genericcloud-amd64.qcow2" : "https://cdimage.debian.org/cdimage/cloud/trixie/latest/debian-13-genericcloud-arm64.qcow2"
@@ -101,7 +107,7 @@ build {
   }
 
   provisioner "shell" {
-    inline = ["bash /tmp/install.sh"]
+    environment_vars = ["CI=${var.ci}"]
+    inline           = ["bash /tmp/install.sh"]
   }
-
 }

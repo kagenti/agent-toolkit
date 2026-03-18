@@ -102,6 +102,8 @@ class LimaVMStatus(TypedDict):
 
 
 async def detect_vm_status(vm_name: str) -> typing.Literal["running", "stopped", "missing"]:
+    if Configuration().running_inside_vm:
+        return "running"
     if detect_driver() == "lima":
         result = await run_command(
             [detect_limactl(), "--tty=false", "list", "--format=json"],
@@ -138,11 +140,20 @@ async def run_in_vm(
     input: bytes | None = None,
     check: bool = True,
 ) -> CompletedProcess[bytes]:
+    vm_env = {"KUBECONFIG": "/var/lib/microshift/resources/kubeadmin/kubeconfig", **(env or {})}
+    if Configuration().running_inside_vm:
+        return await run_command(
+            ["sudo", "-E", *command],
+            message,
+            env=vm_env,
+            input=input,
+            check=check,
+        )
     if detect_driver() == "lima":
         return await run_command(
             [detect_limactl(), "shell", f"--tty={sys.stdin.isatty()}", vm_name, "--", "sudo", *command],
             message,
-            env={"LIMA_HOME": str(Configuration().lima_home)} | (env or {}),
+            env={"LIMA_HOME": str(Configuration().lima_home)} | vm_env,
             cwd="/",
             input=input,
             check=check,
@@ -150,7 +161,7 @@ async def run_in_vm(
     return await run_command(
         ["wsl.exe", "--user", "root", "--distribution", vm_name, "--", *command],
         message,
-        env={**(env or {}), "WSL_UTF8": "1", "WSLENV": "".join("{k}/u" for k in (env or {}).keys() | {"WSL_UTF8"})},
+        env={**vm_env, "WSL_UTF8": "1", "WSLENV": "".join("{k}/u" for k in vm_env.keys() | {"WSL_UTF8"})},
         input=input,
         check=check,
     )
@@ -288,226 +299,184 @@ async def start_cmd(
         version = importlib.metadata.version("agentstack-cli").replace("rc", "-rc")
         arch = "x86_64" if platform_module.machine().lower() in ["x86_64", "amd64"] else "aarch64"
         Configuration().home.mkdir(exist_ok=True)
-        match detect_driver():
-            case "lima":
-                lima_env = {"LIMA_HOME": str(Configuration().lima_home)}
-                match await detect_vm_status(vm_name):
-                    case "missing":
-                        for legacy in [vm_name, "beeai-platform"]:
-                            await run_command(
-                                [detect_limactl(), "--tty=false", "delete", "--force", legacy],
-                                f"Cleaning up remains of {'previous' if legacy == vm_name else 'legacy'} instance",
-                                env=lima_env,
-                                check=False,
-                                cwd="/",
+        if Configuration().running_inside_vm:
+            console.info("Running inside VM, skipping VM management.")
+        else:
+            match detect_driver():
+                case "lima":
+                    lima_env = {"LIMA_HOME": str(Configuration().lima_home)}
+                    match await detect_vm_status(vm_name):
+                        case "missing":
+                            for legacy in [vm_name, "beeai-platform"]:
+                                await run_command(
+                                    [detect_limactl(), "--tty=false", "delete", "--force", legacy],
+                                    f"Cleaning up remains of {'previous' if legacy == vm_name else 'legacy'} instance",
+                                    env=lima_env,
+                                    check=False,
+                                    cwd="/",
+                                )
+                            import psutil
+
+                            total_memory_gib = psutil.virtual_memory().total // (1024**3)
+                            if total_memory_gib < 4:
+                                console.error("Not enough memory. Agent Stack platform requires at least 4 GB of RAM.")
+                                sys.exit(1)
+                            if total_memory_gib < 8:
+                                console.warning("Less than 8 GB of RAM detected. Performance may be degraded.")
+
+                            current_lima_image = (
+                                lima_image
+                                or f"https://github.com/i-am-bee/agentstack/releases/download/v{version}/microshift-vm-{arch}.qcow2"
                             )
-                        import psutil
 
-                        total_memory_gib = psutil.virtual_memory().total // (1024**3)
-                        if total_memory_gib < 4:
-                            console.error("Not enough memory. Agent Stack platform requires at least 4 GB of RAM.")
-                            sys.exit(1)
-                        if total_memory_gib < 8:
-                            console.warning("Less than 8 GB of RAM detected. Performance may be degraded.")
 
-                        current_lima_image = (
-                            lima_image
-                            or f"https://github.com/i-am-bee/agentstack/releases/download/v{version}/microshift-vm-{arch}.qcow2"
+                            if current_lima_image.startswith("/") or current_lima_image.startswith("./"):
+                                current_lima_image = str(await anyio.Path(current_lima_image).absolute())
+
+                            with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete_on_close=False) as f:
+                                f.write(
+                                    yaml.dump(
+                                        {
+                                            "images": [
+                                                {
+                                                    "location": current_lima_image,
+                                                    "arch": arch,
+                                                },
+                                            ],
+                                            "portForwards": [
+                                                {
+                                                    "guestIP": "127.0.0.1",
+                                                    "guestPortRange": [1024, 65535],
+                                                    "hostPortRange": [1024, 65535],
+                                                    "hostIP": "127.0.0.1",
+                                                },
+                                                {"guestIP": "0.0.0.0", "proto": "any", "ignore": True},
+                                            ],
+                                            "mounts": [
+                                                {
+                                                    "location": "/tmp/agentstack",
+                                                    "mountPoint": "/tmp/agentstack",
+                                                    "writable": True,
+                                                }
+                                            ],
+                                            "mountTypesUnsupported": ["9p"],
+                                            "containerd": {"system": False, "user": False},
+                                            "hostResolver": {"hosts": {"host.docker.internal": "host.lima.internal"}},
+                                            "memory": f"{round(min(8.0, max(3.0, total_memory_gib / 2)))}GiB",
+                                        }
+                                    )
+                                )
+                                f.flush()
+                                f.close()
+                                await run_command(
+                                    [detect_limactl(), "--tty=false", "start", f.name, f"--name={vm_name}"],
+                                    "Creating a Lima VM",
+                                    env=lima_env,
+                                    cwd="/",
+                                )
+                        case "stopped":
+                            await run_command(
+                                [detect_limactl(), "--tty=false", "start", vm_name], "Starting up", env=lima_env, cwd="/"
+                            )
+                        case "running":
+                            console.info("Updating an existing instance.")
+                case "wsl":
+                    if (await run_command(["wsl.exe", "--status"], "Checking for WSL2", check=False)).returncode != 0:
+                        console.error(
+                            "WSL is not installed. Please follow the Agent Stack installation instructions: https://agentstack.beeai.dev/stable/introduction/quickstart#windows"
                         )
-
-
-                        if current_lima_image.startswith("/") or current_lima_image.startswith("./"):
-                            current_lima_image = str(await anyio.Path(current_lima_image).absolute())
-
-                        with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete_on_close=False) as f:
-                            f.write(
-                                yaml.dump(
-                                    {
-                                        "env": {"KUBECONFIG": "/kubeconfig"},
-                                        "images": [
-                                            {
-                                                "location": current_lima_image,
-                                                "arch": arch,
-                                            },
-                                        ],
-                                        "portForwards": [
-                                            {
-                                                "guestIP": "127.0.0.1",
-                                                "guestPortRange": [1024, 65535],
-                                                "hostPortRange": [1024, 65535],
-                                                "hostIP": "127.0.0.1",
-                                            },
-                                            {"guestIP": "0.0.0.0", "proto": "any", "ignore": True},
-                                        ],
-                                        "mounts": [
-                                            {
-                                                "location": "/tmp/agentstack",
-                                                "mountPoint": "/tmp/agentstack",
-                                                "writable": True,
-                                            }
-                                        ],
-                                        "mountTypesUnsupported": ["9p"],
-                                        "containerd": {"system": False, "user": False},
-                                        "hostResolver": {"hosts": {"host.docker.internal": "host.lima.internal"}},
-                                        "memory": f"{round(min(8.0, max(3.0, total_memory_gib / 2)))}GiB",
-                                    }
+                        console.hint(
+                            "Run [green]wsl.exe --install[/green] as administrator. If you just did this, restart your PC and run the same command again. Full installation may require up to two restarts. WSL is properly set up once you reach a working Linux terminal. You can verify this by running [green]wsl.exe[/green] without arguments."
+                        )
+                        sys.exit(1)
+                    config_file_path = (
+                        pathlib.Path.home()
+                        if platform_module.system() == "Windows"
+                        else pathlib.Path(
+                            (
+                                await run_command(
+                                    ["/bin/sh", "-c", '''wslpath "$(cmd.exe /c 'echo %USERPROFILE%')"'''],
+                                    "Detecting home path",
                                 )
                             )
-                            f.flush()
-                            f.close()
-                            await run_command(
-                                [detect_limactl(), "--tty=false", "start", f.name, f"--name={vm_name}"],
-                                "Creating a Lima VM",
-                                env=lima_env,
-                                cwd="/",
-                            )
-                    case "stopped":
+                            .stdout.decode()
+                            .strip()
+                        )
+                    ) / ".wslconfig"
+                    config_file_path.touch()
+                    with config_file_path.open("r+") as f:
+                        content = f.read()
+                        config = configparser.ConfigParser()
+                        config.read_string(content)
+                        if not config.has_section("wsl2"):
+                            config.add_section("wsl2")
+                        wsl2_networking_mode = config.get("wsl2", "networkingMode", fallback=None)
+                        if wsl2_networking_mode and wsl2_networking_mode != "nat":
+                            config.set("wsl2", "networkingMode", "nat")
+                            f.seek(0)
+                            f.truncate(0)
+                            config.write(f)
+                            if platform_module.system() == "Linux":
+                                console.warning(
+                                    "WSL networking mode updated. Please close WSL, run [green]wsl --shutdown[/green] from PowerShell, re-open WSL and run [green]agentstack platform start[/green] again."
+                                )
+                                sys.exit(1)
+                            await run_command(["wsl.exe", "--shutdown"], "Updating WSL2 networking")
+                    Configuration().home.mkdir(exist_ok=True)
+                    if await detect_vm_status(vm_name) == "missing":
                         await run_command(
-                            [detect_limactl(), "--tty=false", "start", vm_name], "Starting up", env=lima_env, cwd="/"
+                            ["wsl.exe", "--unregister", vm_name], "Cleaning up remains of previous instance", check=False
                         )
-                    case "running":
-                        console.info("Updating an existing instance.")
-            case "wsl":
-                if (await run_command(["wsl.exe", "--status"], "Checking for WSL2", check=False)).returncode != 0:
-                    console.error(
-                        "WSL is not installed. Please follow the Agent Stack installation instructions: https://agentstack.beeai.dev/stable/introduction/quickstart#windows"
-                    )
-                    console.hint(
-                        "Run [green]wsl.exe --install[/green] as administrator. If you just did this, restart your PC and run the same command again. Full installation may require up to two restarts. WSL is properly set up once you reach a working Linux terminal. You can verify this by running [green]wsl.exe[/green] without arguments."
-                    )
-                    sys.exit(1)
-                config_file_path = (
-                    pathlib.Path.home()
-                    if platform_module.system() == "Windows"
-                    else pathlib.Path(
-                        (
-                            await run_command(
-                                ["/bin/sh", "-c", '''wslpath "$(cmd.exe /c 'echo %USERPROFILE%')"'''],
-                                "Detecting home path",
-                            )
+                        await run_command(
+                            ["wsl.exe", "--unregister", "beeai-platform"],
+                            "Cleaning up remains of legacy instance",
+                            check=False,
                         )
-                        .stdout.decode()
-                        .strip()
-                    )
-                ) / ".wslconfig"
-                config_file_path.touch()
-                with config_file_path.open("r+") as f:
-                    content = f.read()
-                    config = configparser.ConfigParser()
-                    config.read_string(content)
-                    if not config.has_section("wsl2"):
-                        config.add_section("wsl2")
-                    wsl2_networking_mode = config.get("wsl2", "networkingMode", fallback=None)
-                    if wsl2_networking_mode and wsl2_networking_mode != "nat":
-                        config.set("wsl2", "networkingMode", "nat")
-                        f.seek(0)
-                        f.truncate(0)
-                        config.write(f)
-                        if platform_module.system() == "Linux":
-                            console.warning(
-                                "WSL networking mode updated. Please close WSL, run [green]wsl --shutdown[/green] from PowerShell, re-open WSL and run [green]agentstack platform start[/green] again."
-                            )
-                            sys.exit(1)
-                        await run_command(["wsl.exe", "--shutdown"], "Updating WSL2 networking")
-                Configuration().home.mkdir(exist_ok=True)
-                if await detect_vm_status(vm_name) == "missing":
-                    await run_command(
-                        ["wsl.exe", "--unregister", vm_name], "Cleaning up remains of previous instance", check=False
-                    )
-                    await run_command(
-                        ["wsl.exe", "--unregister", "beeai-platform"],
-                        "Cleaning up remains of legacy instance",
-                        check=False,
-                    )
 
-                    current_wsl_image = (
-                        wsl_image
-                        or f"https://github.com/i-am-bee/agentstack/releases/download/v{version}/microshift-vm-{arch}.wsl"
-                    )
-                    install_dir = Configuration().home / "wsl" / vm_name
-                    install_dir.mkdir(parents=True, exist_ok=True)
-                    if current_wsl_image.startswith("http://") or current_wsl_image.startswith("https://"):
-                        with tempfile.NamedTemporaryFile(suffix=".wsl", delete=True, delete_on_close=False) as tmp:
-                            with console.status("Downloading WSL distribution...", spinner="dots"):
-                                async with httpx.AsyncClient(follow_redirects=True) as client:
-                                    async with client.stream("GET", current_wsl_image) as response:
-                                        response.raise_for_status()
-                                        async for chunk in response.aiter_bytes():
-                                            tmp.write(chunk)
-                            tmp.close()
+                        current_wsl_image = (
+                            wsl_image
+                            or f"https://github.com/i-am-bee/agentstack/releases/download/v{version}/microshift-vm-{arch}.wsl"
+                        )
+                        install_dir = Configuration().home / "wsl" / vm_name
+                        install_dir.mkdir(parents=True, exist_ok=True)
+                        if current_wsl_image.startswith("http://") or current_wsl_image.startswith("https://"):
+                            with tempfile.NamedTemporaryFile(suffix=".wsl", delete=True, delete_on_close=False) as tmp:
+                                with console.status("Downloading WSL distribution...", spinner="dots"):
+                                    async with httpx.AsyncClient(follow_redirects=True) as client:
+                                        async with client.stream("GET", current_wsl_image) as response:
+                                            response.raise_for_status()
+                                            async for chunk in response.aiter_bytes():
+                                                tmp.write(chunk)
+                                tmp.close()
+                                await run_command(
+                                    ["wsl.exe", "--import", vm_name, str(install_dir), tmp.name],
+                                    "Importing WSL distribution",
+                                )
+                        else:
                             await run_command(
-                                ["wsl.exe", "--import", vm_name, str(install_dir), tmp.name],
+                                ["wsl.exe", "--import", vm_name, str(install_dir), current_wsl_image],
                                 "Importing WSL distribution",
                             )
-                    else:
-                        await run_command(
-                            ["wsl.exe", "--import", vm_name, str(install_dir), current_wsl_image],
-                            "Importing WSL distribution",
-                        )
-                    await run_command(["wsl.exe", "--terminate", vm_name], "Restarting Agent Stack VM")
-                await run_in_vm(vm_name, ["/usr/bin/setsid", "-f", "/usr/bin/sleep", "infinity"], "Ensuring persistence of Agent Stack VM")
-                await run_in_vm(
-                    vm_name,
-                    [
-                        "bash",
-                        "-c",
-                        "echo $(ip route show | grep -i default | cut -d' ' -f3) host.docker.internal >> /etc/hosts",
-                    ],
-                    "Setting up internal networking",
-                )
-
-        has_microshift = False
-        try:
-            await run_in_vm(
-                vm_name,
-                ["bash", "-c", "command -v microshift"],
-                "Detecting MicroShift",
-            )
-            has_microshift = True
-        except Exception:
-            pass
-
-        if has_microshift:
-            await run_in_vm(
-                vm_name,
-                [
-                    "bash",
-                    "-c",
-                    "systemctl is-active --quiet crio && systemctl is-active --quiet microshift || systemctl enable --now crio && systemctl enable --now microshift",
-                ],
-                "Refreshing existing MicroShift VM",
-            )
-        else:
-            await run_in_vm(
-                vm_name,
-                [
-                    "bash",
-                    "-c",
-                    textwrap.dedent("""\
-                        sysctl -w net.ipv4.ip_forward=1
-                        mkdir -p /tmp/microshift-install
-                        curl -fsSL "https://github.com/microshift-io/microshift/releases/download/4.21.0_g29f429c21_4.21.0_okd_scos.ec.15/microshift-debs-$(uname -m).tgz" | tar -xz -C /tmp/microshift-install &
-                        eatmydata apt-get update -y -q
-                        eatmydata apt-get install -y -q --no-install-recommends skopeo cri-o cri-tools containernetworking-plugins kubectl
-                        mkdir -p -m 777 /postgresql-data /seaweedfs-data /registry-data /redis-data
-                        systemctl enable --now crio
-                        wait
-                        eatmydata dpkg -i /tmp/microshift-install/microshift_*.deb /tmp/microshift-install/microshift-kindnet_*.deb
-                        rm -rf /tmp/microshift-install
-                        systemctl enable --now microshift
-                    """),
-                ],
-                "Installing MicroShift",
-            )
+                        await run_command(["wsl.exe", "--terminate", vm_name], "Restarting Agent Stack VM")
+                    await run_in_vm(vm_name, ["/usr/bin/setsid", "-f", "/usr/bin/sleep", "infinity"], "Ensuring persistence of Agent Stack VM")
+                    await run_in_vm(
+                        vm_name,
+                        [
+                            "bash",
+                            "-c",
+                            "echo $(ip route show | grep -i default | cut -d' ' -f3) host.docker.internal >> /etc/hosts",
+                        ],
+                        "Setting up internal networking",
+                    )
 
         await run_in_vm(
             vm_name,
             [
                 "bash",
                 "-c",
-                "ln -sf /var/lib/microshift/resources/kubeadmin/kubeconfig /kubeconfig && chmod 644 /kubeconfig",
+                'chmod o+x /var/lib/microshift /var/lib/microshift/resources /var/lib/microshift/resources/kubeadmin && until test -f /var/lib/microshift/resources/kubeadmin/kubeconfig; do sleep 5; done && chmod o+r /var/lib/microshift/resources/kubeadmin/kubeconfig',
             ],
-            "Setting up kubeconfig symlink",
+            "Waiting for kubeconfig",
         )
         kubeconfig_local = anyio.Path(Configuration().lima_home) / vm_name / "copied-from-guest" / "kubeconfig.yaml"
         await kubeconfig_local.parent.mkdir(parents=True, exist_ok=True)
@@ -515,13 +484,7 @@ async def start_cmd(
             (
                 await run_in_vm(
                     vm_name,
-                    [
-                        "timeout",
-                        "5m",
-                        "bash",
-                        "-c",
-                        'until grep -q "current-context:" /kubeconfig 2>/dev/null; do sleep 5; done && cat /kubeconfig',
-                    ],
+                    ["cat", "/var/lib/microshift/resources/kubeadmin/kubeconfig"],
                     "Copying kubeconfig from Agent Stack platform",
                 )
             ).stdout.decode()
@@ -782,7 +745,7 @@ async def start_cmd(
                 "bash",
                 "-c",
                 textwrap.dedent("""\
-                    kubectl --kubeconfig=/kubeconfig apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/standard-install.yaml
+                    kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/standard-install.yaml
                 """),
             ],
             "Installing kagenti prerequisites (Gateway API CRDs)",
@@ -798,9 +761,9 @@ async def start_cmd(
                     ISTIO_REPO=https://istio-release.storage.googleapis.com/charts/
                     helm repo add istio "$ISTIO_REPO" 2>/dev/null || true
                     helm repo update istio
-                    kubectl --kubeconfig=/kubeconfig create namespace istio-system --dry-run=client -o yaml | kubectl --kubeconfig=/kubeconfig apply -f -
-                    helm upgrade --install istio-base istio/base --version=$ISTIO_VERSION --namespace=istio-system --kubeconfig=/kubeconfig --wait --force-conflicts
-                    helm upgrade --install istiod istio/istiod --version=$ISTIO_VERSION --namespace=istio-system --kubeconfig=/kubeconfig --wait --force-conflicts \
+                    kubectl create namespace istio-system --dry-run=client -o yaml | kubectl apply -f -
+                    helm upgrade --install istio-base istio/base --version=$ISTIO_VERSION --namespace=istio-system --wait --force-conflicts
+                    helm upgrade --install istiod istio/istiod --version=$ISTIO_VERSION --namespace=istio-system --wait --force-conflicts \
                         --set pilot.resources.requests.cpu=50m \
                         --set pilot.resources.requests.memory=256Mi
                 """),
@@ -815,7 +778,7 @@ async def start_cmd(
         keycloak_pv_yaml = (k8s_data / "keycloak-postgres-pv.yaml").read_text()
         await run_in_vm(
             vm_name,
-            ["bash", "-c", "mkdir -p /kagenti-keycloak-postgres-data && chmod 777 /kagenti-keycloak-postgres-data && kubectl --kubeconfig=/kubeconfig apply -f -"],
+            ["bash", "-c", "mkdir -p /kagenti-keycloak-postgres-data && chmod 777 /kagenti-keycloak-postgres-data && kubectl apply -f -"],
             "Creating PV for kagenti Keycloak Postgres",
             input=keycloak_pv_yaml.encode("utf-8"),
         )
@@ -823,7 +786,7 @@ async def start_cmd(
             phoenix_pv_yaml = (k8s_data / "phoenix-data-pv.yaml").read_text()
             await run_in_vm(
                 vm_name,
-                ["bash", "-c", "mkdir -p /phoenix-data && chmod 777 /phoenix-data && kubectl --kubeconfig=/kubeconfig apply -f -"],
+                ["bash", "-c", "mkdir -p /phoenix-data && chmod 777 /phoenix-data && kubectl apply -f -"],
                 "Creating PV for Phoenix data",
                 input=phoenix_pv_yaml.encode("utf-8"),
             )
@@ -840,7 +803,6 @@ async def start_cmd(
                 "--create-namespace",
                 "--values=/tmp/kagenti-deps-values.yaml",
                 "--timeout=10m",
-                "--kubeconfig=/kubeconfig",
                 "--force-conflicts",
                 *(f"--set={v}" for v in scoped_sets["kagenti-deps"]),
             ],
@@ -852,11 +814,11 @@ async def start_cmd(
             vm_name,
             [
                 "bash", "-c",
-                "UID_RANGE=$(kubectl --kubeconfig=/kubeconfig get namespace keycloak -o jsonpath='{.metadata.annotations.openshift\\.io/sa\\.scc\\.uid-range}') && "
+                "UID_RANGE=$(kubectl get namespace keycloak -o jsonpath='{.metadata.annotations.openshift\\.io/sa\\.scc\\.uid-range}') && "
                 "BASE_UID=${UID_RANGE%%/*} && "
                 'chown "$BASE_UID:$BASE_UID" /kagenti-keycloak-postgres-data && '
                 "chmod 700 /kagenti-keycloak-postgres-data && "
-                "kubectl --kubeconfig=/kubeconfig delete pod -n keycloak postgres-0 --ignore-not-found",
+                "kubectl delete pod -n keycloak postgres-0 --ignore-not-found",
             ],
             "Fixing keycloak postgres data directory ownership",
         )
@@ -867,15 +829,14 @@ async def start_cmd(
                 "bash",
                 "-c",
                 textwrap.dedent("""\
-                    KC=/kubeconfig
                     # Ensure the agentstack namespace exists before creating HTTPRoutes
-                    kubectl --kubeconfig=$KC create namespace agentstack --dry-run=client -o yaml | kubectl --kubeconfig=$KC apply -f -
+                    kubectl create namespace agentstack --dry-run=client -o yaml | kubectl apply -f -
                     # Label namespaces so the Gateway allows HTTPRoutes from them
                     for ns in agentstack keycloak kagenti-system istio-system; do
-                        kubectl --kubeconfig=$KC label namespace $ns shared-gateway-access=true --overwrite
+                        kubectl label namespace $ns shared-gateway-access=true --overwrite
                     done
                     # Create HTTPRoutes for agentstack services through the shared gateway
-                    cat <<'EOF' | kubectl --kubeconfig=$KC apply -f -
+                    cat <<'EOF' | kubectl apply -f -
                     apiVersion: gateway.networking.k8s.io/v1
                     kind: HTTPRoute
                     metadata:
@@ -935,8 +896,8 @@ async def start_cmd(
             [
                 "bash",
                 "-c",
-                "timeout 5m bash -c 'until kubectl --kubeconfig=/kubeconfig get nodes --no-headers -o custom-columns=NAME:.metadata.name 2>/dev/null | grep -q .; do sleep 5; done' && "
-                "kubectl --kubeconfig=/kubeconfig get nodes --no-headers -o custom-columns=NAME:.metadata.name | xargs -I {} sh -c \"grep -q '{}' /etc/hosts || echo '127.0.0.1 {}' >> /etc/hosts\"",
+                "timeout 5m bash -c 'until kubectl get nodes --no-headers -o custom-columns=NAME:.metadata.name 2>/dev/null | grep -q .; do sleep 5; done' && "
+                "kubectl get nodes --no-headers -o custom-columns=NAME:.metadata.name | xargs -I {} sh -c \"grep -q '{}' /etc/hosts || echo '127.0.0.1 {}' >> /etc/hosts\"",
             ],
             "Ensuring node name resolution",
         )
@@ -953,7 +914,6 @@ async def start_cmd(
                 "--values=/tmp/agentstack-values.yaml",
                 "--timeout=20m",
                 "--wait",
-                "--kubeconfig=/kubeconfig",
                 *(f"--set={v}" for v in scoped_sets["agentstack"]),
             ],
             "Deploying Agent Stack platform with Helm",
@@ -971,7 +931,6 @@ async def start_cmd(
                 "--create-namespace",
                 "--values=/tmp/kagenti-values.yaml",
                 "--timeout=10m",
-                "--kubeconfig=/kubeconfig",
                 *(f"--set={v}" for v in scoped_sets["kagenti"]),
             ],
             "Installing kagenti platform (operator + backend)",
@@ -986,7 +945,6 @@ async def start_cmd(
                         vm_name,
                         [
                             "kubectl",
-                            "--kubeconfig=/kubeconfig",
                             "get",
                             "pods",
                             "-o",
@@ -1005,7 +963,6 @@ async def start_cmd(
                         vm_name,
                         [
                             "kubectl",
-                            "--kubeconfig=/kubeconfig",
                             "delete",
                             "pod",
                             pod["metadata"]["name"],
@@ -1021,7 +978,7 @@ async def start_cmd(
                 "5m",
                 "bash",
                 "-c",
-                "until kubectl --kubeconfig=/kubeconfig wait --for=condition=Ready pod -n openshift-dns -l dns.operator.openshift.io/daemonset-dns=default --timeout=2m; do sleep 5; done",
+                "until kubectl wait --for=condition=Ready pod -n openshift-dns -l dns.operator.openshift.io/daemonset-dns=default --timeout=2m; do sleep 5; done",
             ],
             "Waiting for DNS to be ready",
         )
@@ -1064,7 +1021,7 @@ async def start_cmd(
             [
                 "bash",
                 "-c",
-                "kubectl --kubeconfig=/kubeconfig wait --for=condition=Complete job/keycloak-provision -n agentstack --timeout=300s",
+                "kubectl wait --for=condition=Complete job/keycloak-provision -n agentstack --timeout=300s",
             ],
             "Waiting for Keycloak provisioning to complete",
         )
@@ -1102,6 +1059,18 @@ async def stop_cmd(
     verbose: typing.Annotated[bool, typer.Option("-v", "--verbose", help="Show verbose output")] = False,
 ):
     with verbosity(verbose):
+        if Configuration().running_inside_vm:
+            await run_command(
+                ["sudo", "bash", "-c", "systemctl stop 'kubectl-port-forward@*'"],
+                "Stopping port-forwarding services",
+                check=False,
+            )
+            await run_command(
+                ["sudo", "systemctl", "stop", "microshift"],
+                "Stopping MicroShift service",
+            )
+            console.success("Agent Stack platform stopped successfully.")
+            return
         if not await detect_vm_status(vm_name):
             console.info("Agent Stack platform not found. Nothing to stop.")
             return
@@ -1132,6 +1101,23 @@ async def delete_cmd(
     verbose: typing.Annotated[bool, typer.Option("-v", "--verbose", help="Show verbose output")] = False,
 ):
     with verbosity(verbose):
+        if Configuration().running_inside_vm:
+            await run_command(
+                ["sudo", "bash", "-c", "systemctl stop 'kubectl-port-forward@*'"],
+                "Stopping port-forwarding services",
+                check=False,
+            )
+            await run_command(
+                ["sudo", "systemctl", "stop", "microshift"],
+                "Stopping MicroShift service",
+                check=False,
+            )
+            await run_command(
+                ["sudo", "bash", "-c", "rm -rf /var/lib/microshift/*"],
+                "Removing MicroShift data",
+            )
+            console.success("Agent Stack platform deleted successfully.")
+            return
         if detect_driver() == "lima":
             await run_command(
                 [detect_limactl(), "--tty=false", "delete", "--force", vm_name],
@@ -1164,6 +1150,9 @@ async def import_cmd(
         if (await detect_vm_status(vm_name)) != "running":
             console.error("Agent Stack platform is not running.")
             sys.exit(1)
+        if Configuration().running_inside_vm:
+            console.info("Running inside VM — images are already available to CRI-O via shared storage.")
+            return
         host_path, guest_path = detect_export_import_paths()
         try:
             await run_command(["docker", "image", "save", "-o", host_path, tag], f"Exporting image {tag} from Docker")
@@ -1195,7 +1184,15 @@ async def exec_cmd(
         if (await detect_vm_status(vm_name)) != "running":
             console.error("Agent Stack platform is not running.")
             sys.exit(1)
-        if detect_driver() == "lima":
+        if Configuration().running_inside_vm:
+            await anyio.run_process(
+                ["sudo", *(command or ["/bin/bash"])],
+                check=False,
+                stdin=sys.stdin,
+                stdout=sys.stdout,
+                stderr=sys.stderr,
+            )
+        elif detect_driver() == "lima":
             await anyio.run_process(
                 [detect_limactl(), "shell", f"--tty={sys.stdin.isatty()}", vm_name, "--", "sudo", *(command or ["/bin/bash"])],
                 check=False,
