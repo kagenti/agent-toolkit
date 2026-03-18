@@ -52,7 +52,7 @@ Instead, use:
 mise agentstack:start
 ```
 
-This will build the images (`agentstack-server` and `agentstack-ui`) and import them to the cluster. You can add other
+This will build the images (`adk-server` and `agentstack-ui`) and import them to the cluster. You can add other
 CLI arguments as you normally would when using `agentstack` CLI, for example:
 
 ```shell
@@ -124,7 +124,7 @@ Then run `mise run agentstack:start -f config.yaml`
 **OIDC configuration:**
 
 * UI: follow `template.env` in `apps/agentstack-ui` directory (copy to `apps/agentstack-ui/.env`).
-* Server: follow `template.env` in `apps/agentstack-server` directory (copy to `apps/agentstack-server/.env`).
+* Server: follow `template.env` in `apps/adk-server` directory (copy to `apps/adk-server/.env`).
 
 ### Running and debugging individual components
 
@@ -133,7 +133,7 @@ OpenTelemetry, Arize Phoenix, ...). For this, we include [Telepresence](https://
 a Kubernetes container to your local machine. (Note that `sshfs` is not needed, since we don't use it in this setup.)
 
 ```sh
-mise run agentstack-server:dev:start
+mise run adk-server:dev:start
 ```
 
 This will do the following:
@@ -150,7 +150,7 @@ After the command succeeds, you can:
 * send requests as if your machine was running inside the cluster. For example:
   `curl http://<service-name>:<service-port>`.
 * connect to postgresql using the default credentials `postgresql://agentstack-user:password@postgresql:5432/agentstack`
-* now you can start your server from your IDE or using `mise run agentstack-server:run` on port **18333**
+* now you can start your server from your IDE or using `mise run adk-server:run` on port **18333**
 * run agentstack-cli using `mise agentstack-cli:run -- <command>` or HTTP requests to localhost:8333 or localhost:18333
   * localhost:8333 is port-forwarded from the cluster, so any requests will pass through the cluster networking to the
       agentstack pod, which is replaced by telepresence and forwarded back to your local machine to port 18333
@@ -160,7 +160,7 @@ To inspect cluster using `kubectl` or `k9s` and lima using `limactl`, activate t
 
 ```shell
 # Activate dev environment
-eval "$(mise run agentstack-server:dev:shell)"
+eval "$(mise run adk-server:dev:shell)"
 
 # Deactivate dev environment
 deactivate
@@ -169,29 +169,29 @@ deactivate
 When you're done you can stop the development cluster and networking using
 
 ```shell
-mise run agentstack-server:dev:stop
+mise run adk-server:dev:stop
 ```
 
 Or delete the cluster entirely using
 
 ```shell
-mise run agentstack-server:dev:delete
+mise run adk-server:dev:delete
 ```
 
 > TIP: If you run into connection issues after sleep or longer period of inactivity
-> try `mise run agentstack-server:dev:reconnect` first. You may not need to clean and restart
+> try `mise run adk-server:dev:reconnect` first. You may not need to clean and restart
 > the entire VM
 
 #### Developing tests
 
-To run and develop agentstack-server tests locally use `mise run agentstack-server:dev:start --set auth.enabled=true` from above.
+To run and develop adk-server tests locally use `mise run adk-server:dev:start --set auth.enabled=true` from above.
 
 > Note:
 >
 > * Some tests require additional settings (e.g. enabling authentication), see section for tests in `template.env` for more details.
 > * Tests will drop your database - you may need to add agents again or reconfigure model
 
-Locally, the default model for tests is configured in `apps/agentstack-server/tests/conftest.py` (`llama3.1:8b` from ollama).
+Locally, the default model for tests is configured in `apps/adk-server/tests/conftest.py` (`llama3.1:8b` from ollama).
 Make sure to have this model running locally.
 
 <details>
@@ -199,7 +199,7 @@ Make sure to have this model running locally.
 
 ```shell
 # Activate environment
-eval "$(mise run agentstack-server:dev:shell)"
+eval "$(mise run adk-server:dev:shell)"
 
 # Start platform
 mise agentstack-cli:run -- platform start --vm-name=agentstack-local-dev # optional --tag [tag] --import-images
@@ -234,7 +234,7 @@ The `examples/` folder structure mirrors the docs structure. For instance, examp
 **Modifying an existing example:**
 
 1. Edit the agent code in `examples/<path>/src/<name>/agent.py`
-2. Run the related e2e test: `apps/agentstack-server/tests/e2e/examples/<path>/test_<name>.py`
+2. Run the related e2e test: `apps/adk-server/tests/e2e/examples/<path>/test_<name>.py`
 3. Update docs to sync embedded code: `mise run docs:fix`
 
 **Creating a new example:**
@@ -246,7 +246,7 @@ mise run example:create <path> <description>
 This scaffolds the example agent and its e2e test. After scaffolding:
 
 1. Implement the agent logic in `examples/<path>/src/<name>/agent.py`
-2. Implement the e2e test in `apps/agentstack-server/tests/e2e/examples/<path>/test_<name>.py`
+2. Implement the e2e test in `apps/adk-server/tests/e2e/examples/<path>/test_<name>.py`
 3. Embed the example in docs using embedme tags:
    ```mdx
    {/* <!-- embedme examples/<path>/src/<name>/agent.py --> */}
@@ -259,8 +259,8 @@ This scaffolds the example agent and its e2e test. After scaffolding:
 
 | Command | What it runs |
 |---|---|
-| `mise run agentstack-server:test:e2e` | Core e2e tests only (excludes examples) |
-| `mise run agentstack-server:test:e2e-examples` | Example e2e tests only |
+| `mise run adk-server:test:e2e` | Core e2e tests only (excludes examples) |
+| `mise run adk-server:test:e2e-examples` | Example e2e tests only |
 
 E2e example tests are **not** part of the core e2e suite and don't run on every commit. They run automatically when merged to `main`, or on PRs when you add the `e2e-examples` label.
 
@@ -268,13 +268,13 @@ E2e example tests are **not** part of the core e2e suite and don't run on every 
 
 The following commands can be used to create or run migrations in the dev environment above:
 
-* Run migrations: `mise run agentstack-server:migrations:run`
-* Generate migrations: `mise run agentstack-server:migrations:generate`
-* Use Alembic command directly: `mise run agentstack-server:migrations:alembic`
+* Run migrations: `mise run adk-server:migrations:run`
+* Generate migrations: `mise run adk-server:migrations:generate`
+* Use Alembic command directly: `mise run adk-server:migrations:alembic`
 
 > NOTE: The dev setup will run the locally built image including its migrations before replacing it with your local
 > instance. If new migrations you just implemented are not working, the dev setup will not start properly and you need
-> to fix migrations first. You can activate the shell using `eval "$(mise run agentstack-server:dev:shell)"` and use
+> to fix migrations first. You can activate the shell using `eval "$(mise run adk-server:dev:shell)"` and use
 > your favorite kubernetes IDE (e.g., k9s or kubectl) to see the migration logs.
 
 ### Running individual components
@@ -300,8 +300,8 @@ mise agentstack-cli:run -- agent run website_summarizer "summarize beeai.dev"
 # run the UI development server:
 mise agentstack-ui:run
 
-# UI is also available from agentstack-server (in static mode):
-mise agentstack-server:run
+# UI is also available from adk-server (in static mode):
+mise adk-server:run
 ```
 
 ## Releasing

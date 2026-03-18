@@ -1,0 +1,82 @@
+# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# SPDX-License-Identifier: Apache-2.0
+
+from __future__ import annotations
+
+import asyncio
+import logging
+import os
+import socket
+import sys
+
+from adk_server.configuration import get_configuration
+
+# configure logging before importing anything
+from adk_server.logging_config import configure_logging
+
+configure_logging()
+
+from adk_server.telemetry import configure_telemetry  # noqa: E402
+
+configure_telemetry()
+
+logger = logging.getLogger(__name__)
+
+
+def serve():
+    config = get_configuration()
+    host = "0.0.0.0"
+
+    if sys.platform == "win32":
+        logger.error("Native windows is not supported, use WSL")
+        return
+
+    with socket.socket(socket.AF_INET) as sock:
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        try:
+            sock.bind((host, config.port))
+        except OSError:  # pragma: full coverage
+            logger.error(f"Port {config.port} already in use, is another instance of adk-server running?")
+            return
+
+    os.execv(
+        sys.executable,
+        [
+            sys.executable,
+            "-m",
+            "uvicorn",
+            "adk_server.application:app",
+            f"--host={host}",
+            f"--port={config.port}",
+            f"--timeout-keep-alive={config.uvicorn_timeout_keep_alive}",
+            # If the reconnection to a database fails for many retries we treat is as an irrecoverable error
+            # forcing a shutdown (kubernetes will restart this pod). See:
+            # See adk-server.src.adk_server.jobs.procrastinate.py:create_app:exit_app_on_db_error
+            # For this reason we must add timeout to termination to prevent dangling connections or background work
+            # hanging the process forever
+            "--timeout-graceful-shutdown=5",
+        ],
+    )
+
+
+def migrate():
+    from adk_server.infrastructure.persistence.migrations.migrate import migrate as migrate_fn
+
+    migrate_fn()
+
+
+def create_vector_extension():
+    from adk_server.infrastructure.persistence.migrations.migrate import create_vector_extension as create_fn
+
+    asyncio.run(create_fn())
+
+
+def create_buckets():
+    from adk_server.infrastructure.object_storage.create_buckets import create_buckets
+
+    configure_logging()
+    configuration = get_configuration()
+    asyncio.run(create_buckets(configuration.object_storage))
+
+
+__all__ = ["serve"]

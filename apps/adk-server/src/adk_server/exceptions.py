@@ -1,0 +1,197 @@
+# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# SPDX-License-Identifier: Apache-2.0
+
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+from uuid import UUID
+
+from fastapi import status
+from tenacity import retry_base, retry_if_exception
+
+__all__ = [
+    "DuplicateEntityError",
+    "EntityNotFoundError",
+    "ForbiddenUpdateError",
+    "GatewayError",
+    "InvalidProviderCallError",
+    "InvalidProviderUpgradeError",
+    "InvalidVectorDimensionError",
+    "ManifestLoadError",
+    "MissingAgentCardLabelError",
+    "ModelLoadFailedError",
+    "PlatformError",
+    "RateLimitExceededError",
+    "StorageCapacityExceededError",
+    "UsageLimitExceededError",
+    "VersionResolveError",
+    "retry_if_exception_grp_type",
+]
+
+if TYPE_CHECKING:
+    from adk_server.domain.models.model_provider import ModelProvider
+    from adk_server.domain.models.provider import ProviderLocation
+
+
+class PlatformError(Exception):
+    def __init__(self, message: str | None = None, status_code: int = status.HTTP_500_INTERNAL_SERVER_ERROR):
+        self.status_code = status_code
+        super().__init__(message or "An unexpected platform error occurred")
+
+
+class VersionResolveError(PlatformError):
+    def __init__(
+        self,
+        location: str,
+        message: str | None = None,
+        status_code: int = status.HTTP_400_BAD_REQUEST,
+    ):
+        super().__init__(f"Failed to resolve version for '{location}': {message}", status_code)
+
+
+class ManifestLoadError(PlatformError):
+    def __init__(
+        self, location: ProviderLocation, message: str | None = None, status_code: int = status.HTTP_404_NOT_FOUND
+    ):
+        message = message or f"Manifest at location {location} not found"
+        super().__init__(message, status_code)
+
+
+class EntityNotFoundError(PlatformError):
+    entity: str
+    id: UUID | str
+    attribute: str
+
+    def __init__(
+        self, entity: str, id: UUID | str, status_code: int = status.HTTP_404_NOT_FOUND, attribute: str = "id"
+    ):
+        self.entity = entity
+        self.id = id
+        self.attribute = attribute
+        super().__init__(f"{entity} with {attribute} {id} not found", status_code)
+
+
+class ForbiddenUpdateError(PlatformError):
+    entity: str
+    id: UUID | str
+    attribute: str
+
+    def __init__(
+        self, entity: str, id: UUID | str, status_code: int = status.HTTP_404_NOT_FOUND, attribute: str = "id"
+    ):
+        self.entity = entity
+        self.id = id
+        self.attribute = attribute
+        super().__init__("Insufficient permissions", status_code)
+
+
+class InvalidProviderUpgradeError(PlatformError):
+    def __init__(self, message: str, status_code: int = status.HTTP_409_CONFLICT):
+        super().__init__(message, status_code)
+
+
+class InvalidProviderCallError(PlatformError):
+    def __init__(self, message: str, status_code: int = status.HTTP_400_BAD_REQUEST):
+        super().__init__(message, status_code)
+
+
+class InvalidVectorDimensionError(PlatformError): ...
+
+
+class StorageCapacityExceededError(PlatformError):
+    entity: str
+
+    def __init__(self, entity: str, max_size: int, status_code: int = status.HTTP_413_CONTENT_TOO_LARGE):
+        self.entity = entity
+        super().__init__(
+            f"{entity} exceeds the limit of {max_size / 1024 / 1024:.2f} MB. "
+            f"Either the {entity} is too large or you exceeded the available storage capacity.",
+            status_code,
+        )
+
+
+class ModelLoadFailedError(PlatformError):
+    def __init__(
+        self, provider: ModelProvider, exception: Exception, status_code: int = status.HTTP_424_FAILED_DEPENDENCY
+    ):
+        from adk_server.utils.utils import extract_messages
+
+        super().__init__(
+            f"Failed to load models from {provider.type} provider ({provider.base_url}): {extract_messages(exception)}",
+            status_code=status_code,
+        )
+
+
+class RateLimitExceededError(PlatformError):
+    def __init__(
+        self,
+        key: str,
+        amount: int,
+        remaining: int,
+        reset_time: float,
+        message: str | None = None,
+        status_code: int = status.HTTP_429_TOO_MANY_REQUESTS,
+    ):
+        message = message or f"Rate limit exceeded for key '{key[:20]}...'"
+        super().__init__(message, status_code)
+        self.key: str = key
+        self.amount: int = amount
+        self.remaining: int = remaining
+        self.reset_time: float = reset_time
+
+
+class UsageLimitExceededError(PlatformError):
+    def __init__(self, message: str, status_code: int = status.HTTP_413_CONTENT_TOO_LARGE):
+        super().__init__(message, status_code)
+
+
+class DuplicateEntityError(PlatformError):
+    entity: str
+    field: str
+    value: str | UUID | None
+
+    def __init__(
+        self,
+        entity: str,
+        field: str = "name",
+        value: str | UUID | None = None,
+        status_code: int = status.HTTP_409_CONFLICT,
+    ):
+        self.entity = entity
+        self.field = field
+        self.value = value
+        message = f"Duplicate {entity} found"
+        if value:
+            message = f"{message}: {field}='{value}' already exists"
+        super().__init__(message, status_code)
+
+
+def retry_if_exception_grp_type(*exception_types: type[BaseException]) -> retry_base:
+    """Handle also exception groups"""
+
+    def _fn(exception: BaseException) -> bool:
+        retry = False
+        try:
+            raise exception
+        except* exception_types:
+            retry = True
+        except* BaseException:
+            ...
+        return retry
+
+    return retry_if_exception(_fn)
+
+
+class GatewayError(PlatformError):
+    def __init__(self, message: str | None = None, status_code: int = status.HTTP_502_BAD_GATEWAY):
+        super().__init__(message, status_code)
+
+
+class MissingAgentCardLabelError(PlatformError):
+    def __init__(self, image: str):
+        self.image = image
+        super().__init__(
+            f"Docker image labels must contain 'beeai.dev.agent.json': {image}",
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+        )

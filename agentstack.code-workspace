@@ -5,8 +5,8 @@
       "path": ".",
     },
     {
-      "name": "agentstack-server",
-      "path": "apps/agentstack-server",
+      "name": "adk-server",
+      "path": "apps/adk-server",
     },
     {
       "name": "adk-py",

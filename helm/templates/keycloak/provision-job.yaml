@@ -63,17 +63,17 @@ spec:
 
               # Create/Update Server Client
               echo "Configuring Server Client..."
-              CID=$(/opt/keycloak/bin/kcadm.sh get clients -r agentstack -q clientId=agentstack-server --fields id --format csv --noquotes)
+              CID=$(/opt/keycloak/bin/kcadm.sh get clients -r agentstack -q clientId=adk-server --fields id --format csv --noquotes)
               if [ -z "$CID" ]; then
-                /opt/keycloak/bin/kcadm.sh create clients -r agentstack -s clientId=agentstack-server -s enabled=true -s clientAuthenticatorType=client-secret -s secret=$SERVER_CLIENT_SECRET -s serviceAccountsEnabled=true -s directAccessGrantsEnabled=true -s standardFlowEnabled=false
-                CID=$(/opt/keycloak/bin/kcadm.sh get clients -r agentstack -q clientId=agentstack-server --fields id --format csv --noquotes)
+                /opt/keycloak/bin/kcadm.sh create clients -r agentstack -s clientId=adk-server -s enabled=true -s clientAuthenticatorType=client-secret -s secret=$SERVER_CLIENT_SECRET -s serviceAccountsEnabled=true -s directAccessGrantsEnabled=true -s standardFlowEnabled=false
+                CID=$(/opt/keycloak/bin/kcadm.sh get clients -r agentstack -q clientId=adk-server --fields id --format csv --noquotes)
               else
                 /opt/keycloak/bin/kcadm.sh update clients/$CID -r agentstack -s secret=$SERVER_CLIENT_SECRET -s enabled=true
               fi
 
-              # Assign kagenti-viewer role to agentstack-server service account
-              echo "Assigning kagenti-viewer to agentstack-server service account..."
-              /opt/keycloak/bin/kcadm.sh add-roles -r agentstack --uusername service-account-agentstack-server --rolename kagenti-viewer
+              # Assign kagenti-viewer role to adk-server service account
+              echo "Assigning kagenti-viewer to adk-server service account..."
+              /opt/keycloak/bin/kcadm.sh add-roles -r agentstack --uusername service-account-adk-server --rolename kagenti-viewer
 
               # Create/Update UI Client
               {{- if and .Values.ui.enabled }}
@@ -100,7 +100,7 @@ spec:
               declare -a AUDIENCES=(
                 "agentstack-ui|agentstack-ui-audience|$UI_URL"
                 "agentstack-cli|agentstack-cli-audience|$API_URL"
-                "agentstack-server|agentstack-server-audience|$API_URL"
+                "adk-server|adk-server-audience|$API_URL"
               )
 
               if [ -n "$UI_DEV_URL" ]; then

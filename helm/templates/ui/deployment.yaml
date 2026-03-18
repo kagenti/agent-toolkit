@@ -56,7 +56,7 @@ spec:
           {{- end }}
           env:
             - name: API_URL
-              value: "http://agentstack-server-svc:{{.Values.server.service.port}}"
+              value: "http://adk-server-svc:{{.Values.server.service.port}}"
             - name: APP_NAME
               value: {{ .Values.ui.appName | quote }}
             - name: FEATURE_FLAGS

@@ -26,14 +26,14 @@ spec:
         - protocol: TCP
           port: 53
     
-    # Rule 2: Allow ONLY agentstack-server in specific namespace
+    # Rule 2: Allow ONLY adk-server in specific namespace
     - to:
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: default
           podSelector:
             matchLabels:
-              app: agentstack-server
+              app: adk-server
       ports:
         - protocol: TCP
           port: 8333

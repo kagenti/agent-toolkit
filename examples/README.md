@@ -4,7 +4,7 @@ This directory contains example agents that serve three purposes:
 
 1. **Standalone agents** — Each example is a fully functional agent that can be run independently for learning and experimentation.
 
-2. **E2E tests** — Examples are used in end-to-end tests located in `apps/agentstack-server/tests/e2e/examples/`. This ensures all examples remain working and up-to-date. See [E2E example tests](#e2e-example-tests) below.
+2. **E2E tests** — Examples are used in end-to-end tests located in `apps/adk-server/tests/e2e/examples/`. This ensures all examples remain working and up-to-date. See [E2E example tests](#e2e-example-tests) below.
 
 3. **Documentation** — Examples are embedded directly into the [docs](../docs/) using [embedme](https://github.com/zakhenry/embedme) tags:
    ```mdx
@@ -29,7 +29,7 @@ The template names the agent function as `<snake_case_name>_example`. The exampl
 ## Modifying an existing example
 
 1. Edit the agent code in `examples/<path>/src/<name>/agent.py`
-2. Run the related e2e test in `apps/agentstack-server/tests/e2e/examples/<path>/test_<name>.py`
+2. Run the related e2e test in `apps/adk-server/tests/e2e/examples/<path>/test_<name>.py`
 3. Sync embedded code into docs: `mise run docs:fix`
 
 ## Creating a new example
@@ -64,7 +64,7 @@ examples/agent-integration/multi-turn/basic-history/
     __init__.py
     agent.py
 
-apps/agentstack-server/tests/e2e/examples/agent-integration/multi-turn/
+apps/adk-server/tests/e2e/examples/agent-integration/multi-turn/
   test_basic_history.py
 ```
 
@@ -73,7 +73,7 @@ It also adds a VS Code debug configuration to `examples/.vscode/launch.json`.
 After scaffolding:
 
 1. Implement the agent logic in `examples/<path>/src/<name>/agent.py`
-2. Implement the e2e test in `apps/agentstack-server/tests/e2e/examples/<path>/test_<name>.py`
+2. Implement the e2e test in `apps/adk-server/tests/e2e/examples/<path>/test_<name>.py`
 3. Embed the example in docs using an embedme tag:
    ```mdx
    {/* <!-- embedme examples/<path>/src/<name>/agent.py --> */}
@@ -101,11 +101,11 @@ E2E example tests run **separately** from the core e2e tests to avoid slowing do
 
 | Command | What it runs |
 |---|---|
-| `mise run agentstack-server:test:e2e` | Core e2e tests only (excludes examples) |
-| `mise run agentstack-server:test:e2e-examples` | Example e2e tests only |
+| `mise run adk-server:test:e2e` | Core e2e tests only (excludes examples) |
+| `mise run adk-server:test:e2e-examples` | Example e2e tests only |
 
 ### When they run in CI
 
-- **On push to `main`** — automatically, when files change in `apps/agentstack-server/`, `apps/adk-py/`, or `examples/`.
+- **On push to `main`** — automatically, when files change in `apps/adk-server/`, `apps/adk-py/`, or `examples/`.
 - **On pull requests** — add the `e2e-examples` label to the PR. Tests will run when the label is added and on every subsequent push.
 - **Manually** — trigger the `e2e-examples-test` workflow via GitHub Actions.

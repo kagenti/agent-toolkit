@@ -106,7 +106,7 @@ version=$(
     yq -r .project.version      apps/agentstack-cli/pyproject.toml
     yq -r .project.version      apps/adk-py/pyproject.toml
     yq -r .version              apps/adk-ts/package.json
-    yq -r .project.version      apps/agentstack-server/pyproject.toml
+    yq -r .project.version      apps/adk-server/pyproject.toml
     yq -r .version              apps/agentstack-ui/package.json
     yq -r '.providers[].location | split(":")[-1]' agent-registry.yaml
   } | sort -u
@@ -134,7 +134,7 @@ run = "true" # Empty tests in case there are no tests
 
 ["agentstack:start"]
 depends = [
-  "agentstack-server:build",
+  "adk-server:build",
   "microshift-vm:build:qemu",
 ]
 raw = true

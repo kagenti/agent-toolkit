@@ -1,0 +1,25 @@
+# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# SPDX-License-Identifier: Apache-2.0
+
+from __future__ import annotations
+
+from typing import Protocol
+from uuid import UUID
+
+from adk_server.domain.models.common import PaginatedResult
+from adk_server.domain.models.user import User
+
+
+class IUserRepository(Protocol):
+    async def list(
+        self,
+        *,
+        limit: int,
+        page_token: UUID | None = None,
+        email: str | None = None,
+    ) -> PaginatedResult[User]: ...
+
+    async def create(self, *, user: User) -> None: ...
+    async def get(self, *, user_id: UUID) -> User: ...
+    async def get_by_email(self, *, email: str) -> User: ...
+    async def delete(self, *, user_id: UUID) -> int: ...

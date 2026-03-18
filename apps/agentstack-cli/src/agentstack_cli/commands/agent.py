@@ -291,7 +291,7 @@ async def _add_agent_via_kagenti(
     env_vars: dict[str, str] = {
         "PORT": "8000",
         "HOST": "0.0.0.0",
-        "PLATFORM_URL": "http://agentstack-server-svc.agentstack:8333",
+        "PLATFORM_URL": "http://adk-server-svc.agentstack:8333",
         "PLATFORM_AUTH__SKIP_AUDIENCE_VALIDATION": "true",
         "OTEL_EXPORTER_OTLP_ENDPOINT": "http://otel-collector.kagenti-system:8335",
     }

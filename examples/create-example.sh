@@ -5,7 +5,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$SCRIPT_DIR/.."
 TEMPLATE_DIR="$SCRIPT_DIR/.template/example"
 TEST_TEMPLATE="$SCRIPT_DIR/.template/test.py"
-TEST_BASE_DIR="$REPO_ROOT/apps/agentstack-server/tests/e2e/examples"
+TEST_BASE_DIR="$REPO_ROOT/apps/adk-server/tests/e2e/examples"
 
 usage() {
     echo "Usage: $0 <path> <description>"

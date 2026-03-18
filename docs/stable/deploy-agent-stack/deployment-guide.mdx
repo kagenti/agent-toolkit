@@ -191,7 +191,7 @@ externalOidcProvider:
   rolesPath: "realm_access.roles" # JSON path to roles in JWT claims (can be an array or a semicolon separated string)
 
   uiClientId: "agentstack-ui"
-  serverClientId: "agentstack-server"
+  serverClientId: "adk-server"
 
   # Secrets can be provided directly or via existing secrets
   uiClientSecret: "..."
@@ -238,7 +238,7 @@ Without verified emails, authentication will fail with "Verified email not found
   **Realm:** `agentstack`
 
   **Clients:**
-  - `agentstack-server`: Backend service client (Confidential, Service Accounts enabled).
+  - `adk-server`: Backend service client (Confidential, Service Accounts enabled).
   - `agentstack-ui`: Frontend UI client (Confidential, Standard Flow).
   - `agentstack-cli`: Command Line Interface client (Public, Standard Flow).
 
@@ -256,7 +256,7 @@ To move beyond local port-forwarding, you must expose the following services usi
 | Service| Internal Target | Purpose |
 |--------|-----------------|---------|
 |<b>UI Endpoint</b>|`agentstack-ui-svc`| Access to the web interface (includes API proxy).
-|<b>API Endpoint (optional)</b>  | `agentstack-server-svc`| Direct server API access; Required for CLI usage.
+|<b>API Endpoint (optional)</b>  | `adk-server-svc`| Direct server API access; Required for CLI usage.
 |<b>Auth Endpoint (optional)</b>  | `agentstack-keycloak`| Required for UI and CLI authentication if using Keycloak.
 
 ## Configuring External Services & Storage
@@ -542,7 +542,7 @@ Once Agent Stack is running, use these Helm and `kubectl` commands to manage the
 | Upgrade Platform | `helm upgrade --install agentstack -f config.yaml oci://ghcr.io/kagenti/adk/chart/adk:<version>` |
 | View Active Config | `helm get values agentstack` |
 | Deployment Status | `helm status agentstack` |
-| Resource Health | `kubectl get pods` , `kubectl logs deployment/agentstack-server` |
+| Resource Health | `kubectl get pods` , `kubectl logs deployment/adk-server` |
 | Uninstall | `helm uninstall agentstack` |
 
 
@@ -559,9 +559,9 @@ If you encounter issues during or after deployment, use the following commands a
 kubectl get pod
 
 # Check server logs
-kubectl logs deployment/agentstack-server
+kubectl logs deployment/adk-server
 # If server is not starting, check specific init container logs (e.g. migrations)
-kubectl logs deployment/agentstack-server -c run-migrations
+kubectl logs deployment/adk-server -c run-migrations
 
 # Check events
 kubectl get events --sort-by=.lastTimestamp
