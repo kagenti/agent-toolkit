@@ -18,7 +18,7 @@ app = AsyncTyper()
 
 # The in-cluster registry DNS name (used in pod image references)
 REGISTRY_INTERNAL = "registry.cr-system.svc.cluster.local:5000"
-# NodePort exposed by the post-renderer (matches registries.conf mirror)
+# NodePort exposed by the container registry chart (matches registries.conf mirror)
 REGISTRY_NODEPORT = 30500
 
 

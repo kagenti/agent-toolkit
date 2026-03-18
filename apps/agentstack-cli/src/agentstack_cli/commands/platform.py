@@ -606,7 +606,7 @@ async def start_cmd(
             ).encode("utf-8"),
         )
         # --- Prepare kagenti chart values and version before image listing ---
-        kagenti_chart_version = "0.5.1"
+        kagenti_chart_version = "0.5.0-alpha.11"
         kagenti_deps_values = yaml.dump(
             merge(
                 {
@@ -632,6 +632,15 @@ async def start_cmd(
                         "auth": {"adminUser": "admin", "adminPassword": "admin"},
                         "url": "http://keycloak-service.keycloak:8080",
                         "publicUrl": "http://keycloak.localtest.me:8080",
+                        "extraEnvVars": [
+                            {"name": "KC_HOSTNAME_BACKCHANNEL_DYNAMIC", "value": "true"},
+                        ],
+                    },
+                    "phoenix": {
+                        "database": {"type": "sqlite"},
+                    },
+                    "containerRegistry": {
+                        "service": {"type": "NodePort", "nodePort": 30500},
                     },
                 },
                 user_kagenti_deps_values,
@@ -799,6 +808,9 @@ async def start_cmd(
             "Installing Istio (Gateway API controller)",
         )
         # Create hostPath PVs (MicroShift has no dynamic storage provisioner)
+        # Pre-create the keycloak namespace so MicroShift assigns a UID range,
+        # then chown the host directory to match — postgres:17 initdb requires
+        # the process to own its data directory for chmod 700.
         k8s_data = importlib.resources.files("agentstack_cli") / "data" / "k8s"
         keycloak_pv_yaml = (k8s_data / "keycloak-postgres-pv.yaml").read_text()
         await run_in_vm(
@@ -815,53 +827,6 @@ async def start_cmd(
                 "Creating PV for Phoenix data",
                 input=phoenix_pv_yaml.encode("utf-8"),
             )
-        # Install a Helm 4 post-renderer plugin that patches kagenti-deps manifests:
-        # - Strips postgres-otel StatefulSet (x86-only Fedora image, SCC-incompatible)
-        # - Patches Phoenix to use SQLite instead of PostgreSQL
-        # - Patches container registry Service to NodePort 30500 for local image pushes
-        patch_script = (importlib.resources.files("agentstack_cli") / "data" / "k8s" / "patch_kagenti_otel.py").read_text()
-        await run_in_vm(
-            vm_name,
-            [
-                "bash", "-c",
-                textwrap.dedent("""\
-                    PLUGIN_DIR=/tmp/helm-plugin-patch-postgres
-                    mkdir -p "$PLUGIN_DIR"
-                    cat > "$PLUGIN_DIR/plugin.yaml" << 'YAML'
-                    apiVersion: v1
-                    type: postrenderer/v1
-                    name: patch-postgres
-                    version: 0.1.0
-                    runtime: subprocess
-                    runtimeConfig:
-                      platformCommand:
-                        - command: ${HELM_PLUGIN_DIR}/run.sh
-                    YAML
-                    cat > "$PLUGIN_DIR/patch.py"
-                """),
-            ],
-            "Preparing post-renderer patch script",
-            input=patch_script.encode("utf-8"),
-        )
-        # Write run.sh separately to avoid shebang escaping issues with bash -c
-        await run_in_vm(
-            vm_name,
-            [
-                "python3", "-c",
-                "import os; "
-                "p='/tmp/helm-plugin-patch-postgres/run.sh'; "
-                "open(p,'wb').write(b'\\x23\\x21/bin/bash\\nset -e\\nexec python3 /tmp/helm-plugin-patch-postgres/patch.py\\n'); "
-                "os.chmod(p, 0o755)",
-            ],
-            "Writing post-renderer entrypoint",
-        )
-        await run_in_vm(
-            vm_name,
-            ["helm", "plugin", "install", "/tmp/helm-plugin-patch-postgres"],
-            "Installing post-renderer plugin",
-            check=False,  # already installed on subsequent runs
-        )
-        kagenti_deps_post_renderer = ["--post-renderer=patch-postgres"]
         await run_in_vm(
             vm_name,
             [
@@ -877,42 +842,23 @@ async def start_cmd(
                 "--timeout=10m",
                 "--kubeconfig=/kubeconfig",
                 "--force-conflicts",
-                *kagenti_deps_post_renderer,
                 *(f"--set={v}" for v in scoped_sets["kagenti-deps"]),
             ],
             "Installing kagenti dependencies (Keycloak)",
         )
-        # Enable dynamic backchannel hostname so Keycloak returns the internal service URL
-        # (not KC_HOSTNAME) for backend-to-backend OIDC discovery requests
+        # Fix keycloak postgres data dir ownership to match MicroShift's SCC-assigned UID.
+        # The postgres:17 image requires the process to own its data dir for initdb chmod.
         await run_in_vm(
             vm_name,
             [
-                "bash",
-                "-c",
-                textwrap.dedent("""\
-                    kubectl --kubeconfig=/kubeconfig -n keycloak set env statefulset/keycloak KC_HOSTNAME_BACKCHANNEL_DYNAMIC=true
-                    kubectl --kubeconfig=/kubeconfig -n keycloak rollout status statefulset/keycloak --timeout=600s
-                """),
+                "bash", "-c",
+                "UID_RANGE=$(kubectl --kubeconfig=/kubeconfig get namespace keycloak -o jsonpath='{.metadata.annotations.openshift\\.io/sa\\.scc\\.uid-range}') && "
+                "BASE_UID=${UID_RANGE%%/*} && "
+                'chown "$BASE_UID:$BASE_UID" /kagenti-keycloak-postgres-data && '
+                "chmod 700 /kagenti-keycloak-postgres-data && "
+                "kubectl --kubeconfig=/kubeconfig delete pod -n keycloak postgres-0 --ignore-not-found",
             ],
-            "Enabling Keycloak backchannel dynamic hostname",
-        )
-        await run_in_vm(
-            vm_name,
-            [
-                "helm",
-                "upgrade",
-                "--install",
-                "kagenti",
-                "oci://ghcr.io/kagenti/kagenti/kagenti",
-                f"--version={kagenti_chart_version}",
-                "--namespace=kagenti-system",
-                "--create-namespace",
-                "--values=/tmp/kagenti-values.yaml",
-                "--timeout=10m",
-                "--kubeconfig=/kubeconfig",
-                *(f"--set={v}" for v in scoped_sets["kagenti"]),
-            ],
-            "Installing kagenti platform (operator + backend)",
+            "Fixing keycloak postgres data directory ownership",
         )
         # Label namespaces for shared gateway access and create agentstack HTTPRoutes
         await run_in_vm(
@@ -1011,6 +957,24 @@ async def start_cmd(
                 *(f"--set={v}" for v in scoped_sets["agentstack"]),
             ],
             "Deploying Agent Stack platform with Helm",
+        )
+        await run_in_vm(
+            vm_name,
+            [
+                "helm",
+                "upgrade",
+                "--install",
+                "kagenti",
+                "oci://ghcr.io/kagenti/kagenti/kagenti",
+                f"--version={kagenti_chart_version}",
+                "--namespace=kagenti-system",
+                "--create-namespace",
+                "--values=/tmp/kagenti-values.yaml",
+                "--timeout=10m",
+                "--kubeconfig=/kubeconfig",
+                *(f"--set={v}" for v in scoped_sets["kagenti"]),
+            ],
+            "Installing kagenti platform (operator + backend)",
         )
         if shas_guest_before and (
             replaced_digests := set(shas_guest_before.values())
