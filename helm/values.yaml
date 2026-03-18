@@ -435,8 +435,8 @@ seaweedfs:
     createClusterRole: false
   enabled: true
   image:
-    registry: ghcr.io
-    repository: kagenti/chrislusf # Should be kagenti/chrislusf/seaweedfs, there is a bug in the subchart
+    registry: mirror.gcr.io
+    repository: chrislusf
   bucket: "agentstack-files"
   auth:
     admin:
@@ -504,8 +504,8 @@ redis:
   enabled: false
   fullnameOverride: "redis"
   image:
-    registry: ghcr.io
-    repository: kagenti/redis
+    registry: mirror.gcr.io
+    repository: redis
   architecture: standalone
   auth:
     enabled: true
