@@ -26,7 +26,7 @@ sqlite = [
 ]
 
 [[package]]
-name = "agentstack-server"
+name = "adk-server"
 version = "0.7.1"
 source = { editable = "." }
 dependencies = [
