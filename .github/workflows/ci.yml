@@ -103,7 +103,7 @@ jobs:
           install_vm_deps: 'run'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: mise run agent-server:test:integration
+      - run: mise run adk-server:test:integration
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           LLM_API_BASE: "${{ secrets.OPENAI_API_BASE }}"
