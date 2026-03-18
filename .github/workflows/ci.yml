@@ -132,7 +132,7 @@ jobs:
           install_vm_deps: 'run'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: mise run agentstack-server:test:e2e
+      - run: mise run adk-server:test:e2e
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           LLM_API_BASE: "${{ secrets.OPENAI_API_BASE }}"
@@ -164,7 +164,7 @@ jobs:
           install_vm_deps: 'run'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: mise run agentstack-server:test:e2e-examples
+      - run: mise run adk-server:test:e2e-examples
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           LLM_API_BASE: "${{ secrets.OPENAI_API_BASE }}"
