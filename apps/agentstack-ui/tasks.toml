@@ -69,7 +69,7 @@ run = "pnpm next dev --webpack"
 ["agentstack-ui:build"]
 depends = ["agentstack-ui:build:*"]
 dir = "{{config_root}}"
-run = "docker build -t ghcr.io/i-am-bee/agentstack/agentstack-ui:local -f ./apps/agentstack-ui/Dockerfile --load ."
+run = "docker build -t ghcr.io/kagenti/adk/adk-ui:local -f ./apps/agentstack-ui/Dockerfile --load ."
 
 ["agentstack-ui:build:nextjs"]
 depends = ["common:setup:pnpm", "adk-ts:build"]

@@ -4,7 +4,7 @@ The agent stack helm chart is packaged and uploaded to the container registry fo
 You can install the chart using the following command:
 
 ```bash
-helm install agentstack -f config.yaml oci://ghcr.io/i-am-bee/agentstack/chart/agentstack:<release-version>
+helm install agentstack -f config.yaml oci://ghcr.io/kagenti/adk/chart/adk:<release-version>
 ```
 
 Check out the [documentation](https://agentstack.beeai.dev/stable/how-to/deployment-guide) for a detailed deployment guide.

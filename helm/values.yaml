@@ -208,7 +208,7 @@ imagePullSecrets: []
 # -------- SERVER ----------
 server:
   image:
-    repository: ghcr.io/i-am-bee/agentstack/agentstack-server
+    repository: ghcr.io/kagenti/adk/adk-server
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     tag: null
@@ -352,7 +352,7 @@ ui:
   enabled: true
   appName: "Agent Stack"
   image:
-    repository: ghcr.io/i-am-bee/agentstack/agentstack-ui
+    repository: ghcr.io/kagenti/adk/adk-ui
     pullPolicy: IfNotPresent
     tag: null
     resources: {}
@@ -394,7 +394,7 @@ postgresql:
       allowInsecureImages: true
   image:
     registry: ghcr.io
-    repository: i-am-bee/bitnami/postgresql-pgvector
+    repository: kagenti/bitnami/postgresql-pgvector
     tag: 17.6.0@sha256:2af2dbe1216541ecfab4dc0552ef332034e6ac1e7aa2f4124417145b196ed17a
   auth:
     postgresPassword: "admin-password"
@@ -463,7 +463,7 @@ seaweedfs:
   enabled: true
   image:
     registry: ghcr.io
-    repository: i-am-bee/chrislusf # Should be i-am-bee/chrislusf/seaweedfs, there is a bug in the subchart
+    repository: kagenti/chrislusf # Should be kagenti/chrislusf/seaweedfs, there is a bug in the subchart
   bucket: "agentstack-files"
   auth:
     admin:
@@ -532,7 +532,7 @@ redis:
   fullnameOverride: "redis"
   image:
     registry: ghcr.io
-    repository: i-am-bee/redis
+    repository: kagenti/redis
   architecture: standalone
   auth:
     enabled: true
