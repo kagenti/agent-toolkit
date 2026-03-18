@@ -2,42 +2,31 @@ version = 1
 revision = 3
 requires-python = "==3.14.*"
 
+[manifest]
+overrides = [{ name = "a2a-sdk", specifier = ">=1.0.0a0" }]
+
 [[package]]
 name = "a2a-sdk"
-version = "0.3.24"
+version = "1.0.0a0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "google-api-core" },
+    { name = "googleapis-common-protos" },
     { name = "httpx" },
     { name = "httpx-sse" },
+    { name = "json-rpc" },
     { name = "protobuf" },
     { name = "pydantic" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ad/76/cefa956fb2d3911cb91552a1da8ce2dbb339f1759cb475e2982f0ae2332b/a2a_sdk-0.3.24.tar.gz", hash = "sha256:3581e6e8a854cd725808f5732f90b7978e661b6d4e227a4755a8f063a3c1599d", size = 255550, upload-time = "2026-02-20T10:05:43.423Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/77/e3/e0d0b93877dc7d7ad45d59f82a254664e8d78f35fe20c8cd8584eb9bcba0/a2a_sdk-1.0.0a0.tar.gz", hash = "sha256:83ee525015b8577091750ea823af1afe41ccf350789539e421b0ab06d3622eb2", size = 343086, upload-time = "2026-03-17T14:11:04.071Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/10/6e/cae5f0caea527b39c0abd7204d9416768764573c76649ca03cc345a372be/a2a_sdk-0.3.24-py3-none-any.whl", hash = "sha256:7b248767096bb55311f57deebf6b767349388d94c1b376c60cb8f6b715e053f6", size = 145752, upload-time = "2026-02-20T10:05:41.729Z" },
-]
-
-[package.optional-dependencies]
-grpc = [
-    { name = "grpcio" },
-    { name = "grpcio-reflection" },
-    { name = "grpcio-tools" },
-]
-http-server = [
-    { name = "fastapi" },
-    { name = "sse-starlette" },
-    { name = "starlette" },
-]
-telemetry = [
-    { name = "opentelemetry-api" },
-    { name = "opentelemetry-sdk" },
+    { url = "https://files.pythonhosted.org/packages/97/f7/673b61a8272c9d36baf9df7169a784e6eda214a830569e9f0c3e442d75bb/a2a_sdk-1.0.0a0-py3-none-any.whl", hash = "sha256:a062e00a00d0fffcdd4325c36392dff27bf0e9ef99a6a6d35344c08676ca45c4", size = 225939, upload-time = "2026-03-17T14:11:02.672Z" },
 ]
 
 [[package]]
 name = "agentstack-sdk"
 version = "0.7.1"
-source = { editable = "../../apps/agentstack-sdk-py" }
+source = { editable = "../../apps/adk-py" }
 dependencies = [
     { name = "a2a-sdk" },
     { name = "anyio" },
@@ -65,7 +54,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "a2a-sdk", specifier = "==0.3.24" },
+    { name = "a2a-sdk", extras = ["sqlite"], specifier = "==1.0.0a0" },
     { name = "anyio", specifier = ">=4.9.0" },
     { name = "async-lru", specifier = ">=2.0.4" },
     { name = "asyncclick", specifier = ">=8.1.8" },
@@ -96,7 +85,7 @@ dev = [
     { name = "pytest", specifier = ">=8.4.1" },
     { name = "pytest-asyncio", specifier = ">=1.1.0" },
     { name = "pytest-httpx", specifier = ">=0.35.0" },
-    { name = "ruff", specifier = ">=0.12.3" },
+    { name = "ruff", specifier = ">=0.15.0" },
 ]
 
 [[package]]
@@ -266,6 +255,7 @@ name = "beeai-framework"
 version = "0.1.78"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
+    { name = "a2a-sdk" },
     { name = "aiofiles" },
     { name = "cachetools" },
     { name = "chevron" },
@@ -284,7 +274,6 @@ wheels = [
 
 [package.optional-dependencies]
 a2a = [
-    { name = "a2a-sdk", extra = ["grpc", "http-server", "telemetry"] },
     { name = "cryptography" },
     { name = "grpcio-health-checking" },
     { name = "starlette" },
@@ -715,42 +704,6 @@ wheels = [
 ]
 
 [[package]]
-name = "grpcio-reflection"
-version = "1.78.1"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "grpcio" },
-    { name = "protobuf" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/4d/f1/389fbbff18e84fdde609114eae37e74d8ae23e3f48266769d1fe2486b754/grpcio_reflection-1.78.1.tar.gz", hash = "sha256:224c0d604207954923fd6f8dbec541e0976a64ab1be65d2ee40844ce16c762ab", size = 19116, upload-time = "2026-02-20T01:21:49.703Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/2c/29/8f3ad00c7cfd97decd0a9b1c0e5422adf684736c639c7a9d840a1f9166e6/grpcio_reflection-1.78.1-py3-none-any.whl", hash = "sha256:222c4c3d1367fc4c6bf53d556229e3735f54ab4710b4aee541f7f741de069ba0", size = 22801, upload-time = "2026-02-20T01:21:34.143Z" },
-]
-
-[[package]]
-name = "grpcio-tools"
-version = "1.78.1"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "grpcio" },
-    { name = "protobuf" },
-    { name = "setuptools" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/c9/e5/311efa9278a451291e317286babf3f69b1479f8e6fd244836e3803e4b81d/grpcio_tools-1.78.1.tar.gz", hash = "sha256:f47b746b06a940954b9aa86b1824aa4874f068a7ec2d4b407980d202c86a691a", size = 5392610, upload-time = "2026-02-20T01:19:44.109Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/5e/5b/76d7969539159a22dfa20c23c3885ce9024a12d88e23d76063a1e1df566d/grpcio_tools-1.78.1-cp314-cp314-linux_armv7l.whl", hash = "sha256:11c6a338c227e5aab76954f35959682d59c432a5b6d7db053fa1a99c7124bbde", size = 2546269, upload-time = "2026-02-20T01:18:30.673Z" },
-    { url = "https://files.pythonhosted.org/packages/3f/8a/a1d180e7165bbdd30d109a448c95d6077eaa9afe40a2ed159f40bec64ce3/grpcio_tools-1.78.1-cp314-cp314-macosx_11_0_universal2.whl", hash = "sha256:090aeaa053f728539d0f84658bb5d88411a913cbcc49e990b5a80acd3c46dc94", size = 5705752, upload-time = "2026-02-20T01:18:33.396Z" },
-    { url = "https://files.pythonhosted.org/packages/43/5c/067b95424eee7cb980a2237c3ecd23935ea742b17acf4411064a727ec9b0/grpcio_tools-1.78.1-cp314-cp314-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:203347a50b00e6a1793c35af437a39449b247b9461a9f1f9b9baf954b4255cd8", size = 2593895, upload-time = "2026-02-20T01:18:36.746Z" },
-    { url = "https://files.pythonhosted.org/packages/01/1f/6edd882a7c47f74321aeec98ef20b7c54c4fa61c81bb08039b14c1777de2/grpcio_tools-1.78.1-cp314-cp314-manylinux2014_i686.manylinux_2_17_i686.whl", hash = "sha256:7c3cef48b10cccfc039b5ae054d7ad8d7b907ff03a283b606b3999ce3843b5a5", size = 2905296, upload-time = "2026-02-20T01:18:41.875Z" },
-    { url = "https://files.pythonhosted.org/packages/a4/15/2ecacd23670fd8bc945fa1a3ae5ad0916c95d9803ceda0b7427d9dfc4ee0/grpcio_tools-1.78.1-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:abb2aee19b91d619670a3598faaa8036b31dd96708ab82d8fb990da4b5c3fc01", size = 2656183, upload-time = "2026-02-20T01:18:44.556Z" },
-    { url = "https://files.pythonhosted.org/packages/60/36/ec4b0172f803f7add82bcc16346b47a80ca983539dc5bf779da1d44f3b4a/grpcio_tools-1.78.1-cp314-cp314-musllinux_1_2_aarch64.whl", hash = "sha256:b6307ce936cd5f7714bba75e8b7c71f4e6a4da625b907960227568022ee812fa", size = 3109860, upload-time = "2026-02-20T01:18:47.218Z" },
-    { url = "https://files.pythonhosted.org/packages/79/85/6fb37b10667764505f9bc6baab9bccaaa0777bfe07aa786f9e1d4f482253/grpcio_tools-1.78.1-cp314-cp314-musllinux_1_2_i686.whl", hash = "sha256:40aad3da94bf261792ff998084117f6ce092b7b137dcea257628def834b91e96", size = 3657914, upload-time = "2026-02-20T01:18:59.138Z" },
-    { url = "https://files.pythonhosted.org/packages/42/11/da86c93b0d00f5180d283740c89aa998f955c7389ff268128b99c5bebdb9/grpcio_tools-1.78.1-cp314-cp314-musllinux_1_2_x86_64.whl", hash = "sha256:36dbd00415376a3db03cd57a8063dfb5506c3ec69737945488f6c28a3e8b5cf1", size = 3324719, upload-time = "2026-02-20T01:19:01.55Z" },
-    { url = "https://files.pythonhosted.org/packages/9d/b6/6a00609300fbfe2163183522005911f4676bc80db374d55c2a9d9e70997e/grpcio_tools-1.78.1-cp314-cp314-win32.whl", hash = "sha256:6d284037ff456842324fa12b0a6455fce0b3ab92f218677b34c33cf4787a54c4", size = 1015537, upload-time = "2026-02-20T01:19:04.289Z" },
-    { url = "https://files.pythonhosted.org/packages/05/76/ef3d2f5a86da2b3a2abcef7141bc4d2d8d119b0da389029811a4507b499b/grpcio_tools-1.78.1-cp314-cp314-win_amd64.whl", hash = "sha256:acb9849783dc7cf0e7359cbd60c6bf3154008bf9aeff12c696ec7289599eb3a8", size = 1190123, upload-time = "2026-02-20T01:19:06.831Z" },
-]
-
-[[package]]
 name = "h11"
 version = "0.16.0"
 source = { registry = "https://pypi.org/simple" }
@@ -964,6 +917,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/22/cd/030ecc4c864298870bdfedd950d7b86b15abf30aff5915178cb1221abd8c/json_repair-0.52.5.tar.gz", hash = "sha256:b17c8af9af91573bb7bd94a32b98a331df1d5e4ca58f0407c80eb14b1489ca1a", size = 35770, upload-time = "2025-11-06T16:09:28.669Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/29/c1/7cad04a5d6248a38656b0cdb267697e67b174fe21c61fb9bbfe0995591f4/json_repair-0.52.5-py3-none-any.whl", hash = "sha256:031a84536c93df1de3fb8c8554393da69111e375109cac3ff3d7c68158d68633", size = 26733, upload-time = "2025-11-06T16:09:26.532Z" },
+]
+
+[[package]]
+name = "json-rpc"
+version = "1.15.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/6d/9e/59f4a5b7855ced7346ebf40a2e9a8942863f644378d956f68bcef2c88b90/json-rpc-1.15.0.tar.gz", hash = "sha256:e6441d56c1dcd54241c937d0a2dcd193bdf0bdc539b5316524713f554b7f85b9", size = 28854, upload-time = "2023-06-11T09:45:49.078Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/94/9e/820c4b086ad01ba7d77369fb8b11470a01fac9b4977f02e18659cf378b6b/json_rpc-1.15.0-py2.py3-none-any.whl", hash = "sha256:4a4668bbbe7116feb4abbd0f54e64a4adcf4b8f648f19ffa0848ad0f6606a9bf", size = 39450, upload-time = "2023-06-11T09:45:47.136Z" },
 ]
 
 [[package]]
@@ -1866,7 +1828,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "agentstack-sdk", editable = "../../apps/agentstack-sdk-py" },
+    { name = "agentstack-sdk", editable = "../../apps/adk-py" },
     { name = "beeai-framework", extras = ["duckduckgo", "wikipedia", "a2a"], specifier = ">=0.1.76" },
     { name = "fastuuid", specifier = ">=0.14.0" },
     { name = "langchain-text-splitters", specifier = ">=0.3.0" },
@@ -2024,15 +1986,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/da/8a/22b7beea3ee0d44b1916c0c1cb0ee3af23b700b6da9f04991899d0c555d4/rsa-4.9.1.tar.gz", hash = "sha256:e7bdbfdb5497da4c07dfd35530e1a902659db6ff241e39d9953cad06ebd0ae75", size = 29034, upload-time = "2025-04-16T09:51:18.218Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/64/8d/0133e4eb4beed9e425d9a98ed6e081a55d195481b7632472be1af08d2f6b/rsa-4.9.1-py3-none-any.whl", hash = "sha256:68635866661c6836b8d39430f97a996acbd61bfa49406748ea243539fe239762", size = 34696, upload-time = "2025-04-16T09:51:17.142Z" },
-]
-
-[[package]]
-name = "setuptools"
-version = "82.0.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/82/f3/748f4d6f65d1756b9ae577f329c951cda23fb900e4de9f70900ced962085/setuptools-82.0.0.tar.gz", hash = "sha256:22e0a2d69474c6ae4feb01951cb69d515ed23728cf96d05513d36e42b62b37cb", size = 1144893, upload-time = "2026-02-08T15:08:40.206Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/e1/c6/76dc613121b793286a3f91621d7b75a2b493e0390ddca50f11993eadf192/setuptools-82.0.0-py3-none-any.whl", hash = "sha256:70b18734b607bd1da571d097d236cfcfacaf01de45717d59e6e04b96877532e0", size = 1003468, upload-time = "2026-02-08T15:08:38.723Z" },
 ]
 
 [[package]]

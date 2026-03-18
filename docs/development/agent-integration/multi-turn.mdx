@@ -352,21 +352,19 @@ import uuid
 from uuid import UUID
 from typing import Any
 
-from a2a.types import Message, Part, Role, TextPart
+from a2a.types import Message, Part, Role
 from kagenti_adk.platform.context import Context
 from kagenti_adk.server.context import RunContext
 
-async def edit_message_in_context(run_context: RunContext, id: UUID, new_text: str, metadata: dict[str, Any] | None = None):
+async def edit_message_in_context(run_context: RunContext, id: UUID, new_text: str):
     # Step 1: Delete from this message onwards
     await run_context.delete_history_from_id(from_id=id)
 
     # Step 2: Create the corrected message
     corrected_message = Message(
         message_id=str(uuid.uuid4()),
-        parts=[Part(TextPart(text=new_text))],
-        role=Role.user,
-        kind="message",
-        metadata=metadata,
+        parts=[Part(text=new_text)],
+        role=Role.ROLE_USER,
     )
 
     # Step 3: Store the corrected message

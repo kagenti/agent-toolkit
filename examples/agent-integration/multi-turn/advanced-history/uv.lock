@@ -54,7 +54,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "agentstack-sdk", editable = "../../../../apps/agentstack-sdk-py" },
+    { name = "agentstack-sdk", editable = "../../../../apps/adk-py" },
     { name = "beeai-framework", extras = ["duckduckgo", "wikipedia", "a2a"], specifier = "==0.1.78" },
     { name = "fastuuid", specifier = ">=0.14.0" },
     { name = "pyyaml", specifier = ">=6.0.2" },
@@ -70,7 +70,7 @@ dev = [
 [[package]]
 name = "agentstack-sdk"
 version = "0.6.3"
-source = { editable = "../../../../apps/agentstack-sdk-py" }
+source = { editable = "../../../../apps/adk-py" }
 dependencies = [
     { name = "a2a-sdk" },
     { name = "anyio" },
