@@ -14,7 +14,7 @@ Only use forms when the agent has clearly defined, structured parameters. For fr
 - Single free-form question, use A2A `input-required` event.
 - Structured multi-field input, use dynamic form request extension (`FormRequestExtensionServer` / `FormRequestExtensionSpec`).
 
-See the [form agent example](https://github.com/i-am-bee/agentstack/blob/main/agents/form/src/form/agent.py) on GitHub for a complete implementation.
+See the [form agent example](https://github.com/kagenti/adk/blob/main/agents/form/src/form/agent.py) on GitHub for a complete implementation.
 
 ## Turn Detection Guard (for multi-turn agents that also use initial forms)
 

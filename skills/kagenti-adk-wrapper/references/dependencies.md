@@ -41,7 +41,7 @@ Run this snippet **once** to crawl the installed package for `kagenti_adk` and p
 ```
 
 **Fallback Method (Documentation Search):**
-If the packages are not installed and cannot be inspected at runtime, attempt to find the exact import path, class names, method names, and properties in the official Agent Stack documentation. Use your web search or documentation reading tools to locate the correct information.
+If the packages are not installed and cannot be inspected at runtime, attempt to find the exact import path, class names, method names, and properties in the official Kagenti ADK documentation. Use your web search or documentation reading tools to locate the correct information.
 
 ## Import Recovery Sequence (required)
 
@@ -50,5 +50,5 @@ If import validation fails (e.g., `ModuleNotFoundError` or `ImportError`), follo
 1. **Verify Installation:** Ensure `kagenti-adk` and `a2a` actually exist in the active virtual environment manifest and are installed.
 2. **Scan Package Content (Primary Recovery Step):** Immediately use the **Inline Package Search** scripts (shown above) to crawl the installed `.venv`. This will give you the exact, currently installed path for the class that failed to import. Do not guess or hallucinate secondary paths.
 3. **Update Code:** Replace the failed import in your code with the exact path returned by the scan.
-4. **Fallback:** If the class doesn't exist in the scan results at all, check the official Agent Stack documentation to see if the class name or extension design has fundamentally changed.
+4. **Fallback:** If the class doesn't exist in the scan results at all, check the official Kagenti ADK documentation to see if the class name or extension design has fundamentally changed.
 5. If imports still fail after taking these steps, stop and report unresolved imports with module names and file paths to the user.
