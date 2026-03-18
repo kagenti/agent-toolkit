@@ -103,7 +103,7 @@ print(json.dumps(spec, indent=2))
 # run
 
 ["agentstack-server:run"]
-depends = ["agentstack-server:setup", "supergateway:build"]
+depends = ["agentstack-server:setup"]
 dir = "{{config_root}}/apps/agentstack-server"
 run = "uv run agentstack-server"
 
@@ -344,13 +344,6 @@ agentstack:
     enabled: true
   docling:
     enabled: true
-  connector:
-    presets:
-      - url: mcp+stdio://test
-        stdio:
-          image: mcp/aws-documentation
-        metadata:
-          name: Test MCP Server
 ' > "$CONFIG_FILE"
 
 {{ mise_bin }} run agentstack:start -v --vm-name=${VM_NAME} --skip-login -f "$CONFIG_FILE"
@@ -418,13 +411,6 @@ agentstack:
     enabled: false
   docling:
     enabled: true
-  connector:
-    presets:
-      - url: mcp+stdio://test
-        stdio:
-          image: mcp/aws-documentation
-        metadata:
-          name: Test MCP Server
 ' > "$CONFIG_FILE"
 
 {{ mise_bin }} run agentstack:start --vm-name=${VM_NAME} --skip-login -f "$CONFIG_FILE"
