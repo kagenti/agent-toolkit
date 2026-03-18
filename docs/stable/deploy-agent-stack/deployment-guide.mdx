@@ -54,12 +54,12 @@ are explained in the [Configuration Options](#configuration-options) section.
 ```yaml
 # External registries for default catalogs (change release/tag accordingly):
 externalRegistries:
-  public_github: "https://github.com/i-am-bee/agentstack@v0.4.3#path=agent-registry.yaml"
+  public_github: "https://github.com/kagenti/adk@v0.4.3#path=agent-registry.yaml"
 
 # Custom agents as docker images
 providers:
   - location: <docker-image-id>
-  # e.g. location: ghcr.io/i-am-bee/agentstack-starter/my-agent:latest
+  # e.g. location: ghcr.io/kagenti/adk-starter/my-agent:latest
 
 # Use the key generated in Step 1
 encryptionKey: "encryption-key-from-command"
@@ -77,7 +77,7 @@ auth:
 Deploy the stack to your cluster using Helm. 
 
 ```shell
-helm upgrade --install agentstack -f config.yaml oci://ghcr.io/i-am-bee/agentstack/chart/agentstack:0.4.3
+helm upgrade --install agentstack -f config.yaml oci://ghcr.io/kagenti/adk/chart/adk:0.4.3
 ```
 It may take a few minutes for the pods to start.
 
@@ -459,9 +459,9 @@ Use this method to manually define specific agent images and their unique enviro
 ```yaml
 providers:
   # Official agents
-  - location: ghcr.io/i-am-bee/agentstack/agents/chat:0.4.3
-  - location: ghcr.io/i-am-bee/agentstack/agents/rag:0.4.3
-  - location: ghcr.io/i-am-bee/agentstack/agents/form:0.4.3
+  - location: ghcr.io/kagenti/adk/agents/chat:0.4.3
+  - location: ghcr.io/kagenti/adk/agents/rag:0.4.3
+  - location: ghcr.io/kagenti/adk/agents/form:0.4.3
 
   # Your custom agents
   - location: your-registry.com/your-team/custom-agent:v1.0.0
@@ -479,7 +479,7 @@ To upgrade an agent, change its version tag and redeploy using `helm upgrade`.
 Instead of manual listing, you can point to a remote registry file. This is ideal for teams managing a large, dynamic catalog of agents.
 ```yaml
 externalRegistries:
-  public_github: "https://github.com/i-am-bee/agentstack@v0.4.3#path=agent-registry.yaml"
+  public_github: "https://github.com/kagenti/adk@v0.4.3#path=agent-registry.yaml"
 ```
 
 To upgrade an agent, change its version in the registry and wait for automatic synchronization (up to 10 minutes).
@@ -526,7 +526,7 @@ providerBuilds:
 
 The guide above covers the primary configuration paths for production environments. For a comprehensive list of every available parameter, including low-level resource limits, node selectors, and detailed sub-chart settings, refer to the source configuration file.
 
-All configuration options, including their default values and technical descriptions, are documented in the [values.yaml file](https://github.com/i-am-bee/agentstack/blob/v0.4.3/helm/values.yaml) within the official repository.
+All configuration options, including their default values and technical descriptions, are documented in the [values.yaml file](https://github.com/kagenti/adk/blob/v0.4.3/helm/values.yaml) within the official repository.
 
 If your infrastructure has specific requirements (such as custom sidecars, unique volume mounts, or specific network policies) that are not currently exposed via the Helm chart, please open a GitHub issue to request a new configuration toggle.
 
@@ -539,7 +539,7 @@ Once Agent Stack is running, use these Helm and `kubectl` commands to manage the
 
 | Task | Command |
 |------|---------|
-| Upgrade Platform | `helm upgrade --install agentstack -f config.yaml oci://ghcr.io/i-am-bee/agentstack/chart/agentstack:<version>` |
+| Upgrade Platform | `helm upgrade --install agentstack -f config.yaml oci://ghcr.io/kagenti/adk/chart/adk:<version>` |
 | View Active Config | `helm get values agentstack` |
 | Deployment Status | `helm status agentstack` |
 | Resource Health | `kubectl get pods` , `kubectl logs deployment/agentstack-server` |

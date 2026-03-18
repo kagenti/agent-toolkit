@@ -112,7 +112,7 @@ run = "uv run agentstack-server"
 ["agentstack-server:build"]
 depends = ["agentstack-server:build:*"]
 dir = "{{config_root}}/apps/agentstack-server"
-run = "docker build -t ghcr.io/i-am-bee/agentstack/agentstack-server:local --load ."
+run = "docker build -t ghcr.io/kagenti/adk/adk-server:local --load ."
 
 ["agentstack-server:build:requirements"]
 depends = ["agentstack-server:setup"]
