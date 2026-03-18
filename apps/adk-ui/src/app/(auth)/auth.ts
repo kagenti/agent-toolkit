@@ -13,7 +13,7 @@ import type { ProviderConfig, ProviderWithId } from './types';
 import { providerConfigSchema } from './types';
 import { getTokenRefreshSchedule, jwtWithRefresh, RefreshTokenError } from './utils';
 
-export const AUTH_COOKIE_NAME = 'agentstack';
+export const AUTH_COOKIE_NAME = 'adk-auth-token';
 
 const { isAuthEnabled } = runtimeConfig;
 
