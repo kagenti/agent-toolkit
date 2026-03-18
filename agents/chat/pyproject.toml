@@ -23,6 +23,11 @@ line-length = 120
 [tool.uv.sources]
 kagenti-adk = { path = "../../apps/adk-py", editable = true }
 
+[tool.uv]
+override-dependencies = [
+    "a2a-sdk>=1.0.0a0",
+]
+
 [project.scripts]
 server = "chat.agent:serve"
 
