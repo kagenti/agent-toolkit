@@ -4,7 +4,7 @@ metadata:
   name: adk-server-svc
   labels:
     app: adk-server
-    {{- include "agentstack.labels" . | nindent 4 }}
+    {{- include "kagenti-adk.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.server.service.type }}
   ports:
@@ -17,4 +17,4 @@ spec:
       {{- end }}
   selector:
     app: adk-server
-    {{- include "agentstack.selectorLabels" . | nindent 4 }}
+    {{- include "kagenti-adk.selectorLabels" . | nindent 4 }}

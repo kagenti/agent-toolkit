@@ -67,8 +67,8 @@ wait
 ["adk-cli:build:copy-helm-chart"]
 depends = ["helm:build"]
 dir = "{{config_root}}/apps/adk-cli"
-run = "rm ./src/kagenti_cli/data/helm-chart.tgz 2>/dev/null || true && cp {{config_root}}/helm/dist/agentstack-*.tgz ./src/kagenti_cli/data/helm-chart.tgz"
-sources = ["{{config_root}}/helm/dist/agentstack-*.tgz"]
+run = "rm ./src/kagenti_cli/data/helm-chart.tgz 2>/dev/null || true && cp {{config_root}}/helm/dist/kagenti-adk-*.tgz ./src/kagenti_cli/data/helm-chart.tgz"
+sources = ["{{config_root}}/helm/dist/kagenti-adk-*.tgz"]
 outputs = ["./src/kagenti_cli/data/helm-chart.tgz"]
 
 ["adk-cli:build"]

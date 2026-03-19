@@ -1,21 +1,21 @@
 {{/*
-Validation helpers for Agent Stack Helm chart.
+Validation helpers for ADK Helm chart.
 These validators ensure configuration consistency and prevent common deployment issues.
 */}}
 
 {{/*
 Run all validators. Include this in any template to trigger validation.
 */}}
-{{- define "agentstack.validateAll" -}}
-{{- include "agentstack.validate.encryptionKey" . -}}
-{{- include "agentstack.validate.authConfig" . -}}
-{{- include "agentstack.validate.redisForReplicas" . -}}
+{{- define "kagenti-adk.validateAll" -}}
+{{- include "kagenti-adk.validate.encryptionKey" . -}}
+{{- include "kagenti-adk.validate.authConfig" . -}}
+{{- include "kagenti-adk.validate.redisForReplicas" . -}}
 {{- end -}}
 
 {{/*
 Validate that encryptionKey is provided.
 */}}
-{{- define "agentstack.validate.encryptionKey" -}}
+{{- define "kagenti-adk.validate.encryptionKey" -}}
 {{- if empty .Values.encryptionKey -}}
 {{- fail `
 ERROR: .Values.encryptionKey is missing.
@@ -29,7 +29,7 @@ Please generate one using:
 {{/*
 Validate authentication configuration.
 */}}
-{{- define "agentstack.validate.authConfig" -}}
+{{- define "kagenti-adk.validate.authConfig" -}}
 {{- if .Values.auth.enabled -}}
   {{- if and (empty .Values.auth.jwtPrivateKey) (not (empty .Values.auth.jwtPublicKey)) -}}
   {{- fail `
@@ -62,8 +62,8 @@ Please configure the OIDC provider:
 Validate that Redis is enabled when running multiple replicas.
 Redis is required for distributed rate limiting and caching to work correctly.
 */}}
-{{- define "agentstack.validate.redisForReplicas" -}}
-{{- if and (gt (int .Values.server.replicaCount) 1) (ne (include "agentstack.redis.enabled" .) "true") -}}
+{{- define "kagenti-adk.validate.redisForReplicas" -}}
+{{- if and (gt (int .Values.server.replicaCount) 1) (ne (include "kagenti-adk.redis.enabled" .) "true") -}}
 {{- fail `
 ERROR: Redis is required when running multiple replicas (replicaCount > 1).
 
