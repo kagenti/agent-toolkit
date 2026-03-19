@@ -5,7 +5,7 @@ metadata:
   name: keycloak-provision
   labels:
     app: keycloak-provision
-    {{- include "agentstack.labels" . | nindent 4 }}
+    {{- include "kagenti-adk.labels" . | nindent 4 }}
   annotations:
     {{- if .Values.useHelmHooks }}
     "helm.sh/hook": post-install,post-upgrade
@@ -16,7 +16,7 @@ spec:
     metadata:
       labels:
         app: keycloak-provision
-        {{- include "agentstack.labels" . | nindent 8 }}
+        {{- include "kagenti-adk.labels" . | nindent 8 }}
     spec:
       restartPolicy: OnFailure
       containers:
@@ -29,72 +29,72 @@ spec:
             - |
               # Wait for Keycloak to be ready by attempting login
               echo "Waiting for Keycloak to be ready..."
-              until /opt/keycloak/bin/kcadm.sh config credentials --server {{ regexReplaceAll "/realms/.*" (include "agentstack.oidc.internalIssuerUrl" .) "" | quote }} --realm master --user $KC_ADMIN_USER --password $KC_ADMIN_PASSWORD; do
+              until /opt/keycloak/bin/kcadm.sh config credentials --server {{ regexReplaceAll "/realms/.*" (include "kagenti-adk.oidc.internalIssuerUrl" .) "" | quote }} --realm master --user $KC_ADMIN_USER --password $KC_ADMIN_PASSWORD; do
                 echo "Keycloak not ready or login failed... retrying in 5s"
                 sleep 5
               done
-              
+
               echo "Keycloak is ready and logged in. Configuring..."
-              
+
               # Create Realm
-              echo "Creating Realm 'agentstack'..."
-              if /opt/keycloak/bin/kcadm.sh get realms/agentstack; then
+              echo "Creating Realm 'adk'..."
+              if /opt/keycloak/bin/kcadm.sh get realms/adk; then
                 echo "Realm exists."
               else
-                /opt/keycloak/bin/kcadm.sh create realms -s realm=agentstack -s enabled=true
+                /opt/keycloak/bin/kcadm.sh create realms -s realm=adk -s enabled=true
               fi
 
               # Create Roles
               echo "Creating Roles..."
-              if ! /opt/keycloak/bin/kcadm.sh get roles/agentstack-admin -r agentstack > /dev/null 2>&1; then
-                /opt/keycloak/bin/kcadm.sh create roles -r agentstack -s name=agentstack-admin
+              if ! /opt/keycloak/bin/kcadm.sh get roles/adk-admin -r adk > /dev/null 2>&1; then
+                /opt/keycloak/bin/kcadm.sh create roles -r adk -s name=adk-admin
               fi
-              if ! /opt/keycloak/bin/kcadm.sh get roles/agentstack-developer -r agentstack > /dev/null 2>&1; then
-                /opt/keycloak/bin/kcadm.sh create roles -r agentstack -s name=agentstack-developer
+              if ! /opt/keycloak/bin/kcadm.sh get roles/adk-developer -r adk > /dev/null 2>&1; then
+                /opt/keycloak/bin/kcadm.sh create roles -r adk -s name=adk-developer
               fi
-              
+
               # Create kagenti RBAC roles (idempotent — needed for single-realm setup)
               echo "Creating kagenti RBAC roles..."
               for KAGENTI_ROLE in kagenti-viewer kagenti-operator kagenti-admin; do
-                if ! /opt/keycloak/bin/kcadm.sh get roles/$KAGENTI_ROLE -r agentstack > /dev/null 2>&1; then
-                  /opt/keycloak/bin/kcadm.sh create roles -r agentstack -s name=$KAGENTI_ROLE -s "description=Kagenti RBAC role: $KAGENTI_ROLE"
+                if ! /opt/keycloak/bin/kcadm.sh get roles/$KAGENTI_ROLE -r adk > /dev/null 2>&1; then
+                  /opt/keycloak/bin/kcadm.sh create roles -r adk -s name=$KAGENTI_ROLE -s "description=Kagenti RBAC role: $KAGENTI_ROLE"
                 fi
               done
 
               # Create/Update Server Client
               echo "Configuring Server Client..."
-              CID=$(/opt/keycloak/bin/kcadm.sh get clients -r agentstack -q clientId=adk-server --fields id --format csv --noquotes)
+              CID=$(/opt/keycloak/bin/kcadm.sh get clients -r adk -q clientId=adk-server --fields id --format csv --noquotes)
               if [ -z "$CID" ]; then
-                /opt/keycloak/bin/kcadm.sh create clients -r agentstack -s clientId=adk-server -s enabled=true -s clientAuthenticatorType=client-secret -s secret=$SERVER_CLIENT_SECRET -s serviceAccountsEnabled=true -s directAccessGrantsEnabled=true -s standardFlowEnabled=false
-                CID=$(/opt/keycloak/bin/kcadm.sh get clients -r agentstack -q clientId=adk-server --fields id --format csv --noquotes)
+                /opt/keycloak/bin/kcadm.sh create clients -r adk -s clientId=adk-server -s enabled=true -s clientAuthenticatorType=client-secret -s secret=$SERVER_CLIENT_SECRET -s serviceAccountsEnabled=true -s directAccessGrantsEnabled=true -s standardFlowEnabled=false
+                CID=$(/opt/keycloak/bin/kcadm.sh get clients -r adk -q clientId=adk-server --fields id --format csv --noquotes)
               else
-                /opt/keycloak/bin/kcadm.sh update clients/$CID -r agentstack -s secret=$SERVER_CLIENT_SECRET -s enabled=true
+                /opt/keycloak/bin/kcadm.sh update clients/$CID -r adk -s secret=$SERVER_CLIENT_SECRET -s enabled=true
               fi
 
               # Assign kagenti-viewer role to adk-server service account
               echo "Assigning kagenti-viewer to adk-server service account..."
-              /opt/keycloak/bin/kcadm.sh add-roles -r agentstack --uusername service-account-adk-server --rolename kagenti-viewer
+              /opt/keycloak/bin/kcadm.sh add-roles -r adk --uusername service-account-adk-server --rolename kagenti-viewer
 
               # Create/Update UI Client
               {{- if and .Values.ui.enabled }}
               echo "Configuring UI Client..."
-              CID=$(/opt/keycloak/bin/kcadm.sh get clients -r agentstack -q clientId=adk-ui --fields id --format csv --noquotes)
+              CID=$(/opt/keycloak/bin/kcadm.sh get clients -r adk -q clientId=adk-ui --fields id --format csv --noquotes)
               if [ -z "$CID" ]; then
-                /opt/keycloak/bin/kcadm.sh create clients -r agentstack -s clientId=adk-ui -s enabled=true -s clientAuthenticatorType=client-secret -s secret=$UI_CLIENT_SECRET -s serviceAccountsEnabled=false -s directAccessGrantsEnabled=true -s standardFlowEnabled=true -s "redirectUris=[\"*\",\"$UI_URL/*\"]" -s "webOrigins=[\"*\"]" -s publicClient=false
+                /opt/keycloak/bin/kcadm.sh create clients -r adk -s clientId=adk-ui -s enabled=true -s clientAuthenticatorType=client-secret -s secret=$UI_CLIENT_SECRET -s serviceAccountsEnabled=false -s directAccessGrantsEnabled=true -s standardFlowEnabled=true -s "redirectUris=[\"*\",\"$UI_URL/*\"]" -s "webOrigins=[\"*\"]" -s publicClient=false
                 # Refresh CID
-                CID=$(/opt/keycloak/bin/kcadm.sh get clients -r agentstack -q clientId=adk-ui --fields id --format csv --noquotes)
+                CID=$(/opt/keycloak/bin/kcadm.sh get clients -r adk -q clientId=adk-ui --fields id --format csv --noquotes)
               else
-                /opt/keycloak/bin/kcadm.sh update clients/$CID -r agentstack -s secret=$UI_CLIENT_SECRET -s enabled=true -s "redirectUris=[\"*\",\"$UI_URL/*\"]"
+                /opt/keycloak/bin/kcadm.sh update clients/$CID -r adk -s secret=$UI_CLIENT_SECRET -s enabled=true -s "redirectUris=[\"*\",\"$UI_URL/*\"]"
               fi
               {{- end }}
 
               # Create/Update CLI Client
               echo "Configuring CLI Client..."
-              CID=$(/opt/keycloak/bin/kcadm.sh get clients -r agentstack -q clientId=kagenti-cli --fields id --format csv --noquotes)
+              CID=$(/opt/keycloak/bin/kcadm.sh get clients -r adk -q clientId=kagenti-cli --fields id --format csv --noquotes)
               if [ -z "$CID" ]; then
-                /opt/keycloak/bin/kcadm.sh create clients -r agentstack -s clientId=kagenti-cli -s enabled=true -s publicClient=true -s standardFlowEnabled=true -s directAccessGrantsEnabled=true -s "redirectUris=[\"http://localhost:9001/callback\"]" -s "webOrigins=[\"+\"]"
+                /opt/keycloak/bin/kcadm.sh create clients -r adk -s clientId=kagenti-cli -s enabled=true -s publicClient=true -s standardFlowEnabled=true -s directAccessGrantsEnabled=true -s "redirectUris=[\"http://localhost:9001/callback\"]" -s "webOrigins=[\"+\"]"
               else
-                /opt/keycloak/bin/kcadm.sh update clients/$CID -r agentstack -s enabled=true -s publicClient=true -s directAccessGrantsEnabled=true -s "redirectUris=[\"http://localhost:9001/callback\"]"
+                /opt/keycloak/bin/kcadm.sh update clients/$CID -r adk -s enabled=true -s publicClient=true -s directAccessGrantsEnabled=true -s "redirectUris=[\"http://localhost:9001/callback\"]"
               fi
 
               declare -a AUDIENCES=(
@@ -112,17 +112,17 @@ spec:
 
                 if [ -n "$AUDIENCE_URL" ]; then
                    echo "Configuring audience '$SCOPE_NAME' for client '$CLIENT_ID' with URL '$AUDIENCE_URL'..."
-                   
+
                    # Create/Get Client Scope
-                   SCOPE_ID=$(/opt/keycloak/bin/kcadm.sh get client-scopes -r agentstack --fields id,name --format csv --noquotes | grep ",$SCOPE_NAME$" | cut -d, -f1 || true)
+                   SCOPE_ID=$(/opt/keycloak/bin/kcadm.sh get client-scopes -r adk --fields id,name --format csv --noquotes | grep ",$SCOPE_NAME$" | cut -d, -f1 || true)
                    if [ -z "$SCOPE_ID" ]; then
-                     SCOPE_ID=$(/opt/keycloak/bin/kcadm.sh create client-scopes -r agentstack -s name=$SCOPE_NAME -s protocol=openid-connect -i)
+                     SCOPE_ID=$(/opt/keycloak/bin/kcadm.sh create client-scopes -r adk -s name=$SCOPE_NAME -s protocol=openid-connect -i)
                    fi
 
                    # Configure Mapper
-                   MAPPER_ID=$(/opt/keycloak/bin/kcadm.sh get client-scopes/$SCOPE_ID/protocol-mappers/models -r agentstack --fields id,name --format csv --noquotes | grep ",audience-mapper$" | cut -d, -f1 || true)
+                   MAPPER_ID=$(/opt/keycloak/bin/kcadm.sh get client-scopes/$SCOPE_ID/protocol-mappers/models -r adk --fields id,name --format csv --noquotes | grep ",audience-mapper$" | cut -d, -f1 || true)
                    if [ -z "$MAPPER_ID" ]; then
-                     /opt/keycloak/bin/kcadm.sh create client-scopes/$SCOPE_ID/protocol-mappers/models -r agentstack \
+                     /opt/keycloak/bin/kcadm.sh create client-scopes/$SCOPE_ID/protocol-mappers/models -r adk \
                        -s name=audience-mapper \
                        -s protocol=openid-connect \
                        -s protocolMapper=oidc-audience-mapper \
@@ -130,14 +130,14 @@ spec:
                        -s config.\"id.token.claim\"="false" \
                        -s config.\"access.token.claim\"="true"
                    else
-                     /opt/keycloak/bin/kcadm.sh update client-scopes/$SCOPE_ID/protocol-mappers/models/$MAPPER_ID -r agentstack \
+                     /opt/keycloak/bin/kcadm.sh update client-scopes/$SCOPE_ID/protocol-mappers/models/$MAPPER_ID -r adk \
                        -s config.\"included.client.audience\"="$AUDIENCE_URL"
                    fi
-                   
+
                    # Assign Scope to Client
-                   CID=$(/opt/keycloak/bin/kcadm.sh get clients -r agentstack -q clientId=$CLIENT_ID --fields id --format csv --noquotes)
+                   CID=$(/opt/keycloak/bin/kcadm.sh get clients -r adk -q clientId=$CLIENT_ID --fields id --format csv --noquotes)
                    if [ -n "$CID" ]; then
-                      /opt/keycloak/bin/kcadm.sh update clients/$CID/default-client-scopes/$SCOPE_ID -r agentstack
+                      /opt/keycloak/bin/kcadm.sh update clients/$CID/default-client-scopes/$SCOPE_ID -r adk
                    else
                       echo "Warning: Client '$CLIENT_ID' not found, skipping scope assignment."
                    fi
@@ -145,13 +145,13 @@ spec:
               done
 
               # Seed Users
-              {{- range .Values.auth.keycloakProvisionJob.seedAgentstackUsers }}
+              {{- range .Values.auth.keycloakProvisionJob.seedUsers }}
               {{- $username := .username }}
               echo "Seeding user {{ $username }}..."
-              USER_ID=$(/opt/keycloak/bin/kcadm.sh get users -r agentstack -q username={{ $username }} --fields id --format csv --noquotes)
+              USER_ID=$(/opt/keycloak/bin/kcadm.sh get users -r adk -q username={{ $username }} --fields id --format csv --noquotes)
               if [ -z "$USER_ID" ]; then
                 echo "Creating user {{ $username }}..."
-                USER_ID=$(/opt/keycloak/bin/kcadm.sh create users -r agentstack \
+                USER_ID=$(/opt/keycloak/bin/kcadm.sh create users -r adk \
                   -s username={{ $username }} \
                   -s enabled={{ .enabled | default true }} \
                   -s email={{ .email }} \
@@ -161,31 +161,31 @@ spec:
                   -i)
               else
                 echo "User {{ $username }} exists, updating..."
-                /opt/keycloak/bin/kcadm.sh update users/$USER_ID -r agentstack \
+                /opt/keycloak/bin/kcadm.sh update users/$USER_ID -r adk \
                   -s enabled={{ .enabled | default true }} \
                   -s email={{ .email }} \
                   -s firstName={{ .firstName }} \
                   -s lastName={{ .lastName }} \
                   -s emailVerified=true
               fi
-              
+
               # Set Password
-              /opt/keycloak/bin/kcadm.sh set-password -r agentstack --username {{ $username }} --new-password {{ .password }} --temporary=false
+              /opt/keycloak/bin/kcadm.sh set-password -r adk --username {{ $username }} --new-password {{ .password }} --temporary=false
 
               # Assign Roles
               {{- if .roles }}
               echo "Assigning roles for {{ $username }}..."
               {{- range .roles }}
-              ROLE_ID=$(/opt/keycloak/bin/kcadm.sh get roles/{{ . }} -r agentstack --fields id --format csv --noquotes)
+              ROLE_ID=$(/opt/keycloak/bin/kcadm.sh get roles/{{ . }} -r adk --fields id --format csv --noquotes)
               if [ -n "$ROLE_ID" ]; then
-                 /opt/keycloak/bin/kcadm.sh add-roles -r agentstack --uusername {{ $username }} --rolename {{ . }}
+                 /opt/keycloak/bin/kcadm.sh add-roles -r adk --uusername {{ $username }} --rolename {{ . }}
               else
                  echo "Warning: Role {{ . }} not found."
               fi
               {{- end }}
               {{- end }}
               {{- end }}
-              
+
               echo "Provisioning complete."
           env:
             - name: HOME
@@ -200,8 +200,8 @@ spec:
             - name: SERVER_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: agentstack-secret
-                  key: agentstackServerClientSecret
+                  name: adk-secret
+                  key: adkServerClientSecret
             - name: API_URL
               value: {{ .Values.auth.apiUrl | quote }}
             {{- if and .Values.ui.enabled }}
@@ -213,6 +213,6 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: adk-ui-secret
-                  key: agentstackUiClientSecret
+                  key: adkUiClientSecret
             {{- end }}
 {{- end }}

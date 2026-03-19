@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "agentstack.name" -}}
+{{- define "kagenti-adk.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "agentstack.fullname" -}}
+{{- define "kagenti-adk.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,7 +26,7 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "agentstack.chart" -}}
+{{- define "kagenti-adk.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -34,9 +34,9 @@ Create chart name and version as used by the chart label.
 {{/*
 Common labels
 */}}
-{{- define "agentstack.labels" -}}
-helm.sh/chart: {{ include "agentstack.chart" . }}
-{{ include "agentstack.selectorLabels" . }}
+{{- define "kagenti-adk.labels" -}}
+helm.sh/chart: {{ include "kagenti-adk.chart" . }}
+{{ include "kagenti-adk.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -46,8 +46,8 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "agentstack.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "agentstack.name" . }}
+{{- define "kagenti-adk.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "kagenti-adk.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
@@ -59,7 +59,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{/*
 Return the PostgreSQL Hostname
 */}}
-{{- define "agentstack.databaseHost" -}}
+{{- define "kagenti-adk.databaseHost" -}}
 {{- if .Values.postgresql.enabled }}
     {{- print (.Values.postgresql.fullnameOverride | default "postgresql") -}}
 {{- else -}}
@@ -70,7 +70,7 @@ Return the PostgreSQL Hostname
 {{/*
 Return the PostgreSQL Port
 */}}
-{{- define "agentstack.databasePort" -}}
+{{- define "kagenti-adk.databasePort" -}}
 {{- if .Values.postgresql.enabled }}
     {{- print (.Values.postgresql.service.port | default 5432) -}}
 {{- else -}}
@@ -81,7 +81,7 @@ Return the PostgreSQL Port
 {{/*
 Return the PostgreSQL Database Name
 */}}
-{{- define "agentstack.databaseName" -}}
+{{- define "kagenti-adk.databaseName" -}}
 {{- if .Values.postgresql.enabled }}
     {{- print .Values.postgresql.auth.database -}}
 {{- else -}}
@@ -92,7 +92,7 @@ Return the PostgreSQL Database Name
 {{/*
 Return the PostgreSQL User
 */}}
-{{- define "agentstack.databaseUser" -}}
+{{- define "kagenti-adk.databaseUser" -}}
 {{- if .Values.postgresql.enabled }}
     {{- print (.Values.postgresql.auth.username | default "postgres") -}}
 {{- else -}}
@@ -103,7 +103,7 @@ Return the PostgreSQL User
 {{/*
 Return the PostgreSQL Admin User
 */}}
-{{- define "agentstack.databaseAdminUser" -}}
+{{- define "kagenti-adk.databaseAdminUser" -}}
 {{- if .Values.postgresql.enabled }}
     {{- print (.Values.postgresql.auth.username | default "postgres") -}}
 {{- else -}}
@@ -114,7 +114,7 @@ Return the PostgreSQL Admin User
 {{/*
 Return the PostgreSQL Password
 */}}
-{{- define "agentstack.databasePassword" -}}
+{{- define "kagenti-adk.databasePassword" -}}
 {{- if .Values.postgresql.enabled }}
     {{- print .Values.postgresql.auth.password -}}
 {{- else -}}
@@ -125,7 +125,7 @@ Return the PostgreSQL Password
 {{/*
 Return the PostgreSQL Admin Password
 */}}
-{{- define "agentstack.databaseAdminPassword" -}}
+{{- define "kagenti-adk.databaseAdminPassword" -}}
 {{- if .Values.postgresql.enabled }}
     {{- print .Values.postgresql.auth.password -}}
 {{- else -}}
@@ -137,20 +137,20 @@ Return the PostgreSQL Admin Password
 {{/*
 Return the PostgreSQL Secret Name
 */}}
-{{- define "agentstack.databaseSecretName" -}}
+{{- define "kagenti-adk.databaseSecretName" -}}
 {{- if .Values.postgresql.enabled }}
-    {{- print "agentstack-secret" -}}
+    {{- print "adk-secret" -}}
 {{- else if .Values.externalDatabase.existingSecret -}}
     {{- print .Values.externalDatabase.existingSecret -}}
 {{- else -}}
-    {{- print "agentstack-secret" -}}
+    {{- print "adk-secret" -}}
 {{- end -}}
 {{- end -}}
 
 {{/*
 Return if SSL is enabled
 */}}
-{{- define "agentstack.databaseSslEnabled" -}}
+{{- define "kagenti-adk.databaseSslEnabled" -}}
 {{- if and (not .Values.postgresql.enabled) .Values.externalDatabase.ssl -}}
 true
 {{- end -}}
@@ -165,7 +165,7 @@ true
 {{/*
 Return the S3 backend host
 */}}
-{{- define "agentstack.s3.host" -}}
+{{- define "kagenti-adk.s3.host" -}}
     {{- if .Values.seaweedfs.enabled -}}
         {{- printf "seaweedfs-all-in-one" -}}
     {{- else -}}
@@ -176,7 +176,7 @@ Return the S3 backend host
 {{/*
 Return the S3 bucket
 */}}
-{{- define "agentstack.s3.bucket" -}}
+{{- define "kagenti-adk.s3.bucket" -}}
     {{- if .Values.seaweedfs.enabled -}}
         {{- print .Values.seaweedfs.bucket -}}
     {{- else -}}
@@ -187,7 +187,7 @@ Return the S3 bucket
 {{/*
 Return the S3 protocol
 */}}
-{{- define "agentstack.s3.protocol" -}}
+{{- define "kagenti-adk.s3.protocol" -}}
     {{- if .Values.seaweedfs.enabled -}}
         {{- ternary "https" "http" .Values.seaweedfs.global.enableSecurity -}}
     {{- else -}}
@@ -198,7 +198,7 @@ Return the S3 protocol
 {{/*
 Return the S3 region
 */}}
-{{- define "agentstack.s3.region" -}}
+{{- define "kagenti-adk.s3.region" -}}
     {{- if .Values.seaweedfs.enabled -}}
         {{- print "us-east-1"  -}}
     {{- else -}}
@@ -209,43 +209,43 @@ Return the S3 region
 {{/*
 Return the S3 port
 */}}
-{{- define "agentstack.s3.port" -}}
+{{- define "kagenti-adk.s3.port" -}}
 {{- ternary .Values.seaweedfs.s3.port .Values.externalS3.port .Values.seaweedfs.enabled -}}
 {{- end -}}
 
 {{/*
 Return the S3 endpoint
 */}}
-{{- define "agentstack.s3.endpoint" -}}
-{{- $port := include "agentstack.s3.port" . | int -}}
+{{- define "kagenti-adk.s3.endpoint" -}}
+{{- $port := include "kagenti-adk.s3.port" . | int -}}
 {{- $printedPort := "" -}}
 {{- if and (ne $port 80) (ne $port 443) -}}
     {{- $printedPort = printf ":%d" $port -}}
 {{- end -}}
-{{- printf "%s://%s%s" (include "agentstack.s3.protocol" .) (include "agentstack.s3.host" .) $printedPort -}}
+{{- printf "%s://%s%s" (include "kagenti-adk.s3.protocol" .) (include "kagenti-adk.s3.host" .) $printedPort -}}
 {{- end -}}
 
 {{/*
 Return the S3 credentials secret name
 */}}
-{{- define "agentstack.s3.secretName" -}}
+{{- define "kagenti-adk.s3.secretName" -}}
 {{- if .Values.seaweedfs.enabled -}}
     {{- if .Values.seaweedfs.auth.existingSecret -}}
     {{- print .Values.seaweedfs.auth.existingSecret -}}
     {{- else -}}
-    {{- print "agentstack-secret" -}}
+    {{- print "adk-secret" -}}
     {{- end -}}
 {{- else if .Values.externalS3.existingSecret -}}
     {{- print .Values.externalS3.existingSecret -}}
 {{- else -}}
-    {{- print "agentstack-secret" -}}
+    {{- print "adk-secret" -}}
 {{- end -}}
 {{- end -}}
 
 {{/*
 Return the S3 access key id inside the secret
 */}}
-{{- define "agentstack.s3.accessKeyID" -}}
+{{- define "kagenti-adk.s3.accessKeyID" -}}
     {{- if .Values.seaweedfs.enabled -}}
         {{- print .Values.seaweedfs.auth.admin.accessKeyID -}}
     {{- else -}}
@@ -256,7 +256,7 @@ Return the S3 access key id inside the secret
 {{/*
 Return the S3 secret access key inside the secret
 */}}
-{{- define "agentstack.s3.accessKeySecret" -}}
+{{- define "kagenti-adk.s3.accessKeySecret" -}}
     {{- if .Values.seaweedfs.enabled -}}
         {{- print .Values.seaweedfs.auth.admin.accessKeySecret  -}}
     {{- else -}}
@@ -270,7 +270,7 @@ Return the S3 secret access key inside the secret
 {{/*
 Generate imagePullSecrets
 */}}
-{{- define "agentstack.imagePullSecrets" -}}
+{{- define "kagenti-adk.imagePullSecrets" -}}
 {{- if .Values.imagePullSecrets -}}
 imagePullSecrets:
 {{- range .Values.imagePullSecrets }}
@@ -288,16 +288,16 @@ imagePullSecrets:
 Create a default fully qualified redis name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
-{{- define "agentstack.redis.fullname" -}}
+{{- define "kagenti-adk.redis.fullname" -}}
 {{- print (.Values.redis.fullnameOverride | default "redis") -}}
 {{- end -}}
 
 {{/*
 Return the Redis Hostname
 */}}
-{{- define "agentstack.redis.host" -}}
+{{- define "kagenti-adk.redis.host" -}}
 {{- if .Values.redis.enabled }}
-    {{- print (include "agentstack.redis.fullname" .) -}}
+    {{- print (include "kagenti-adk.redis.fullname" .) -}}
 {{- else -}}
     {{- print .Values.externalRedis.host -}}
 {{- end -}}
@@ -306,7 +306,7 @@ Return the Redis Hostname
 {{/*
 Return the Redis Port
 */}}
-{{- define "agentstack.redis.port" -}}
+{{- define "kagenti-adk.redis.port" -}}
 {{- if .Values.redis.enabled }}
     {{- print "6379" -}}
 {{- else -}}
@@ -317,7 +317,7 @@ Return the Redis Port
 {{/*
 Return the Redis Password
 */}}
-{{- define "agentstack.redis.password" -}}
+{{- define "kagenti-adk.redis.password" -}}
 {{- if .Values.redis.enabled }}
     {{- print .Values.redis.auth.password -}}
 {{- else -}}
@@ -328,24 +328,24 @@ Return the Redis Password
 {{/*
 Return the Redis Secret Name
 */}}
-{{- define "agentstack.redis.secretName" -}}
+{{- define "kagenti-adk.redis.secretName" -}}
 {{- if .Values.redis.enabled }}
     {{- if .Values.redis.auth.existingSecret -}}
     {{- print .Values.redis.auth.existingSecret -}}
     {{- else -}}
-    {{- printf "%s" (include "agentstack.redis.fullname" .) -}}
+    {{- printf "%s" (include "kagenti-adk.redis.fullname" .) -}}
     {{- end -}}
 {{- else if .Values.externalRedis.existingSecret -}}
     {{- print .Values.externalRedis.existingSecret -}}
 {{- else -}}
-    {{- print "agentstack-secret" -}}
+    {{- print "adk-secret" -}}
 {{- end -}}
 {{- end -}}
 
 {{/*
 Return the Redis Secret Password Key
 */}}
-{{- define "agentstack.redis.secretPasswordKey" -}}
+{{- define "kagenti-adk.redis.secretPasswordKey" -}}
 {{- if .Values.redis.enabled }}
     {{- if .Values.redis.auth.existingSecretPasswordKey -}}
     {{- print .Values.redis.auth.existingSecretPasswordKey -}}
@@ -360,7 +360,7 @@ Return the Redis Secret Password Key
 {{/*
 Return if Redis is enabled
 */}}
-{{- define "agentstack.redis.enabled" -}}
+{{- define "kagenti-adk.redis.enabled" -}}
 {{- if or .Values.redis.enabled .Values.externalRedis.host -}}
 true
 {{- else -}}
@@ -376,11 +376,11 @@ false
 {{/*
 Return the OIDC Issuer URL
 */}}
-{{- define "agentstack.oidc.internalIssuerUrl" -}}
+{{- define "kagenti-adk.oidc.internalIssuerUrl" -}}
 {{- print .Values.auth.oidcProvider.issuerUrl -}}
 {{- end -}}
 
-{{- define "agentstack.oidc.publicIssuerUrl" -}}
+{{- define "kagenti-adk.oidc.publicIssuerUrl" -}}
 {{- if .Values.auth.oidcProvider.publicIssuerUrl -}}
     {{- print .Values.auth.oidcProvider.publicIssuerUrl -}}
 {{- else -}}
@@ -391,21 +391,21 @@ Return the OIDC Issuer URL
 {{/*
 Return the OIDC UI Client ID
 */}}
-{{- define "agentstack.oidc.uiClientId" -}}
+{{- define "kagenti-adk.oidc.uiClientId" -}}
 {{- print .Values.auth.oidcProvider.uiClientId -}}
 {{- end -}}
 
 {{/*
 Return the OIDC Server Client ID
 */}}
-{{- define "agentstack.oidc.serverClientId" -}}
+{{- define "kagenti-adk.oidc.serverClientId" -}}
 {{- print .Values.auth.oidcProvider.serverClientId -}}
 {{- end -}}
 
 {{/*
 Return the OIDC UI Client Secret Name
 */}}
-{{- define "agentstack.oidc.uiClientSecretName" -}}
+{{- define "kagenti-adk.oidc.uiClientSecretName" -}}
 {{- if .Values.auth.oidcProvider.existingSecret -}}
     {{- print .Values.auth.oidcProvider.existingSecret -}}
 {{- else -}}
@@ -416,56 +416,56 @@ Return the OIDC UI Client Secret Name
 {{/*
 Return the OIDC UI Client Secret Key
 */}}
-{{- define "agentstack.oidc.uiClientSecretKey" -}}
+{{- define "kagenti-adk.oidc.uiClientSecretKey" -}}
 {{- if .Values.auth.oidcProvider.existingSecret -}}
     {{- print .Values.auth.oidcProvider.uiClientSecretKey -}}
 {{- else -}}
-    {{- print "agentstackUiClientSecret" -}}
+    {{- print "adkUiClientSecret" -}}
 {{- end -}}
 {{- end -}}
 
 {{/*
 Return the OIDC Server Client Secret Name
 */}}
-{{- define "agentstack.oidc.serverClientSecretName" -}}
+{{- define "kagenti-adk.oidc.serverClientSecretName" -}}
 {{- if .Values.auth.oidcProvider.existingSecret -}}
     {{- print .Values.auth.oidcProvider.existingSecret -}}
 {{- else -}}
-    {{- print "agentstack-secret" -}}
+    {{- print "adk-secret" -}}
 {{- end -}}
 {{- end -}}
 
 {{/*
 Return the OIDC Server Client Secret Key
 */}}
-{{- define "agentstack.oidc.serverClientSecretKey" -}}
+{{- define "kagenti-adk.oidc.serverClientSecretKey" -}}
 {{- if .Values.auth.oidcProvider.existingSecret -}}
     {{- print .Values.auth.oidcProvider.serverClientSecretKey -}}
 {{- else -}}
-    {{- print "agentstackServerClientSecret" -}}
+    {{- print "adkServerClientSecret" -}}
 {{- end -}}
 {{- end -}}
 
-{{- define "agentstack.oidc.providerName" -}}
+{{- define "kagenti-adk.oidc.providerName" -}}
 {{- print .Values.auth.oidcProvider.name -}}
 {{- end -}}
 
-{{- define "agentstack.oidc.providerId" -}}
+{{- define "kagenti-adk.oidc.providerId" -}}
 {{- print .Values.auth.oidcProvider.id -}}
 {{- end -}}
 
-{{- define "agentstack.oidc.rolesPath" -}}
+{{- define "kagenti-adk.oidc.rolesPath" -}}
 {{- print .Values.auth.oidcProvider.rolesPath -}}
 {{- end -}}
 
 {{/*
 Return the OIDC UI Client Secret Value
 */}}
-{{- define "agentstack.oidc.uiClientSecretValue" -}}
+{{- define "kagenti-adk.oidc.uiClientSecretValue" -}}
 {{- $uiClientSecret := .Values.auth.oidcProvider.uiClientSecret -}}
 {{- $secret := (lookup "v1" "Secret" .Release.Namespace "adk-ui-secret") -}}
-{{- if and $secret $secret.data (hasKey $secret.data "agentstackUiClientSecret") -}}
-    {{- $uiClientSecret = index $secret.data "agentstackUiClientSecret" | b64dec -}}
+{{- if and $secret $secret.data (hasKey $secret.data "adkUiClientSecret") -}}
+    {{- $uiClientSecret = index $secret.data "adkUiClientSecret" | b64dec -}}
 {{- end -}}
 {{- if not $uiClientSecret -}}
     {{- $uiClientSecret = randAlphaNum 32 -}}
@@ -476,11 +476,11 @@ Return the OIDC UI Client Secret Value
 {{/*
 Return the OIDC Server Client Secret Value
 */}}
-{{- define "agentstack.oidc.serverClientSecretValue" -}}
+{{- define "kagenti-adk.oidc.serverClientSecretValue" -}}
 {{- $serverClientSecret := .Values.auth.oidcProvider.serverClientSecret -}}
-{{- $secret := (lookup "v1" "Secret" .Release.Namespace "agentstack-secret") -}}
-{{- if and $secret $secret.data (hasKey $secret.data "agentstackServerClientSecret") -}}
-    {{- $serverClientSecret = index $secret.data "agentstackServerClientSecret" | b64dec -}}
+{{- $secret := (lookup "v1" "Secret" .Release.Namespace "adk-secret") -}}
+{{- if and $secret $secret.data (hasKey $secret.data "adkServerClientSecret") -}}
+    {{- $serverClientSecret = index $secret.data "adkServerClientSecret" | b64dec -}}
 {{- end -}}
 {{- if not $serverClientSecret -}}
     {{- $serverClientSecret = randAlphaNum 32 -}}

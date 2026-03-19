@@ -7,7 +7,7 @@ Getting started:
 {{- end }}
 {{- else if contains "NodePort" .Values.server.service.type }}
 
-  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "agentstack.fullname" . }})
+  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "kagenti-adk.fullname" . }})
   export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
   echo http://$NODE_IP:$NODE_PORT
 {{- else if contains "LoadBalancer" .Values.server.service.type }}
@@ -30,24 +30,24 @@ Getting started:
 
 {{- if .Values.auth.enabled }}
 
-# Login to agentstack server using CLI
-  agentstack server login {{ .Values.auth.apiUrl }}
+# Login to adk server using CLI
+  kagenti-adk server login {{ .Values.auth.apiUrl }}
 {{- end}}
 
 # Setup models
-  agentstack model setup
+  kagenti-adk model setup
 
 {{- if .Values.ui.enabled }}
 
 # Open the UI in the browser
-  agentstack ui
+  kagenti-adk ui
 {{- end }}
 
-See the documentation for more details and troubleshooting steps: https://agentstack.beeai.dev/stable/how-to/deployment-guide
+See the documentation for more details and troubleshooting steps: https://kagenti.github.io/adk/stable/how-to/deployment-guide
 
 Resources:
 
-    Documentation: https://agentstack.beeai.dev
+    Documentation: https://kagenti.github.io/adk
     Discord Community: https://discord.gg/NradeA6ZNF
     GitHub Issues: https://github.com/kagenti/adk/issues
 

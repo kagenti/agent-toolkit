@@ -5,7 +5,7 @@ metadata:
   name: adk-ui-svc
   labels:
     app: adk-ui
-    {{- include "agentstack.labels" . | nindent 4 }}
+    {{- include "kagenti-adk.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.ui.service.type }}
   ports:
@@ -18,5 +18,5 @@ spec:
       {{- end }}
   selector:
     app: adk-ui
-    {{- include "agentstack.selectorLabels" . | nindent 4 }}
+    {{- include "kagenti-adk.selectorLabels" . | nindent 4 }}
 {{- end }}

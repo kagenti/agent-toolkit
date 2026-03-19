@@ -4,13 +4,13 @@ metadata:
   name: adk-server
   labels:
     app: adk-server
-    {{- include "agentstack.labels" . | nindent 4 }}
+    {{- include "kagenti-adk.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.server.replicaCount }}
   selector:
     matchLabels:
       app: adk-server
-      {{- include "agentstack.selectorLabels" . | nindent 6 }}
+      {{- include "kagenti-adk.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       annotations:
@@ -20,7 +20,7 @@ spec:
       {{- end }}
       labels:
         app: adk-server
-        {{- include "agentstack.labels" . | nindent 8 }}
+        {{- include "kagenti-adk.labels" . | nindent 8 }}
         {{- with .Values.server.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -29,7 +29,7 @@ spec:
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
       {{- end }}
-      {{- include "agentstack.imagePullSecrets" . | nindent 6 }}
+      {{- include "kagenti-adk.imagePullSecrets" . | nindent 6 }}
       {{- with .Values.server.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
@@ -53,14 +53,14 @@ spec:
             - name: PERSISTENCE__ENCRYPTION_KEY
               valueFrom:
                 secretKeyRef:
-                  name: agentstack-secret
+                  name: adk-secret
                   key: encryptionKey
             - name: PERSISTENCE__DB_URL
               valueFrom:
                 secretKeyRef:
                   key: sqlConnectionSuperuser
-                  name: {{ include "agentstack.databaseSecretName" . }}
-            {{- if include "agentstack.databaseSslEnabled" . }}
+                  name: {{ include "kagenti-adk.databaseSecretName" . }}
+            {{- if include "kagenti-adk.databaseSslEnabled" . }}
             - name: PERSISTENCE__DB_USE_SSL
               value: "true"
             {{- if .Values.externalDatabase.sslRootCert }}
@@ -68,7 +68,7 @@ spec:
               value: /app/db.crt
             {{- end }}
             {{- end }}
-          {{- if and (include "agentstack.databaseSslEnabled" .) .Values.externalDatabase.sslRootCert }}
+          {{- if and (include "kagenti-adk.databaseSslEnabled" .) .Values.externalDatabase.sslRootCert }}
           volumeMounts:
             - name: db-ssl-cert
               mountPath: /app/db.crt
@@ -93,14 +93,14 @@ spec:
             - name: PERSISTENCE__ENCRYPTION_KEY
               valueFrom:
                 secretKeyRef:
-                  name: agentstack-secret
+                  name: adk-secret
                   key: encryptionKey
             - name: PERSISTENCE__DB_URL
               valueFrom:
                 secretKeyRef:
                   key: sqlConnection
-                  name: {{ include "agentstack.databaseSecretName" . }}
-            {{- if include "agentstack.databaseSslEnabled" . }}
+                  name: {{ include "kagenti-adk.databaseSecretName" . }}
+            {{- if include "kagenti-adk.databaseSslEnabled" . }}
             - name: PERSISTENCE__DB_USE_SSL
               value: "true"
             {{- if .Values.externalDatabase.sslRootCert }}
@@ -108,7 +108,7 @@ spec:
               value: /app/db.crt
             {{- end }}
             {{- end }}
-          {{- if and (include "agentstack.databaseSslEnabled" .) .Values.externalDatabase.sslRootCert }}
+          {{- if and (include "kagenti-adk.databaseSslEnabled" .) .Values.externalDatabase.sslRootCert }}
           volumeMounts:
             - name: db-ssl-cert
               mountPath: /app/db.crt
@@ -131,23 +131,23 @@ spec:
               value: "dummy"
             # Object Storage Configuration
             - name: OBJECT_STORAGE__ENDPOINT_URL
-              value: {{ include "agentstack.s3.endpoint" . | quote }}
+              value: {{ include "kagenti-adk.s3.endpoint" . | quote }}
             - name: OBJECT_STORAGE__ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "agentstack.s3.secretName" . }}
+                  name: {{ include "kagenti-adk.s3.secretName" . }}
                   key: s3AccessKeyId
             - name: OBJECT_STORAGE__ACCESS_KEY_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "agentstack.s3.secretName" . }}
+                  name: {{ include "kagenti-adk.s3.secretName" . }}
                   key: s3AccessKeySecret
             - name: OBJECT_STORAGE__BUCKET_NAME
-              value: {{ include "agentstack.s3.bucket" . | quote }}
+              value: {{ include "kagenti-adk.s3.bucket" . | quote }}
             - name: OBJECT_STORAGE__REGION
-              value: {{ include "agentstack.s3.region" . | quote }}
+              value: {{ include "kagenti-adk.s3.region" . | quote }}
             - name: OBJECT_STORAGE__USE_SSL
-              value: {{ ternary "true" "false" (eq (include "agentstack.s3.protocol" .) "https") | quote}}
+              value: {{ ternary "true" "false" (eq (include "kagenti-adk.s3.protocol" .) "https") | quote}}
       containers:
         - name: {{ .Chart.Name }}
           {{- with .Values.server.securityContext }}
@@ -200,7 +200,7 @@ spec:
             - name: GITHUB_REGISTRY_CONFIG_JSON
               valueFrom:
                 secretKeyRef:
-                  name: agentstack-secret
+                  name: adk-secret
                   key: .githubconfigjson
             {{- end }}
             - name: MODEL_PROVIDER_REGISTRY__LOCATIONS__FILE
@@ -216,14 +216,14 @@ spec:
             - name: PERSISTENCE__ENCRYPTION_KEY
               valueFrom:
                 secretKeyRef:
-                  name: agentstack-secret
+                  name: adk-secret
                   key: encryptionKey
             - name: PERSISTENCE__DB_URL
               valueFrom:
                 secretKeyRef:
                   key: sqlConnection
-                  name: {{ include "agentstack.databaseSecretName" . }}
-            {{- if include "agentstack.databaseSslEnabled" . }}
+                  name: {{ include "kagenti-adk.databaseSecretName" . }}
+            {{- if include "kagenti-adk.databaseSslEnabled" . }}
             - name: PERSISTENCE__DB_USE_SSL
               value: "true"
             {{- if .Values.externalDatabase.sslRootCert }}
@@ -235,12 +235,12 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: jwtPrivateKey
-                  name: agentstack-secret
+                  name: adk-secret
             - name: AUTH__JWT_PUBLIC_KEY
               valueFrom:
                 secretKeyRef:
                   key: jwtPublicKey
-                  name: agentstack-secret
+                  name: adk-secret
             {{- if .Values.auth.enabled }}
             - name: AUTH__DISABLE_AUTH
               value: "false"
@@ -251,22 +251,22 @@ spec:
             - name: AUTH__OIDC__VALIDATE_AUDIENCE
               value: {{ .Values.auth.validateAudience | quote }}
             - name: AUTH__OIDC__NAME
-              value: {{ include "agentstack.oidc.providerName" . | quote }}
+              value: {{ include "kagenti-adk.oidc.providerName" . | quote }}
             - name: AUTH__OIDC__ISSUER
-              value: {{ include "agentstack.oidc.internalIssuerUrl" . | quote }}
+              value: {{ include "kagenti-adk.oidc.internalIssuerUrl" . | quote }}
             - name: AUTH__OIDC__EXTERNAL_ISSUER
-              value: {{ include "agentstack.oidc.publicIssuerUrl" . | quote }}
+              value: {{ include "kagenti-adk.oidc.publicIssuerUrl" . | quote }}
             - name: AUTH__OIDC__INSECURE_TRANSPORT
-              value: {{ hasPrefix "http://" (include "agentstack.oidc.internalIssuerUrl" . | default "") | quote }}
+              value: {{ hasPrefix "http://" (include "kagenti-adk.oidc.internalIssuerUrl" . | default "") | quote }}
             - name: AUTH__OIDC__CLIENT_ID
-              value: {{ include "agentstack.oidc.serverClientId" . | quote }}
+              value: {{ include "kagenti-adk.oidc.serverClientId" . | quote }}
             - name: AUTH__OIDC__ROLES_PATH
-              value: {{ include "agentstack.oidc.rolesPath" . | quote }}
+              value: {{ include "kagenti-adk.oidc.rolesPath" . | quote }}
             - name: AUTH__OIDC__CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  key: {{ include "agentstack.oidc.serverClientSecretKey" . }}
-                  name: {{ include "agentstack.oidc.serverClientSecretName" . }}
+                  key: {{ include "kagenti-adk.oidc.serverClientSecretKey" . }}
+                  name: {{ include "kagenti-adk.oidc.serverClientSecretName" . }}
             {{- else }}
             - name: AUTH__DISABLE_AUTH
               value: "true"
@@ -278,14 +278,14 @@ spec:
             - name: KAGENTI__API_URL
               value: {{ .Values.kagenti.apiUrl | quote }}
             - name: KAGENTI__AUTH_TOKEN_URL
-              value: {{ include "agentstack.oidc.internalIssuerUrl" . | trimSuffix "/" }}/protocol/openid-connect/token
+              value: {{ include "kagenti-adk.oidc.internalIssuerUrl" . | trimSuffix "/" }}/protocol/openid-connect/token
             - name: KAGENTI__CLIENT_ID
-              value: {{ include "agentstack.oidc.serverClientId" . | quote }}
+              value: {{ include "kagenti-adk.oidc.serverClientId" . | quote }}
             - name: KAGENTI__CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  key: {{ include "agentstack.oidc.serverClientSecretKey" . }}
-                  name: {{ include "agentstack.oidc.serverClientSecretName" . }}
+                  key: {{ include "kagenti-adk.oidc.serverClientSecretKey" . }}
+                  name: {{ include "kagenti-adk.oidc.serverClientSecretName" . }}
             - name: KAGENTI__NAMESPACES
               value: {{ .Values.kagenti.namespaces | toJson | quote }}
             {{- else }}
@@ -300,37 +300,37 @@ spec:
               value: {{ .Values.generateConversationTitle.prompt | quote }}
             # Object Storage Configuration
             - name: OBJECT_STORAGE__ENDPOINT_URL
-              value: {{ include "agentstack.s3.endpoint" . | quote }}
+              value: {{ include "kagenti-adk.s3.endpoint" . | quote }}
             - name: OBJECT_STORAGE__ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "agentstack.s3.secretName" . }}
+                  name: {{ include "kagenti-adk.s3.secretName" . }}
                   key: s3AccessKeyId
             - name: OBJECT_STORAGE__ACCESS_KEY_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "agentstack.s3.secretName" . }}
+                  name: {{ include "kagenti-adk.s3.secretName" . }}
                   key: s3AccessKeySecret
             - name: OBJECT_STORAGE__BUCKET_NAME
-              value: {{ include "agentstack.s3.bucket" . | quote }}
+              value: {{ include "kagenti-adk.s3.bucket" . | quote }}
             - name: OBJECT_STORAGE__REGION
-              value: {{ include "agentstack.s3.region" . | quote }}
+              value: {{ include "kagenti-adk.s3.region" . | quote }}
             - name: OBJECT_STORAGE__USE_SSL
-              value: {{ ternary "true" "false" (eq (include "agentstack.s3.protocol" .) "https") | quote}}
+              value: {{ ternary "true" "false" (eq (include "kagenti-adk.s3.protocol" .) "https") | quote}}
             # Redis Configuration
             - name: REDIS__ENABLED
-              value: {{ include "agentstack.redis.enabled" . | quote }}
-            {{- if eq (include "agentstack.redis.enabled" .) "true" }}
+              value: {{ include "kagenti-adk.redis.enabled" . | quote }}
+            {{- if eq (include "kagenti-adk.redis.enabled" .) "true" }}
             - name: REDIS__HOST
-              value: {{ include "agentstack.redis.host" . | quote }}
+              value: {{ include "kagenti-adk.redis.host" . | quote }}
             - name: REDIS__PORT
-              value: {{ include "agentstack.redis.port" . | quote }}
+              value: {{ include "kagenti-adk.redis.port" . | quote }}
             {{- if or .Values.redis.enabled .Values.externalRedis.existingSecret .Values.externalRedis.password }}
             - name: REDIS__PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "agentstack.redis.secretName" . }}
-                  key: {{ include "agentstack.redis.secretPasswordKey" . }}
+                  name: {{ include "kagenti-adk.redis.secretName" . }}
+                  key: {{ include "kagenti-adk.redis.secretPasswordKey" . }}
             {{- end }}
             {{- end }}
             - name: RATE_LIMIT__ENABLED
@@ -351,7 +351,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: presets.json
-                  name: agentstack-connectors-secret
+                  name: adk-connectors-secret
             - name: UVICORN_TIMEOUT_KEEP_ALIVE
               value: {{ .Values.server.uvicornTimeoutKeepAlive | quote }}
             - name: TELEMETRY__COLLECTOR_URL
@@ -360,27 +360,27 @@ spec:
               value: "http://phoenix.kagenti-system:6006"
 
           volumeMounts:
-            {{- if and (include "agentstack.databaseSslEnabled" .) .Values.externalDatabase.sslRootCert }}
+            {{- if and (include "kagenti-adk.databaseSslEnabled" .) .Values.externalDatabase.sslRootCert }}
             - name: db-ssl-cert
               mountPath: /app/db.crt
               subPath: sslRootCert
               readOnly: true
             {{- end }}
-            - name: agentstack-providers
+            - name: adk-providers
               mountPath: /app/config
               readOnly: true
             {{- with .Values.server.volumeMounts }}
               {{- toYaml . | nindent 12 }}
             {{- end }}
       volumes:
-        {{- if and (include "agentstack.databaseSslEnabled" .) .Values.externalDatabase.sslRootCert }}
+        {{- if and (include "kagenti-adk.databaseSslEnabled" .) .Values.externalDatabase.sslRootCert }}
         - name: db-ssl-cert
           secret:
-            secretName: agentstack-secret
+            secretName: adk-secret
         {{- end }}
-        - name: agentstack-providers
+        - name: adk-providers
           secret:
-            secretName: agentstack-providers-secret
+            secretName: adk-providers-secret
         {{- with .Values.server.volumes }}
           {{- toYaml . | nindent 8 }}
         {{- end }}
