@@ -102,7 +102,7 @@ importers:
         specifier: ^4.3.6
         version: 4.3.6
     devDependencies:
-      "kagenti/lint-config":
+      "@kagenti/adk-lint-config":
         specifier: workspace:*
         version: link:../lint-config
       "@types/express":
@@ -295,7 +295,7 @@ importers:
         specifier: ^4.3.6
         version: 4.3.6
     devDependencies:
-      "kagenti/lint-config":
+      "@kagenti/adk-lint-config":
         specifier: workspace:*
         version: link:../lint-config
       "@svgr/webpack":
@@ -410,7 +410,7 @@ importers:
 
   docs:
     devDependencies:
-      "kagenti/lint-config":
+      "@kagenti/adk-lint-config":
         specifier: workspace:*
         version: link:../apps/lint-config
       embedme:

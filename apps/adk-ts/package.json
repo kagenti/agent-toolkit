@@ -90,7 +90,7 @@
     }
   },
   "devDependencies": {
-    "kagenti/lint-config": "workspace:*",
+    "@kagenti/adk-lint-config": "workspace:*",
     "@types/express": "5.0.6",
     "eslint": "9.39.3",
     "prettier": "3.8.1",

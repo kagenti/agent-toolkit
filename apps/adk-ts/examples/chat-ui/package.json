@@ -15,7 +15,7 @@
     "react-dom": "^19.2.4"
   },
   "devDependencies": {
-    "kagenti/lint-config": "workspace:*",
+    "@kagenti/adk-lint-config": "workspace:*",
     "@types/node": "^22.19.11",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
