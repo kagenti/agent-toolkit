@@ -1,57 +1,57 @@
 # setup
 
-["agentstack-cli:setup"]
+["adk-cli:setup"]
 extends = "python:setup"
 depends = ["adk-py:setup"]
-dir = "{{config_root}}/apps/agentstack-cli"
+dir = "{{config_root}}/apps/adk-cli"
 
 # check
 
-["agentstack-cli:check"]
-depends = ["agentstack-cli:check:*"]
+["adk-cli:check"]
+depends = ["adk-cli:check:*"]
 
-["agentstack-cli:check:ruff-check"]
+["adk-cli:check:ruff-check"]
 extends = "python:check:ruff"
-depends = ["agentstack-cli:setup"]
-dir = "{{config_root}}/apps/agentstack-cli"
+depends = ["adk-cli:setup"]
+dir = "{{config_root}}/apps/adk-cli"
 
-["agentstack-cli:check:ruff-format"]
+["adk-cli:check:ruff-format"]
 extends = "python:check:ruff-format"
-depends = ["agentstack-cli:setup"]
-dir = "{{config_root}}/apps/agentstack-cli"
+depends = ["adk-cli:setup"]
+dir = "{{config_root}}/apps/adk-cli"
 
-["agentstack-cli:check:pyrefly"]
+["adk-cli:check:pyrefly"]
 extends = "python:check:pyrefly"
-dir = "{{config_root}}/apps/agentstack-cli"
+dir = "{{config_root}}/apps/adk-cli"
 
 # fix
 
-["agentstack-cli:fix"]
-depends = ["agentstack-cli:fix:*"]
+["adk-cli:fix"]
+depends = ["adk-cli:fix:*"]
 
-["agentstack-cli:fix:ruff-check"]
+["adk-cli:fix:ruff-check"]
 extends = "python:fix:ruff"
-depends = ["agentstack-cli:setup"]
-dir = "{{config_root}}/apps/agentstack-cli"
+depends = ["adk-cli:setup"]
+dir = "{{config_root}}/apps/adk-cli"
 
-["agentstack-cli:fix:ruff-format"]
+["adk-cli:fix:ruff-format"]
 extends = "python:fix:ruff-format"
-depends = ["agentstack-cli:setup"]
-dir = "{{config_root}}/apps/agentstack-cli"
+depends = ["adk-cli:setup"]
+dir = "{{config_root}}/apps/adk-cli"
 
 # run
 
-["agentstack-cli:run"]
-description = "NOTE: Use double dash to pass extra args, like `mise agentstack-cli:run -- provider list`"
-depends = ["agentstack-cli:setup", "agentstack-cli:build:copy-helm-chart"]
-dir = "{{config_root}}/apps/agentstack-cli"
+["adk-cli:run"]
+description = "NOTE: Use double dash to pass extra args, like `mise adk-cli:run -- provider list`"
+depends = ["adk-cli:setup", "adk-cli:build:copy-helm-chart"]
+dir = "{{config_root}}/apps/adk-cli"
 raw = true
-run = "uv run agentstack"
+run = "uv run kagenti-cli"
 
 # build
 
-["agentstack-cli:build:download-binaries"]
-dir = "{{config_root}}/apps/agentstack-cli"
+["adk-cli:build:download-binaries"]
+dir = "{{config_root}}/apps/adk-cli"
 run = '''
 set -e
 LIMA_VERSION=$(yq -r '.tools["lima"]' ../../mise.toml)
@@ -64,20 +64,20 @@ echo '*' >./vendor/.gitignore
 wait
 '''
 
-["agentstack-cli:build:copy-helm-chart"]
+["adk-cli:build:copy-helm-chart"]
 depends = ["helm:build"]
-dir = "{{config_root}}/apps/agentstack-cli"
-run = "rm ./src/agentstack_cli/data/helm-chart.tgz 2>/dev/null || true && cp {{config_root}}/helm/dist/agentstack-*.tgz ./src/agentstack_cli/data/helm-chart.tgz"
+dir = "{{config_root}}/apps/adk-cli"
+run = "rm ./src/kagenti_cli/data/helm-chart.tgz 2>/dev/null || true && cp {{config_root}}/helm/dist/agentstack-*.tgz ./src/kagenti_cli/data/helm-chart.tgz"
 sources = ["{{config_root}}/helm/dist/agentstack-*.tgz"]
-outputs = ["./src/agentstack_cli/data/helm-chart.tgz"]
+outputs = ["./src/kagenti_cli/data/helm-chart.tgz"]
 
-["agentstack-cli:build"]
+["adk-cli:build"]
 depends = [
-  "agentstack-cli:setup",
-  "agentstack-cli:build:*",
+  "adk-cli:setup",
+  "adk-cli:build:*",
   "adk-py:build",
 ]
-dir = "{{config_root}}/apps/agentstack-cli"
+dir = "{{config_root}}/apps/adk-cli"
 sources = ["src/**/*", "hatch_build.py", "pyproject.toml", "vendor/lima/**/*"]
 outputs = ["dist/**/*"]
 run = '''
@@ -89,15 +89,15 @@ rm -rf ./dist
 uv build -q --out-dir ./dist
 export lima_version=$(yq -r '.tools["lima"]' ../../mise.toml)
 export version="$(yq -r '.project.version' pyproject.toml | tr -d -)"
-export universal_wheel=$(realpath "./dist/agentstack_cli-$version-py3-none-any.whl")
+export universal_wheel=$(realpath "./dist/kagenti_cli-$version-py3-none-any.whl")
 
 # Pin versions from uv.lock in wheel
 tmpdir="$(mktemp -d)"
 unzip -q "$universal_wheel" -d "$tmpdir"
 find "$tmpdir" -type f -exec chmod +r {} \;
-insert_line=$(awk '/^Requires-Dist:/ {print FNR-1; exit}' "$tmpdir/agentstack_cli-${version}.dist-info/METADATA" | cut -d: -f1)
+insert_line=$(awk '/^Requires-Dist:/ {print FNR-1; exit}' "$tmpdir/kagenti_cli-${version}.dist-info/METADATA" | cut -d: -f1)
 (
-  head -n $insert_line "$tmpdir/agentstack_cli-${version}.dist-info/METADATA"
+  head -n $insert_line "$tmpdir/kagenti_cli-${version}.dist-info/METADATA"
   uv export --no-editable --no-hashes --no-emit-workspace --no-dev --format requirements-txt | sed '/^[[:space:]]*#/d' | while IFS= read -r dep; do
     if [[ "$dep" =~ ^[a-zA-Z] ]]; then
       echo "Requires-Dist: $dep"
@@ -105,15 +105,15 @@ insert_line=$(awk '/^Requires-Dist:/ {print FNR-1; exit}' "$tmpdir/agentstack_cl
       echo "Requires-Dist: $(yq -r '.project.name' "$dep/pyproject.toml")==$(yq -r '.project.version' "$dep/pyproject.toml" | tr -d '-')"
     fi
   done
-  awk -v insert_line="$insert_line" 'NR > insert_line && $0 !~ /^Requires-Dist:/' "$tmpdir/agentstack_cli-${version}.dist-info/METADATA"
-) > "$tmpdir/agentstack_cli-${version}.dist-info/METADATA.new"
-mv "$tmpdir/agentstack_cli-${version}.dist-info/METADATA.new" "$tmpdir/agentstack_cli-${version}.dist-info/METADATA"
+  awk -v insert_line="$insert_line" 'NR > insert_line && $0 !~ /^Requires-Dist:/' "$tmpdir/kagenti_cli-${version}.dist-info/METADATA"
+) > "$tmpdir/kagenti_cli-${version}.dist-info/METADATA.new"
+mv "$tmpdir/kagenti_cli-${version}.dist-info/METADATA.new" "$tmpdir/kagenti_cli-${version}.dist-info/METADATA"
 rm "$universal_wheel"
 uv run -m wheel pack "$tmpdir" --dest-dir ./dist >/dev/null
 rm -rf "$tmpdir"
 
 # Verify that the wheel works
-if ! uv tool run --isolated --from "$universal_wheel" --with ../adk-py/dist/kagenti_adk-*-py3-none-any.whl -- agentstack version; then
+if ! uv tool run --isolated --from "$universal_wheel" --with ../adk-py/dist/kagenti_adk-*-py3-none-any.whl -- kagenti-cli version; then
   echo "Failed to install $universal_wheel"
   exit 1
 fi
@@ -129,13 +129,13 @@ build_wheel() {
   find "$tmpdir" -type f -exec chmod +r {} \;
 
   # Add Lima binaries
-  mkdir -p "$tmpdir/agentstack_cli/data/bin" "$tmpdir/agentstack_cli/data/share/lima"
-  cp "./vendor/lima-$lima_version/$wheel_tag/bin/limactl" "$tmpdir/agentstack_cli/data/bin/"
-  cp "./vendor/lima-$lima_version/$wheel_tag/share/lima/lima-guestagent.Linux-$hostagent_arch.gz" "$tmpdir/agentstack_cli/data/share/lima/"
+  mkdir -p "$tmpdir/kagenti_cli/data/bin" "$tmpdir/kagenti_cli/data/share/lima"
+  cp "./vendor/lima-$lima_version/$wheel_tag/bin/limactl" "$tmpdir/kagenti_cli/data/bin/"
+  cp "./vendor/lima-$lima_version/$wheel_tag/share/lima/lima-guestagent.Linux-$hostagent_arch.gz" "$tmpdir/kagenti_cli/data/share/lima/"
   
   # Update WHEEL file
-  perl -pi -e "s/Root-Is-Purelib: true/Root-Is-Purelib: false/" "$tmpdir/agentstack_cli-$version.dist-info/WHEEL"
-  perl -pi -e "s/Tag: .*/Tag: py3-none-$wheel_tag/" "$tmpdir/agentstack_cli-$version.dist-info/WHEEL"
+  perl -pi -e "s/Root-Is-Purelib: true/Root-Is-Purelib: false/" "$tmpdir/kagenti_cli-$version.dist-info/WHEEL"
+  perl -pi -e "s/Tag: .*/Tag: py3-none-$wheel_tag/" "$tmpdir/kagenti_cli-$version.dist-info/WHEEL"
 
   uv run -m wheel pack "$tmpdir" --dest-dir ./dist >/dev/null
   rm -rf "$tmpdir"
@@ -149,21 +149,21 @@ for job in $(jobs -p); do wait $job; done
 
 # docs
 
-["agentstack-cli:docs"]
-dir = "{{config_root}}/apps/agentstack-cli"
-depends = ["agentstack-cli:setup"]
+["adk-cli:docs"]
+dir = "{{config_root}}/apps/adk-cli"
+depends = ["adk-cli:setup"]
 run = '''
 #!/bin/bash
 set -euo pipefail
 
 CLI_REFERENCE="../../docs/development/reference/cli-reference.mdx"
-TYPER_SCRIPT="src/agentstack_cli/__init__.py"
+TYPER_SCRIPT="src/kagenti_cli/__init__.py"
 
 HEAD_TMP=$(mktemp)
 GEN_TMP=$(mktemp)
 trap 'rm -f $HEAD_TMP $GEN_TMP' EXIT
 
 cat $CLI_REFERENCE | sed "/usage-generator/q" > $HEAD_TMP
-uv run -m typer $TYPER_SCRIPT utils docs --name agentstack | tail -n +2 > $GEN_TMP
+uv run -m typer $TYPER_SCRIPT utils docs --name kagenti-cli | tail -n +2 > $GEN_TMP
 cat $HEAD_TMP $GEN_TMP > $CLI_REFERENCE
 '''

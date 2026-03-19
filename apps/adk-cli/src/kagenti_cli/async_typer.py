@@ -18,9 +18,9 @@ from rich.markdown import Heading, Markdown
 from rich.table import Table
 from typer.core import TyperGroup
 
-from agentstack_cli.configuration import Configuration
-from agentstack_cli.console import console, err_console
-from agentstack_cli.utils import extract_messages, format_error
+from kagenti_cli.configuration import Configuration
+from kagenti_cli.console import console, err_console
+from kagenti_cli.utils import extract_messages, format_error
 
 DEBUG = Configuration().debug
 
@@ -100,7 +100,7 @@ class AsyncTyper(typer.Typer):
                         err_console.print()
                     if is_connect_error:
                         err_console.hint(
-                            "Start the Agent Stack platform using: [green]agentstack platform start[/green]. If that does not help, run [green]agentstack platform delete[/green] to clean up, then [green]agentstack platform start[/green] again."
+                            "Start the Kagenti ADK platform using: [green]kagenti-cli platform start[/green]. If that does not help, run [green]kagenti-cli platform delete[/green] to clean up, then [green]kagenti-cli platform start[/green] again."
                         )
                     elif is_permission_error:
                         err_console.hint(
@@ -108,7 +108,7 @@ class AsyncTyper(typer.Typer):
                         )
                     else:
                         err_console.hint(
-                            "Are you having consistent problems? If so, try these troubleshooting steps: [green]agentstack platform delete[/green] to remove the platform, and [green]agentstack platform start[/green] to recreate it."
+                            "Are you having consistent problems? If so, try these troubleshooting steps: [green]kagenti-cli platform delete[/green] to remove the platform, and [green]kagenti-cli platform start[/green] to recreate it."
                         )
                     if DEBUG:
                         raise

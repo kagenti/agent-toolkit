@@ -51,7 +51,7 @@ if [ -z "${CI:-}" ]; then
         podman
     printf '#!/bin/sh\nexec sudo podman "$@"\n' > /usr/local/bin/docker
     chmod +x /usr/local/bin/docker
-    echo 'export AGENTSTACK__RUNNING_INSIDE_VM=true' > /etc/profile.d/agentstack-vm.sh
+    echo 'export KAGENTI_ADK_RUNNING_INSIDE_VM=true' > /etc/profile.d/agentstack-vm.sh
 fi
 
 passwd -l root

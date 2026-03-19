@@ -13,11 +13,11 @@ from kagenti_adk.platform.types import Metadata
 from InquirerPy import inquirer
 from InquirerPy.base.control import Choice
 
-from agentstack_cli import configuration
-from agentstack_cli.async_typer import AsyncTyper
-from agentstack_cli.configuration import Configuration
-from agentstack_cli.console import console
-from agentstack_cli.server_utils import (
+from kagenti_cli import configuration
+from kagenti_cli.async_typer import AsyncTyper
+from kagenti_cli.configuration import Configuration
+from kagenti_cli.console import console
+from kagenti_cli.server_utils import (
     announce_server_action,
     confirm_server_action,
 )

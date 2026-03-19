@@ -59,7 +59,7 @@ while command -v beeai >/dev/null && rm $(command -v beeai); do true; done
 # We set the version to error out on platforms incompatible with the latest version
 # It also avoids accidentally installing prereleases of dependencies by only allowing explicitly set ones
 echo "Installing Kagenti ADK CLI..."
-uv tool install --quiet --python-preference=only-managed --python=$PYTHON_VERSION --refresh --prerelease if-necessary-or-explicit --with "kagenti-adk==$KAGENTI_ADK_VERSION" "agentstack-cli==$KAGENTI_ADK_VERSION" --force || error
+uv tool install --quiet --python-preference=only-managed --python=$PYTHON_VERSION --refresh --prerelease if-necessary-or-explicit --with "kagenti-adk==$KAGENTI_ADK_VERSION" "kagenti-cli==$KAGENTI_ADK_VERSION" --force || error
 
 # Finish set up using CLI (install QEMU on Linux, start platform, set up API keys, run UI, ...)
-kagenti-adk self install
+kagenti-cli self install

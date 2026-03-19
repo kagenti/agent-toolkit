@@ -1,6 +1,6 @@
 ---
 title: "Quickstart"
-description: "Get Agent Stack up and running in minutes. Then explore running pre-built agents."
+description: "Get Kagenti ADK up and running in minutes. Then explore running pre-built agents."
 ---
 
 ## Prerequisites
@@ -16,7 +16,7 @@ description: "Get Agent Stack up and running in minutes. Then explore running pr
 
 ## One-Line Install
 
-Open the terminal and run this command to install Agent Stack:
+Open the terminal and run this command to install Kagenti ADK:
 
 ```bash
 sh -c "$(curl -LsSf https://agentstack.beeai.dev/install.sh)"
@@ -24,7 +24,7 @@ sh -c "$(curl -LsSf https://agentstack.beeai.dev/install.sh)"
 
 <Info> 
 
-The installer sets up `uv` and the `agentstack-cli` on your host machine. Agent Stack uses a virtual machine (managed via a bundled [Lima](https://github.com/lima-vm/lima) binary) to keep your host machine clean. The Kubernetes cluster running the Agent Stack server, agent containers, and associated storage and services live entirely inside the VM and not on your host directly. 
+The installer sets up `uv` and the `kagenti-cli` on your host machine. Kagenti ADK uses a virtual machine (managed via a bundled [Lima](https://github.com/lima-vm/lima) binary) to keep your host machine clean. The Kubernetes cluster running the Kagenti ADK server, agent containers, and associated storage and services live entirely inside the VM and not on your host directly.
 
 
 For details on what happens under the hood, refer to the Manual Install section or read the [`install.sh`](https://github.com/i-am-bee/agentstack/blob/install/install.sh) source code.
@@ -36,7 +36,7 @@ For details on what happens under the hood, refer to the Manual Install section 
 <Steps>
 <Step title="Install uv">
 
-Follow the [installation instructions](https://docs.astral.sh/uv/getting-started/installation/). Agent Stack uses `uv` to manage its own internal Python environment.
+Follow the [installation instructions](https://docs.astral.sh/uv/getting-started/installation/). Kagenti ADK uses `uv` to manage its own internal Python environment.
 
 </Step>
 <Step title="Linux only: Install QEMU">
@@ -44,12 +44,12 @@ Follow the [installation instructions](https://docs.astral.sh/uv/getting-started
 On Linux, Lima requires QEMU. Install it via these ([instructions](https://www.qemu.org/download/)).
 
 </Step>
-<Step title="Install Agent Stack">
+<Step title="Install Kagenti ADK">
 
 Open a new terminal and run:
 
 ```bash
-uv python install --quiet --python-preference=only-managed --no-bin 3.13 && uv tool install --refresh --force --python-preference=only-managed --python=3.13 agentstack-cli && agentstack self install
+uv python install --quiet --python-preference=only-managed --no-bin 3.13 && uv tool install --refresh --force --python-preference=only-managed --python=3.13 kagenti-cli && kagenti-cli self install
 ```
 
 Follow the interactive prompts to finish setup and optionally start the VM.
@@ -86,7 +86,7 @@ WSL is properly set up once you reach a working Linux shell. You can verify this
 
 <Warning>
 
-Even though WSL2 is required, Agent Stack CLI can't be installed _inside_ WSL2. All subsequent commands should be run from Windows PowerShell.
+Even though WSL2 is required, Kagenti ADK CLI can't be installed _inside_ WSL2. All subsequent commands should be run from Windows PowerShell.
 
 </Warning>
 
@@ -136,7 +136,7 @@ Close and reopen your terminal after installation.
 
 If you plan to use Ollama, we recommend installing the [Windows app](https://ollama.com/download/windows).
 
-In the Ollama app settings, it's necessary to enable *"Expose Ollama to the network"* in order for it to be accessible by Agent Stack. After enabling this option, you may get a firewall prompt where you need to select *"Allow"*.
+In the Ollama app settings, it's necessary to enable *"Expose Ollama to the network"* in order for it to be accessible by Kagenti ADK. After enabling this option, you may get a firewall prompt where you need to select *"Allow"*.
 
 </Step>
 <Step title="Configure local agents">
@@ -151,17 +151,17 @@ Close and reopen your terminal after this.
 
 <Info>
 
-This will make local agents accessible over the local network, which is needed for Agent Stack to access them. When running local agents, you may encounter firewall prompts where you need to select *"Allow"*.
+This will make local agents accessible over the local network, which is needed for Kagenti ADK to access them. When running local agents, you may encounter firewall prompts where you need to select *"Allow"*.
 
 </Info>
 
 </Step>
-<Step title="Install Agent Stack">
+<Step title="Install Kagenti ADK">
 
 Run in PowerShell:
 
 ```bash
-uv python install --quiet --python-preference=only-managed --no-bin 3.13; uv tool install --refresh --force --python-preference=only-managed --python=3.13 agentstack-cli; agentstack self install
+uv python install --quiet --python-preference=only-managed --no-bin 3.13; uv tool install --refresh --force --python-preference=only-managed --python=3.13 kagenti-cli; kagenti-cli self install
 ```
 
 Follow the interactive prompts to finish the installation and setup.
@@ -174,31 +174,31 @@ Follow the interactive prompts to finish the installation and setup.
 ## Usage
 
 ```sh
-agentstack ui                          # Launch web interface
-agentstack list                        # See what agents are available
-agentstack run chat "Hi, who are you"  # Send a message to chat agent
-agentstack run chat                    # Try interactive mode
-agentstack info chat                   # View agent details
-agentstack --help                      # See all options
+kagenti-cli ui                          # Launch web interface
+kagenti-cli list                        # See what agents are available
+kagenti-cli run chat "Hi, who are you"  # Send a message to chat agent
+kagenti-cli run chat                    # Try interactive mode
+kagenti-cli info chat                   # View agent details
+kagenti-cli --help                      # See all options
 ```
 
 ## Platform Management
 
 ```sh
-agentstack platform start        # Start platform
-agentstack model setup           # Configure LLM provider
-agentstack platform stop         # Stop (keeps data)
-agentstack platform delete       # Delete all data
+kagenti-cli platform start        # Start platform
+kagenti-cli model setup           # Configure LLM provider
+kagenti-cli platform stop         # Stop (keeps data)
+kagenti-cli platform delete       # Delete all data
 ```
 
 ## Version & Upgrades
 
 <Warning>
-If you are having issues with these commands, you may be running an old version of Agent Stack. Run the one-line install script above to upgrade to the latest version.
+If you are having issues with these commands, you may be running an old version of Kagenti ADK. Run the one-line install script above to upgrade to the latest version.
 </Warning>
 
 ```sh
-agentstack self version          # Check version
-agentstack self upgrade          # Update
-agentstack self uninstall        # Remove completely
+kagenti-cli self version          # Check version
+kagenti-cli self upgrade          # Update
+kagenti-cli self uninstall        # Remove completely
 ```

@@ -26,67 +26,6 @@ sqlite = [
 ]
 
 [[package]]
-name = "agentstack-cli"
-version = "0.7.1"
-source = { editable = "." }
-dependencies = [
-    { name = "a2a-sdk" },
-    { name = "anyio" },
-    { name = "authlib" },
-    { name = "gnureadline", marker = "sys_platform != 'win32'" },
-    { name = "inquirerpy" },
-    { name = "jsf" },
-    { name = "jsonschema" },
-    { name = "kagenti-adk" },
-    { name = "openai" },
-    { name = "prompt-toolkit" },
-    { name = "psutil" },
-    { name = "pydantic" },
-    { name = "pydantic-settings" },
-    { name = "pyyaml" },
-    { name = "requests" },
-    { name = "tenacity" },
-    { name = "typer" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "pyrefly" },
-    { name = "pytest" },
-    { name = "ruff" },
-    { name = "wheel" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "a2a-sdk" },
-    { name = "anyio", specifier = ">=4.12.1" },
-    { name = "authlib", specifier = ">=1.6.6" },
-    { name = "gnureadline", marker = "sys_platform != 'win32'", specifier = ">=8.3.3" },
-    { name = "inquirerpy", specifier = ">=0.3.4" },
-    { name = "jsf", specifier = ">=0.11.2" },
-    { name = "jsonschema", specifier = ">=4.26.0" },
-    { name = "kagenti-adk", editable = "../adk-py" },
-    { name = "openai", specifier = ">=2.16.0" },
-    { name = "prompt-toolkit", specifier = ">=3.0.52" },
-    { name = "psutil", specifier = ">=7.2.2" },
-    { name = "pydantic", specifier = ">=2.12.5" },
-    { name = "pydantic-settings", specifier = ">=2.12.0" },
-    { name = "pyyaml", specifier = ">=6.0.3" },
-    { name = "requests", specifier = ">=2.32.5" },
-    { name = "tenacity", specifier = ">=9.1.2" },
-    { name = "typer", specifier = ">=0.21.1" },
-]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "pyrefly", specifier = ">=0.52.0" },
-    { name = "pytest", specifier = ">=9.0.2" },
-    { name = "ruff", specifier = ">=0.14.14" },
-    { name = "wheel", specifier = ">=0.46.3" },
-]
-
-[[package]]
 name = "aiosqlite"
 version = "0.22.1"
 source = { registry = "https://pypi.org/simple" }
@@ -708,6 +647,67 @@ dev = [
     { name = "pytest-asyncio", specifier = ">=1.1.0" },
     { name = "pytest-httpx", specifier = ">=0.35.0" },
     { name = "ruff", specifier = ">=0.15.0" },
+]
+
+[[package]]
+name = "kagenti-cli"
+version = "0.7.1"
+source = { editable = "." }
+dependencies = [
+    { name = "a2a-sdk" },
+    { name = "anyio" },
+    { name = "authlib" },
+    { name = "gnureadline", marker = "sys_platform != 'win32'" },
+    { name = "inquirerpy" },
+    { name = "jsf" },
+    { name = "jsonschema" },
+    { name = "kagenti-adk" },
+    { name = "openai" },
+    { name = "prompt-toolkit" },
+    { name = "psutil" },
+    { name = "pydantic" },
+    { name = "pydantic-settings" },
+    { name = "pyyaml" },
+    { name = "requests" },
+    { name = "tenacity" },
+    { name = "typer" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "pyrefly" },
+    { name = "pytest" },
+    { name = "ruff" },
+    { name = "wheel" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "a2a-sdk" },
+    { name = "anyio", specifier = ">=4.12.1" },
+    { name = "authlib", specifier = ">=1.6.6" },
+    { name = "gnureadline", marker = "sys_platform != 'win32'", specifier = ">=8.3.3" },
+    { name = "inquirerpy", specifier = ">=0.3.4" },
+    { name = "jsf", specifier = ">=0.11.2" },
+    { name = "jsonschema", specifier = ">=4.26.0" },
+    { name = "kagenti-adk", editable = "../adk-py" },
+    { name = "openai", specifier = ">=2.16.0" },
+    { name = "prompt-toolkit", specifier = ">=3.0.52" },
+    { name = "psutil", specifier = ">=7.2.2" },
+    { name = "pydantic", specifier = ">=2.12.5" },
+    { name = "pydantic-settings", specifier = ">=2.12.0" },
+    { name = "pyyaml", specifier = ">=6.0.3" },
+    { name = "requests", specifier = ">=2.32.5" },
+    { name = "tenacity", specifier = ">=9.1.2" },
+    { name = "typer", specifier = ">=0.21.1" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "pyrefly", specifier = ">=0.52.0" },
+    { name = "pytest", specifier = ">=9.0.2" },
+    { name = "ruff", specifier = ">=0.14.14" },
+    { name = "wheel", specifier = ">=0.46.3" },
 ]
 
 [[package]]

@@ -33,7 +33,7 @@ from pydantic import BaseModel
 from rich.console import Capture, Console
 from rich.text import Text
 
-from agentstack_cli.console import console, err_console
+from kagenti_cli.console import console, err_console
 
 __all__ = [
     "IN_VERBOSITY_CONTEXT",

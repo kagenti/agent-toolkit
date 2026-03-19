@@ -130,7 +130,7 @@ outputs = { auto = true }
 includes = [
     "./tasks.toml",
     "helm/tasks.toml",
-    "apps/agentstack-cli/tasks.toml",
+    "apps/adk-cli/tasks.toml",
     "apps/adk-py/tasks.toml",
     "apps/adk-server/tasks.toml",
     "apps/agentstack-ui/tasks.toml",

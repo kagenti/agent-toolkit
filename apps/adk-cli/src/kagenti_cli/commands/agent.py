@@ -93,8 +93,8 @@ from rich.box import HORIZONTALS
 from rich.console import ConsoleRenderable, Group, NewLine
 from rich.panel import Panel
 
-from agentstack_cli.commands.model import ensure_llm_provider
-from agentstack_cli.configuration import Configuration
+from kagenti_cli.commands.model import ensure_llm_provider
+from kagenti_cli.configuration import Configuration
 
 # This is necessary for proper handling of arrow keys in interactive input
 if sys.platform != "win32":
@@ -115,10 +115,10 @@ import typer
 from rich.markdown import Markdown
 from rich.table import Column
 
-from agentstack_cli.api import a2a_client
-from agentstack_cli.async_typer import AsyncTyper, console, create_table, err_console
-from agentstack_cli.server_utils import announce_server_action, confirm_server_action
-from agentstack_cli.utils import (
+from kagenti_cli.api import a2a_client
+from kagenti_cli.async_typer import AsyncTyper, console, create_table, err_console
+from kagenti_cli.server_utils import announce_server_action, confirm_server_action
+from kagenti_cli.utils import (
     generate_schema_example,
     prompt_user,
     remove_nullable,
@@ -262,7 +262,7 @@ async def _add_agent_via_kagenti(
     import contextlib
     import re
 
-    from agentstack_cli.kagenti_client import KagentiClient
+    from kagenti_cli.kagenti_client import KagentiClient
 
     # Derive name from image if not provided
     if not name:
@@ -282,7 +282,7 @@ async def _add_agent_via_kagenti(
                 )
 
     if not auth_token:
-        console.error("Not authenticated. Run [green]agentstack server login[/green] first.")
+        console.error("Not authenticated. Run [green]kagenti-cli server login[/green] first.")
         sys.exit(1)
 
     client = KagentiClient(configuration.kagenti_url, auth_token.access_token)
@@ -369,7 +369,7 @@ async def _add_agent_via_kagenti(
         console.success(f"Agent [bold]{name}[/bold] is healthy in kagenti")
 
     # Wait for agent to appear in agentstack (30s timeout)
-    console.info("Waiting for agent to appear in agentstack...")
+    console.info("Waiting for agent to appear in Kagenti ADK...")
     appeared = False
     for _ in range(30):
         await asyncio.sleep(1)
@@ -384,7 +384,7 @@ async def _add_agent_via_kagenti(
 
     if not appeared:
         console.warning(
-            f"Agent [bold]{name}[/bold] has not appeared in agentstack within 30s. "
+            f"Agent [bold]{name}[/bold] has not appeared in Kagenti ADK within 30s. "
             "It may take longer for kagenti to sync the agent."
         )
 
@@ -405,7 +405,7 @@ async def update_agent(
 
     if search_path is None:
         if not providers:
-            console.error("No agents found. Add an agent first using 'agentstack agent add'.")
+            console.error("No agents found. Add an agent first using 'kagenti-cli agent add'.")
             sys.exit(1)
 
         provider_choices = [
@@ -546,7 +546,7 @@ async def uninstall_agent(
             import contextlib
             from urllib.parse import urlparse
 
-            from agentstack_cli.kagenti_client import KagentiClient
+            from kagenti_cli.kagenti_client import KagentiClient
 
             auth_token = None
             try:
@@ -1214,7 +1214,7 @@ async def run_agent(
 
         if search_path is None:
             if not providers:
-                err_console.error("No agents found. Add an agent first using 'agentstack agent add'.")
+                err_console.error("No agents found. Add an agent first using 'kagenti-cli agent add'.")
                 sys.exit(1)
             search_path = await inquirer.fuzzy(
                 message="Select an agent to run:",

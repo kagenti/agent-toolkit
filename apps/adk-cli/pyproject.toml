@@ -1,7 +1,7 @@
 [project]
-name = "agentstack-cli"
+name = "kagenti-cli"
 version = "0.7.1"
-description = "Agent Stack CLI"
+description = "Kagenti ADK CLI"
 readme = "README.md"
 authors = [{ name = "IBM Corp." }]
 requires-python = ">=3.14,<3.15"
@@ -37,15 +37,16 @@ dev = [
 kagenti-adk = { path = "../adk-py", editable = true }
 
 [project.scripts]
-agentstack = "agentstack_cli:app"
-agentstack-cli = "agentstack_cli:app"
+kagenti-cli = "kagenti_cli:app"
+kagenti = "kagenti_cli:app"
+kag = "kagenti_cli:app"
 
 [build-system]
 requires = ["uv_build>=0.10.0,<0.11.0"]
 build-backend = "uv_build"
 
 [tool.uv.build-backend]
-source-include = ["src/agentstack_cli/data"]
+source-include = ["src/kagenti_cli/data"]
 source-exclude = ["**/.DS_Store"]
 
 [tool.ruff]

@@ -11,7 +11,7 @@ run = '''
 #!/bin/bash
 set -euxo pipefail
 
-if [ "${AGENTSTACK__RUNNING_INSIDE_VM-}" = true ]; then
+if [ "${KAGENTI_ADK_RUNNING_INSIDE_VM-}" = true ]; then
   echo "Running inside VM, image not needed."
   exit 0
 fi

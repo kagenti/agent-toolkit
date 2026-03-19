@@ -23,11 +23,11 @@ from InquirerPy import inquirer
 from InquirerPy.base.control import Choice
 from rich.table import Column
 
-from agentstack_cli.api import openai_client
-from agentstack_cli.async_typer import AsyncTyper, console, create_table
-from agentstack_cli.configuration import Configuration
-from agentstack_cli.server_utils import announce_server_action, confirm_server_action
-from agentstack_cli.utils import run_command, verbosity
+from kagenti_cli.api import openai_client
+from kagenti_cli.async_typer import AsyncTyper, console, create_table
+from kagenti_cli.configuration import Configuration
+from kagenti_cli.server_utils import announce_server_action, confirm_server_action
+from kagenti_cli.utils import run_command, verbosity
 
 app = AsyncTyper()
 configuration = Configuration()
@@ -413,7 +413,7 @@ async def _select_default_model(
     if not available_models:
         raise ModelProviderError(
             f"[bold]No models are available[/bold]\n"
-            f"Configure at least one working {capability} provider using `agentstack model add` command."
+            f"Configure at least one working {capability} provider using `kagenti-cli model add` command."
         )
 
     recommended_model = [m for m in recommended_models if m in available_models]
@@ -626,7 +626,7 @@ async def setup(
                 default_embedding_model = None
                 if skip_embedding:
                     console.hint(
-                        "Skipping embedding setup. You can add an embedding provider later with: [green]agentstack model add[/green]"
+                        "Skipping embedding setup. You can add an embedding provider later with: [green]kagenti-cli model add[/green]"
                     )
                 elif embedding_provider is not None:
                     console.print("[bold]Setting up embedding provider...[/bold]")
@@ -668,7 +668,7 @@ async def setup(
                     await _add_provider(capability=ModelCapability.EMBEDDING, use_true_localhost=use_true_localhost)
                     default_embedding_model = await _select_default_model(ModelCapability.EMBEDDING, yes=yes)
                 else:
-                    console.hint("You can add an embedding provider later with: [green]agentstack model add[/green]")
+                    console.hint("You can add an embedding provider later with: [green]kagenti-cli model add[/green]")
 
                 with console.status("Saving configuration...", spinner="dots"):
                     await SystemConfiguration.update(
@@ -677,7 +677,7 @@ async def setup(
                     )
                 console.print(
                     "\n[bold green]You're all set![/bold green] "
-                    "(You can re-run this setup anytime with [blue]agentstack model setup[/blue])"
+                    "(You can re-run this setup anytime with [blue]kagenti-cli model setup[/blue])"
                 )
             except Exception:
                 await _reset_configuration()
@@ -903,12 +903,12 @@ async def ensure_llm_provider():
         if config.default_llm_model and not inconsistent:
             return
 
-    console.print("[bold]Welcome to [red]Agent Stack[/red]![/bold]")
+    console.print("[bold]Welcome to [red]Kagenti ADK[/red]![/bold]")
     console.print("Let's start by configuring your LLM environment.\n")
     try:
         await setup()
     except Exception:
         console.error("Could not continue because the LLM environment is not properly set up.")
-        console.hint("Try re-entering your LLM API details with: [green]agentstack model setup[/green]")
+        console.hint("Try re-entering your LLM API details with: [green]kagenti-cli model setup[/green]")
         raise
     console.print()

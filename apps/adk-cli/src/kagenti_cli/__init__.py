@@ -12,24 +12,24 @@ from copy import deepcopy
 import kagenti_adk  # noqa: F401 -- imported early due to Pydantic patches
 import typer
 
-import agentstack_cli.commands.agent
-import agentstack_cli.commands.build
-import agentstack_cli.commands.connector
-import agentstack_cli.commands.model
-import agentstack_cli.commands.platform
-import agentstack_cli.commands.self
-import agentstack_cli.commands.server
+import kagenti_cli.commands.agent
+import kagenti_cli.commands.build
+import kagenti_cli.commands.connector
+import kagenti_cli.commands.model
+import kagenti_cli.commands.platform
+import kagenti_cli.commands.self
+import kagenti_cli.commands.server
 
-# import agentstack_cli.commands.user
-from agentstack_cli.async_typer import AsyncTyper
-from agentstack_cli.configuration import Configuration
+# import kagenti_cli.commands.user
+from kagenti_cli.async_typer import AsyncTyper
+from kagenti_cli.configuration import Configuration
 
 logging.basicConfig(level=logging.INFO if Configuration().debug else logging.FATAL)
 logging.getLogger("httpx").setLevel(logging.WARNING)  # not sure why this is necessary
 
 
 HELP_TEXT = """\
-Usage: agentstack [OPTIONS] COMMAND [ARGS]...
+Usage: kagenti-cli [OPTIONS] COMMAND [ARGS]...
 
 ╭─ Getting Started ──────────────────────────────────────────────────────────╮
 │ ui       Launch the web interface                                          │
@@ -49,10 +49,10 @@ Usage: agentstack [OPTIONS] COMMAND [ARGS]...
 | connector       Manage connectors to external services                     │
 │ model           Configure 15+ LLM providers [Admin only]                   │
 │ platform        Start, stop, or delete local platform [Local only]         │
-│ server          Connect to remote Agent Stack servers                      │
-│ self version    Show Agent Stack CLI and Platform version                  │
-│ self upgrade    Upgrade Agent Stack CLI and Platform [Local only]          │
-│ self uninstall  Uninstall Agent Stack CLI and Platform [Local only]        │
+│ server          Connect to remote Kagenti ADK servers                      │
+│ self version    Show Kagenti ADK CLI and Platform version                  │
+│ self upgrade    Upgrade Kagenti ADK CLI and Platform [Local only]          │
+│ self uninstall  Uninstall Kagenti ADK CLI and Platform [Local only]        │
 ╰────────────────────────────────────────────────────────────────────────────╯
 
 ╭─ Options ──────────────────────────────────────────────────────────────────╮
@@ -74,7 +74,7 @@ def main(
     version: bool = typer.Option(False, "--version", help="Show CLI version and exit."),
 ):
     if version:
-        asyncio.run(agentstack_cli.commands.self.version())
+        asyncio.run(kagenti_cli.commands.self.version())
         raise typer.Exit()
     if help or ctx.invoked_subcommand is None:
         typer.echo(HELP_TEXT)
@@ -82,51 +82,51 @@ def main(
 
 
 app.add_typer(
-    agentstack_cli.commands.model.app, name="model", no_args_is_help=True, help="Manage model providers. [Admin only]"
+    kagenti_cli.commands.model.app, name="model", no_args_is_help=True, help="Manage model providers. [Admin only]"
 )
 app.add_typer(
-    agentstack_cli.commands.agent.app,
+    kagenti_cli.commands.agent.app,
     name="agent",
     no_args_is_help=True,
     help="Manage agents. Some commands are [Admin only].",
 )
 app.add_typer(
-    agentstack_cli.commands.connector.app,
+    kagenti_cli.commands.connector.app,
     name="connector",
     no_args_is_help=True,
     help="Manage connectors to external services.",
 )
 app.add_typer(
-    agentstack_cli.commands.platform.app,
+    kagenti_cli.commands.platform.app,
     name="platform",
     no_args_is_help=True,
-    help="Manage Agent Stack platform. [Local only]",
+    help="Manage Kagenti ADK platform. [Local only]",
 )
 app.add_typer(
-    agentstack_cli.commands.server.app,
+    kagenti_cli.commands.server.app,
     name="server",
     no_args_is_help=True,
-    help="Manage Agent Stack servers and authentication.",
+    help="Manage Kagenti ADK servers and authentication.",
 )
 app.add_typer(
-    agentstack_cli.commands.self.app,
+    kagenti_cli.commands.self.app,
     name="self",
     no_args_is_help=True,
-    help="Manage Agent Stack installation.",
+    help="Manage Kagenti ADK installation.",
     hidden=True,
 )
 # TODO: Implement keycloak integration
 # app.add_typer(
-#     agentstack_cli.commands.user.app,
+#     kagenti_cli.commands.user.app,
 #     name="user",
 #     no_args_is_help=True,
 #     help="Manage users. [Admin only]",
 # )
 
 
-app.add_typer(agentstack_cli.commands.build.app, name="", no_args_is_help=True, help="Build agent images.")
+app.add_typer(kagenti_cli.commands.build.app, name="", no_args_is_help=True, help="Build agent images.")
 
-agent_alias = deepcopy(agentstack_cli.commands.agent.app)
+agent_alias = deepcopy(kagenti_cli.commands.agent.app)
 for cmd in agent_alias.registered_commands:
     cmd.rich_help_panel = "Agent commands"
 
@@ -137,10 +137,10 @@ app.add_typer(agent_alias, name="", no_args_is_help=True)
 async def version(
     verbose: typing.Annotated[bool, typer.Option("-v", "--verbose", help="Show verbose output")] = False,
 ):
-    """Print version of the Agent Stack CLI."""
-    import agentstack_cli.commands.self
+    """Print version of the Kagenti ADK CLI."""
+    import kagenti_cli.commands.self
 
-    await agentstack_cli.commands.self.version(verbose=verbose)
+    await kagenti_cli.commands.self.version(verbose=verbose)
 
 
 @app.command("ui")
@@ -148,9 +148,9 @@ async def ui():
     """Launch the graphical interface."""
     import webbrowser
 
-    import agentstack_cli.commands.model
+    import kagenti_cli.commands.model
 
-    await agentstack_cli.commands.model.ensure_llm_provider()
+    await kagenti_cli.commands.model.ensure_llm_provider()
 
     config = Configuration()
     active_server = config.auth_manager.active_server

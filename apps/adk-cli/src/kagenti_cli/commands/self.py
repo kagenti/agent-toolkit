@@ -16,13 +16,13 @@ import pydantic
 import typer
 from InquirerPy import inquirer
 
-import agentstack_cli.commands.platform
-from agentstack_cli.api import fetch_server_version
-from agentstack_cli.async_typer import AsyncTyper
-from agentstack_cli.commands.model import setup as model_setup
-from agentstack_cli.configuration import Configuration
-from agentstack_cli.console import console
-from agentstack_cli.utils import run_command, verbosity
+import kagenti_cli.commands.platform
+from kagenti_cli.api import fetch_server_version
+from kagenti_cli.async_typer import AsyncTyper
+from kagenti_cli.commands.model import setup as model_setup
+from kagenti_cli.configuration import Configuration
+from kagenti_cli.console import console
+from kagenti_cli.utils import run_command, verbosity
 
 app = AsyncTyper()
 configuration = Configuration()
@@ -46,16 +46,16 @@ def _path() -> str:
 async def version(
     verbose: typing.Annotated[bool, typer.Option("-v", "--verbose", help="Show verbose output")] = False,
 ):
-    """Print version of the Agent Stack CLI."""
+    """Print version of the Kagenti ADK CLI."""
     with verbosity(verbose=verbose):
-        cli_version = importlib.metadata.version("agentstack-cli")
+        cli_version = importlib.metadata.version("kagenti-cli")
         platform_version = await fetch_server_version()
         active_server = configuration.auth_manager.active_server
 
         latest_cli_version: str | None = None
         with console.status("Checking for newer version...", spinner="dots"):
             async with httpx.AsyncClient(timeout=10.0) as client:
-                response = await client.get("https://pypi.org/pypi/agentstack-cli/json")
+                response = await client.get("https://pypi.org/pypi/kagenti-cli/json")
                 PyPIPackageInfo = typing.TypedDict("PyPIPackageInfo", {"version": str})
                 PyPIPackage = typing.TypedDict("PyPIPackage", {"info": PyPIPackageInfo})
                 if response.status_code == 200:
@@ -64,21 +64,21 @@ async def version(
                     ]
 
         console.print()
-        console.print(f"     agentstack-cli version: [bold]{cli_version}[/bold]")
+        console.print(f"       kagenti-cli version: [bold]{cli_version}[/bold]")
         console.print(
-            f"agentstack-platform version: [bold]{platform_version.replace('-', '') if platform_version is not None else 'not running'}[/bold]"
+            f"  kagenti-platform version: [bold]{platform_version.replace('-', '') if platform_version is not None else 'not running'}[/bold]"
         )
-        console.print(f"          agentstack server: [bold]{active_server if active_server else 'none'}[/bold]")
+        console.print(f"        kagenti-cli server: [bold]{active_server if active_server else 'none'}[/bold]")
         console.print()
 
         if latest_cli_version and packaging.version.parse(latest_cli_version) > packaging.version.parse(cli_version):
             console.hint(
-                f"A newer version ([bold]{latest_cli_version}[/bold]) is available. Update using: [green]agentstack self upgrade[/green]."
+                f"A newer version ([bold]{latest_cli_version}[/bold]) is available. Update using: [green]kagenti-cli self upgrade[/green]."
             )
         elif platform_version is None:
-            console.hint("Start the Agent Stack platform using: [green]agentstack platform start[/green]")
+            console.hint("Start the Kagenti ADK platform using: [green]kagenti-cli platform start[/green]")
         elif platform_version.replace("-", "") != cli_version:
-            console.hint("Update the Agent Stack platform using: [green]agentstack platform start[/green]")
+            console.hint("Update the Kagenti ADK platform using: [green]kagenti-cli platform start[/green]")
         else:
             console.success("Everything is up to date!")
 
@@ -88,7 +88,7 @@ async def install(
     verbose: typing.Annotated[bool, typer.Option("-v", "--verbose", help="Show verbose output")] = False,
     yes: typing.Annotated[bool, typer.Option("--yes", "-y", help="Skip confirmation prompts")] = False,
 ):
-    """Install Agent Stack platform pre-requisites."""
+    """Install Kagenti ADK platform pre-requisites."""
     with verbosity(verbose=verbose):
         ready_to_start = False
         if platform.system() == "Linux":
@@ -117,7 +117,7 @@ async def install(
                             break
                         except subprocess.CalledProcessError, FileNotFoundError:
                             console.warning(
-                                "Failed to install QEMU automatically. Please install QEMU manually before using Agent Stack. Refer to https://www.qemu.org/download/ for instructions."
+                                "Failed to install QEMU automatically. Please install QEMU manually before using Kagenti ADK. Refer to https://www.qemu.org/download/ for instructions."
                             )
                             break
         elif platform.system() == "Darwin":
@@ -128,34 +128,34 @@ async def install(
         if ready_to_start and (
             yes
             or await inquirer.confirm(
-                message="Do you want to start the Agent Stack platform now? Will run: agentstack platform start",
+                message="Do you want to start the Kagenti ADK platform now? Will run: kagenti-cli platform start",
                 default=True,
             ).execute_async()
         ):
             try:
-                await agentstack_cli.commands.platform.start_cmd(set_values_list=[], verbose=verbose)
+                await kagenti_cli.commands.platform.start_cmd(set_values_list=[], verbose=verbose)
                 already_started = True
                 console.print()
             except Exception:
-                console.warning("Platform start failed. You can retry with [green]agentstack platform start[/green].")
+                console.warning("Platform start failed. You can retry with [green]kagenti-cli platform start[/green].")
 
         already_configured = False
         if already_started and (
             yes
             or await inquirer.confirm(
-                message="Do you want to configure your LLM provider now? Will run: agentstack model setup", default=True
+                message="Do you want to configure your LLM provider now? Will run: kagenti-cli model setup", default=True
             ).execute_async()
         ):
             try:
                 await model_setup(verbose=verbose, yes=yes)
                 already_configured = True
             except Exception:
-                console.warning("Model setup failed. You can retry with [green]agentstack model setup[/green].")
+                console.warning("Model setup failed. You can retry with [green]kagenti-cli model setup[/green].")
 
         if already_configured and (
             yes
             or await inquirer.confirm(
-                message="Do you want to open the web UI now? Will run: agentstack ui", default=True
+                message="Do you want to open the web UI now? Will run: kagenti-cli ui", default=True
             ).execute_async()
         ):
             import webbrowser
@@ -164,17 +164,17 @@ async def install(
 
         console.print()
         console.success("Installation complete!")
-        if not shutil.which("agentstack", path=_path()):
-            console.hint("Open a new terminal window to use the [green]agentstack[/green] command.")
+        if not shutil.which("kagenti-cli", path=_path()):
+            console.hint("Open a new terminal window to use the [green]kagenti-cli[/green] command.")
         if not already_started:
-            console.hint("Start the Agent Stack platform using: [green]agentstack platform start[/green]")
+            console.hint("Start the Kagenti ADK platform using: [green]kagenti-cli platform start[/green]")
         if not already_configured:
-            console.hint("Configure your LLM provider using: [green]agentstack model setup[/green]")
+            console.hint("Configure your LLM provider using: [green]kagenti-cli model setup[/green]")
         console.hint(
-            "Use [green]agentstack ui[/green] to open the web GUI, or [green]agentstack run chat[/green] to talk to an agent on the command line."
+            "Use [green]kagenti-cli ui[/green] to open the web GUI, or [green]kagenti-cli run chat[/green] to talk to an agent on the command line."
         )
         console.hint(
-            "Run [green]agentstack --help[/green] to learn about available commands, or check the documentation at https://agentstack.beeai.dev/"
+            "Run [green]kagenti-cli --help[/green] to learn about available commands, or check the documentation at https://agentstack.beeai.dev/"
         )
 
 
@@ -182,18 +182,18 @@ async def install(
 async def upgrade(
     verbose: typing.Annotated[bool, typer.Option("-v", "--verbose", help="Show verbose output")] = False,
 ):
-    """Upgrade Agent Stack CLI and Platform to the latest version."""
+    """Upgrade Kagenti ADK CLI and Platform to the latest version."""
     if not shutil.which("uv", path=_path()):
         console.error("Can't self-upgrade because 'uv' was not found.")
         raise typer.Exit(1)
 
     with verbosity(verbose=verbose):
         await run_command(
-            ["uv", "tool", "install", "--force", "agentstack-cli"],
-            "Upgrading agentstack-cli",
+            ["uv", "tool", "install", "--force", "kagenti-cli"],
+            "Upgrading kagenti-cli",
             env={"PATH": _path()},
         )
-        await agentstack_cli.commands.platform.start_cmd(set_values_list=[], verbose=verbose)
+        await kagenti_cli.commands.platform.start_cmd(set_values_list=[], verbose=verbose)
         await version(verbose=verbose)
 
 
@@ -201,16 +201,16 @@ async def upgrade(
 async def uninstall(
     verbose: typing.Annotated[bool, typer.Option("-v", "--verbose", help="Show verbose output")] = False,
 ):
-    """Uninstall Agent Stack CLI and Platform."""
+    """Uninstall Kagenti ADK CLI and Platform."""
     if not shutil.which("uv", path=_path()):
         console.error("Can't self-uninstall because 'uv' was not found.")
         raise typer.Exit(1)
 
     with verbosity(verbose=verbose):
-        await agentstack_cli.commands.platform.delete_cmd(verbose=verbose)
+        await kagenti_cli.commands.platform.delete_cmd(verbose=verbose)
         await run_command(
-            ["uv", "tool", "uninstall", "agentstack-cli"],
-            "Uninstalling agentstack-cli",
+            ["uv", "tool", "uninstall", "kagenti-cli"],
+            "Uninstalling kagenti-cli",
             env={"PATH": _path()},
         )
-        console.success("Agent Stack uninstalled successfully.")
+        console.success("Kagenti ADK uninstalled successfully.")

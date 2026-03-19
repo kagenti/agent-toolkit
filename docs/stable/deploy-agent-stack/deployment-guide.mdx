@@ -95,8 +95,8 @@ kubectl port-forward svc/agentstack-svc 8333:8333 &
 After the platform becomes ready, set up your model provider (and login if auth is enabled):
 
 ```shell
-# agentstack server login (if auth is enabled)
-agentstack model setup
+# kagenti-cli server login (if auth is enabled)
+kagenti-cli model setup
 ```
 
 ### 6. Test the Deployment
@@ -104,8 +104,8 @@ agentstack model setup
 Verify the installation by listing available agents and running a test command:
 
 ```shell
-agentstack list
-agentstack run chat hi
+kagenti-cli list
+kagenti-cli run chat hi
 ```
 
 ## Configuration Options
@@ -240,7 +240,7 @@ Without verified emails, authentication will fail with "Verified email not found
   **Clients:**
   - `adk-server`: Backend service client (Confidential, Service Accounts enabled).
   - `agentstack-ui`: Frontend UI client (Confidential, Standard Flow).
-  - `agentstack-cli`: Command Line Interface client (Public, Standard Flow).
+  - `kagenti-cli`: Command Line Interface client (Public, Standard Flow).
 
   **Roles:**
   - `agentstack-admin`: Full system access.

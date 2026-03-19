@@ -10,9 +10,9 @@ import typing
 import anyio
 import typer
 
-from agentstack_cli.async_typer import AsyncTyper
-from agentstack_cli.console import console
-from agentstack_cli.utils import run_command, verbosity
+from kagenti_cli.async_typer import AsyncTyper
+from kagenti_cli.console import console
+from kagenti_cli.utils import run_command, verbosity
 
 app = AsyncTyper()
 
@@ -60,11 +60,11 @@ async def build_agent(
         console.success(f"Built image: [bold]{build_tag}[/bold]")
 
         # Push to the in-cluster registry via NodePort (localhost:30500)
-        from agentstack_cli.commands.platform import detect_export_import_paths, detect_vm_status, run_in_vm
-        from agentstack_cli.configuration import Configuration
+        from kagenti_cli.commands.platform import detect_export_import_paths, detect_vm_status, run_in_vm
+        from kagenti_cli.configuration import Configuration
 
         if (await detect_vm_status(vm_name)) != "running":
-            console.error("Agent Stack platform is not running.")
+            console.error("Kagenti ADK platform is not running.")
             raise typer.Exit(1)
 
         if Configuration().running_inside_vm:
@@ -99,5 +99,5 @@ async def build_agent(
 
         console.success(
             f"Image pushed to platform registry.\n"
-            f"Add it using: [green]agentstack add {cluster_ref}[/green]"
+            f"Add it using: [green]kagenti-cli add {cluster_ref}[/green]"
         )
