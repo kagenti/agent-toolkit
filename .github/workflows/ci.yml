@@ -24,6 +24,7 @@ jobs:
       adk-py: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.adk-py == 'true' }}
       helm: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.helm == 'true' }}
       examples: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.examples == 'true' }}
+      ci: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.ci == 'true' }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/setup
@@ -39,6 +40,7 @@ jobs:
             helm: 'helm/**'
             examples: 'examples/**'
             microshift-vm: 'apps/microshift-vm/**'
+            ci: '.github/**'
 
   check:
     name: mise check
@@ -92,9 +94,12 @@ jobs:
       always() &&
       needs.microshift-vm-build-qemu.result != 'failure' &&
       (needs.setup.outputs.adk-server == 'true' ||
-      needs.setup.outputs.adk-cli == 'true')
+      needs.setup.outputs.adk-cli == 'true' ||
+      needs.setup.outputs.ci == 'true')
     timeout-minutes: 45
     runs-on: ubuntu-latest
+    env:
+      KAGENTI_ADK_HOME: ${{ github.workspace }}/.kagenti/adk
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/setup
