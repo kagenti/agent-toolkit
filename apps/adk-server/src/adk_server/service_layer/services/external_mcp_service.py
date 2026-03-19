@@ -256,7 +256,7 @@ async def _register_client(resource_server_url: str, *, redirect_uri: str) -> _C
     async with httpx.AsyncClient() as client:
         response = await client.post(
             str(registration_endpoint),
-            json={"client_name": "Agent Stack", "redirect_uris": [redirect_uri]},
+            json={"client_name": "Kagenti ADK", "redirect_uris": [redirect_uri]},
         )
         response.raise_for_status()
         return _ClientRegistrationResponse.model_validate(response.json())
@@ -303,7 +303,7 @@ def _render_success():
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Agent Stack</title>
+  <title>Kagenti ADK</title>
   <style>
     body { font-family: system-ui, sans-serif; text-align: center; margin-top: 5rem; }
   </style>
@@ -328,7 +328,7 @@ def _render_failure(error: str, error_description: str | None):
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Agent Stack</title>
+  <title>Kagenti ADK</title>
   <style>
     body { font-family: system-ui, sans-serif; text-align: center; margin-top: 5rem; }
   </style>

@@ -151,7 +151,7 @@ async def serve():
                     description=textwrap.dedent(
                         """\
                         The agent is an AI-powered conversational system designed to process user messages, maintain context,
-                        and generate intelligent responses. Built on the **Agent Stack framework**, it leverages memory and external
+                        and generate intelligent responses. Built on the **Kagenti ADK framework**, it leverages memory and external
                         tools to enhance interactions. It supports real-time web search, Wikipedia lookups, and weather updates,
                         making it a versatile assistant for various applications.
                         ## How It Works

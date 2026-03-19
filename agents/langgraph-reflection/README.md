@@ -16,20 +16,20 @@ Run locally:
 uv run server
 ```
 
-## Migration Guide: Wrapping Reflection Agent for AgentStack
+## Migration Guide: Wrapping Reflection Agent for Kagenti ADK
 
-Follow these steps to convert a standard LangGraph [reflection agent](https://github.com/langchain-ai/langgraph/blob/23961cff61a42b52525f3b20b4094d8d2fba1744/docs/docs/tutorials/reflection/reflection.ipynb) into an AgentStack-compatible microservice.
+Follow these steps to convert a standard LangGraph [reflection agent](https://github.com/langchain-ai/langgraph/blob/23961cff61a42b52525f3b20b4094d8d2fba1744/docs/docs/tutorials/reflection/reflection.ipynb) into an Kagenti ADK-compatible microservice.
 
 ### Prerequisites
 
-- [Kagenti ADK](https://agentstack.beeai.dev/stable/introduction/quickstart) installed.
+- [Kagenti ADK](https://github.com/kagenti/adk/blob/main/docs/stable/introduction/quickstart) installed.
 - Understanding of the original `reflection.py` logic.
 
 ### Integration Process
 
 #### 1. Initialize the Server
 
-Instead of running top-level script logic, you need to wrap it in an AgentStack `Server`.
+Instead of running top-level script logic, you need to wrap it in an Kagenti ADK `Server`.
 
 ```python
 from kagenti_adk.server import Server
@@ -100,7 +100,7 @@ user_input = get_message_text(input)
 
 #### 5. Stream Graph Events to Trajectory
 
-Instead of printing to console, use the `trajectory` extension to send updates back to the AgentStack UI.
+Instead of printing to console, use the `trajectory` extension to send updates back to the Kagenti ADK UI.
 
 ```python
 async for event in graph.astream({"messages": [HumanMessage(content=user_input)]}, config):

@@ -5,7 +5,7 @@ description: Handle platform API errors and agent task failures
 
 The SDK handles errors at two levels:
 
-1. **Platform API errors** occur when communicating with the Agent Stack server (authentication, network issues, invalid responses).
+1. **Platform API errors** occur when communicating with the Kagenti ADK server (authentication, network issues, invalid responses).
 2. **Agent task errors** occur when agents fail or reject tasks during execution.
 
 This guide shows how to catch and handle both error types in your UI.
@@ -17,7 +17,7 @@ All API methods return `ApiResult<T>`. You can branch on `result.ok` or use `unw
 ```typescript
 import { buildApiClient, unwrapResult } from "@kagenti/adk";
 
-const api = buildApiClient({ baseUrl: "https://your-agentstack-instance.com" });
+const api = buildApiClient({ baseUrl: "https://your-adk-instance.com" });
 
 const result = await api.readUser();
 

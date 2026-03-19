@@ -58,7 +58,7 @@ class PlatformApiExtensionMetadata(SecureBaseModel):
 
 class PlatformApiExtension(pydantic.BaseModel):
     """
-    Request authentication token and url to be able to access the agentstack API
+    Request authentication token and url to be able to access the kagenti-adk API
     """
 
 

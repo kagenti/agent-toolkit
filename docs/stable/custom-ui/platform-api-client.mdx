@@ -3,9 +3,9 @@ title: Platform API Client
 description: Complete reference for platform endpoints and API authentication
 ---
 
-The platform API client provides typed access to Agent Stack server endpoints for managing contexts, files, providers, and other platform resources. This guide covers client initialization, authentication, response handling, and the complete endpoint reference.
+The platform API client provides typed access to Kagenti ADK server endpoints for managing contexts, files, providers, and other platform resources. This guide covers client initialization, authentication, response handling, and the complete endpoint reference.
 
-The `buildApiClient` function creates a type safe HTTP client for interacting with the AgentStack platform API. It returns an object that groups all platform endpoints into a single client. Every method returns an `ApiResult<T>` object so you can handle errors without throwing, or use `unwrapResult` to throw an `ApiErrorException` on failure.
+The `buildApiClient` function creates a type safe HTTP client for interacting with the Kagenti ADK platform API. It returns an object that groups all platform endpoints into a single client. Every method returns an `ApiResult<T>` object so you can handle errors without throwing, or use `unwrapResult` to throw an `ApiErrorException` on failure.
 
 ## Initialization
 
@@ -15,14 +15,14 @@ Create an API client by calling `buildApiClient` with configuration options:
 import { buildApiClient } from "@kagenti/adk";
 
 const api = buildApiClient({
-  baseUrl: "https://your-agentstack-instance.com",
+  baseUrl: "https://your-adk-instance.com",
   fetch: customFetch, // Optional: provide custom fetch implementation
 });
 ```
 
 ### Configuration Options
 
-- `baseUrl` (required): The base URL of your AgentStack server instance.
+- `baseUrl` (required): The base URL of your Kagenti ADK server instance.
 - `fetch` (optional): Custom fetch implementation. Required in Node.js < 18 or environments without global fetch support. Useful for adding authentication headers or custom request handling.
 
 ### Example: Authenticated Client
@@ -35,7 +35,7 @@ import { buildApiClient, createAuthenticatedFetch } from "@kagenti/adk";
 const authFetch = createAuthenticatedFetch("token-value");
 
 const api = buildApiClient({
-  baseUrl: "https://your-agentstack-instance.com",
+  baseUrl: "https://your-adk-instance.com",
   fetch: authFetch,
 });
 ```

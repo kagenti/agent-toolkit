@@ -2,7 +2,7 @@
 trigger: always_on
 ---
 
-# AgentStack UI Styling Guidelines
+# Kagenti ADK UI Styling Guidelines
 
 ## SCSS Modules - MANDATORY
 

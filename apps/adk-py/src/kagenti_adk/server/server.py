@@ -294,7 +294,7 @@ class Server:
         return os.getenv("PRODUCTION_MODE", "").lower() in ["true", "1"]
 
     async def _register_agent(self) -> None:
-        """If not in PRODUCTION mode, register agent to the agentstack platform and provide missing env variables"""
+        """If not in PRODUCTION mode, register agent to the kagenti-adk platform and provide missing env variables"""
         assert self.server and self._agent
         if self._production_mode:
             logger.debug("Agent is not automatically registered in the production mode.")
@@ -302,8 +302,8 @@ class Server:
 
         host = re.sub(r"localhost|127\.0\.0\.1", "host.docker.internal", self.server.config.host)
         provider_location = f"http://{host}:{self.server.config.port}#{self._self_registration_id}"
-        logger.info("Attempting to register agent to the agentstack platform")
-        auto_register_fail_message = "Agent can not be automatically registered to agentstack platform, try manual registration using `agentstack add`."
+        logger.info("Attempting to register agent to the kagenti-adk platform")
+        auto_register_fail_message = "Agent can not be automatically registered to kagenti-adk platform, try manual registration using `kagenti-adk add`."
         try:
             async for attempt in AsyncRetrying(
                 stop=stop_after_attempt(10),
@@ -326,7 +326,7 @@ class Server:
                             agent_card=self._agent.card,
                         )
                     self._provider_id = provider.id
-                    logger.debug("Agent registered to the agentstack server.")
+                    logger.debug("Agent registered to the kagenti-adk server.")
             logger.info("Agent registered successfully")
         except HTTPStatusError as e:
             with suppress(Exception):

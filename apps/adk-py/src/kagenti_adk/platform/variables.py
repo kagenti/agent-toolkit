@@ -14,7 +14,7 @@ class Variables(dict[str, str]):
         client: PlatformClient | None = None,
     ) -> None:
         """
-        Save variables to the Agent Stack platform. Does not delete keys unless explicitly set to None.
+        Save variables to the Kagenti ADK platform. Does not delete keys unless explicitly set to None.
 
         Can be used as a class method: Variables.save({"key": "value", ...})
         ...or as an instance method: variables.save()
@@ -29,7 +29,7 @@ class Variables(dict[str, str]):
 
     async def load(self: "Variables" | None = None, *, client: PlatformClient | None = None) -> "Variables":
         """
-        Load variables from the Agent Stack platform.
+        Load variables from the Kagenti ADK platform.
 
         Can be used as a class method: variables = Variables.load()
         ...or as an instance method to update the instance: variables.load()

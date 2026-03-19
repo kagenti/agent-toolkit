@@ -31,7 +31,7 @@ def _get_text(object: Message | Artifact) -> str:
 
 @server.agent(
     name="Canvas",
-    documentation_url=f"https://github.com/i-am-bee/agentstack/blob/{os.getenv('RELEASE_VERSION', 'main')}/agents/canvas",
+    documentation_url=f"https://github.com/kagenti/adk/blob/{os.getenv('RELEASE_VERSION', 'main')}/agents/canvas",
     default_input_modes=["text/plain"],
     default_output_modes=["text/plain"],
     description="A minimal canvas agent capable of iterating on an artifact.",

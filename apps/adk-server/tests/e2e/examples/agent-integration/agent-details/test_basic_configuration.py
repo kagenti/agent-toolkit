@@ -45,7 +45,7 @@ async def test_basic_configuration_example(subtests, get_final_task_from_stream,
             agent_detail = get_extension(agent_card, AGENT_DETAIL_EXTENSION_URI)
             params = agent_detail.model_dump()["params"]
 
-            assert params["author"]["name"] == "Agent Stack Team"
+            assert params["author"]["name"] == "Kagenti ADK Team"
             assert params["author"]["email"] == "team@example.com"
 
         with subtests.test("agent detail has tools"):

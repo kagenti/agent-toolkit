@@ -25,7 +25,7 @@ server = Server()
         ],
         framework="Kagenti ADK",
         author=AgentDetailContributor(
-            name="ADK Team",
+            name="Kagenti ADK Team",
             email="team@example.com",
         ),
         source_code_url="https://github.com/example/example-research-assistant",

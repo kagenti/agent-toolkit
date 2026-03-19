@@ -1,14 +1,15 @@
-# Agent Stack
+# Kagenti ADK
 
 ## GitHub Operations
 
 Use `gh` command for GitHub operations.
 
-Repo: `i-am-bee/agentstack`
+Repo: `kagenti/adk`
 
 All commits must be signed off for DCO compliance (`git commit --signoff`).
 
 ## Useful scripts
+
 - `mise run adk-server:migrations:run` run migrations
 
 ## Development rules

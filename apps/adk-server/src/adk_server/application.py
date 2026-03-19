@@ -144,7 +144,7 @@ def mount_routes(app: FastAPI):
     @app.get("/api/v1/openapi.json", include_in_schema=False)
     async def custom_openapi(request: Request):
         openapi_schema = get_openapi(
-            title="Agentstack server",
+            title="Kagenti ADK server",
             version=get_version(),
             routes=app.routes,
         )

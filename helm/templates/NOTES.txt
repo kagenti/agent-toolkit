@@ -30,7 +30,7 @@ Getting started:
 
 {{- if .Values.auth.enabled }}
 
-# Login to adk server using CLI
+# Login to kagenti-adk server using CLI
   kagenti-adk server login {{ .Values.auth.apiUrl }}
 {{- end}}
 

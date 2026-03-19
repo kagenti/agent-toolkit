@@ -1,1 +1,1 @@
-# Agent Stack server
+# Kagenti ADK server

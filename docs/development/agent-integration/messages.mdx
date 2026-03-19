@@ -3,7 +3,7 @@ title: "Working with Messages"
 description: "Learn how to structure, send, and receive messages - the foundation of agent communication."
 ---
 
-In Agent Stack, you communicate with the client by yielding data. This concept consists of two parts:
+In Kagenti ADK, you communicate with the client by yielding data. This concept consists of two parts:
 
 1. **Yielding data**: Sending data from your agent implementation to the client.
 2. **The Wrapper**: Using convenience objects like `AgentMessage` to simplify the underlying [A2A Protocol](https://github.com/a2aproject/A2A) requirements.
@@ -64,7 +64,7 @@ yield AgentArtifact(
 For advanced use cases, you can yield direct [A2A protocol components](https://a2a-protocol.org/latest/topics/key-concepts/#core-actors-in-a2a-interactions).
 
 <Warning>
-While yielding plain A2A components is supported, the Agent Stack is optimized for convenience wrappers. Using wrappers ensures the best UX in the GUI.
+While yielding plain A2A components is supported, the Kagenti ADK is optimized for convenience wrappers. Using wrappers ensures the best UX in the GUI.
 </Warning>
 
 #### Message

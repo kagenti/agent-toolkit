@@ -129,7 +129,7 @@ for await (const event of stream) {
 
   1. A2A uses tasks to represent long running work so you can track progress and cancel.
   2. Status updates provide the incremental channel for UI events and streaming output.
-  3. Each streamed token typically arrives as a `TaskStatusUpdateEvent` in Agent Stack, so you can append text as it arrives.
+  3. Each streamed token typically arrives as a `TaskStatusUpdateEvent` in Kagenti ADK, so you can append text as it arrives.
 </Tip>
 
 
@@ -219,14 +219,14 @@ for await (const event of responseStream) {
 
 ## Basic concepts: tasks, status updates, and streaming output
 
-Agent Stack’s A2A streaming is task-based. A single `sendMessageStream` call can yield several event shapes, and you should handle all of them:
+Kagenti ADK’s A2A streaming is task-based. A single `sendMessageStream` call can yield several event shapes, and you should handle all of them:
 
 - `task`: emits the initial Task object. Capture `task.id`, and use `task.status` (and optional `history`/`artifacts`) to seed your UI state.
 - `status-update`: emits a task status transition. When the agent is streaming, incremental output is typically delivered via `event.status.message` (a `Message` payload attached to the status).
 - `artifact-update`: emits artifacts as they are generated or updated (useful for streamed files, canvases, or structured outputs).
 - `message`: emits a standalone Message. This is common for non‑streaming agents and may also appear as a final response.
 
-Key detail for Agent Stack streaming: **incremental output usually arrives inside `status-update` events** (`event.status.message`). If you only render `message` events, you may miss streamed output.
+Key detail for Kagenti ADK streaming: **incremental output usually arrives inside `status-update` events** (`event.status.message`). If you only render `message` events, you may miss streamed output.
 
 ## Handling failed states
 

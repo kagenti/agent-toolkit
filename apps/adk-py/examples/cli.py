@@ -65,7 +65,7 @@ async def cli(base_url: str, context_id: str) -> None:
                         metadata=(
                             kagenti_adk.a2a.extensions.LLMServiceExtensionClient(llm_spec).fulfillment_metadata(
                                 llm_fulfillments={
-                                    # Demonstration only: we ignore the asks and just configure Agent Stack proxy for everything
+                                    # Demonstration only: we ignore the asks and just configure Kagenti ADK proxy for everything
                                     key: kagenti_adk.a2a.extensions.services.llm.LLMFulfillment(
                                         api_base="http://localhost:8333/api/v1/openai/",
                                         api_key="dummy",
@@ -80,7 +80,7 @@ async def cli(base_url: str, context_id: str) -> None:
                         | (
                             kagenti_adk.a2a.extensions.MCPServiceExtensionClient(mcp_spec).fulfillment_metadata(
                                 mcp_fulfillments={
-                                    # Demonstration only: we ignore the asks and just configure Agent Stack proxy for everything
+                                    # Demonstration only: we ignore the asks and just configure Kagenti ADK proxy for everything
                                     key: kagenti_adk.a2a.extensions.services.mcp.MCPFulfillment(
                                         transport=kagenti_adk.a2a.extensions.services.mcp.StreamableHTTPTransport(
                                             url="http://localhost:8333/mcp",
