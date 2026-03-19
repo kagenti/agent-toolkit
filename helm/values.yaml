@@ -8,10 +8,19 @@
 useHelmHooks: true
 
 # Local storage configuration for single-node development environments
-# When true, creates hostPath-backed PersistentVolumes for PostgreSQL and SeaweedFS
-# instead of relying on dynamic provisioning (StorageClass/CSI drivers)
+# When true, creates hostPath-backed PersistentVolumes for PostgreSQL, SeaweedFS,
+# kagenti Keycloak Postgres, and Phoenix instead of relying on dynamic provisioning
 # WARNING: Only use for local development. Data is stored on the node's filesystem.
 localStorage: false
+
+# Gateway API HTTPRoute configuration for local development
+# When enabled, creates HTTPRoutes for agentstack UI and API through a shared gateway
+# Hostnames are derived from auth.nextauthUrl and auth.apiUrl
+gateway:
+  enabled: false
+  parentRef:
+    name: http
+    namespace: kagenti-system
 
 features:
   # UI only features

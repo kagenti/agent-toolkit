@@ -5,7 +5,7 @@ export DEBIAN_FRONTEND=noninteractive
 
 echo net.ipv4.ip_forward=1 >> /etc/sysctl.conf
 
-mkdir -p -m 777 /postgresql-data /seaweedfs-data /registry-data /redis-data
+mkdir -p -m 777 /postgresql-data /seaweedfs-data /registry-data /redis-data /kagenti-keycloak-postgres-data /phoenix-data
 
 if [ -n "${CI:-}" ]; then
     apt-mark auto $(apt-mark showmanual)
