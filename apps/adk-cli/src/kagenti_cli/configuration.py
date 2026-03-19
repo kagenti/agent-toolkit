@@ -65,7 +65,7 @@ class Configuration(pydantic_settings.BaseSettings):
         if self.auth_manager.active_server is None:
             console.error("No server selected.")
             console.hint(
-                "Run [green]kagenti-cli platform start[/green] to start a local server, or [green]kagenti-cli server login[/green] to connect to a remote one."
+                "Run [green]kagenti-adk platform start[/green] to start a local server, or [green]kagenti-adk server login[/green] to connect to a remote one."
             )
             sys.exit(1)
 
@@ -82,7 +82,7 @@ class Configuration(pydantic_settings.BaseSettings):
             if not auth_token:
                 console.error(f"Failed to load authentication: {e}")
                 console.hint(
-                    f"Run [green]kagenti-cli server login {self.auth_manager.active_server}[/green] to re-authenticate."
+                    f"Run [green]kagenti-adk server login {self.auth_manager.active_server}[/green] to re-authenticate."
                 )
                 sys.exit(1)
 

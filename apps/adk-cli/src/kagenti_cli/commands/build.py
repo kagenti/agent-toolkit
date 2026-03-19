@@ -99,5 +99,5 @@ async def build_agent(
 
         console.success(
             f"Image pushed to platform registry.\n"
-            f"Add it using: [green]kagenti-cli add {cluster_ref}[/green]"
+            f"Add it using: [green]kagenti-adk add {cluster_ref}[/green]"
         )

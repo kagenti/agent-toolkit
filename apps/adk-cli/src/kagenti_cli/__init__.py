@@ -29,7 +29,7 @@ logging.getLogger("httpx").setLevel(logging.WARNING)  # not sure why this is nec
 
 
 HELP_TEXT = """\
-Usage: kagenti-cli [OPTIONS] COMMAND [ARGS]...
+Usage: kagenti-adk [OPTIONS] COMMAND [ARGS]...
 
 ╭─ Getting Started ──────────────────────────────────────────────────────────╮
 │ ui       Launch the web interface                                          │

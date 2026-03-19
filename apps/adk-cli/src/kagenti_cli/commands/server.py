@@ -376,7 +376,7 @@ def server_show():
     if not config.auth_manager.active_server:
         console.info("No server selected.")
         console.hint(
-            "Run [green]kagenti-cli server list[/green] to list available servers, and [green]kagenti-cli server login[/green] to select one."
+            "Run [green]kagenti-adk server list[/green] to list available servers, and [green]kagenti-adk server login[/green] to select one."
         )
         return
     console.info(f"Active server: [cyan]{config.auth_manager.active_server}[/cyan]")
@@ -387,7 +387,7 @@ def server_list():
     if not config.auth_manager.servers:
         console.info("No servers found.")
         console.hint(
-            "Run [green]kagenti-cli platform start[/green] to start a local server, or [green]kagenti-cli server login[/green] to connect to a remote one."
+            "Run [green]kagenti-adk platform start[/green] to start a local server, or [green]kagenti-adk server login[/green] to connect to a remote one."
         )
         return
     for server in config.auth_manager.servers:

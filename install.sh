@@ -62,4 +62,4 @@ echo "Installing Kagenti ADK CLI..."
 uv tool install --quiet --python-preference=only-managed --python=$PYTHON_VERSION --refresh --prerelease if-necessary-or-explicit --with "kagenti-adk==$KAGENTI_ADK_VERSION" "kagenti-cli==$KAGENTI_ADK_VERSION" --force || error
 
 # Finish set up using CLI (install QEMU on Linux, start platform, set up API keys, run UI, ...)
-kagenti-cli self install
+kagenti-adk self install

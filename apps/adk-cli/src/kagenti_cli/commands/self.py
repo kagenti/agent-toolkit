@@ -64,21 +64,21 @@ async def version(
                     ]
 
         console.print()
-        console.print(f"       kagenti-cli version: [bold]{cli_version}[/bold]")
+        console.print(f"       kagenti-adk version: [bold]{cli_version}[/bold]")
         console.print(
             f"  kagenti-platform version: [bold]{platform_version.replace('-', '') if platform_version is not None else 'not running'}[/bold]"
         )
-        console.print(f"        kagenti-cli server: [bold]{active_server if active_server else 'none'}[/bold]")
+        console.print(f"        kagenti-adk server: [bold]{active_server if active_server else 'none'}[/bold]")
         console.print()
 
         if latest_cli_version and packaging.version.parse(latest_cli_version) > packaging.version.parse(cli_version):
             console.hint(
-                f"A newer version ([bold]{latest_cli_version}[/bold]) is available. Update using: [green]kagenti-cli self upgrade[/green]."
+                f"A newer version ([bold]{latest_cli_version}[/bold]) is available. Update using: [green]kagenti-adk self upgrade[/green]."
             )
         elif platform_version is None:
-            console.hint("Start the Kagenti ADK platform using: [green]kagenti-cli platform start[/green]")
+            console.hint("Start the Kagenti ADK platform using: [green]kagenti-adk platform start[/green]")
         elif platform_version.replace("-", "") != cli_version:
-            console.hint("Update the Kagenti ADK platform using: [green]kagenti-cli platform start[/green]")
+            console.hint("Update the Kagenti ADK platform using: [green]kagenti-adk platform start[/green]")
         else:
             console.success("Everything is up to date!")
 
@@ -128,7 +128,7 @@ async def install(
         if ready_to_start and (
             yes
             or await inquirer.confirm(
-                message="Do you want to start the Kagenti ADK platform now? Will run: kagenti-cli platform start",
+                message="Do you want to start the Kagenti ADK platform now? Will run: kagenti-adk platform start",
                 default=True,
             ).execute_async()
         ):
@@ -137,25 +137,25 @@ async def install(
                 already_started = True
                 console.print()
             except Exception:
-                console.warning("Platform start failed. You can retry with [green]kagenti-cli platform start[/green].")
+                console.warning("Platform start failed. You can retry with [green]kagenti-adk platform start[/green].")
 
         already_configured = False
         if already_started and (
             yes
             or await inquirer.confirm(
-                message="Do you want to configure your LLM provider now? Will run: kagenti-cli model setup", default=True
+                message="Do you want to configure your LLM provider now? Will run: kagenti-adk model setup", default=True
             ).execute_async()
         ):
             try:
                 await model_setup(verbose=verbose, yes=yes)
                 already_configured = True
             except Exception:
-                console.warning("Model setup failed. You can retry with [green]kagenti-cli model setup[/green].")
+                console.warning("Model setup failed. You can retry with [green]kagenti-adk model setup[/green].")
 
         if already_configured and (
             yes
             or await inquirer.confirm(
-                message="Do you want to open the web UI now? Will run: kagenti-cli ui", default=True
+                message="Do you want to open the web UI now? Will run: kagenti-adk ui", default=True
             ).execute_async()
         ):
             import webbrowser
@@ -164,17 +164,17 @@ async def install(
 
         console.print()
         console.success("Installation complete!")
-        if not shutil.which("kagenti-cli", path=_path()):
-            console.hint("Open a new terminal window to use the [green]kagenti-cli[/green] command.")
+        if not shutil.which("kagenti-adk", path=_path()):
+            console.hint("Open a new terminal window to use the [green]kagenti-adk[/green] command.")
         if not already_started:
-            console.hint("Start the Kagenti ADK platform using: [green]kagenti-cli platform start[/green]")
+            console.hint("Start the Kagenti ADK platform using: [green]kagenti-adk platform start[/green]")
         if not already_configured:
-            console.hint("Configure your LLM provider using: [green]kagenti-cli model setup[/green]")
+            console.hint("Configure your LLM provider using: [green]kagenti-adk model setup[/green]")
         console.hint(
-            "Use [green]kagenti-cli ui[/green] to open the web GUI, or [green]kagenti-cli run chat[/green] to talk to an agent on the command line."
+            "Use [green]kagenti-adk ui[/green] to open the web GUI, or [green]kagenti-adk run chat[/green] to talk to an agent on the command line."
         )
         console.hint(
-            "Run [green]kagenti-cli --help[/green] to learn about available commands, or check the documentation at https://agentstack.beeai.dev/"
+            "Run [green]kagenti-adk --help[/green] to learn about available commands, or check the documentation at https://agentstack.beeai.dev/"
         )
 
 

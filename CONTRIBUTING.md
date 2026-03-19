@@ -42,7 +42,7 @@ Edit `[env]` in `mise.local.toml` in the project root ([documentation](https://m
 
 ### Running the platform from source
 
-Starting up the platform using the CLI (`kagenti-cli platform start`, even `mise adk-cli:run -- platform start`)
+Starting up the platform using the CLI (`kagenti-adk platform start`, even `mise adk-cli:run -- platform start`)
 will use
 **published images** by default. To use local images, you need to build them and import them into the platform.
 
@@ -151,7 +151,7 @@ After the command succeeds, you can:
   `curl http://<service-name>:<service-port>`.
 * connect to postgresql using the default credentials `postgresql://agentstack-user:password@postgresql:5432/agentstack`
 * now you can start your server from your IDE or using `mise run adk-server:run` on port **18333**
-* run kagenti-cli using `mise adk-cli:run -- <command>` or HTTP requests to localhost:8333 or localhost:18333
+* run kagenti-adk using `mise adk-cli:run -- <command>` or HTTP requests to localhost:8333 or localhost:18333
   * localhost:8333 is port-forwarded from the cluster, so any requests will pass through the cluster networking to the
       agentstack pod, which is replaced by telepresence and forwarded back to your local machine to port 18333
   * localhost:18333 is where your local platform should be running
@@ -222,7 +222,7 @@ mise x -- telepresence quit
 If you want to run this local setup against Ollama you must use a special option when setting up the LLM:
 
 ```
-kagenti-cli model setup --use-true-localhost
+kagenti-adk model setup --use-true-localhost
 ```
 
 ### Examples

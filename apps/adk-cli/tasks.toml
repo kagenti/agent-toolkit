@@ -46,7 +46,7 @@ description = "NOTE: Use double dash to pass extra args, like `mise adk-cli:run 
 depends = ["adk-cli:setup", "adk-cli:build:copy-helm-chart"]
 dir = "{{config_root}}/apps/adk-cli"
 raw = true
-run = "uv run kagenti-cli"
+run = "uv run kagenti-adk"
 
 # build
 
@@ -113,7 +113,7 @@ uv run -m wheel pack "$tmpdir" --dest-dir ./dist >/dev/null
 rm -rf "$tmpdir"
 
 # Verify that the wheel works
-if ! uv tool run --isolated --from "$universal_wheel" --with ../adk-py/dist/kagenti_adk-*-py3-none-any.whl -- kagenti-cli version; then
+if ! uv tool run --isolated --from "$universal_wheel" --with ../adk-py/dist/kagenti_adk-*-py3-none-any.whl -- kagenti-adk version; then
   echo "Failed to install $universal_wheel"
   exit 1
 fi
@@ -164,6 +164,6 @@ GEN_TMP=$(mktemp)
 trap 'rm -f $HEAD_TMP $GEN_TMP' EXIT
 
 cat $CLI_REFERENCE | sed "/usage-generator/q" > $HEAD_TMP
-uv run -m typer $TYPER_SCRIPT utils docs --name kagenti-cli | tail -n +2 > $GEN_TMP
+uv run -m typer $TYPER_SCRIPT utils docs --name kagenti-adk | tail -n +2 > $GEN_TMP
 cat $HEAD_TMP $GEN_TMP > $CLI_REFERENCE
 '''

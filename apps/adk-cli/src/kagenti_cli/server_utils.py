@@ -17,7 +17,7 @@ def require_active_server() -> str:
         return url
     console.error("No server selected.")
     console.hint(
-        "Run [green]kagenti-cli platform start[/green] to start a local server, or [green]kagenti-cli server login[/green] to connect to a remote one."
+        "Run [green]kagenti-adk platform start[/green] to start a local server, or [green]kagenti-adk server login[/green] to connect to a remote one."
     )
     sys.exit(1)
 

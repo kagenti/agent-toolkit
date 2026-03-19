@@ -413,7 +413,7 @@ async def _select_default_model(
     if not available_models:
         raise ModelProviderError(
             f"[bold]No models are available[/bold]\n"
-            f"Configure at least one working {capability} provider using `kagenti-cli model add` command."
+            f"Configure at least one working {capability} provider using `kagenti-adk model add` command."
         )
 
     recommended_model = [m for m in recommended_models if m in available_models]
@@ -626,7 +626,7 @@ async def setup(
                 default_embedding_model = None
                 if skip_embedding:
                     console.hint(
-                        "Skipping embedding setup. You can add an embedding provider later with: [green]kagenti-cli model add[/green]"
+                        "Skipping embedding setup. You can add an embedding provider later with: [green]kagenti-adk model add[/green]"
                     )
                 elif embedding_provider is not None:
                     console.print("[bold]Setting up embedding provider...[/bold]")
@@ -668,7 +668,7 @@ async def setup(
                     await _add_provider(capability=ModelCapability.EMBEDDING, use_true_localhost=use_true_localhost)
                     default_embedding_model = await _select_default_model(ModelCapability.EMBEDDING, yes=yes)
                 else:
-                    console.hint("You can add an embedding provider later with: [green]kagenti-cli model add[/green]")
+                    console.hint("You can add an embedding provider later with: [green]kagenti-adk model add[/green]")
 
                 with console.status("Saving configuration...", spinner="dots"):
                     await SystemConfiguration.update(
@@ -677,7 +677,7 @@ async def setup(
                     )
                 console.print(
                     "\n[bold green]You're all set![/bold green] "
-                    "(You can re-run this setup anytime with [blue]kagenti-cli model setup[/blue])"
+                    "(You can re-run this setup anytime with [blue]kagenti-adk model setup[/blue])"
                 )
             except Exception:
                 await _reset_configuration()
@@ -909,6 +909,6 @@ async def ensure_llm_provider():
         await setup()
     except Exception:
         console.error("Could not continue because the LLM environment is not properly set up.")
-        console.hint("Try re-entering your LLM API details with: [green]kagenti-cli model setup[/green]")
+        console.hint("Try re-entering your LLM API details with: [green]kagenti-adk model setup[/green]")
         raise
     console.print()

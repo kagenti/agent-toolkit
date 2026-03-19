@@ -16,7 +16,7 @@ dependencies = [
     "prompt-toolkit>=3.0.52",
     "inquirerpy>=0.3.4",
     "psutil>=7.2.2",
-    "a2a-sdk", # version determined by kagenti-adk
+    "a2a-sdk",                                     # version determined by kagenti-adk
     "tenacity>=9.1.2",
     "typer>=0.21.1",
     "pyyaml>=6.0.3",
@@ -26,20 +26,13 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = [
-    "pyrefly>=0.52.0",
-    "pytest>=9.0.2",
-    "ruff>=0.14.14",
-    "wheel>=0.46.3",
-]
+dev = ["pyrefly>=0.52.0", "pytest>=9.0.2", "ruff>=0.14.14", "wheel>=0.46.3"]
 
 [tool.uv.sources]
 kagenti-adk = { path = "../adk-py", editable = true }
 
 [project.scripts]
-kagenti-cli = "kagenti_cli:app"
-kagenti = "kagenti_cli:app"
-kag = "kagenti_cli:app"
+kagenti-adk = "kagenti_cli:app"
 
 [build-system]
 requires = ["uv_build>=0.10.0,<0.11.0"]
@@ -53,30 +46,27 @@ source-exclude = ["**/.DS_Store"]
 line-length = 120
 target-version = "py314"
 lint.select = [
-    "E", # pycodestyle errors
-    "W", # pycodestyle warnings
-    "F", # pyflakes
-    "UP", # pyupgrade
-    "I", # isort
-    "B", # bugbear
-    "N", # pep8-naming
-    "C4", # Comprehensions
-    "Q", # Quotes
-    "SIM", # Simplify
-    "RUF", # Ruff
-    "TID", # tidy-imports
+    "E",     # pycodestyle errors
+    "W",     # pycodestyle warnings
+    "F",     # pyflakes
+    "UP",    # pyupgrade
+    "I",     # isort
+    "B",     # bugbear
+    "N",     # pep8-naming
+    "C4",    # Comprehensions
+    "Q",     # Quotes
+    "SIM",   # Simplify
+    "RUF",   # Ruff
+    "TID",   # tidy-imports
     "ASYNC", # async
     # TODO: add "DTZ",   # DatetimeZ
     # TODO: add "ANN",   # annotations
 ]
 lint.ignore = [
-    "E501", # line lenght (annyoing)
+    "E501",  # line lenght (annyoing)
     "UP013", # update TypedDict to longer syntax -- not necessary
 ]
 force-exclude = true
 
 [tool.pyrefly]
-project-includes = [
-    "**/*.py*",
-    "**/*.ipynb",
-]
+project-includes = ["**/*.py*", "**/*.ipynb"]

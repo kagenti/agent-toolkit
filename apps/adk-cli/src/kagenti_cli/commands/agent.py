@@ -282,7 +282,7 @@ async def _add_agent_via_kagenti(
                 )
 
     if not auth_token:
-        console.error("Not authenticated. Run [green]kagenti-cli server login[/green] first.")
+        console.error("Not authenticated. Run [green]kagenti-adk server login[/green] first.")
         sys.exit(1)
 
     client = KagentiClient(configuration.kagenti_url, auth_token.access_token)
@@ -405,7 +405,7 @@ async def update_agent(
 
     if search_path is None:
         if not providers:
-            console.error("No agents found. Add an agent first using 'kagenti-cli agent add'.")
+            console.error("No agents found. Add an agent first using 'kagenti-adk agent add'.")
             sys.exit(1)
 
         provider_choices = [
@@ -1214,7 +1214,7 @@ async def run_agent(
 
         if search_path is None:
             if not providers:
-                err_console.error("No agents found. Add an agent first using 'kagenti-cli agent add'.")
+                err_console.error("No agents found. Add an agent first using 'kagenti-adk agent add'.")
                 sys.exit(1)
             search_path = await inquirer.fuzzy(
                 message="Select an agent to run:",

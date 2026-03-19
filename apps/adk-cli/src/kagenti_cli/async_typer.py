@@ -100,7 +100,7 @@ class AsyncTyper(typer.Typer):
                         err_console.print()
                     if is_connect_error:
                         err_console.hint(
-                            "Start the Kagenti ADK platform using: [green]kagenti-cli platform start[/green]. If that does not help, run [green]kagenti-cli platform delete[/green] to clean up, then [green]kagenti-cli platform start[/green] again."
+                            "Start the Kagenti ADK platform using: [green]kagenti-adk platform start[/green]. If that does not help, run [green]kagenti-adk platform delete[/green] to clean up, then [green]kagenti-adk platform start[/green] again."
                         )
                     elif is_permission_error:
                         err_console.hint(
@@ -108,7 +108,7 @@ class AsyncTyper(typer.Typer):
                         )
                     else:
                         err_console.hint(
-                            "Are you having consistent problems? If so, try these troubleshooting steps: [green]kagenti-cli platform delete[/green] to remove the platform, and [green]kagenti-cli platform start[/green] to recreate it."
+                            "Are you having consistent problems? If so, try these troubleshooting steps: [green]kagenti-adk platform delete[/green] to remove the platform, and [green]kagenti-adk platform start[/green] to recreate it."
                         )
                     if DEBUG:
                         raise

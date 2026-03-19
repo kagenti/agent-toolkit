@@ -385,7 +385,7 @@ async def start_cmd(
                             config.write(f)
                             if platform_module.system() == "Linux":
                                 console.warning(
-                                    "WSL networking mode updated. Please close WSL, run [green]wsl --shutdown[/green] from PowerShell, re-open WSL and run [green]kagenti-cli platform start[/green] again."
+                                    "WSL networking mode updated. Please close WSL, run [green]wsl --shutdown[/green] from PowerShell, re-open WSL and run [green]kagenti-adk platform start[/green] again."
                                 )
                                 sys.exit(1)
                             await run_command(["wsl.exe", "--shutdown"], "Updating WSL2 networking")
