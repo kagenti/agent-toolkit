@@ -8,7 +8,6 @@ import contextlib
 import time
 import uuid
 from threading import Thread
-from typing import Any
 from unittest import mock
 
 import pytest
@@ -105,17 +104,16 @@ async def test_imported_agent(
             await get_final_task_from_stream(a2a_client.send_message(SendMessageRequest(message=message)))
 
 
-EXTERNAL_AGENT_CARD: dict[str, Any] = {
-    "authentication": {"schemes": ["Bearer"]},
-    "capabilities": AgentCapabilities(streaming=True),
-    "defaultInputModes": ["text/plain"],
-    "defaultOutputModes": ["text/plain"],
-    "description": "Test external A2A agent",
-    "name": "ExternalTestAgent",
-    "skills": [{"id": "skill-1", "name": "Echo", "description": "Echoes back", "tags": ["test"]}],
-    "url": "http://example.com/agent",
-    "version": "1.0",
-}
+EXTERNAL_AGENT_CARD = AgentCard(
+    capabilities=AgentCapabilities(streaming=True),
+    default_input_modes=["text/plain"],
+    default_output_modes=["text/plain"],
+    description="Test external A2A agent",
+    name="ExternalTestAgent",
+    skills=[AgentSkill(id="skill-1", name="Echo", description="Echoes back", tags=["test"])],
+    supported_interfaces=[AgentInterface(url="http://example.com/agent", protocol_binding="JSONRPC")],
+    version="1.0",
+)
 
 
 
@@ -124,8 +122,10 @@ def external_a2a_server(free_port, setup_platform_client, clean_up_fn):
     server_instance: uvicorn.Server | None = None
     thread: Thread | None = None
 
-    agent_card = AgentCard(**EXTERNAL_AGENT_CARD)
-    agent_card.url = f"http://host.docker.internal:{free_port}"
+    agent_card = AgentCard()
+    agent_card.CopyFrom(EXTERNAL_AGENT_CARD)
+    for interface in agent_card.supported_interfaces:
+        interface.url = f"http://host.docker.internal:{free_port}"
 
     executor = mock.AsyncMock(spec=AgentExecutor)
     http_handler = DefaultRequestHandler(agent_executor=executor, task_store=InMemoryTaskStore())
