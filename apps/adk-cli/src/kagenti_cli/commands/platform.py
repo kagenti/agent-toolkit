@@ -501,11 +501,15 @@ async def start_cmd(
                         "providerBuilds": {"enabled": True},
                         "disableProviderDownscaling": True,
                         "server": {
+                            "image": {"tag": "local"},
                             "cors": {
                                 "enabled": True,
                                 "allowOriginRegex": r"https?://(localhost|127\.0\.0\.1|[a-z0-9.-]*\.?localtest\.me)(:\d+)?",
                                 "allowCredentials": True,
                             },
+                        },
+                        "ui": {
+                            "image": {"tag": "local"},
                         },
                     },
                     user_values.get("kagenti-adk", {}),
