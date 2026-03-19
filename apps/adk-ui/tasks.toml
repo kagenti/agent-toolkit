@@ -1,0 +1,96 @@
+# check
+
+["adk-ui:check"]
+depends = ["adk-ui:check:*"]
+
+["adk-ui:check:prettier"]
+extends = "node:check:prettier"
+depends = ["common:setup:pnpm"]
+dir = "{{config_root}}/apps/adk-ui"
+
+["adk-ui:check:eslint"]
+extends = "node:check:eslint"
+depends = ["common:setup:pnpm"]
+dir = "{{config_root}}/apps/adk-ui"
+
+["adk-ui:check:tsc"]
+extends = "node:check:tsc"
+depends = ["common:setup:pnpm", "adk-ts:build"]
+dir = "{{config_root}}/apps/adk-ui"
+run = "pnpm tsc --noEmit -p tsconfig.check.json"
+
+["adk-ui:check:stylelint"]
+extends = "node:check:stylelint"
+depends = ["common:setup:pnpm"]
+dir = "{{config_root}}/apps/adk-ui"
+
+["adk-ui:check:hadolint"]
+extends = "docker:check:hadolint"
+dir = "{{config_root}}/apps/adk-ui"
+
+# fix
+
+["adk-ui:fix"]
+depends = ["adk-ui:fix:*"]
+
+["adk-ui:fix:prettier"]
+extends = "node:fix:prettier"
+depends = ["common:setup:pnpm"]
+dir = "{{config_root}}/apps/adk-ui"
+
+["adk-ui:fix:next"]
+extends = "node:fix:eslint"
+depends = ["common:setup:pnpm"]
+dir = "{{config_root}}/apps/adk-ui"
+
+["adk-ui:fix:stylelint"]
+extends = "node:fix:stylelint"
+depends = ["common:setup:pnpm"]
+dir = "{{config_root}}/apps/adk-ui"
+run = "pnpm stylelint --fix=lax \"src/**/*.css\" \"src/**/*.scss\""
+
+# run
+
+["adk-ui:run"]
+depends = ["adk-ui:build:nextjs"]
+env.NODE_OPTIONS = "--no-experimental-global-navigator"
+dir = "{{config_root}}/apps/adk-ui"
+run = "pnpm next start"
+
+["adk-ui:run:dev"]
+depends = ["common:setup:pnpm", "adk-ts:build"]
+env.NODE_OPTIONS = "--no-experimental-global-navigator"
+dir = "{{config_root}}/apps/adk-ui"
+# Using --webpack because Turbopack doesn’t yet support some required features (e.g. the ::highlight() CSS rule).
+run = "pnpm next dev --webpack"
+
+# build
+
+["adk-ui:build"]
+depends = ["adk-ui:build:*"]
+dir = "{{config_root}}"
+run = "docker build -t ghcr.io/kagenti/adk/adk-ui:local -f ./apps/adk-ui/Dockerfile --load ."
+
+["adk-ui:build:nextjs"]
+depends = ["common:setup:pnpm", "adk-ts:build"]
+dir = "{{config_root}}/apps/adk-ui"
+env.NODE_OPTIONS = "--no-experimental-global-navigator"
+run = """
+pnpm next build --webpack
+# Remove broken symlinks in standalone output — they cause mise's task_source_checker to panic on stat()
+find .next/standalone -type l ! -exec test -e {} \\; -delete 2>/dev/null || true
+"""
+sources = [
+    "package.json",
+    "next.config.ts",
+    "tsconfig.json",
+    "public/**/*",
+    "src/**/*",
+]
+outputs = [".next/standalone/**/*"]
+
+# schema
+
+["adk-ui:schema:generate"]
+dir = "{{config_root}}/apps/adk-ui"
+run = "./scripts/generate-schema.sh http://agentstack-api.localtest.me:8080/api/v1/openapi.json ./src/api/schema.d.ts"

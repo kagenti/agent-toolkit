@@ -2,15 +2,15 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: agentstack-ui
+  name: adk-ui
   labels:
-    app: agentstack-ui
+    app: adk-ui
     {{- include "agentstack.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.ui.replicaCount }}
   selector:
     matchLabels:
-      app: agentstack-ui
+      app: adk-ui
       {{- include "agentstack.selectorLabels" . | nindent 6 }}
   template:
     metadata:
@@ -19,7 +19,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        app: agentstack-ui
+        app: adk-ui
         {{- include "agentstack.labels" . | nindent 8 }}
         {{- with .Values.ui.podLabels }}
         {{- toYaml . | nindent 8 }}
@@ -31,7 +31,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
-        - name: agentstack-ui
+        - name: adk-ui
           {{- with .Values.ui.securityContext }}
           securityContext:
             {{- toYaml . | nindent 12 }}
@@ -78,7 +78,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: authSecret
-                  name: agentstack-ui-secret
+                  name: adk-ui-secret
             - name: OIDC_ENABLED
               value: "true"
             - name: OIDC_PROVIDER_NAME

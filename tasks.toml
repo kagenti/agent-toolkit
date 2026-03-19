@@ -107,7 +107,7 @@ version=$(
     yq -r .project.version      apps/adk-py/pyproject.toml
     yq -r .version              apps/adk-ts/package.json
     yq -r .project.version      apps/adk-server/pyproject.toml
-    yq -r .version              apps/agentstack-ui/package.json
+    yq -r .version              apps/adk-ui/package.json
     yq -r '.providers[].location | split(":")[-1]' agent-registry.yaml
   } | sort -u
 )
@@ -144,7 +144,7 @@ run = """
 set -euxo pipefail
 
 if [[ ! "$*" =~ 'ui.enabled=false' ]]; then
-    {{ mise_bin }} run agentstack-ui:build
+    {{ mise_bin }} run adk-ui:build
     UI_TAG="--set agentstack:ui.image.tag=local"
 fi
 

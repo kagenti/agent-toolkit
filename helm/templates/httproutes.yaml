@@ -17,7 +17,7 @@ spec:
     - {{ $uiHost | quote }}
   rules:
     - backendRefs:
-        - name: agentstack-ui-svc
+        - name: adk-ui-svc
           port: {{ .Values.ui.service.port }}
 
 ---

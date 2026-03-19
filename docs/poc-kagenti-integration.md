@@ -227,7 +227,7 @@ Kagenti-deps deploys Keycloak in `keycloak` namespace. Agentstack Helm chart dec
 - Creates roles: `agentstack-admin`, `agentstack-developer`
 - Creates OAuth clients:
   - `agentstack-server` (confidential, service accounts + direct access grants)
-  - `agentstack-ui` (confidential, standard flow + direct access grants)
+  - `adk-ui` (confidential, standard flow + direct access grants)
   - `kagenti-adk` (public, standard flow + direct access grants, localhost redirect)
 - Configures audience mappers per client (UI URL, API URL)
 - Seeds users with passwords and role assignments

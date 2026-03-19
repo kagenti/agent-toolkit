@@ -19,21 +19,21 @@ brew install qemu # if not using Brew: install QEMU through some other package m
 
 After setup, you can use:
 
-* `mise run` to list tasks and select one interactively to run
+- `mise run` to list tasks and select one interactively to run
 
-* `mise <task-name>` to run a task
+- `mise <task-name>` to run a task
 
-* `mise x -- <command>` to run a project tool -- for example `mise x -- uv add <package>`
+- `mise x -- <command>` to run a project tool -- for example `mise x -- uv add <package>`
 
 If you want to run tools directly without the `mise x --` prefix, you need to activate a shell hook:
 
-* Bash: `eval "$(mise activate bash)"` (add to `~/.bashrc` to make permanent)
+- Bash: `eval "$(mise activate bash)"` (add to `~/.bashrc` to make permanent)
 
-* Zsh: `eval "$(mise activate zsh)"` (add to `~/.zshrc` to make permanent)
+- Zsh: `eval "$(mise activate zsh)"` (add to `~/.zshrc` to make permanent)
 
-* Fish: `mise activate fish | source` (add to `~/.config/fish/config.fish` to make permanent)
+- Fish: `mise activate fish | source` (add to `~/.config/fish/config.fish` to make permanent)
 
-* Other shells: [documentation](https://mise.jdx.dev/installing-mise.html#shells)
+- Other shells: [documentation](https://mise.jdx.dev/installing-mise.html#shells)
 
 ### Configuration
 
@@ -52,11 +52,11 @@ Instead, use:
 mise agentstack:start
 ```
 
-This will build the images (`adk-server` and `agentstack-ui`) and import them to the cluster. You can add other
+This will build the images (`adk-server` and `adk-ui`) and import them to the cluster. You can add other
 CLI arguments as you normally would when using `kagenti-adk` CLI, for example:
 
 ```shell
-mise agentstack:start --set docling.enabled=true --set oidc.enabled=true 
+mise agentstack:start --set docling.enabled=true --set oidc.enabled=true
 ```
 
 To stop or delete the platform use
@@ -116,14 +116,14 @@ Then run `mise run agentstack:start -f config.yaml`
 **Available endpoints:**
 
 | Service              | HTTP                                |
-|----------------------|-------------------------------------|
+| -------------------- | ----------------------------------- |
 | Keycloak             | `http://localhost:8336`             |
 | Agent Stack UI       | `http://localhost:8334`             |
 | Agent Stack API Docs | `http://localhost:8333/api/v1/docs` |
 
 **OIDC configuration:**
 
-* UI: follow `template.env` in `apps/agentstack-ui` directory (copy to `apps/agentstack-ui/.env`).
+* UI: follow `template.env` in `apps/adk-ui` directory (copy to `apps/adk-ui/.env`).
 * Server: follow `template.env` in `apps/adk-server` directory (copy to `apps/adk-server/.env`).
 
 ### Running and debugging individual components
@@ -147,7 +147,7 @@ This will do the following:
 
 After the command succeeds, you can:
 
-* send requests as if your machine was running inside the cluster. For example:
+- send requests as if your machine was running inside the cluster. For example:
   `curl http://<service-name>:<service-port>`.
 * connect to postgresql using the default credentials `postgresql://agentstack-user:password@postgresql:5432/agentstack`
 * now you can start your server from your IDE or using `mise run adk-server:run` on port **18333**
@@ -188,8 +188,8 @@ To run and develop adk-server tests locally use `mise run adk-server:dev:start -
 
 > Note:
 >
-> * Some tests require additional settings (e.g. enabling authentication), see section for tests in `template.env` for more details.
-> * Tests will drop your database - you may need to add agents again or reconfigure model
+> - Some tests require additional settings (e.g. enabling authentication), see section for tests in `template.env` for more details.
+> - Tests will drop your database - you may need to add agents again or reconfigure model
 
 Locally, the default model for tests is configured in `apps/adk-server/tests/conftest.py` (`llama3.1:8b` from ollama).
 Make sure to have this model running locally.
@@ -298,7 +298,7 @@ mise adk-cli:run -- agent run website_summarizer "summarize beeai.dev"
 
 ```sh
 # run the UI development server:
-mise agentstack-ui:run
+mise adk-ui:run
 
 # UI is also available from adk-server (in static mode):
 mise adk-server:run

@@ -21,8 +21,8 @@
       "path": "apps/adk-cli",
     },
     {
-      "name": "agentstack-ui",
-      "path": "apps/agentstack-ui",
+      "name": "adk-ui",
+      "path": "apps/adk-ui",
     },
     {
       "name": "keycloak-theme",
