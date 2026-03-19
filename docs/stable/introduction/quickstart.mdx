@@ -49,7 +49,7 @@ On Linux, Lima requires QEMU. Install it via these ([instructions](https://www.q
 Open a new terminal and run:
 
 ```bash
-uv python install --quiet --python-preference=only-managed --no-bin 3.13 && uv tool install --refresh --force --python-preference=only-managed --python=3.13 kagenti-cli && kagenti-cli self install
+uv python install --quiet --python-preference=only-managed --no-bin 3.13 && uv tool install --refresh --force --python-preference=only-managed --python=3.13 kagenti-adk && kagenti-adk self install
 ```
 
 Follow the interactive prompts to finish setup and optionally start the VM.
@@ -161,7 +161,7 @@ This will make local agents accessible over the local network, which is needed f
 Run in PowerShell:
 
 ```bash
-uv python install --quiet --python-preference=only-managed --no-bin 3.13; uv tool install --refresh --force --python-preference=only-managed --python=3.13 kagenti-cli; kagenti-cli self install
+uv python install --quiet --python-preference=only-managed --no-bin 3.13; uv tool install --refresh --force --python-preference=only-managed --python=3.13 kagenti-adk; kagenti-adk self install
 ```
 
 Follow the interactive prompts to finish the installation and setup.
@@ -174,21 +174,21 @@ Follow the interactive prompts to finish the installation and setup.
 ## Usage
 
 ```sh
-kagenti-cli ui                          # Launch web interface
-kagenti-cli list                        # See what agents are available
-kagenti-cli run chat "Hi, who are you"  # Send a message to chat agent
-kagenti-cli run chat                    # Try interactive mode
-kagenti-cli info chat                   # View agent details
-kagenti-cli --help                      # See all options
+kagenti-adk ui                          # Launch web interface
+kagenti-adk list                        # See what agents are available
+kagenti-adk run chat "Hi, who are you"  # Send a message to chat agent
+kagenti-adk run chat                    # Try interactive mode
+kagenti-adk info chat                   # View agent details
+kagenti-adk --help                      # See all options
 ```
 
 ## Platform Management
 
 ```sh
-kagenti-cli platform start        # Start platform
-kagenti-cli model setup           # Configure LLM provider
-kagenti-cli platform stop         # Stop (keeps data)
-kagenti-cli platform delete       # Delete all data
+kagenti-adk platform start        # Start platform
+kagenti-adk model setup           # Configure LLM provider
+kagenti-adk platform stop         # Stop (keeps data)
+kagenti-adk platform delete       # Delete all data
 ```
 
 ## Version & Upgrades
@@ -198,7 +198,7 @@ If you are having issues with these commands, you may be running an old version 
 </Warning>
 
 ```sh
-kagenti-cli self version          # Check version
-kagenti-cli self upgrade          # Update
-kagenti-cli self uninstall        # Remove completely
+kagenti-adk self version          # Check version
+kagenti-adk self upgrade          # Update
+kagenti-adk self uninstall        # Remove completely
 ```

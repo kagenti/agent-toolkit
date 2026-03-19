@@ -53,7 +53,7 @@ mise agentstack:start
 ```
 
 This will build the images (`adk-server` and `agentstack-ui`) and import them to the cluster. You can add other
-CLI arguments as you normally would when using `kagenti-cli` CLI, for example:
+CLI arguments as you normally would when using `kagenti-adk` CLI, for example:
 
 ```shell
 mise agentstack:start --set docling.enabled=true --set oidc.enabled=true 
