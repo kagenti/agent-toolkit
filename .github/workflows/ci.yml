@@ -95,6 +95,8 @@ jobs:
       needs.setup.outputs.adk-cli == 'true')
     timeout-minutes: 45
     runs-on: ubuntu-latest
+    env:
+      KAGENTI_ADK_HOME: ${{ github.workspace }}/.kagenti/adk
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/setup
@@ -103,6 +105,7 @@ jobs:
           install_vm_deps: "run"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: mkdir -p "$KAGENTI_ADK_HOME"
       - run: mise run adk-server:test:integration
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -132,6 +135,7 @@ jobs:
           install_vm_deps: "run"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: mkdir -p "$KAGENTI_ADK_HOME"
       - run: mise run adk-server:test:e2e
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -164,6 +168,7 @@ jobs:
           install_vm_deps: "run"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: mkdir -p "$KAGENTI_ADK_HOME"
       - run: mise run adk-server:test:e2e-examples
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
