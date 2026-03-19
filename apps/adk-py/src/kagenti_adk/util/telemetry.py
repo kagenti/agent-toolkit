@@ -1,4 +1,4 @@
-# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
 
 # Modified version of https://github.com/a2aproject/a2a-python/blob/2acd838796d44ab9bfe6ba8c8b4ea0c2571a59dc/src/a2a/utils/telemetry.py

@@ -1,4 +1,4 @@
-# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
 
 # Based on: https://github.com/a2aproject/a2a-samples/tree/main/samples/python/hosts/cli
