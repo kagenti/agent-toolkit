@@ -68,7 +68,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@i-am-bee/lint-config": "workspace:*",
+    "kagenti/lint-config": "workspace:*",
     "@svgr/webpack": "catalog:",
     "@types/hast": "3.0.4",
     "@types/humanize-duration": "3.27.4",

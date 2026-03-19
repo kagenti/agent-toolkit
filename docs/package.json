@@ -10,7 +10,7 @@
   "author": "IBM Corp.",
   "license": "ISC",
   "devDependencies": {
-    "@i-am-bee/lint-config": "workspace:*",
+    "kagenti/lint-config": "workspace:*",
     "embedme": ">=1.22.1",
     "mintlify": ">=4.2.377"
   }

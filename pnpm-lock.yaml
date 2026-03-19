@@ -102,7 +102,7 @@ importers:
         specifier: ^4.3.6
         version: 4.3.6
     devDependencies:
-      "@i-am-bee/lint-config":
+      "kagenti/lint-config":
         specifier: workspace:*
         version: link:../lint-config
       "@types/express":
@@ -295,7 +295,7 @@ importers:
         specifier: ^4.3.6
         version: 4.3.6
     devDependencies:
-      "@i-am-bee/lint-config":
+      "kagenti/lint-config":
         specifier: workspace:*
         version: link:../lint-config
       "@svgr/webpack":
@@ -410,7 +410,7 @@ importers:
 
   docs:
     devDependencies:
-      "@i-am-bee/lint-config":
+      "kagenti/lint-config":
         specifier: workspace:*
         version: link:../apps/lint-config
       embedme:
@@ -1169,9 +1169,12 @@ packages:
     peerDependencies:
       "@babel/core": ^7.0.0-0
 
-  '@babel/plugin-transform-react-jsx@7.28.6':
-    resolution: {integrity: sha512-61bxqhiRfAACulXSLd/GxqmAedUSrRZIu/cbaT18T1CetkTmtDN15it7i80ru4DVqRK1WMxQhXs+Lf9kajm5Ow==}
-    engines: {node: '>=6.9.0'}
+  "@babel/plugin-transform-react-jsx@7.28.6":
+    resolution:
+      {
+        integrity: sha512-61bxqhiRfAACulXSLd/GxqmAedUSrRZIu/cbaT18T1CetkTmtDN15it7i80ru4DVqRK1WMxQhXs+Lf9kajm5Ow==,
+      }
+    engines: { node: ">=6.9.0" }
     peerDependencies:
       "@babel/core": ^7.0.0-0
 
@@ -4313,8 +4316,11 @@ packages:
       }
     engines: { node: ">=18.17.0", npm: ">=9.5.0" }
 
-  '@rollup/rollup-android-arm-eabi@4.59.0':
-    resolution: {integrity: sha512-upnNBkA6ZH2VKGcBj9Fyl9IGNPULcjXRlg0LLeaioQWueH30p6IXtJEbKAgvyv+mJaMxSm1l6xwDXYjpEMiLMg==}
+  "@rollup/rollup-android-arm-eabi@4.59.0":
+    resolution:
+      {
+        integrity: sha512-upnNBkA6ZH2VKGcBj9Fyl9IGNPULcjXRlg0LLeaioQWueH30p6IXtJEbKAgvyv+mJaMxSm1l6xwDXYjpEMiLMg==,
+      }
     cpu: [arm]
     os: [android]
 
@@ -4915,8 +4921,11 @@ packages:
         integrity: sha512-veQTnWP+1D/xbxVrPC3zHnCZRjSrKfhbMUlEA43iMZLu7EsnTtkJklIuwrCPbOi8YkvDQAiW05VQQFvvz9oieQ==,
       }
 
-  '@types/body-parser@1.19.6':
-    resolution: {integrity: sha512-HLFeCYgz89uk22N5Qg3dvGvsv46B8GLvKKo1zKG4NybA8U2DiEO3w9lqGg29t/tfLRJpJ6iQxnVw4OnB7MoM9g==}
+  "@types/body-parser@1.19.6":
+    resolution:
+      {
+        integrity: sha512-HLFeCYgz89uk22N5Qg3dvGvsv46B8GLvKKo1zKG4NybA8U2DiEO3w9lqGg29t/tfLRJpJ6iQxnVw4OnB7MoM9g==,
+      }
 
   "@types/chai@5.2.3":
     resolution:
@@ -5254,8 +5263,11 @@ packages:
         integrity: sha512-GYDxsZi3ChgmckRT9HPU0WEhKLP08ev/Yfcq2AstjrDASOYCSXeyjDsHg4v5t4jOj7cyDX3vmprafKlWIG9MXQ==,
       }
 
-  '@types/node@25.4.0':
-    resolution: {integrity: sha512-9wLpoeWuBlcbBpOY3XmzSTG3oscB6xjBEEtn+pYXTfhyXhIxC5FsBer2KTopBlvKEiW9l13po9fq+SJY/5lkhw==}
+  "@types/node@25.4.0":
+    resolution:
+      {
+        integrity: sha512-9wLpoeWuBlcbBpOY3XmzSTG3oscB6xjBEEtn+pYXTfhyXhIxC5FsBer2KTopBlvKEiW9l13po9fq+SJY/5lkhw==,
+      }
 
   "@types/pluralize@0.0.33":
     resolution:
@@ -5610,8 +5622,11 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@vitest/expect@4.0.18':
-    resolution: {integrity: sha512-8sCWUyckXXYvx4opfzVY03EOiYVxyNrHS5QxX3DAIi5dpJAAkyJezHCP77VMX4HKA2LDT/Jpfo8i2r5BE3GnQQ==}
+  "@vitest/expect@4.0.18":
+    resolution:
+      {
+        integrity: sha512-8sCWUyckXXYvx4opfzVY03EOiYVxyNrHS5QxX3DAIi5dpJAAkyJezHCP77VMX4HKA2LDT/Jpfo8i2r5BE3GnQQ==,
+      }
 
   "@vitest/mocker@4.0.18":
     resolution:
@@ -13813,7 +13828,7 @@ snapshots:
       "@bufbuild/protobuf": 2.11.0
       express: 4.21.2
 
-  '@alcalzone/ansi-tokenize@0.2.5':
+  "@alcalzone/ansi-tokenize@0.2.5":
     dependencies:
       ansi-styles: 6.2.3
       is-fullwidth-code-point: 5.1.0
@@ -14379,7 +14394,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@babel/plugin-transform-react-jsx@7.28.6(@babel/core@7.29.0)':
+  "@babel/plugin-transform-react-jsx@7.28.6(@babel/core@7.29.0)":
     dependencies:
       "@babel/core": 7.29.0
       "@babel/helper-annotate-as-pure": 7.27.3
@@ -15056,7 +15071,7 @@ snapshots:
       "@iconify/types": 2.0.0
       mlly: 1.8.0
 
-  '@img/colour@1.0.0': {}
+  "@img/colour@1.0.0": {}
 
   "@img/sharp-darwin-arm64@0.33.5":
     optionalDependencies:
@@ -17206,7 +17221,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@rollup/rollup-android-arm-eabi@4.59.0':
+  "@rollup/rollup-android-arm-eabi@4.59.0":
     optional: true
 
   "@rollup/rollup-android-arm64@4.59.0":
@@ -17617,10 +17632,10 @@ snapshots:
     dependencies:
       "@types/estree": 1.0.8
 
-  '@types/body-parser@1.19.6':
+  "@types/body-parser@1.19.6":
     dependencies:
-      '@types/connect': 3.4.38
-      '@types/node': 25.4.0
+      "@types/connect": 3.4.38
+      "@types/node": 25.4.0
 
   "@types/chai@5.2.3":
     dependencies:
@@ -17629,7 +17644,7 @@ snapshots:
 
   "@types/connect@3.4.38":
     dependencies:
-      '@types/node': 25.4.0
+      "@types/node": 25.4.0
 
   "@types/cookie@0.4.1": {}
 
@@ -17772,10 +17787,10 @@ snapshots:
 
   "@types/express-serve-static-core@5.1.1":
     dependencies:
-      '@types/node': 25.4.0
-      '@types/qs': 6.14.0
-      '@types/range-parser': 1.2.7
-      '@types/send': 1.2.1
+      "@types/node": 25.4.0
+      "@types/qs": 6.14.0
+      "@types/range-parser": 1.2.7
+      "@types/send": 1.2.1
 
   "@types/express@5.0.6":
     dependencies:
@@ -17819,7 +17834,7 @@ snapshots:
     dependencies:
       undici-types: 7.16.0
 
-  '@types/node@25.4.0':
+  "@types/node@25.4.0":
     dependencies:
       undici-types: 7.18.2
 
@@ -17849,12 +17864,12 @@ snapshots:
 
   "@types/send@1.2.1":
     dependencies:
-      '@types/node': 25.4.0
+      "@types/node": 25.4.0
 
   "@types/serve-static@2.2.0":
     dependencies:
-      '@types/http-errors': 2.0.5
-      '@types/node': 25.4.0
+      "@types/http-errors": 2.0.5
+      "@types/node": 25.4.0
 
   "@types/trusted-types@2.0.7":
     optional: true
@@ -18031,7 +18046,7 @@ snapshots:
   "@unrs/resolver-binding-win32-x64-msvc@1.11.1":
     optional: true
 
-  '@vitest/expect@4.0.18':
+  "@vitest/expect@4.0.18":
     dependencies:
       "@standard-schema/spec": 1.1.0
       "@types/chai": 5.2.3
@@ -22684,30 +22699,30 @@ snapshots:
       detect-libc: 2.1.2
       semver: 7.7.4
     optionalDependencies:
-      '@img/sharp-darwin-arm64': 0.34.5
-      '@img/sharp-darwin-x64': 0.34.5
-      '@img/sharp-libvips-darwin-arm64': 1.2.4
-      '@img/sharp-libvips-darwin-x64': 1.2.4
-      '@img/sharp-libvips-linux-arm': 1.2.4
-      '@img/sharp-libvips-linux-arm64': 1.2.4
-      '@img/sharp-libvips-linux-ppc64': 1.2.4
-      '@img/sharp-libvips-linux-riscv64': 1.2.4
-      '@img/sharp-libvips-linux-s390x': 1.2.4
-      '@img/sharp-libvips-linux-x64': 1.2.4
-      '@img/sharp-libvips-linuxmusl-arm64': 1.2.4
-      '@img/sharp-libvips-linuxmusl-x64': 1.2.4
-      '@img/sharp-linux-arm': 0.34.5
-      '@img/sharp-linux-arm64': 0.34.5
-      '@img/sharp-linux-ppc64': 0.34.5
-      '@img/sharp-linux-riscv64': 0.34.5
-      '@img/sharp-linux-s390x': 0.34.5
-      '@img/sharp-linux-x64': 0.34.5
-      '@img/sharp-linuxmusl-arm64': 0.34.5
-      '@img/sharp-linuxmusl-x64': 0.34.5
-      '@img/sharp-wasm32': 0.34.5
-      '@img/sharp-win32-arm64': 0.34.5
-      '@img/sharp-win32-ia32': 0.34.5
-      '@img/sharp-win32-x64': 0.34.5
+      "@img/sharp-darwin-arm64": 0.34.5
+      "@img/sharp-darwin-x64": 0.34.5
+      "@img/sharp-libvips-darwin-arm64": 1.2.4
+      "@img/sharp-libvips-darwin-x64": 1.2.4
+      "@img/sharp-libvips-linux-arm": 1.2.4
+      "@img/sharp-libvips-linux-arm64": 1.2.4
+      "@img/sharp-libvips-linux-ppc64": 1.2.4
+      "@img/sharp-libvips-linux-riscv64": 1.2.4
+      "@img/sharp-libvips-linux-s390x": 1.2.4
+      "@img/sharp-libvips-linux-x64": 1.2.4
+      "@img/sharp-libvips-linuxmusl-arm64": 1.2.4
+      "@img/sharp-libvips-linuxmusl-x64": 1.2.4
+      "@img/sharp-linux-arm": 0.34.5
+      "@img/sharp-linux-arm64": 0.34.5
+      "@img/sharp-linux-ppc64": 0.34.5
+      "@img/sharp-linux-riscv64": 0.34.5
+      "@img/sharp-linux-s390x": 0.34.5
+      "@img/sharp-linux-x64": 0.34.5
+      "@img/sharp-linuxmusl-arm64": 0.34.5
+      "@img/sharp-linuxmusl-x64": 0.34.5
+      "@img/sharp-wasm32": 0.34.5
+      "@img/sharp-win32-arm64": 0.34.5
+      "@img/sharp-win32-ia32": 0.34.5
+      "@img/sharp-win32-x64": 0.34.5
 
   shebang-command@2.0.0:
     dependencies:
