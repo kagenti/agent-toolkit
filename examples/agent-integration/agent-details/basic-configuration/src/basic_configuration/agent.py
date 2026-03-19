@@ -1,4 +1,4 @@
-# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# Copyright 2025 © Kagenti a Series of LF Projects, LLC
 # SPDX-License-Identifier: Apache-2.0
 
 import os
@@ -23,9 +23,9 @@ server = Server()
                 name="Document Reader", description="Reads and extracts key insights from uploaded PDFs or text files."
             ),
         ],
-        framework="BeeAI Framework",
+        framework="Kagenti ADK",
         author=AgentDetailContributor(
-            name="Agent Stack Team",
+            name="ADK Team",
             email="team@example.com",
         ),
         source_code_url="https://github.com/example/example-research-assistant",
