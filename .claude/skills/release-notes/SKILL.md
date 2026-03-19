@@ -3,7 +3,7 @@ name: release-notes
 description: Helps generate release notes to be published on GitHub as well as in a Slack community channel
 ---
 
-When tasked to generate release notes for a given version, your goal is to produce good-quality release notes focused on the user of Agent Stack. You don't need to provide a list of changed tickets or merged PRs; your goal is to provide human-readable release notes focused on the impact on the user.
+When tasked to generate release notes for a given version, your goal is to produce good-quality release notes focused on the user of Kagenti ADK. You don't need to provide a list of changed tickets or merged PRs; your goal is to provide human-readable release notes focused on the impact on the user.
 
 ## Scope of the release
 
@@ -13,7 +13,7 @@ The user generally provides a version tag for which they want to generate releas
 
 The user tells you for which version they want to generate the release notes, e.g., `release-v0.5.0`. Your next step is to figure out what the start commit in the git history is, and then you compare that with the head of the given release, e.g., `release-v0.5.0`.
 
-The start commit is the latest stable version of the Agent Stack.
+The start commit is the latest stable version of the Kagenti ADK.
 
 You can easily find the last release commit by looking at the `install` branch in `i-am-bee/agentstack` and checking the `install.sh` script in the root of the repo, which contains the `LATEST_STABLE_AGENTSTACK_VERSION` variable.
 
@@ -22,7 +22,7 @@ For example, you can do something like this:
 curl -s https://raw.githubusercontent.com/i-am-bee/agentstack/install/install.sh | grep 'LATEST_STABLE_AGENTSTACK_VERSION=' | cut -d'=' -f2
 ```
 
-This gives you a version number (e.g., `0.5.0`). The corresponding git tag for the latest stable Agent Stack version is formed by prepending `release-v` to this number (e.g., `release-v0.5.0`).
+This gives you a version number (e.g., `0.5.0`). The corresponding git tag for the latest stable Kagenti ADK version is formed by prepending `release-v` to this number (e.g., `release-v0.5.0`).
 
 Now, knowing the start and end of the scope, you can figure out what the merged PRs are by calling the attached utility script:
 ```bash
@@ -58,12 +58,12 @@ With all the prior knowledge, you are capable of drafting the release notes. The
 
 Instead of PRs focus on factual changes, described with couple paragraphs. The goal is to keep the release notes short, on point and providing reader a good idea what the new release means to them.
 
-Keep in mind that user of Agent Stack is either of these personas:
+Keep in mind that user of Kagenti ADK is either of these personas:
 
 - A system administrator who is using the to manage agents and system via CLI
 - A system administrator who is deploying production using kubernetes or openshift
 - A developer who is building agent via Kagenti ADK (Python/TypeScript)
-- A developer who is integrating the Agent Stack in their custom GUI and using Agent Stack as backend for agents (TypeScript)
+- A developer who is integrating the Kagenti ADK in their custom GUI and using Kagenti ADK as backend for agents (TypeScript)
 - An end user who is running agents via GUI
 
 Then at the end, provide list of all merged PRs (links + titles)
@@ -71,7 +71,7 @@ Then at the end, provide list of all merged PRs (links + titles)
 ### Example of great release notes
 
 ```markdown
-# 🚀 Agent Stack version 0.5.3 has been released 
+# 🚀 Kagenti ADK version 0.5.3 has been released 
 
 This release brings a major TypeScript SDK restructuring, a new Canvas agent, comprehensive UI redesign, and significant improvements to authentication and CLI experience.
 

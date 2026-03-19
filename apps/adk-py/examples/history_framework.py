@@ -26,7 +26,7 @@ FrameworkMessage = UserMessage | AssistantMessage
 
 
 def to_framework_message(message: Message) -> FrameworkMessage:
-    """Convert A2A Message to Agent Stack Framework Message format"""
+    """Convert A2A Message to Kagenti ADK Framework Message format"""
     message_text = "".join(part.root.text for part in message.parts if part.root.kind == "text")
 
     if message.role == Role.agent:
@@ -49,7 +49,7 @@ async def multi_turn_chat_agent(
     # Load conversation history
     history = [message async for message in context.load_history() if isinstance(message, Message) and message.parts]
 
-    # Initialize Agent Stack Framework LLM client
+    # Initialize Kagenti ADK Framework LLM client
     llm_client = AgentStackChatModel()
     llm_client.set_context(llm)
 

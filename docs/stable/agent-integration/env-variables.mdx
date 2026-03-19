@@ -1,18 +1,18 @@
 ---
 title: "Environment Variables"
-description: "Declare which environment variables the agent requires so they can be provided by the Agent Stack runtime."
+description: "Declare which environment variables the agent requires so they can be provided by the Kagenti ADK runtime."
 ---
 
 Sometimes you need to configure your agent with environment variables that should be provided by the runtime.
 
 For example, you might want to globally enable or disable thinking mode for all users of your agent, or configure API endpoints, feature flags, or other environment settings.
 
-Normally, you would set these environment variables directly in your deployment environment. However, when your agent is deployed to Agent Stack via the `agentstack add` command, the platform manages the runtime environment and you can't directly control it.
+Normally, you would set these environment variables directly in your deployment environment. However, when your agent is deployed to Kagenti ADK via the `kagenti-adk add` command, the platform manages the runtime environment and you can't directly control it.
 
-The Agent Stack platform allows you to declare environment variable requirements through `AgentDetail`. The platform will then provide these variables to your agent at runtime, and you can access them using standard `os.getenv()` calls.
+The Kagenti ADK platform allows you to declare environment variable requirements through `AgentDetail`. The platform will then provide these variables to your agent at runtime, and you can access them using standard `os.getenv()` calls.
 
 <Tip>
-Environment variables declared in `AgentDetail` are automatically provided by the Agent Stack platform when your agent is deployed via `agentstack add`. When running your agent locally or with auto-registration via SDK, you're responsible for providing these variables yourself.
+Environment variables declared in `AgentDetail` are automatically provided by the Kagenti ADK platform when your agent is deployed via `kagenti-adk add`. When running your agent locally or with auto-registration via SDK, you're responsible for providing these variables yourself.
 </Tip>
 
 ## Basic Environment Variables Example
@@ -70,12 +70,12 @@ Import the necessary components from the Kagenti ADK.
 Add an `EnvVar` list to the `variables` field in your `AgentDetail` configuration.
 </Step>
 
-<Step title="Deploy your agent to the Agent Stack">
-Use `agentstack add` command to [deploy your agent in Agent Stack](../deploy-agents/deploy-your-agents)
+<Step title="Deploy your agent to the Kagenti ADK">
+Use `kagenti-adk add` command to [deploy your agent in Kagenti ADK](../deploy-agents/deploy-your-agents)
 </Step>
 
 <Step title="Configure the variables via CLI">
-Configure environment variables for your agent using `agentstack env add "Name or ID of your Agent" KEY=VALUE`.
+Configure environment variables for your agent using `kagenti-adk env add "Name or ID of your Agent" KEY=VALUE`.
 </Step>
 
 
@@ -86,14 +86,14 @@ Use `os.getenv()` to access the environment variables in your agent code.
 
 ## Managing Environment Variables
 
-Once your agent is deployed to Agent Stack, you need to provide the environment variables it requires. You can manage these variables using the `agentstack env` CLI commands.
+Once your agent is deployed to Kagenti ADK, you need to provide the environment variables it requires. You can manage these variables using the `kagenti-adk env` CLI commands.
 
 ### Adding Environment Variables
 
-To provide environment variables to your agent, use the `agentstack env add` command:
+To provide environment variables to your agent, use the `kagenti-adk env add` command:
 
 ```bash
-agentstack env add "Name or ID of the agent" FIRST_VAR=VALUE SECOND_VAR=VALUE ...
+kagenti-adk env add "Name or ID of the agent" FIRST_VAR=VALUE SECOND_VAR=VALUE ...
 ```
 
 <Tip>
@@ -105,7 +105,7 @@ You can add multiple variables at once by including them all in a single command
 To view the environment variables configured for an agent:
 
 ```bash
-agentstack env list "Name or ID of the agent"
+kagenti-adk env list "Name or ID of the agent"
 ```
 
 ### Removing Environment Variables
@@ -113,9 +113,9 @@ agentstack env list "Name or ID of the agent"
 To remove an environment variable from an agent:
 
 ```bash
-agentstack env remove "Name or ID of the agent" VARIABLE_NAME
+kagenti-adk env remove "Name or ID of the agent" VARIABLE_NAME
 ```
 
 ### Checking Missing Variables
 
-When a required variable hasn't been provided, you can see this in the agent list. Use `agentstack list` to view all agents - the `INFO` column shows which variables still need to be configured.
+When a required variable hasn't been provided, you can see this in the agent list. Use `kagenti-adk list` to view all agents - the `INFO` column shows which variables still need to be configured.

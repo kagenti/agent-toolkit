@@ -153,7 +153,7 @@ class PlatformAuthBackend(SdkAuthenticationBackend):
                     http_auth_security_scheme=HTTPAuthSecurityScheme(
                         scheme="bearer",
                         bearer_format="JWT",
-                        description="Platform context token, issued by the AgentStack server using POST /api/v1/context/{context_id}/token.",
+                        description="Platform context token, issued by the Kagenti ADK server using POST /api/v1/context/{context_id}/token.",
                     )
                 )
             },

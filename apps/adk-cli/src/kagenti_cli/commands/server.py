@@ -72,7 +72,7 @@ async def _wait_for_auth_code(port: int = 9001) -> str:
 
 
 def get_unique_app_name() -> str:
-    return f"Agent Stack CLI {uuid.uuid4()}"
+    return f"Kagenti ADK CLI {uuid.uuid4()}"
 
 
 @app.command("login | change | select | default | switch")

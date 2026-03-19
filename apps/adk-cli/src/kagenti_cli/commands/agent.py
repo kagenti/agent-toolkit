@@ -368,7 +368,7 @@ async def _add_agent_via_kagenti(
     else:
         console.success(f"Agent [bold]{name}[/bold] is healthy in kagenti")
 
-    # Wait for agent to appear in agentstack (30s timeout)
+    # Wait for agent to appear in kagenti-adk (30s timeout)
     console.info("Waiting for agent to appear in Kagenti ADK...")
     appeared = False
     for _ in range(30):

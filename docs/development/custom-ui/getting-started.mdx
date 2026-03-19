@@ -3,12 +3,12 @@ title: Getting Started
 description: SDK overview and key workflows for building custom agent interfaces
 ---
 
-The Agent Stack TypeScript Client SDK simplifies building custom UIs for A2A agents. It handles agent service demands, maps task status updates to UI actions, and provides a typed platform API client. Use it to fulfill agent requirements, render interactive elements like forms and approvals, and manage communication between your UI and Agent Stack.
+The Kagenti ADK TypeScript Client SDK simplifies building custom UIs for A2A agents. It handles agent service demands, maps task status updates to UI actions, and provides a typed platform API client. Use it to fulfill agent requirements, render interactive elements like forms and approvals, and manage communication between your UI and Kagenti ADK.
 
 It builds on the [Agent2Agent Protocol (A2A)](https://a2a-protocol.org/) and provides two layers:
 
 1. A2A extensions and helpers that translate agent card demands such as LLM access, embeddings, OAuth, and secrets into client fulfillments like API keys, model choices, redirect URIs, and secret values, plus UI metadata.
-2. A platform API client that talks to the AgentStack server.
+2. A platform API client that talks to the Kagenti ADK server.
 
 The SDK also exports A2A protocol types and Zod schemas so your UI can stay in sync with the protocol.
 
@@ -25,7 +25,7 @@ npm i @kagenti/adk @a2a-js/sdk
 ```typescript
 import { buildApiClient, createAuthenticatedFetch } from "@kagenti/adk";
 
-const baseUrl = "https://your-agentstack-instance.com";
+const baseUrl = "https://your-adk-instance.com";
 
 const api = buildApiClient({
   baseUrl,
@@ -39,7 +39,7 @@ Use the user access token from your identity provider (OIDC/OAuth) for UI side A
 <Note>
   **Browser clients require CORS**
 
-  If your custom UI runs on a different origin than your Agent Stack server, enable CORS on the server for your frontend origin. See **[Cross-Origin Resource Sharing Configuration](../deploy-agent-stack/deployment-guide#cross-origin-resource-sharing-configuration)**.
+  If your custom UI runs on a different origin than your Kagenti ADK server, enable CORS on the server for your frontend origin. See **[Cross-Origin Resource Sharing Configuration](../deploy-agent-stack/deployment-guide#cross-origin-resource-sharing-configuration)**.
   If allowing origins directly is not possible, route calls through a same-origin frontend proxy.
 </Note>
 
@@ -128,7 +128,7 @@ The agent card URL follows this convention:
 
 `{baseUrl}/api/v1/a2a/{providerId}/.well-known/agent-card.json`
 
-- `baseUrl` is your Agent Stack server root
+- `baseUrl` is your Kagenti ADK server root
 - `providerId` is the agent provider identifier
 
 `getAgentCardPath(providerId)` returns the **path portion** of that URL. Use it with `ClientFactory.createFromUrl(baseUrl, agentCardPath)` so the client can resolve the full
@@ -147,7 +147,7 @@ graph TB
         A2AClient[A2A Client]
     end
     
-    subgraph AgentStack [Agent Stack Platform]
+    subgraph Kagenti ADK [Kagenti ADK Platform]
         Agent[Agent]
         API[Platform API]
     end
@@ -175,7 +175,7 @@ The SDK is split into focused entrypoints:
 
 ## Protocol Types and Schemas
 
-The SDK exports A2A protocol types and Zod schemas that match the AgentStack UI usage, including:
+The SDK exports A2A protocol types and Zod schemas that match the Kagenti ADK UI usage, including:
 
 - `Message`, `Part`, and `Task` types
 - `TaskStatusUpdateEvent` and `TaskArtifactUpdateEvent`

@@ -3,7 +3,7 @@ title: Permissions and Tokens
 description: User roles, context tokens, and permission scopes for platform access
 ---
 
-Agent Stack uses two types of authentication tokens to control access to platform resources:
+Kagenti ADK uses two types of authentication tokens to control access to platform resources:
 
 1. **User Tokens** - Issued by your identity provider (OIDC/OAuth) for human users accessing the platform
 2. **Context Tokens** - Generated programmatically for agents to access resources with limited permissions during a conversation
@@ -12,7 +12,7 @@ Both token types can be used to authenticate API requests, but serve different p
 
 ## Understanding the Permission System
 
-Agent Stack's permission system has two independent dimensions that work together:
+Kagenti ADK's permission system has two independent dimensions that work together:
 
 1. **Privacy and Ownership** - Controls who can access resources (user roles and entity visibility)
 2. **Context Scoping** - Controls where resources are associated and how agents access them
@@ -73,7 +73,7 @@ graph TB
 
 #### User Roles and Access
 
-Agent Stack uses three role-based access levels:
+Kagenti ADK uses three role-based access levels:
 
 **USER** - Standard user role:
 - **Platform Entities**: Read-only access
@@ -477,10 +477,10 @@ Both `File.create()` and `VectorStore.create()` include a `context_id` parameter
 
 <Warning>
     This is an advanced section aimed for agent application developers who want to integrate their custom a2a clients
-    with the Agent Stack.
+    with the Kagenti ADK.
 </Warning>
 
-The Agent Stack platform API accepts two types of tokens for authentication:
+The Kagenti ADK platform API accepts two types of tokens for authentication:
 
 1. **Access Token** - Issued by your identity provider (OIDC/OAuth) when a user logs in
 2. **Context Token** - Generated programmatically for agents with limited permissions

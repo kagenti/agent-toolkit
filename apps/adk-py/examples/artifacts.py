@@ -33,7 +33,7 @@ FrameworkMessage = UserMessage | AssistantMessage
 
 
 def to_framework_message(message: Message) -> FrameworkMessage:
-    """Convert A2A Message to Agent Stack Framework Message format"""
+    """Convert A2A Message to Kagenti ADK Framework Message format"""
     message_text = "".join(part.root.text for part in message.parts if part.root.kind == "text")
 
     if message.role == Role.agent:

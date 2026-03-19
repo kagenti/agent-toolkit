@@ -1,24 +1,24 @@
 ---
 title: "Deploy Your Agents"
-description: "Package and deploy your agent to Agent Stack as a managed service"
+description: "Package and deploy your agent to Kagenti ADK as a managed service"
 ---
 
-Once you've wrapped your agent with the Agent Stack server, you need to containerize it and deploy it, so that Agent Stack can run it as a managed service.
+Once you've wrapped your agent with the Kagenti ADK server, you need to containerize it and deploy it, so that Kagenti ADK can run it as a managed service.
 
 ## Prerequisites
-- Agent Stack installed ([Quickstart](/stable/introduction/quickstart))
+- Kagenti ADK installed ([Quickstart](/stable/introduction/quickstart))
 - Agent wrapped with Kagenti ADK ([Wrap Existing Agents](/stable/deploy-agents/wrap-existing-agents) or [Build New Agent](/stable/deploy-agents/building-agents))
 
 ## Agent Deploy Process
 
-To deploy your agent to Agent Stack, you need to create a github repository with your agent and then deploy from that repository to Agent Stack.
+To deploy your agent to Kagenti ADK, you need to create a github repository with your agent and then deploy from that repository to Kagenti ADK.
 
 ### 1. Create an Agent github repository
 
-You can quickly create an agent repository by using the Agent Stack starter template. The [agentstack-starter template](https://github.com/i-am-bee/agentstack-starter) includes everything you need:
+You can quickly create an agent repository by using the Kagenti ADK starter template. The [agentstack-starter template](https://github.com/i-am-bee/agentstack-starter) includes everything you need:
 - Production-ready Dockerfile
 - GitHub Actions for automated builds
-- Agent Stack deployment configuration
+- Kagenti ADK deployment configuration
 
 Clone it and modify it for your agent as follows:
 ```bash
@@ -38,30 +38,30 @@ ENV PRODUCTION_MODE=true
 CMD ["/app/.venv/bin/server"]
 ```
 
-### 2. Deploy your Agent to Agent Stack
+### 2. Deploy your Agent to Kagenti ADK
 
 To deploy from your my-agent github repo, run the following with your organization name substituted for myorg:
 ```bash
-agentstack add https://github.com/myorg/my-agent
+kagenti-adk add https://github.com/myorg/my-agent
 ```
 
 This command automatically:
 1. ✓ Builds your Docker image from github using the provided Dockerfile in the github root directory
-2. ✓ Copies the image into Agent Stack's VM
+2. ✓ Copies the image into Kagenti ADK's VM
 3. ✓ Registers it as an available agent
 
 As a specific example, to deploy the agentstack-starter example agent without modification, you can issue the following command:
 
 ```bash
-agentstack add https://github.com/i-am-bee/agentstack-starter
+kagenti-adk add https://github.com/i-am-bee/agentstack-starter
 ```
 
 <Note>
-**Why "copy into VM"?** Agent Stack runs in an isolated VM (Lima on Mac/Linux, WSL on Windows). Even though Docker Desktop builds your image, Agent Stack needs it copied into its VM to run it. The `add` command handles this automatically.
+**Why "copy into VM"?** Kagenti ADK runs in an isolated VM (Lima on Mac/Linux, WSL on Windows). Even though Docker Desktop builds your image, Kagenti ADK needs it copied into its VM to run it. The `add` command handles this automatically.
 </Note>
 
 ## Github Deploy Options
-The `agentstack add` command supports various URL formats to specify the repository, version, and location of your agent's code.
+The `kagenti-adk add` command supports various URL formats to specify the repository, version, and location of your agent's code.
 
 The supported formats include:
 - **Basic URL**: `https://github.com/myorg/myrepo`
@@ -77,10 +77,10 @@ The supported formats include:
 
 To deploy an agent from a specific branch and subfolder, you would run:
 ```bash
-agentstack add "https://github.com/my-org/my-awesome-agents@main#path=/my-agent"
+kagenti-adk add "https://github.com/my-org/my-awesome-agents@main#path=/my-agent"
 ```
 
-This command tells Agent Stack to:
+This command tells Kagenti ADK to:
 1. Fetch the `main` branch of the `my-awesome-agents` repository.
 2. Look for the agent's `Dockerfile` and source code in the `/my-agent` directory.
 3. Build the Docker image and register it with the platform.
@@ -89,7 +89,7 @@ This command tells Agent Stack to:
 
 You can check that your agent is registered by running:
 ```bash
-agentstack list
+kagenti-adk list
 ```
 
 Your agent should appear in the list with status information.
@@ -98,12 +98,12 @@ Your agent should appear in the list with status information.
 
 Test via CLI:
 ```bash
-agentstack run my-agent "Hello!"
+kagenti-adk run my-agent "Hello!"
 ```
 
 Or open the web UI:
 ```bash
-agentstack ui
+kagenti-adk ui
 ```
 
 Your agent will be available at `http://127.0.0.1:8333`
@@ -113,11 +113,11 @@ Your agent will be available at `http://127.0.0.1:8333`
 ### Two-step build process
 If you need more control over the build:
 ```bash
-# Step 1: Build and copy to Agent Stack VM
-agentstack build https://github.com/myorg/myrepo
+# Step 1: Build and copy to Kagenti ADK VM
+kagenti-adk build https://github.com/myorg/myrepo
 
 # Step 2: Register the agent
-agentstack add agentstack.local/my-agent-abc123:latest
+kagenti-adk add agentstack.local/my-agent-abc123:latest
 ```
 
 ## Next Steps

@@ -23,8 +23,8 @@ Retrieval:
 
 <Steps>
 
-<Step title="Start Agent Stack with Docling enabled!!">
-  Use `agentstack platform start --set docling.enabled=true` to start Agent Stack with Docling.
+<Step title="Start Kagenti ADK with Docling enabled!!">
+  Use `kagenti-adk platform start --set docling.enabled=true` to start Kagenti ADK with Docling.
 </Step>
 
 <Step title="Enable file uploads in your agent">
@@ -59,7 +59,7 @@ Import `PlatformApiExtensionServer`, `PlatformApiExtensionSpec`,
 </Step>
 </Steps>
 
-Let's break down how each step can be implemented with the Agent Stack API.
+Let's break down how each step can be implemented with the Kagenti ADK API.
 
 ## Building blocks
 
@@ -67,7 +67,7 @@ Let's break down how each step can be implemented with the Agent Stack API.
 
 Add the `default_input_modes` parameter to your agent decorator to allow users to upload files to your agent.
 This also specifies which file types users can upload.
-Agent Stack uses [docling](https://docling-project.github.io/docling/) for extracting text out of documents in various
+Kagenti ADK uses [docling](https://docling-project.github.io/docling/) for extracting text out of documents in various
 [supported formats](https://docling-project.github.io/docling/usage/supported_formats/).
 
 ```python
@@ -220,7 +220,7 @@ def chunk_markdown(markdown_text: str) -> list[str]:
 
 ### Embedding
 
-Now we need to generate embeddings for each chunk using the embedding service. Similarly to LLM, Agent Stack implements
+Now we need to generate embeddings for each chunk using the embedding service. Similarly to LLM, Kagenti ADK implements
 OpenAI-compatible embedding API. You can use any preferred client, in this example we will use the embedding extension
 to create an `AsyncOpenAI` client:
 

@@ -1,15 +1,13 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Agentstack server",
+    "title": "Kagenti ADK server",
     "version": "0.7.1"
   },
   "paths": {
     "/api/v1/user": {
       "get": {
-        "tags": [
-          "user"
-        ],
+        "tags": ["user"],
         "summary": "Get User",
         "operationId": "get_user_api_v1_user_get",
         "responses": {
@@ -36,10 +34,7 @@
     },
     "/api/v1/users/me": {
       "get": {
-        "tags": [
-          "users",
-          "users"
-        ],
+        "tags": ["users", "users"],
         "summary": "Get Me",
         "description": "Get current user",
         "operationId": "get_me_api_v1_users_me_get",
@@ -67,9 +62,7 @@
     },
     "/api/v1/a2a/{provider_id}/.well-known/agent-card.json": {
       "get": {
-        "tags": [
-          "a2a"
-        ],
+        "tags": ["a2a"],
         "summary": "Get Agent Card",
         "operationId": "get_agent_card_api_v1_a2a__provider_id___well_known_agent_card_json_get",
         "security": [
@@ -120,9 +113,7 @@
     },
     "/api/v1/a2a/{provider_id}/": {
       "post": {
-        "tags": [
-          "a2a"
-        ],
+        "tags": ["a2a"],
         "summary": "A2A Proxy Jsonrpc Transport",
         "operationId": "a2a_proxy_jsonrpc_transport_api_v1_a2a__provider_id___post",
         "security": [
@@ -169,9 +160,7 @@
     },
     "/api/v1/a2a/{provider_id}": {
       "post": {
-        "tags": [
-          "a2a"
-        ],
+        "tags": ["a2a"],
         "summary": "A2A Proxy Jsonrpc Transport",
         "operationId": "a2a_proxy_jsonrpc_transport_api_v1_a2a__provider_id__post",
         "security": [
@@ -218,9 +207,7 @@
     },
     "/api/v1/a2a/{provider_id}/http/{path}": {
       "patch": {
-        "tags": [
-          "a2a"
-        ],
+        "tags": ["a2a"],
         "summary": "A2A Proxy Http Transport",
         "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http__path__patch",
         "security": [
@@ -274,9 +261,7 @@
         }
       },
       "post": {
-        "tags": [
-          "a2a"
-        ],
+        "tags": ["a2a"],
         "summary": "A2A Proxy Http Transport",
         "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http__path__patch",
         "security": [
@@ -330,9 +315,7 @@
         }
       },
       "head": {
-        "tags": [
-          "a2a"
-        ],
+        "tags": ["a2a"],
         "summary": "A2A Proxy Http Transport",
         "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http__path__patch",
         "security": [
@@ -386,9 +369,7 @@
         }
       },
       "options": {
-        "tags": [
-          "a2a"
-        ],
+        "tags": ["a2a"],
         "summary": "A2A Proxy Http Transport",
         "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http__path__patch",
         "security": [
@@ -442,9 +423,7 @@
         }
       },
       "get": {
-        "tags": [
-          "a2a"
-        ],
+        "tags": ["a2a"],
         "summary": "A2A Proxy Http Transport",
         "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http__path__patch",
         "security": [
@@ -498,9 +477,7 @@
         }
       },
       "put": {
-        "tags": [
-          "a2a"
-        ],
+        "tags": ["a2a"],
         "summary": "A2A Proxy Http Transport",
         "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http__path__patch",
         "security": [
@@ -554,9 +531,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "a2a"
-        ],
+        "tags": ["a2a"],
         "summary": "A2A Proxy Http Transport",
         "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http__path__patch",
         "security": [
@@ -612,9 +587,7 @@
     },
     "/api/v1/a2a/{provider_id}/http": {
       "patch": {
-        "tags": [
-          "a2a"
-        ],
+        "tags": ["a2a"],
         "summary": "A2A Proxy Http Transport",
         "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http_patch",
         "security": [
@@ -669,9 +642,7 @@
         }
       },
       "post": {
-        "tags": [
-          "a2a"
-        ],
+        "tags": ["a2a"],
         "summary": "A2A Proxy Http Transport",
         "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http_patch",
         "security": [
@@ -726,9 +697,7 @@
         }
       },
       "head": {
-        "tags": [
-          "a2a"
-        ],
+        "tags": ["a2a"],
         "summary": "A2A Proxy Http Transport",
         "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http_patch",
         "security": [
@@ -783,9 +752,7 @@
         }
       },
       "options": {
-        "tags": [
-          "a2a"
-        ],
+        "tags": ["a2a"],
         "summary": "A2A Proxy Http Transport",
         "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http_patch",
         "security": [
@@ -840,9 +807,7 @@
         }
       },
       "get": {
-        "tags": [
-          "a2a"
-        ],
+        "tags": ["a2a"],
         "summary": "A2A Proxy Http Transport",
         "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http_patch",
         "security": [
@@ -897,9 +862,7 @@
         }
       },
       "put": {
-        "tags": [
-          "a2a"
-        ],
+        "tags": ["a2a"],
         "summary": "A2A Proxy Http Transport",
         "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http_patch",
         "security": [
@@ -954,9 +917,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "a2a"
-        ],
+        "tags": ["a2a"],
         "summary": "A2A Proxy Http Transport",
         "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http_patch",
         "security": [
@@ -1013,9 +974,7 @@
     },
     "/api/v1/providers": {
       "post": {
-        "tags": [
-          "providers"
-        ],
+        "tags": ["providers"],
         "summary": "Create Provider",
         "operationId": "create_provider_api_v1_providers_post",
         "security": [
@@ -1060,9 +1019,7 @@
         }
       },
       "get": {
-        "tags": [
-          "providers"
-        ],
+        "tags": ["providers"],
         "summary": "List Providers",
         "operationId": "list_providers_api_v1_providers_get",
         "security": [
@@ -1133,9 +1090,7 @@
     },
     "/api/v1/providers/{id}": {
       "patch": {
-        "tags": [
-          "providers"
-        ],
+        "tags": ["providers"],
         "summary": "Patch Provider",
         "operationId": "patch_provider_api_v1_providers__id__patch",
         "security": [
@@ -1192,9 +1147,7 @@
         }
       },
       "get": {
-        "tags": [
-          "providers"
-        ],
+        "tags": ["providers"],
         "summary": "Get Provider",
         "operationId": "get_provider_api_v1_providers__id__get",
         "security": [
@@ -1241,9 +1194,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "providers"
-        ],
+        "tags": ["providers"],
         "summary": "Delete Provider",
         "operationId": "delete_provider_api_v1_providers__id__delete",
         "security": [
@@ -1285,9 +1236,7 @@
     },
     "/api/v1/providers/preview": {
       "post": {
-        "tags": [
-          "providers"
-        ],
+        "tags": ["providers"],
         "summary": "Preview Provider",
         "operationId": "preview_provider_api_v1_providers_preview_post",
         "requestBody": {
@@ -1334,9 +1283,7 @@
     },
     "/api/v1/providers/by-location/{location}": {
       "get": {
-        "tags": [
-          "providers"
-        ],
+        "tags": ["providers"],
         "summary": "Get Provider By Location",
         "operationId": "get_provider_by_location_api_v1_providers_by_location__location__get",
         "security": [
@@ -1384,9 +1331,7 @@
     },
     "/api/v1/providers/{id}/logs": {
       "get": {
-        "tags": [
-          "providers"
-        ],
+        "tags": ["providers"],
         "summary": "Stream Logs",
         "operationId": "stream_logs_api_v1_providers__id__logs_get",
         "security": [
@@ -1433,9 +1378,7 @@
     },
     "/api/v1/providers/{id}/variables": {
       "put": {
-        "tags": [
-          "providers"
-        ],
+        "tags": ["providers"],
         "summary": "Update Provider Variables",
         "operationId": "update_provider_variables_api_v1_providers__id__variables_put",
         "security": [
@@ -1490,9 +1433,7 @@
         }
       },
       "get": {
-        "tags": [
-          "providers"
-        ],
+        "tags": ["providers"],
         "summary": "List Provider Variables",
         "operationId": "list_provider_variables_api_v1_providers__id__variables_get",
         "security": [
@@ -1541,9 +1482,7 @@
     },
     "/api/v1/providers/discovery": {
       "post": {
-        "tags": [
-          "provider_discovery"
-        ],
+        "tags": ["provider_discovery"],
         "summary": "Create Provider Discovery",
         "operationId": "create_provider_discovery_api_v1_providers_discovery_post",
         "requestBody": {
@@ -1590,9 +1529,7 @@
     },
     "/api/v1/providers/discovery/{id}": {
       "get": {
-        "tags": [
-          "provider_discovery"
-        ],
+        "tags": ["provider_discovery"],
         "summary": "Get Provider Discovery",
         "operationId": "get_provider_discovery_api_v1_providers_discovery__id__get",
         "security": [
@@ -1641,9 +1578,7 @@
     },
     "/api/v1/provider_builds": {
       "post": {
-        "tags": [
-          "provider_builds"
-        ],
+        "tags": ["provider_builds"],
         "summary": "Create Provider Build",
         "operationId": "create_provider_build_api_v1_provider_builds_post",
         "security": [
@@ -1688,9 +1623,7 @@
         }
       },
       "get": {
-        "tags": [
-          "provider_builds"
-        ],
+        "tags": ["provider_builds"],
         "summary": "List Provider Builds",
         "operationId": "list_provider_builds_api_v1_provider_builds_get",
         "security": [
@@ -1809,9 +1742,7 @@
     },
     "/api/v1/provider_builds/preview": {
       "post": {
-        "tags": [
-          "provider_builds"
-        ],
+        "tags": ["provider_builds"],
         "summary": "Preview Provider Build",
         "operationId": "preview_provider_build_api_v1_provider_builds_preview_post",
         "requestBody": {
@@ -1858,9 +1789,7 @@
     },
     "/api/v1/provider_builds/{id}": {
       "get": {
-        "tags": [
-          "provider_builds"
-        ],
+        "tags": ["provider_builds"],
         "summary": "Get Provider Build",
         "operationId": "get_provider_build_api_v1_provider_builds__id__get",
         "security": [
@@ -1907,9 +1836,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "provider_builds"
-        ],
+        "tags": ["provider_builds"],
         "summary": "Delete",
         "operationId": "delete_api_v1_provider_builds__id__delete",
         "security": [
@@ -1951,9 +1878,7 @@
     },
     "/api/v1/provider_builds/{id}/logs": {
       "get": {
-        "tags": [
-          "provider_builds"
-        ],
+        "tags": ["provider_builds"],
         "summary": "Stream Logs",
         "operationId": "stream_logs_api_v1_provider_builds__id__logs_get",
         "security": [
@@ -2000,9 +1925,7 @@
     },
     "/api/v1/model_providers": {
       "get": {
-        "tags": [
-          "model_providers"
-        ],
+        "tags": ["model_providers"],
         "summary": "List Model Providers",
         "operationId": "list_model_providers_api_v1_model_providers_get",
         "responses": {
@@ -2027,9 +1950,7 @@
         ]
       },
       "post": {
-        "tags": [
-          "model_providers"
-        ],
+        "tags": ["model_providers"],
         "summary": "Create Model Provider",
         "operationId": "create_model_provider_api_v1_model_providers_post",
         "requestBody": {
@@ -2076,9 +1997,7 @@
     },
     "/api/v1/model_providers/{model_provider_id}": {
       "get": {
-        "tags": [
-          "model_providers"
-        ],
+        "tags": ["model_providers"],
         "summary": "Get Model Provider",
         "operationId": "get_model_provider_api_v1_model_providers__model_provider_id__get",
         "security": [
@@ -2125,9 +2044,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "model_providers"
-        ],
+        "tags": ["model_providers"],
         "summary": "Delete Model Provider",
         "operationId": "delete_model_provider_api_v1_model_providers__model_provider_id__delete",
         "security": [
@@ -2169,9 +2086,7 @@
     },
     "/api/v1/model_providers/match": {
       "post": {
-        "tags": [
-          "model_providers"
-        ],
+        "tags": ["model_providers"],
         "summary": "Match",
         "operationId": "match_api_v1_model_providers_match_post",
         "requestBody": {
@@ -2218,9 +2133,7 @@
     },
     "/api/v1/configurations/system": {
       "get": {
-        "tags": [
-          "configurations"
-        ],
+        "tags": ["configurations"],
         "summary": "Get Configuration",
         "operationId": "get_configuration_api_v1_configurations_system_get",
         "responses": {
@@ -2245,9 +2158,7 @@
         ]
       },
       "put": {
-        "tags": [
-          "configurations"
-        ],
+        "tags": ["configurations"],
         "summary": "Update Configuration",
         "operationId": "update_configuration_api_v1_configurations_system_put",
         "requestBody": {
@@ -2294,9 +2205,7 @@
     },
     "/api/v1/files": {
       "post": {
-        "tags": [
-          "files"
-        ],
+        "tags": ["files"],
         "summary": "Upload File",
         "operationId": "upload_file_api_v1_files_post",
         "security": [
@@ -2360,9 +2269,7 @@
         }
       },
       "get": {
-        "tags": [
-          "files"
-        ],
+        "tags": ["files"],
         "summary": "List Files",
         "operationId": "list_files_api_v1_files_get",
         "security": [
@@ -2426,9 +2333,7 @@
     },
     "/api/v1/files/{file_id}": {
       "get": {
-        "tags": [
-          "files"
-        ],
+        "tags": ["files"],
         "summary": "Get File",
         "operationId": "get_file_api_v1_files__file_id__get",
         "security": [
@@ -2492,9 +2397,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "files"
-        ],
+        "tags": ["files"],
         "summary": "Delete File",
         "operationId": "delete_file_api_v1_files__file_id__delete",
         "security": [
@@ -2553,9 +2456,7 @@
     },
     "/api/v1/files/{file_id}/content": {
       "get": {
-        "tags": [
-          "files"
-        ],
+        "tags": ["files"],
         "summary": "Get File Content",
         "operationId": "get_file_content_api_v1_files__file_id__content_get",
         "security": [
@@ -2619,9 +2520,7 @@
     },
     "/api/v1/files/{file_id}/text_content": {
       "get": {
-        "tags": [
-          "files"
-        ],
+        "tags": ["files"],
         "summary": "Get Text File Content",
         "operationId": "get_text_file_content_api_v1_files__file_id__text_content_get",
         "security": [
@@ -2685,9 +2584,7 @@
     },
     "/api/v1/files/{file_id}/extraction": {
       "post": {
-        "tags": [
-          "files"
-        ],
+        "tags": ["files"],
         "summary": "Create Text Extraction",
         "description": "Create or return text extraction for a file.\n\n- If extraction is completed, returns existing result\n- If extraction failed, retries the extraction\n- If extraction is pending/in-progress, returns current status\n- If no extraction exists, creates a new one",
         "operationId": "create_text_extraction_api_v1_files__file_id__extraction_post",
@@ -2769,9 +2666,7 @@
         }
       },
       "get": {
-        "tags": [
-          "files"
-        ],
+        "tags": ["files"],
         "summary": "Get Text Extraction",
         "operationId": "get_text_extraction_api_v1_files__file_id__extraction_get",
         "security": [
@@ -2835,9 +2730,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "files"
-        ],
+        "tags": ["files"],
         "summary": "Delete Text Extraction",
         "operationId": "delete_text_extraction_api_v1_files__file_id__extraction_delete",
         "security": [
@@ -2896,9 +2789,7 @@
     },
     "/api/v1/variables": {
       "get": {
-        "tags": [
-          "variables"
-        ],
+        "tags": ["variables"],
         "summary": "List User Variables",
         "operationId": "list_user_variables_api_v1_variables_get",
         "responses": {
@@ -2923,9 +2814,7 @@
         ]
       },
       "put": {
-        "tags": [
-          "variables"
-        ],
+        "tags": ["variables"],
         "summary": "Update User Variables",
         "operationId": "update_user_variables_api_v1_variables_put",
         "requestBody": {
@@ -2970,9 +2859,7 @@
     },
     "/api/v1/contexts": {
       "post": {
-        "tags": [
-          "contexts"
-        ],
+        "tags": ["contexts"],
         "summary": "Create Context",
         "operationId": "create_context_api_v1_contexts_post",
         "security": [
@@ -3017,9 +2904,7 @@
         }
       },
       "get": {
-        "tags": [
-          "contexts"
-        ],
+        "tags": ["contexts"],
         "summary": "List Context",
         "operationId": "list_context_api_v1_contexts_get",
         "security": [
@@ -3133,9 +3018,7 @@
     },
     "/api/v1/contexts/{context_id}": {
       "get": {
-        "tags": [
-          "contexts"
-        ],
+        "tags": ["contexts"],
         "summary": "Get Context",
         "operationId": "get_context_api_v1_contexts__context_id__get",
         "security": [
@@ -3182,9 +3065,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "contexts"
-        ],
+        "tags": ["contexts"],
         "summary": "Delete Context",
         "operationId": "delete_context_api_v1_contexts__context_id__delete",
         "security": [
@@ -3224,9 +3105,7 @@
         }
       },
       "put": {
-        "tags": [
-          "contexts"
-        ],
+        "tags": ["contexts"],
         "summary": "Update Context",
         "operationId": "update_context_api_v1_contexts__context_id__put",
         "security": [
@@ -3285,9 +3164,7 @@
     },
     "/api/v1/contexts/{context_id}/metadata": {
       "patch": {
-        "tags": [
-          "contexts"
-        ],
+        "tags": ["contexts"],
         "summary": "Patch Context Metadata",
         "operationId": "patch_context_metadata_api_v1_contexts__context_id__metadata_patch",
         "security": [
@@ -3346,9 +3223,7 @@
     },
     "/api/v1/contexts/{context_id}/token": {
       "post": {
-        "tags": [
-          "contexts"
-        ],
+        "tags": ["contexts"],
         "summary": "Generate Context Token",
         "operationId": "generate_context_token_api_v1_contexts__context_id__token_post",
         "security": [
@@ -3407,9 +3282,7 @@
     },
     "/api/v1/contexts/{context_id}/history": {
       "post": {
-        "tags": [
-          "contexts"
-        ],
+        "tags": ["contexts"],
         "summary": "Add Context History Item",
         "operationId": "add_context_history_item_api_v1_contexts__context_id__history_post",
         "security": [
@@ -3464,9 +3337,7 @@
         }
       },
       "get": {
-        "tags": [
-          "contexts"
-        ],
+        "tags": ["contexts"],
         "summary": "List Context History",
         "operationId": "list_context_history_api_v1_contexts__context_id__history_get",
         "security": [
@@ -3561,9 +3432,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "contexts"
-        ],
+        "tags": ["contexts"],
         "summary": "Delete Context History From Id",
         "operationId": "delete_context_history_from_id_api_v1_contexts__context_id__history_delete",
         "security": [
@@ -3615,9 +3484,7 @@
     },
     "/api/v1/openai/chat/completions": {
       "post": {
-        "tags": [
-          "openai"
-        ],
+        "tags": ["openai"],
         "summary": "Create Chat Completion",
         "operationId": "create_chat_completion_api_v1_openai_chat_completions_post",
         "requestBody": {
@@ -3662,9 +3529,7 @@
     },
     "/api/v1/openai/embeddings": {
       "post": {
-        "tags": [
-          "openai"
-        ],
+        "tags": ["openai"],
         "summary": "Create Embedding",
         "operationId": "create_embedding_api_v1_openai_embeddings_post",
         "requestBody": {
@@ -3709,9 +3574,7 @@
     },
     "/api/v1/openai/models": {
       "get": {
-        "tags": [
-          "openai"
-        ],
+        "tags": ["openai"],
         "summary": "List Models",
         "operationId": "list_models_api_v1_openai_models_get",
         "responses": {
@@ -3738,9 +3601,7 @@
     },
     "/api/v1/vector_stores": {
       "post": {
-        "tags": [
-          "vector_stores"
-        ],
+        "tags": ["vector_stores"],
         "summary": "Create Vector Store",
         "description": "Create a new vector store.",
         "operationId": "create_vector_store_api_v1_vector_stores_post",
@@ -3807,9 +3668,7 @@
     },
     "/api/v1/vector_stores/{vector_store_id}": {
       "get": {
-        "tags": [
-          "vector_stores"
-        ],
+        "tags": ["vector_stores"],
         "summary": "Get Vector Store",
         "description": "Get a vector store by ID.",
         "operationId": "get_vector_store_api_v1_vector_stores__vector_store_id__get",
@@ -3874,9 +3733,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "vector_stores"
-        ],
+        "tags": ["vector_stores"],
         "summary": "Delete Vector Store",
         "description": "Delete a vector store by ID.",
         "operationId": "delete_vector_store_api_v1_vector_stores__vector_store_id__delete",
@@ -3934,9 +3791,7 @@
         }
       },
       "put": {
-        "tags": [
-          "vector_stores"
-        ],
+        "tags": ["vector_stores"],
         "summary": "Add Items",
         "operationId": "add_items_api_v1_vector_stores__vector_store_id__put",
         "security": [
@@ -4014,9 +3869,7 @@
     },
     "/api/v1/vector_stores/{vector_store_id}/search": {
       "post": {
-        "tags": [
-          "vector_stores"
-        ],
+        "tags": ["vector_stores"],
         "summary": "Search With Vector",
         "description": "Search a vector store using either text or a vector.",
         "operationId": "search_with_vector_api_v1_vector_stores__vector_store_id__search_post",
@@ -4093,9 +3946,7 @@
     },
     "/api/v1/vector_stores/{vector_store_id}/documents": {
       "get": {
-        "tags": [
-          "vector_stores"
-        ],
+        "tags": ["vector_stores"],
         "summary": "List Documents",
         "description": "List all documents in a vector store.",
         "operationId": "list_documents_api_v1_vector_stores__vector_store_id__documents_get",
@@ -4162,9 +4013,7 @@
     },
     "/api/v1/vector_stores/{vector_store_id}/documents/{document_id}": {
       "delete": {
-        "tags": [
-          "vector_stores"
-        ],
+        "tags": ["vector_stores"],
         "summary": "Delete Document",
         "description": "Delete a document by ID.",
         "operationId": "delete_document_api_v1_vector_stores__vector_store_id__documents__document_id__delete",
@@ -4233,9 +4082,7 @@
     },
     "/api/v1/user_feedback": {
       "post": {
-        "tags": [
-          "user_feedback"
-        ],
+        "tags": ["user_feedback"],
         "summary": "User Feedback",
         "operationId": "user_feedback_api_v1_user_feedback_post",
         "security": [
@@ -4278,9 +4125,7 @@
         }
       },
       "get": {
-        "tags": [
-          "user_feedback"
-        ],
+        "tags": ["user_feedback"],
         "summary": "List User Feedback",
         "operationId": "list_user_feedback_api_v1_user_feedback_get",
         "security": [
@@ -4365,9 +4210,7 @@
     },
     "/api/v1/connectors/presets": {
       "get": {
-        "tags": [
-          "connectors"
-        ],
+        "tags": ["connectors"],
         "summary": "List Presets",
         "operationId": "list_presets_api_v1_connectors_presets_get",
         "responses": {
@@ -4394,9 +4237,7 @@
     },
     "/api/v1/connectors": {
       "get": {
-        "tags": [
-          "connectors"
-        ],
+        "tags": ["connectors"],
         "summary": "List Connectors",
         "operationId": "list_connectors_api_v1_connectors_get",
         "responses": {
@@ -4421,9 +4262,7 @@
         ]
       },
       "post": {
-        "tags": [
-          "connectors"
-        ],
+        "tags": ["connectors"],
         "summary": "Create Connector",
         "operationId": "create_connector_api_v1_connectors_post",
         "requestBody": {
@@ -4470,9 +4309,7 @@
     },
     "/api/v1/connectors/{connector_id}": {
       "get": {
-        "tags": [
-          "connectors"
-        ],
+        "tags": ["connectors"],
         "summary": "Read Connector",
         "operationId": "read_connector_api_v1_connectors__connector_id__get",
         "security": [
@@ -4519,9 +4356,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "connectors"
-        ],
+        "tags": ["connectors"],
         "summary": "Delete Connector",
         "operationId": "delete_connector_api_v1_connectors__connector_id__delete",
         "security": [
@@ -4563,9 +4398,7 @@
     },
     "/api/v1/connectors/{connector_id}/connect": {
       "post": {
-        "tags": [
-          "connectors"
-        ],
+        "tags": ["connectors"],
         "summary": "Connect Connector",
         "operationId": "connect_connector_api_v1_connectors__connector_id__connect_post",
         "security": [
@@ -4624,9 +4457,7 @@
     },
     "/api/v1/connectors/{connector_id}/disconnect": {
       "post": {
-        "tags": [
-          "connectors"
-        ],
+        "tags": ["connectors"],
         "summary": "Disconnect Connector",
         "operationId": "disconnect_connector_api_v1_connectors__connector_id__disconnect_post",
         "security": [
@@ -4675,9 +4506,7 @@
     },
     "/api/v1/connectors/{connector_id}/mcp": {
       "get": {
-        "tags": [
-          "connectors"
-        ],
+        "tags": ["connectors"],
         "summary": "Mcp",
         "operationId": "mcp_api_v1_connectors__connector_id__mcp_get",
         "security": [
@@ -4722,9 +4551,7 @@
         }
       },
       "post": {
-        "tags": [
-          "connectors"
-        ],
+        "tags": ["connectors"],
         "summary": "Mcp",
         "operationId": "mcp_api_v1_connectors__connector_id__mcp_post",
         "security": [
@@ -4771,9 +4598,7 @@
     },
     "/api/v1/connectors/oauth/callback": {
       "get": {
-        "tags": [
-          "connectors"
-        ],
+        "tags": ["connectors"],
         "summary": "Oauth Callback",
         "operationId": "oauth_callback_api_v1_connectors_oauth_callback_get",
         "parameters": [
@@ -4843,9 +4668,7 @@
     },
     "/.well-known/oauth-protected-resource/{resource}": {
       "get": {
-        "tags": [
-          "auth"
-        ],
+        "tags": ["auth"],
         "summary": "Protected Resource Metadata",
         "operationId": "protected_resource_metadata__well_known_oauth_protected_resource__resource__get",
         "parameters": [
@@ -4883,9 +4706,7 @@
     },
     "/.well-known/jwks": {
       "get": {
-        "tags": [
-          "auth"
-        ],
+        "tags": ["auth"],
         "summary": "Jwks",
         "operationId": "jwks__well_known_jwks_get",
         "responses": {
@@ -4952,9 +4773,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id"
-        ],
+        "required": ["id"],
         "title": "Audio",
         "description": "Data about a previous audio response from the model.\n[Learn more](https://platform.openai.com/docs/guides/audio)."
       },
@@ -4974,9 +4793,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "authorization_endpoint"
-        ],
+        "required": ["authorization_endpoint"],
         "title": "AuthorizationCodeRequest"
       },
       "Body_upload_file_api_v1_files_post": {
@@ -4988,9 +4805,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "file"
-        ],
+        "required": ["file"],
         "title": "Body_upload_file_api_v1_files_post"
       },
       "BuildConfiguration": {
@@ -5014,13 +4829,7 @@
       },
       "BuildState": {
         "type": "string",
-        "enum": [
-          "missing",
-          "in_progress",
-          "build_completed",
-          "completed",
-          "failed"
-        ],
+        "enum": ["missing", "in_progress", "build_completed", "completed", "failed"],
         "title": "BuildState"
       },
       "ChatCompletionAllowedToolChoiceParam": {
@@ -5035,10 +4844,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "allowed_tools",
-          "type"
-        ],
+        "required": ["allowed_tools", "type"],
         "title": "ChatCompletionAllowedToolChoiceParam",
         "description": "Constrains the tools available to the model to a pre-defined set."
       },
@@ -5046,10 +4852,7 @@
         "properties": {
           "mode": {
             "type": "string",
-            "enum": [
-              "auto",
-              "required"
-            ],
+            "enum": ["auto", "required"],
             "title": "Mode"
           },
           "tools": {
@@ -5062,10 +4865,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "mode",
-          "tools"
-        ],
+        "required": ["mode", "tools"],
         "title": "ChatCompletionAllowedToolsParam",
         "description": "Constrains the tools available to the model to a pre-defined set."
       },
@@ -5151,9 +4951,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "role"
-        ],
+        "required": ["role"],
         "title": "ChatCompletionAssistantMessageParam",
         "description": "Messages sent by the model in response to user messages."
       },
@@ -5161,14 +4959,7 @@
         "properties": {
           "format": {
             "type": "string",
-            "enum": [
-              "wav",
-              "aac",
-              "mp3",
-              "flac",
-              "opus",
-              "pcm16"
-            ],
+            "enum": ["wav", "aac", "mp3", "flac", "opus", "pcm16"],
             "title": "Format"
           },
           "voice": {
@@ -5178,28 +4969,14 @@
               },
               {
                 "type": "string",
-                "enum": [
-                  "alloy",
-                  "ash",
-                  "ballad",
-                  "coral",
-                  "echo",
-                  "sage",
-                  "shimmer",
-                  "verse",
-                  "marin",
-                  "cedar"
-                ]
+                "enum": ["alloy", "ash", "ballad", "coral", "echo", "sage", "shimmer", "verse", "marin", "cedar"]
               }
             ],
             "title": "Voice"
           }
         },
         "type": "object",
-        "required": [
-          "format",
-          "voice"
-        ],
+        "required": ["format", "voice"],
         "title": "ChatCompletionAudioParam",
         "description": "Parameters for audio output.\n\nRequired when audio output is requested with\n`modalities: [\"audio\"]`. [Learn more](https://platform.openai.com/docs/guides/audio)."
       },
@@ -5215,10 +4992,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "image_url",
-          "type"
-        ],
+        "required": ["image_url", "type"],
         "title": "ChatCompletionContentPartImageParam",
         "description": "Learn about [image inputs](https://platform.openai.com/docs/guides/vision)."
       },
@@ -5234,10 +5008,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "input_audio",
-          "type"
-        ],
+        "required": ["input_audio", "type"],
         "title": "ChatCompletionContentPartInputAudioParam",
         "description": "Learn about [audio inputs](https://platform.openai.com/docs/guides/audio)."
       },
@@ -5254,10 +5025,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "refusal",
-          "type"
-        ],
+        "required": ["refusal", "type"],
         "title": "ChatCompletionContentPartRefusalParam"
       },
       "ChatCompletionContentPartTextParam": {
@@ -5273,10 +5041,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "text",
-          "type"
-        ],
+        "required": ["text", "type"],
         "title": "ChatCompletionContentPartTextParam",
         "description": "Learn about [text inputs](https://platform.openai.com/docs/guides/text-generation)."
       },
@@ -5307,10 +5072,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "content",
-          "role"
-        ],
+        "required": ["content", "role"],
         "title": "ChatCompletionDeveloperMessageParam",
         "description": "Developer-provided instructions that the model should follow, regardless of\nmessages sent by the user. With o1 models and newer, `developer` messages\nreplace the previous `system` messages."
       },
@@ -5322,9 +5084,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "name"
-        ],
+        "required": ["name"],
         "title": "ChatCompletionFunctionCallOptionParam",
         "description": "Specifying a particular function via `{\"name\": \"my_function\"}` forces the model to call that function."
       },
@@ -5352,11 +5112,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "content",
-          "name",
-          "role"
-        ],
+        "required": ["content", "name", "role"],
         "title": "ChatCompletionFunctionMessageParam"
       },
       "ChatCompletionFunctionToolParam": {
@@ -5371,10 +5127,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "function",
-          "type"
-        ],
+        "required": ["function", "type"],
         "title": "ChatCompletionFunctionToolParam",
         "description": "A function tool that can be used to generate a response."
       },
@@ -5394,11 +5147,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "custom",
-          "type"
-        ],
+        "required": ["id", "custom", "type"],
         "title": "ChatCompletionMessageCustomToolCallParam",
         "description": "A call to a custom tool created by the model."
       },
@@ -5418,11 +5167,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "function",
-          "type"
-        ],
+        "required": ["id", "function", "type"],
         "title": "ChatCompletionMessageFunctionToolCallParam",
         "description": "A call to a function tool created by the model."
       },
@@ -5438,10 +5183,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "custom",
-          "type"
-        ],
+        "required": ["custom", "type"],
         "title": "ChatCompletionNamedToolChoiceCustomParam",
         "description": "Specifies a tool the model should use.\n\nUse to force the model to call a specific custom tool."
       },
@@ -5457,10 +5199,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "function",
-          "type"
-        ],
+        "required": ["function", "type"],
         "title": "ChatCompletionNamedToolChoiceParam",
         "description": "Specifies a tool the model should use.\n\nUse to force the model to call a specific function."
       },
@@ -5487,10 +5226,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "content",
-          "type"
-        ],
+        "required": ["content", "type"],
         "title": "ChatCompletionPredictionContentParam",
         "description": "Static predicted output content, such as the content of a text file that is\nbeing regenerated."
       },
@@ -5632,10 +5368,7 @@
             "anyOf": [
               {
                 "type": "string",
-                "enum": [
-                  "none",
-                  "auto"
-                ]
+                "enum": ["none", "auto"]
               },
               {
                 "$ref": "#/components/schemas/ChatCompletionFunctionCallOptionParam"
@@ -5726,10 +5459,7 @@
               {
                 "items": {
                   "type": "string",
-                  "enum": [
-                    "text",
-                    "audio"
-                  ]
+                  "enum": ["text", "audio"]
                 },
                 "type": "array"
               },
@@ -5786,14 +5516,7 @@
             "anyOf": [
               {
                 "type": "string",
-                "enum": [
-                  "none",
-                  "minimal",
-                  "low",
-                  "medium",
-                  "high",
-                  "xhigh"
-                ]
+                "enum": ["none", "minimal", "low", "medium", "high", "xhigh"]
               },
               {
                 "type": "null"
@@ -5833,13 +5556,7 @@
             "anyOf": [
               {
                 "type": "string",
-                "enum": [
-                  "auto",
-                  "default",
-                  "flex",
-                  "scale",
-                  "priority"
-                ]
+                "enum": ["auto", "default", "flex", "scale", "priority"]
               },
               {
                 "type": "null"
@@ -5911,11 +5628,7 @@
             "anyOf": [
               {
                 "type": "string",
-                "enum": [
-                  "none",
-                  "auto",
-                  "required"
-                ]
+                "enum": ["none", "auto", "required"]
               },
               {
                 "$ref": "#/components/schemas/ChatCompletionAllowedToolChoiceParam"
@@ -5991,10 +5704,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "messages",
-          "model"
-        ],
+        "required": ["messages", "model"],
         "title": "ChatCompletionRequest",
         "description": "Corresponds to args to OpenAI `client.chat.completions.create(...)`"
       },
@@ -6040,10 +5750,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "content",
-          "role"
-        ],
+        "required": ["content", "role"],
         "title": "ChatCompletionSystemMessageParam",
         "description": "Developer-provided instructions that the model should follow, regardless of\nmessages sent by the user. With o1 models and newer, use `developer` messages\nfor this purpose instead."
       },
@@ -6074,11 +5781,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "content",
-          "role",
-          "tool_call_id"
-        ],
+        "required": ["content", "role", "tool_call_id"],
         "title": "ChatCompletionToolMessageParam"
       },
       "ChatCompletionUserMessageParam": {
@@ -6121,10 +5824,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "content",
-          "role"
-        ],
+        "required": ["content", "role"],
         "title": "ChatCompletionUserMessageParam",
         "description": "Messages sent by an end user, containing prompts or additional context\ninformation."
       },
@@ -6210,9 +5910,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "url"
-        ],
+        "required": ["url"],
         "title": "ConnectorCreateRequest"
       },
       "ConnectorPresetResponse": {
@@ -6240,10 +5938,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "url",
-          "metadata"
-        ],
+        "required": ["url", "metadata"],
         "title": "ConnectorPresetResponse"
       },
       "ConnectorResponse": {
@@ -6341,12 +6036,7 @@
       },
       "ConnectorState": {
         "type": "string",
-        "enum": [
-          "created",
-          "auth_required",
-          "connected",
-          "disconnected"
-        ],
+        "enum": ["created", "auth_required", "connected", "disconnected"],
         "title": "ConnectorState"
       },
       "Context": {
@@ -6405,9 +6095,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "created_by"
-        ],
+        "required": ["created_by"],
         "title": "Context",
         "description": "A context that groups files and vector stores for LLM proxy token generation."
       },
@@ -6469,20 +6157,13 @@
           },
           "kind": {
             "type": "string",
-            "enum": [
-              "message",
-              "artifact"
-            ],
+            "enum": ["message", "artifact"],
             "title": "Kind",
             "readOnly": true
           }
         },
         "type": "object",
-        "required": [
-          "data",
-          "context_id",
-          "kind"
-        ],
+        "required": ["data", "context_id", "kind"],
         "title": "ContextHistoryItem"
       },
       "ContextHistoryItemCreateRequest": {
@@ -6509,9 +6190,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "metadata"
-        ],
+        "required": ["metadata"],
         "title": "ContextPatchMetadataRequest",
         "description": "Request schema for patching context metadata."
       },
@@ -6520,12 +6199,7 @@
           "files": {
             "items": {
               "type": "string",
-              "enum": [
-                "read",
-                "write",
-                "extract",
-                "*"
-              ]
+              "enum": ["read", "write", "extract", "*"]
             },
             "type": "array",
             "title": "Files"
@@ -6533,11 +6207,7 @@
           "vector_stores": {
             "items": {
               "type": "string",
-              "enum": [
-                "read",
-                "write",
-                "*"
-              ]
+              "enum": ["read", "write", "*"]
             },
             "type": "array",
             "title": "Vector Stores"
@@ -6545,11 +6215,7 @@
           "context_data": {
             "items": {
               "type": "string",
-              "enum": [
-                "read",
-                "write",
-                "*"
-              ]
+              "enum": ["read", "write", "*"]
             },
             "type": "array",
             "title": "Context Data"
@@ -6592,10 +6258,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "token",
-          "expires_at"
-        ],
+        "required": ["token", "expires_at"],
         "title": "ContextTokenResponse",
         "description": "Response schema for context token generation."
       },
@@ -6629,9 +6292,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "docker_image"
-        ],
+        "required": ["docker_image"],
         "title": "CreateDiscoveryRequest"
       },
       "CreateModelProviderRequest": {
@@ -6696,11 +6357,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "type",
-          "base_url",
-          "api_key"
-        ],
+        "required": ["type", "base_url", "api_key"],
         "title": "CreateModelProviderRequest"
       },
       "CreateProviderBuildRequest": {
@@ -6723,9 +6380,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "location"
-        ],
+        "required": ["location"],
         "title": "CreateProviderBuildRequest"
       },
       "CreateProviderRequest": {
@@ -6795,9 +6450,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "location"
-        ],
+        "required": ["location"],
         "title": "CreateProviderRequest"
       },
       "CreateVectorStoreRequest": {
@@ -6818,22 +6471,13 @@
           }
         },
         "type": "object",
-        "required": [
-          "name",
-          "dimension",
-          "model_id"
-        ],
+        "required": ["name", "dimension", "model_id"],
         "title": "CreateVectorStoreRequest",
         "description": "Request to create a new vector store."
       },
       "DiscoveryState": {
         "type": "string",
-        "enum": [
-          "pending",
-          "in_progress",
-          "completed",
-          "failed"
-        ],
+        "enum": ["pending", "in_progress", "completed", "failed"],
         "title": "DiscoveryState"
       },
       "DockerImageID": {
@@ -6846,10 +6490,7 @@
       },
       "DocumentType": {
         "type": "string",
-        "enum": [
-          "platform_file",
-          "external"
-        ],
+        "enum": ["platform_file", "external"],
         "title": "DocumentType"
       },
       "EmbeddingsRequest": {
@@ -6876,10 +6517,7 @@
             "anyOf": [
               {
                 "type": "string",
-                "enum": [
-                  "float",
-                  "base64"
-                ]
+                "enum": ["float", "base64"]
               },
               {
                 "type": "null"
@@ -6889,10 +6527,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "model",
-          "input"
-        ],
+        "required": ["model", "input"],
         "title": "EmbeddingsRequest",
         "description": "Corresponds to the arguments for OpenAI `client.embeddings.create(...)`."
       },
@@ -6921,9 +6556,7 @@
         },
         "additionalProperties": true,
         "type": "object",
-        "required": [
-          "name"
-        ],
+        "required": ["name"],
         "title": "EnvVar"
       },
       "ExtractedFileInfo": {
@@ -6945,18 +6578,13 @@
           }
         },
         "type": "object",
-        "required": [
-          "file_id"
-        ],
+        "required": ["file_id"],
         "title": "ExtractedFileInfo",
         "description": "Information about an extracted file."
       },
       "ExtractionFormat": {
         "type": "string",
-        "enum": [
-          "markdown",
-          "vendor_specific_json"
-        ],
+        "enum": ["markdown", "vendor_specific_json"],
         "title": "ExtractionFormat"
       },
       "ExtractionMetadata": {
@@ -6989,13 +6617,7 @@
       },
       "ExtractionStatus": {
         "type": "string",
-        "enum": [
-          "pending",
-          "in_progress",
-          "completed",
-          "failed",
-          "cancelled"
-        ],
+        "enum": ["pending", "in_progress", "completed", "failed", "cancelled"],
         "title": "ExtractionStatus"
       },
       "File-Input": {
@@ -7010,10 +6632,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "file",
-          "type"
-        ],
+        "required": ["file", "type"],
         "title": "File",
         "description": "Learn about [file inputs](https://platform.openai.com/docs/guides/text) for text generation."
       },
@@ -7084,11 +6703,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "filename",
-          "content_type",
-          "created_by"
-        ],
+        "required": ["filename", "content_type", "created_by"],
         "title": "File"
       },
       "FileFile": {
@@ -7181,10 +6796,7 @@
       },
       "FileType": {
         "type": "string",
-        "enum": [
-          "user_upload",
-          "extracted_text"
-        ],
+        "enum": ["user_upload", "extracted_text"],
         "title": "FileType"
       },
       "FunctionCall": {
@@ -7199,10 +6811,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "arguments",
-          "name"
-        ],
+        "required": ["arguments", "name"],
         "title": "FunctionCall",
         "description": "Deprecated and replaced by `tool_calls`.\n\nThe name and arguments of a function that should be called, as generated by the model."
       },
@@ -7234,9 +6843,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "name"
-        ],
+        "required": ["name"],
         "title": "FunctionDefinition"
       },
       "GithubRegistryLocation": {
@@ -7249,10 +6856,7 @@
       },
       "GithubVersionType": {
         "type": "string",
-        "enum": [
-          "head",
-          "tag"
-        ],
+        "enum": ["head", "tag"],
         "title": "GithubVersionType"
       },
       "GlobalPermissionGrant": {
@@ -7260,12 +6864,7 @@
           "files": {
             "items": {
               "type": "string",
-              "enum": [
-                "read",
-                "write",
-                "extract",
-                "*"
-              ]
+              "enum": ["read", "write", "extract", "*"]
             },
             "type": "array",
             "title": "Files"
@@ -7281,11 +6880,7 @@
           "vector_stores": {
             "items": {
               "type": "string",
-              "enum": [
-                "read",
-                "write",
-                "*"
-              ]
+              "enum": ["read", "write", "*"]
             },
             "type": "array",
             "title": "Vector Stores"
@@ -7323,11 +6918,7 @@
           "model_providers": {
             "items": {
               "type": "string",
-              "enum": [
-                "read",
-                "write",
-                "*"
-              ]
+              "enum": ["read", "write", "*"]
             },
             "type": "array",
             "title": "Model Providers"
@@ -7354,11 +6945,7 @@
           "providers": {
             "items": {
               "type": "string",
-              "enum": [
-                "read",
-                "write",
-                "*"
-              ]
+              "enum": ["read", "write", "*"]
             },
             "type": "array",
             "title": "Providers"
@@ -7366,11 +6953,7 @@
           "provider_variables": {
             "items": {
               "type": "string",
-              "enum": [
-                "read",
-                "write",
-                "*"
-              ]
+              "enum": ["read", "write", "*"]
             },
             "type": "array",
             "title": "Provider Variables"
@@ -7378,11 +6961,7 @@
           "contexts": {
             "items": {
               "type": "string",
-              "enum": [
-                "read",
-                "write",
-                "*"
-              ]
+              "enum": ["read", "write", "*"]
             },
             "type": "array",
             "title": "Contexts"
@@ -7390,11 +6969,7 @@
           "context_data": {
             "items": {
               "type": "string",
-              "enum": [
-                "read",
-                "write",
-                "*"
-              ]
+              "enum": ["read", "write", "*"]
             },
             "type": "array",
             "title": "Context Data"
@@ -7402,12 +6977,7 @@
           "connectors": {
             "items": {
               "type": "string",
-              "enum": [
-                "read",
-                "write",
-                "proxy",
-                "*"
-              ]
+              "enum": ["read", "write", "proxy", "*"]
             },
             "type": "array",
             "title": "Connectors"
@@ -7437,18 +7007,12 @@
           },
           "detail": {
             "type": "string",
-            "enum": [
-              "auto",
-              "low",
-              "high"
-            ],
+            "enum": ["auto", "low", "high"],
             "title": "Detail"
           }
         },
         "type": "object",
-        "required": [
-          "url"
-        ],
+        "required": ["url"],
         "title": "ImageURL"
       },
       "InputAudio": {
@@ -7459,18 +7023,12 @@
           },
           "format": {
             "type": "string",
-            "enum": [
-              "wav",
-              "mp3"
-            ],
+            "enum": ["wav", "mp3"],
             "title": "Format"
           }
         },
         "type": "object",
-        "required": [
-          "data",
-          "format"
-        ],
+        "required": ["data", "format"],
         "title": "InputAudio"
       },
       "InsertUserFeedbackRequest": {
@@ -7526,13 +7084,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "provider_id",
-          "task_id",
-          "context_id",
-          "rating",
-          "message"
-        ],
+        "required": ["provider_id", "task_id", "context_id", "rating", "message"],
         "title": "InsertUserFeedbackRequest",
         "description": "Request to create a user feedback."
       },
@@ -7564,9 +7116,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "name"
-        ],
+        "required": ["name"],
         "title": "JSONSchema",
         "description": "Structured Outputs configuration options, including a JSON Schema."
       },
@@ -7581,9 +7131,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "variables"
-        ],
+        "required": ["variables"],
         "title": "ListVariablesSchema"
       },
       "MatchModelsRequest": {
@@ -7612,9 +7160,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "capability"
-        ],
+        "required": ["capability"],
         "title": "MatchModelsRequest"
       },
       "Model": {
@@ -7656,18 +7202,12 @@
         },
         "additionalProperties": true,
         "type": "object",
-        "required": [
-          "id",
-          "provider"
-        ],
+        "required": ["id", "provider"],
         "title": "Model"
       },
       "ModelCapability": {
         "type": "string",
-        "enum": [
-          "llm",
-          "embedding"
-        ],
+        "enum": ["llm", "embedding"],
         "title": "ModelCapability"
       },
       "ModelProvider": {
@@ -7743,11 +7283,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "type",
-          "base_url",
-          "capabilities"
-        ],
+        "required": ["type", "base_url", "capabilities"],
         "title": "ModelProvider"
       },
       "ModelProviderInfo": {
@@ -7762,17 +7298,12 @@
           }
         },
         "type": "object",
-        "required": [
-          "capabilities"
-        ],
+        "required": ["capabilities"],
         "title": "ModelProviderInfo"
       },
       "ModelProviderState": {
         "type": "string",
-        "enum": [
-          "online",
-          "offline"
-        ],
+        "enum": ["online", "offline"],
         "title": "ModelProviderState"
       },
       "ModelProviderType": {
@@ -7815,10 +7346,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "model_id",
-          "score"
-        ],
+        "required": ["model_id", "score"],
         "title": "ModelWithScore"
       },
       "NetworkProviderLocation": {
@@ -7877,9 +7405,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "OpenAIPage[Model]"
       },
       "PaginatedResult_ConnectorPresetResponse_": {
@@ -7915,11 +7441,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "items",
-          "total_count",
-          "next_page_token"
-        ],
+        "required": ["items", "total_count", "next_page_token"],
         "title": "PaginatedResult[ConnectorPresetResponse]"
       },
       "PaginatedResult_ConnectorResponse_": {
@@ -7955,11 +7477,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "items",
-          "total_count",
-          "next_page_token"
-        ],
+        "required": ["items", "total_count", "next_page_token"],
         "title": "PaginatedResult[ConnectorResponse]"
       },
       "PaginatedResult_ContextHistoryItem_": {
@@ -7995,11 +7513,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "items",
-          "total_count",
-          "next_page_token"
-        ],
+        "required": ["items", "total_count", "next_page_token"],
         "title": "PaginatedResult[ContextHistoryItem]"
       },
       "PaginatedResult_Context_": {
@@ -8035,11 +7549,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "items",
-          "total_count",
-          "next_page_token"
-        ],
+        "required": ["items", "total_count", "next_page_token"],
         "title": "PaginatedResult[Context]"
       },
       "PaginatedResult_File_": {
@@ -8075,11 +7585,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "items",
-          "total_count",
-          "next_page_token"
-        ],
+        "required": ["items", "total_count", "next_page_token"],
         "title": "PaginatedResult[File]"
       },
       "PaginatedResult_ModelOutput_": {
@@ -8115,11 +7621,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "items",
-          "total_count",
-          "next_page_token"
-        ],
+        "required": ["items", "total_count", "next_page_token"],
         "title": "PaginatedResult[EntityModel.__class_getitem__.<locals>.ModelOutput]"
       },
       "PaginatedResult_ModelProvider_": {
@@ -8155,11 +7657,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "items",
-          "total_count",
-          "next_page_token"
-        ],
+        "required": ["items", "total_count", "next_page_token"],
         "title": "PaginatedResult[ModelProvider]"
       },
       "PaginatedResult_ModelWithScore_": {
@@ -8195,11 +7693,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "items",
-          "total_count",
-          "next_page_token"
-        ],
+        "required": ["items", "total_count", "next_page_token"],
         "title": "PaginatedResult[ModelWithScore]"
       },
       "PaginatedResult_ProviderBuild_": {
@@ -8235,11 +7729,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "items",
-          "total_count",
-          "next_page_token"
-        ],
+        "required": ["items", "total_count", "next_page_token"],
         "title": "PaginatedResult[ProviderBuild]"
       },
       "PaginatedResult_UserFeedbackResponse_": {
@@ -8275,11 +7765,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "items",
-          "total_count",
-          "next_page_token"
-        ],
+        "required": ["items", "total_count", "next_page_token"],
         "title": "PaginatedResult[UserFeedbackResponse]"
       },
       "PaginatedResult_VectorStoreDocument_": {
@@ -8315,11 +7801,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "items",
-          "total_count",
-          "next_page_token"
-        ],
+        "required": ["items", "total_count", "next_page_token"],
         "title": "PaginatedResult[VectorStoreDocument]"
       },
       "PaginatedResult_VectorStoreSearchResult_": {
@@ -8355,11 +7837,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "items",
-          "total_count",
-          "next_page_token"
-        ],
+        "required": ["items", "total_count", "next_page_token"],
         "title": "PaginatedResult[VectorStoreSearchResult]"
       },
       "PatchProviderRequest": {
@@ -8507,24 +7985,12 @@
           }
         },
         "type": "object",
-        "required": [
-          "status",
-          "source",
-          "destination",
-          "created_by",
-          "provider_origin"
-        ],
+        "required": ["status", "source", "destination", "created_by", "provider_origin"],
         "title": "ProviderBuild"
       },
       "ProviderDeploymentState": {
         "type": "string",
-        "enum": [
-          "missing",
-          "starting",
-          "ready",
-          "running",
-          "error"
-        ],
+        "enum": ["missing", "starting", "ready", "running", "error"],
         "title": "ProviderDeploymentState"
       },
       "ProviderDiscovery": {
@@ -8576,11 +8042,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "status",
-          "docker_image",
-          "created_by"
-        ],
+        "required": ["status", "docker_image", "created_by"],
         "title": "ProviderDiscovery"
       },
       "ProviderErrorMessage": {
@@ -8591,17 +8053,12 @@
           }
         },
         "type": "object",
-        "required": [
-          "message"
-        ],
+        "required": ["message"],
         "title": "ProviderErrorMessage"
       },
       "ProviderType": {
         "type": "string",
-        "enum": [
-          "managed",
-          "unmanaged"
-        ],
+        "enum": ["managed", "unmanaged"],
         "title": "ProviderType"
       },
       "ProviderWithState": {
@@ -8725,16 +8182,7 @@
         },
         "additionalProperties": true,
         "type": "object",
-        "required": [
-          "source",
-          "origin",
-          "created_by",
-          "agent_card",
-          "state",
-          "type",
-          "managed",
-          "env"
-        ],
+        "required": ["source", "origin", "created_by", "agent_card", "state", "type", "managed", "env"],
         "title": "ProviderWithState"
       },
       "ResolvedDockerImageID": {
@@ -8761,13 +8209,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "registry",
-          "repository",
-          "tag",
-          "digest",
-          "image_id"
-        ],
+        "required": ["registry", "repository", "tag", "digest", "image_id"],
         "title": "ResolvedDockerImageID"
       },
       "ResolvedGithubUrl": {
@@ -8809,13 +8251,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "org",
-          "repo",
-          "version",
-          "version_type",
-          "commit_hash"
-        ],
+        "required": ["org", "repo", "version", "version_type", "commit_hash"],
         "title": "ResolvedGithubUrl"
       },
       "ResponseFormatJSONObject": {
@@ -8827,9 +8263,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "type"
-        ],
+        "required": ["type"],
         "title": "ResponseFormatJSONObject",
         "description": "JSON object response format.\n\nAn older method of generating JSON responses.\nUsing `json_schema` is recommended for models that support it. Note that the\nmodel will not generate JSON without a system or user message instructing it\nto do so."
       },
@@ -8845,10 +8279,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "json_schema",
-          "type"
-        ],
+        "required": ["json_schema", "type"],
         "title": "ResponseFormatJSONSchema",
         "description": "JSON Schema response format.\n\nUsed to generate structured JSON responses.\nLearn more about [Structured Outputs](https://platform.openai.com/docs/guides/structured-outputs)."
       },
@@ -8861,9 +8292,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "type"
-        ],
+        "required": ["type"],
         "title": "ResponseFormatText",
         "description": "Default response format. Used to generate text responses."
       },
@@ -8886,9 +8315,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "query_vector"
-        ],
+        "required": ["query_vector"],
         "title": "SearchRequest",
         "description": "Request to search a vector store."
       },
@@ -8925,10 +8352,7 @@
       },
       "UnmanagedState": {
         "type": "string",
-        "enum": [
-          "online",
-          "offline"
-        ],
+        "enum": ["online", "offline"],
         "title": "UnmanagedState"
       },
       "UpdateConfigurationRequest": {
@@ -8974,9 +8398,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "provider_id"
-        ],
+        "required": ["provider_id"],
         "title": "UpdateProvider",
         "description": "Will update provider specified by ID"
       },
@@ -8999,9 +8421,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "variables"
-        ],
+        "required": ["variables"],
         "title": "UpdateVariablesRequest"
       },
       "User": {
@@ -9027,9 +8447,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "email"
-        ],
+        "required": ["email"],
         "title": "User"
       },
       "UserFeedbackResponse": {
@@ -9098,16 +8516,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "provider_id",
-          "task_id",
-          "context_id",
-          "rating",
-          "message",
-          "created_at",
-          "agent_name"
-        ],
+        "required": ["id", "provider_id", "task_id", "context_id", "rating", "message", "created_at", "agent_name"],
         "title": "UserFeedbackResponse"
       },
       "UserResponse": {
@@ -9132,21 +8541,12 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "email",
-          "role",
-          "created_at"
-        ],
+        "required": ["id", "email", "role", "created_at"],
         "title": "UserResponse"
       },
       "UserRole": {
         "type": "string",
-        "enum": [
-          "admin",
-          "developer",
-          "user"
-        ],
+        "enum": ["admin", "developer", "user"],
         "title": "UserRole"
       },
       "ValidationError": {
@@ -9182,11 +8582,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "loc",
-          "msg",
-          "type"
-        ],
+        "required": ["loc", "msg", "type"],
         "title": "ValidationError"
       },
       "VectorStoreDocument": {
@@ -9230,10 +8626,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "vector_store_id"
-        ],
+        "required": ["id", "vector_store_id"],
         "title": "VectorStoreDocument"
       },
       "VectorStoreItem": {
@@ -9292,11 +8685,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "document_id",
-          "text",
-          "embedding"
-        ],
+        "required": ["document_id", "text", "embedding"],
         "title": "VectorStoreItem",
         "description": "A single item in a vector store, containing text content and its vector embedding."
       },
@@ -9311,10 +8700,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "item",
-          "score"
-        ],
+        "required": ["item", "score"],
         "title": "VectorStoreSearchResult",
         "description": "Result of a vector store search operation containing full item data and similarity score."
       },
@@ -9330,10 +8716,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "usage_bytes",
-          "num_documents"
-        ],
+        "required": ["usage_bytes", "num_documents"],
         "title": "VectorStoreStats"
       },
       "VersionInfo": {
@@ -9366,11 +8749,7 @@
         "properties": {
           "search_context_size": {
             "type": "string",
-            "enum": [
-              "low",
-              "medium",
-              "high"
-            ],
+            "enum": ["low", "medium", "high"],
             "title": "Search Context Size"
           },
           "user_location": {
@@ -9400,10 +8779,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "approximate",
-          "type"
-        ],
+        "required": ["approximate", "type"],
         "title": "WebSearchOptionsUserLocation",
         "description": "Approximate location parameters for the search."
       },
@@ -9551,17 +8927,7 @@
         },
         "additionalProperties": true,
         "type": "object",
-        "required": [
-          "source",
-          "id",
-          "origin",
-          "created_by",
-          "agent_card",
-          "state",
-          "type",
-          "managed",
-          "env"
-        ],
+        "required": ["source", "id", "origin", "created_by", "agent_card", "state", "type", "managed", "env"],
         "title": "ProviderWithStateResponse"
       },
       "agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__10": {
@@ -9650,10 +9016,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "file_id"
-        ],
+        "required": ["id", "file_id"],
         "title": "TextExtractionResponse"
       },
       "agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__11": {
@@ -9742,10 +9105,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "file_id"
-        ],
+        "required": ["id", "file_id"],
         "title": "TextExtractionResponse"
       },
       "agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__12": {
@@ -9804,10 +9164,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "created_by"
-        ],
+        "required": ["id", "created_by"],
         "title": "ContextResponse"
       },
       "agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__13": {
@@ -9866,10 +9223,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "created_by"
-        ],
+        "required": ["id", "created_by"],
         "title": "ContextResponse"
       },
       "agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__14": {
@@ -9928,10 +9282,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "created_by"
-        ],
+        "required": ["id", "created_by"],
         "title": "ContextResponse"
       },
       "agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__15": {
@@ -9990,10 +9341,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "created_by"
-        ],
+        "required": ["id", "created_by"],
         "title": "ContextResponse"
       },
       "agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__16": {
@@ -10063,12 +9411,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "model_id",
-          "dimension",
-          "created_by"
-        ],
+        "required": ["id", "model_id", "dimension", "created_by"],
         "title": "VectorStoreResponse"
       },
       "agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__17": {
@@ -10138,12 +9481,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "model_id",
-          "dimension",
-          "created_by"
-        ],
+        "required": ["id", "model_id", "dimension", "created_by"],
         "title": "VectorStoreResponse"
       },
       "agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__2": {
@@ -10267,17 +9605,7 @@
         },
         "additionalProperties": true,
         "type": "object",
-        "required": [
-          "source",
-          "id",
-          "origin",
-          "created_by",
-          "agent_card",
-          "state",
-          "type",
-          "managed",
-          "env"
-        ],
+        "required": ["source", "id", "origin", "created_by", "agent_card", "state", "type", "managed", "env"],
         "title": "ProviderWithStateResponse"
       },
       "agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__3": {
@@ -10401,17 +9729,7 @@
         },
         "additionalProperties": true,
         "type": "object",
-        "required": [
-          "source",
-          "id",
-          "origin",
-          "created_by",
-          "agent_card",
-          "state",
-          "type",
-          "managed",
-          "env"
-        ],
+        "required": ["source", "id", "origin", "created_by", "agent_card", "state", "type", "managed", "env"],
         "title": "ProviderWithStateResponse"
       },
       "agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__4": {
@@ -10487,12 +9805,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "type",
-          "base_url",
-          "capabilities"
-        ],
+        "required": ["id", "type", "base_url", "capabilities"],
         "title": "ModelProviderResponse"
       },
       "agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__5": {
@@ -10568,12 +9881,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "type",
-          "base_url",
-          "capabilities"
-        ],
+        "required": ["id", "type", "base_url", "capabilities"],
         "title": "ModelProviderResponse"
       },
       "agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__6": {
@@ -10619,10 +9927,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "created_by"
-        ],
+        "required": ["id", "created_by"],
         "title": "SystemConfigurationResponse"
       },
       "agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__7": {
@@ -10668,10 +9973,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "created_by"
-        ],
+        "required": ["id", "created_by"],
         "title": "SystemConfigurationResponse"
       },
       "agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__8": {
@@ -10741,12 +10043,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "filename",
-          "content_type",
-          "created_by"
-        ],
+        "required": ["id", "filename", "content_type", "created_by"],
         "title": "FileResponse"
       },
       "agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__9": {
@@ -10816,12 +10113,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "filename",
-          "content_type",
-          "created_by"
-        ],
+        "required": ["id", "filename", "content_type", "created_by"],
         "title": "FileResponse"
       },
       "openai__types__chat__chat_completion_message_custom_tool_call_param__Custom": {
@@ -10836,10 +10128,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "input",
-          "name"
-        ],
+        "required": ["input", "name"],
         "title": "Custom",
         "description": "The custom tool that the model called."
       },
@@ -10855,10 +10144,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "arguments",
-          "name"
-        ],
+        "required": ["arguments", "name"],
         "title": "Function",
         "description": "The function that the model called."
       },
@@ -10870,9 +10156,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "name"
-        ],
+        "required": ["name"],
         "title": "Custom"
       },
       "openai__types__chat__chat_completion_named_tool_choice_param__Function": {
@@ -10883,9 +10167,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "name"
-        ],
+        "required": ["name"],
         "title": "Function"
       },
       "openai__types__chat__completion_create_params__Function": {
@@ -10905,9 +10187,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "name"
-        ],
+        "required": ["name"],
         "title": "Function"
       }
     },

@@ -103,7 +103,7 @@ async def main():
     """Run all examples."""
     try:
         # Note:
-        # - These examples assume the AgentStack server is running and you have proper authentication set up.
+        # - These examples assume the Kagenti ADK server is running and you have proper authentication set up.
         # - Repalce the example URLs and credentials with valid ones for your setup.
 
         # Uncomment the examples you want to run:
@@ -113,7 +113,7 @@ async def main():
         # await example_presets()
 
         print("\nTo run the examples, uncomment them in the main() function")
-        print("and ensure the AgentStack server is running with proper authentication.")
+        print("and ensure the Kagenti ADK server is running with proper authentication.")
 
     except Exception as e:
         print(f"Error: {e}")

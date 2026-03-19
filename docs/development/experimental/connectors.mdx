@@ -3,7 +3,7 @@ title: "MCP Connectors"
 description: "Create and manage data connections to external services"
 ---
 
-Connectors are remote MCP servers registered into the Agent Stack. Effectively, they take some responsibilities away from MCP Clients to improve user experience and reduce overhead within the Agent Stack.
+Connectors are remote MCP servers registered into the Kagenti ADK. Effectively, they take some responsibilities away from MCP Clients to improve user experience and reduce overhead within the Kagenti ADK.
 
 Once connector is created and connected, it can be used as any regular remote MCP server by both clients and agents.
 
@@ -134,7 +134,7 @@ To disable preset matching and provide all credentials manually, set `match_pres
 
 ### Configuring Presets
 
-Connector presets are configurable via Helm values when deploying Agent Stack. The presets are defined in the `connector.presets` section of `values.yaml`:
+Connector presets are configurable via Helm values when deploying Kagenti ADK. The presets are defined in the `connector.presets` section of `values.yaml`:
 
 #### Remote MCP Servers (HTTP/HTTPS)
 
@@ -169,7 +169,7 @@ After modifying preset configuration in Helm values, redeploy the platform for c
 
 ## Python SDK
 
-The AgentStack Python SDK provides a convenient wrapper around the connectors API, handling common patterns and reducing boilerplate. While it maps directly to API endpoints, the SDK adds extra functionality for smoother interaction patterns such as methods to wait until a connector reaches a desired state or until it is deleted.
+The Kagenti ADK Python SDK provides a convenient wrapper around the connectors API, handling common patterns and reducing boilerplate. While it maps directly to API endpoints, the SDK adds extra functionality for smoother interaction patterns such as methods to wait until a connector reaches a desired state or until it is deleted.
 
 ### Getting Started
 ```python

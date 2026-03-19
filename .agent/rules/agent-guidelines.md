@@ -1,17 +1,18 @@
 ---
 trigger: always_on
-description: "Project-specific guidelines and instructions for the AgentStack monorepo"
+description: "Project-specific guidelines and instructions for the Kagenti ADK monorepo"
 ---
 
-# AgentStack Project Guidelines
+# Kagenti ADK Project Guidelines
 
-This document contains critical instructions for working with the AgentStack monorepo.
+This document contains critical instructions for working with the Kagenti ADK monorepo.
 
 ## 1. Architecture Overview
 
 The platform consists of multiple K8s microservices:
 
-### AgentStack Server (`adk-server`)
+### Kagenti ADK server (`adk-server`)
+
 - **Core Orchestrator**: Manages APIs for agents, files, vector stores, and permissions (Context Service/JWT).
 - **Cluster Management**: Uses `kr8s` client to create K8s objects (deployments, services, secrets, build jobs, MCP servers).
 - **Infrastructure Integrations**:
@@ -25,11 +26,13 @@ The platform consists of multiple K8s microservices:
 - **Background Workers**: Uses procrastinate package to manage background workers and crons in postgresql.
 - **Permission System**: We use role-based permissions with caveats, this is described in detail in `docs/development/custom-ui/permissions-and-tokens.mdx`
 
-### AgentStack UI (`adk-ui`)
-- JavaScript frontend communicating with `agentstack-server`.
+### Kagenti ADK UI (`adk-ui`)
+
+- JavaScript frontend communicating with `adk-server`.
 - **Development**: Runs locally on `localhost:3000` or inside the cluster.
 
 ### Kagenti ADK (`adk-py`)
+
 - Python library for agents to interact with the server API.
 
 ### Infrastructure & Observability
@@ -47,6 +50,7 @@ The platform consists of multiple K8s microservices:
 ## 3. Development Environment ("Dev Mode")
 
 The "dev mode" stack is complex, utilizing **Lima** (VM), **Kubernetes**, and **Telepresence**.
+
 - **Startup**: It takes ~10 minutes to start (`mise run adk-server:dev:start`).
 - **Your Role**: **Do not attempt to start the stack yourself.** Ask the developer to ensure it is running if you need it.
 - **Verification**: Run `curl localhost:8333/healthcheck` to see if the stack is up.
@@ -55,6 +59,7 @@ The "dev mode" stack is complex, utilizing **Lima** (VM), **Kubernetes**, and **
 ## 4. Testing Strategies
 
 ### adk-server
+
 - **Dependencies**: Relies heavily on the full "dev mode" stack (infrastructure + server).
 - **E2E/Integration Tests**:
   - **Never** run these via `mise`.
@@ -63,6 +68,7 @@ The "dev mode" stack is complex, utilizing **Lima** (VM), **Kubernetes**, and **
 - **Unit/Dependency Checks**: You can use `uv run pytest` to check imports or specific logic that doesn't require the full stack.
 
 ### adk-py
+
 - **Independence**: Tests are completely independent of the dev stack/infrastructure.
 - **Execution**: Run freely using `uv run pytest` from the `apps/adk-py` directory.
 

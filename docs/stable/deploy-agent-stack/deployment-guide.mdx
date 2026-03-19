@@ -1,15 +1,15 @@
 ---
-title: "Agent Stack Deployment Guide"
-description: "Deploying Agent Stack"
+title: "Kagenti ADK Deployment Guide"
+description: "Deploying Kagenti ADK"
 ---
 
-This guide walks you through running Agent Stack in your own self-hosted environment so you can evaluate, develop, and integrate agents as backend services. Agent Stack provides a consistent runtime for agents—handling model access, storage, authentication, and service wiring—so teams can move from agent code to a running service with minimal setup. Agent Stack deploys with Kubernetes via our provided Helm chart, ensuring a standardized setup within your infrastructure.
+This guide walks you through running Kagenti ADK in your own self-hosted environment so you can evaluate, develop, and integrate agents as backend services. Kagenti ADK provides a consistent runtime for agents—handling model access, storage, authentication, and service wiring—so teams can move from agent code to a running service with minimal setup. Kagenti ADK deploys with Kubernetes via our provided Helm chart, ensuring a standardized setup within your infrastructure.
 
-Agent Stack is designed for trusted environments and early-stage integration work. It’s well suited for local development, shared team environments, and internal evaluation. It is not intended to be directly exposed to untrusted public traffic or used as a hardened, multi-tenant production platform today. If you’re evaluating Agent Stack for broader organizational use, deploy it behind your existing network and security boundaries.
+Kagenti ADK is designed for trusted environments and early-stage integration work. It’s well suited for local development, shared team environments, and internal evaluation. It is not intended to be directly exposed to untrusted public traffic or used as a hardened, multi-tenant production platform today. If you’re evaluating Kagenti ADK for broader organizational use, deploy it behind your existing network and security boundaries.
 
 If you’re an application or agent developer, this guide helps you get agents running in your deployment environment and callable from your application. If you’re part of a platform or IT team, this guide provides a concrete runtime to assess how agent services run inside your infrastructure using our Helm-based deployment, how they integrate with your security and observability tooling, and how they fit your deployment standards. 
 
-Proceed to the installation guide below to configure your environment and deploy the Agent Stack cluster.
+Proceed to the installation guide below to configure your environment and deploy the Kagenti ADK cluster.
 
 
 ## Requirements
@@ -21,7 +21,7 @@ Before deployment, ensure your environment meets these specifications:
 |**Tooling**  | Helm 3.8+ and kubectl configured|
 |**Storage**  | 20GB+ available for PostgreSQL|
 |**Providers**| API access for LLMs (OpenAI, Anthropic, etc.)|
-|**Agent Stack CLI**| Agent Stack CLI installed for post-deploy config|
+|**Kagenti ADK CLI**| Kagenti ADK CLI installed for post-deploy config|
 
 <Tip>
   **OpenShift Users**: Use the [OpenShift
@@ -30,7 +30,7 @@ Before deployment, ensure your environment meets these specifications:
 
 ## Deployment Steps
 ### 1. Generate Encryption Key
-Agent Stack requires an encryption key for secure data handling. Generate this using Python before creating your configuration file.
+Kagenti ADK requires an encryption key for secure data handling. Generate this using Python before creating your configuration file.
 
 ```shell
 # Option A: Using UV
@@ -223,7 +223,7 @@ If using OIDC (Bundled or External), you must expose the following endpoints pub
 <Warning>
 **Email Verification Required:** 
 
-Agent Stack requires the `email_verified` claim to be `true` in JWT tokens. Ensure:
+Kagenti ADK requires the `email_verified` claim to be `true` in JWT tokens. Ensure:
 - Users verify emails before authenticating
 - The `email_verified` claim is mapped to the token (included by default in the `email` scope)
 - External providers pass the email verification status correctly
@@ -233,7 +233,7 @@ Without verified emails, authentication will fail with "Verified email not found
 </Warning>
 
 <Accordion title="Keycloak Architecture & Roles">
-  The Agent Stack Keycloak integration is automatically provisioned with the following architecture:
+  The Kagenti ADK Keycloak integration is automatically provisioned with the following architecture:
 
   **Realm:** `agentstack`
 
@@ -261,7 +261,7 @@ To move beyond local port-forwarding, you must expose the following services usi
 
 ## Configuring External Services & Storage
 
-By default, Agent Stack includes PostgreSQL and SeaweedFS (S3-compatible storage). For production environments, it is highly recommended to use external, managed services.
+By default, Kagenti ADK includes PostgreSQL and SeaweedFS (S3-compatible storage). For production environments, it is highly recommended to use external, managed services.
 
 ### External PostgreSQL
 To use an external PostgreSQL instance, disable the built-in subchart and provide connection details. This is required if you prefer a managed database like AWS RDS or Google Cloud SQL.
@@ -307,7 +307,7 @@ SET hnsw.max_scan_tuples = 1000000;
 
 ### External S3 support
 
-You may want to have Agent Stack connect to an external object storage rather than installing seaweedfs inside
+You may want to have Kagenti ADK connect to an external object storage rather than installing seaweedfs inside
 your cluster. This chart allows you to specify credentials for an external storage streaming with the
 `externalS3`. You should also disable the seaweedfs installation with the `seaweedfs.enabled`
 option. 
@@ -386,7 +386,7 @@ rateLimit:
 
 ### Cross-Origin Resource Sharing Configuration
 
-Agent Stack supports Cross-Origin Resource Sharing (CORS) to allow web applications hosted on different domains to interact with the Agent Stack API.
+Kagenti ADK supports Cross-Origin Resource Sharing (CORS) to allow web applications hosted on different domains to interact with the Kagenti ADK API.
 
 ```yaml
 cors:
@@ -407,7 +407,7 @@ cors:
 ```
 
 - `cors.enabled`: Set to `true` to enable CORS. Default is `false`.
-- `cors.allowOrigins`: A list of origins (e.g., `http://localhost:3000`) that are allowed to make cross-site requests to the Agent Stack API.
+- `cors.allowOrigins`: A list of origins (e.g., `http://localhost:3000`) that are allowed to make cross-site requests to the Kagenti ADK API.
 - `cors.allowMethods`: A list of HTTP methods (e.g., `GET`, `POST`) that are allowed for cross-origin requests. Default is `["*"]`.
 - `cors.allowHeaders`: A list of HTTP request headers (e.g., `Content-Type`, `Authorization`) that can be used when making the actual cross-origin request. Default is `["*"]`.
 - `cors.allowCredentials`: Set to `true` to indicate that the client can send cookies and HTTP authentication credentials with the cross-origin request. Note that `allowOrigins` cannot be `["*"]` when `allowCredentials` is `true`. Default is `false`.
@@ -415,7 +415,7 @@ cors:
 
 
 ## Agent Management
-To manage agents within Agent Stack, you must configure how the platform accesses existing images, how it registers them for use, and how it builds new agents from source code.
+To manage agents within Kagenti ADK, you must configure how the platform accesses existing images, how it registers them for use, and how it builds new agents from source code.
 
 ### Configuring Private Access
 If your agent images or source code are hosted in private environments, you must provide authentication credentials to allow the cluster to retrieve them.
@@ -431,7 +431,7 @@ imagePullSecrets:
 
 #### Private GitHub Repositories
 
-For building agents from private or Enterprise GitHub repositories, Agent Stack supports both [Personal Access Token (PAT)](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) and [GitHub Apps](https://docs.github.com/en/apps/creating-github-apps/about-creating-github-apps/about-creating-github-apps). This configuration enables the build engine to clone your source code.
+For building agents from private or Enterprise GitHub repositories, Kagenti ADK supports both [Personal Access Token (PAT)](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) and [GitHub Apps](https://docs.github.com/en/apps/creating-github-apps/about-creating-github-apps/about-creating-github-apps). This configuration enables the build engine to clone your source code.
 
 ```yaml
 github:
@@ -535,7 +535,7 @@ If your infrastructure has specific requirements (such as custom sidecars, uniqu
 ### Management Commands
 
 ### Upgrading
-Once Agent Stack is running, use these Helm and `kubectl` commands to manage the lifecycle of your deployment.
+Once Kagenti ADK is running, use these Helm and `kubectl` commands to manage the lifecycle of your deployment.
 
 | Task | Command |
 |------|---------|

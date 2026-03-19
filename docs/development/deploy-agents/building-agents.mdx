@@ -8,7 +8,7 @@ You can clone it and start coding right away—no setup headaches or boilerplate
 
 ## Prerequisites
 
-- Agent Stack installed ([Quickstart](../introduction/quickstart)) and the platform running with `agentstack platform start`
+- Kagenti ADK installed ([Quickstart](../introduction/quickstart)) and the platform running with `kagenti-adk platform start`
 - [uv](https://docs.astral.sh/uv/) package manager (should be already installed if you followed the quickstart)
 
 ## 1.  Start From Template
@@ -30,7 +30,7 @@ cd my-agent
 </Tabs>
 </Step>
 
-<Step title="Run the Server and Autoregister with Agent Stack">
+<Step title="Run the Server and Autoregister with Kagenti ADK">
 
 ```bash
 uv run server
@@ -49,7 +49,7 @@ uv run watchfiles agentstack_agents.agent.run
 In another terminal:
 
 ```bash
-agentstack run example_agent "Alice"
+kagenti-adk run example_agent "Alice"
 ```
 </Step>
 </Steps>
@@ -127,7 +127,7 @@ Agents should be async and use `yield`. This allows the server to stream respons
 
 <Accordion title="Manual Project Configuration">
 
-If you prefer not to use our starter template, you must ensure your project includes these core components to integrate correctly with the Agent Stack platform.
+If you prefer not to use our starter template, you must ensure your project includes these core components to integrate correctly with the Kagenti ADK platform.
 - The SDK Inegration
     - Add kagenti-adk to your project dependencies.
     - Your code must initialize a Server() instance from the SDK.
@@ -136,7 +136,7 @@ If you prefer not to use our starter template, you must ensure your project incl
 - Containerization Requirements
     - If you plan to deploy your agent to the platform (rather than just running it locally), your repository must contain a `Dockerfile`
 - Git and Platform Metadata
-    - The repository must be accessible to the Agent Stack orchestrator if you are using the `agentstack add` command via URL.
+    - The repository must be accessible to the Kagenti ADK orchestrator if you are using the `kagenti-adk add` command via URL.
     - Use Git tags (e.g., v1.0.0) if you want to manage stable releases of your agent.
 
 </Accordion>
