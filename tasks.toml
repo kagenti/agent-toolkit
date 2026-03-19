@@ -145,7 +145,7 @@ set -euxo pipefail
 
 if [[ ! "$*" =~ 'ui.enabled=false' ]]; then
     {{ mise_bin }} run adk-ui:build
-    UI_TAG="--set agentstack:ui.image.tag=local"
+    UI_TAG="--set kagenti-adk:ui.image.tag=local"
 fi
 
 if [[ -n "${KAGENTI_ADK_RUNNING_INSIDE_VM-}" ]]; then
@@ -166,8 +166,8 @@ fi
 {{ mise_bin }} run adk-cli:run -- platform start -v \
     ${LIMA_IMAGE_FLAG-} \
     --image-pull-mode="$PULL_MODE" \
-    --set agentstack:auth.nextauthDevUrl="http://localhost:3000" \
-    --set agentstack:server.image.tag=local \
+    --set kagenti-adk:auth.nextauthDevUrl="http://localhost:3000" \
+    --set kagenti-adk:server.image.tag=local \
     ${UI_TAG-} "$@"
 """
 
