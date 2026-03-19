@@ -2,7 +2,7 @@
 
 Use this reference for mapping agent configuration variables and handling secrets safely.
 
-Read the documentation first: [Environment Variables](https://agentstack.beeai.dev/stable/agent-integration/env-variables.md), [Manage Runtime Secrets](https://agentstack.beeai.dev/stable/agent-integration/secrets.md)
+Read the documentation first: [Environment Variables](https://github.com/kagenti/adk/blob/main/docs/stable/agent-integration/env-variables.mdx), [Manage Runtime Secrets](https://github.com/kagenti/adk/blob/main/docs/stable/agent-integration/secrets.mdx)
 
 ## Configuration Mapping Rule
 
@@ -20,7 +20,7 @@ If you identify variables, you must decide how to handle them. Use the following
 
 If a third-party integration can truly run anonymously and the credential is optional, preserve optional behavior and do not force a secret demand.
 
-**API Tools & Environment Variables Constraint**: Third-party library integrations often implicitly depend on standard environment variables, which will fail in the AgentStack wrapper sandbox. You must systematically identify these required credentials, extract them using the `SecretsExtension`, and pass them explicitly as named parameters to component constructors.
+**API Tools & Environment Variables Constraint**: Third-party library integrations often implicitly depend on standard environment variables, which will fail in the Kagenti ADK wrapper sandbox. You must systematically identify these required credentials, extract them using the `SecretsExtension`, and pass them explicitly as named parameters to component constructors.
 
 **IMPORTANT CAUTION**: If you are unsure which extension to use for a particular secret or environment variable (especially regarding API keys to external services), **always ask the user** before making structural changes.
 
@@ -28,13 +28,13 @@ If a third-party integration can truly run anonymously and the credential is opt
 
 > [!CAUTION]
 > **NEVER ASSIGN SECRETS TO `os.environ`!**
-> Setting `os.environ["KEY"] = value` is a critical security vulnerability in AgentStack. The platform runs multiple isolated agent instances in a shared environment (multi-tenant infrastructure). Modifying the global OS environment exposes the private keys of one user to every other concurrent execution on the same pod.
+> Setting `os.environ["KEY"] = value` is a critical security vulnerability in Kagenti ADK. The platform runs multiple isolated agent instances in a shared environment (multi-tenant infrastructure). Modifying the global OS environment exposes the private keys of one user to every other concurrent execution on the same pod.
 
 Instead, pass the secret value directly to the function or class that requires it (e.g., as a client constructor argument: `Client(api_key=secret_value)`). This prevents global side effects and ensures that secrets are correctly scoped to the specific execution context.
 
 ## Requesting Secrets (Required)
 
-Follow the official guide: [Manage Runtime Secrets](https://agentstack.beeai.dev/stable/agent-integration/secrets.md).
+Follow the official guide: [Manage Runtime Secrets](https://github.com/kagenti/adk/blob/main/docs/stable/agent-integration/secrets.mdx).
 
 - Declare required secrets with the Secrets extension.
 - Before using a secret, check whether it is present in `secret_fulfillments` and request it if missing:

@@ -32,9 +32,9 @@ Scan the original code for: `open()`, `pathlib.Path.read_*()`, `with open(...)`,
 4. Load file content via `file.load_content()` (raw bytes) or `file.load_text_content()` (extracted text).
 5. The platform `File` API requires `PlatformApiExtensionSpec` declared as an agent parameter (see Step 7 extensions table).
 
-**Important:** The exact calling conventions for `load_content()`, `load_text_content()`, `create_extraction()`, and `get_extraction()` **MUST** be verified by reading the [Working with Files](https://agentstack.beeai.dev/stable/agent-integration/files.md) documentation before implementation. Do not guess return types, async patterns, or attribute names.
+**Important:** The exact calling conventions for `load_content()`, `load_text_content()`, `create_extraction()`, and `get_extraction()` **MUST** be verified by reading the [Working with Files](https://github.com/kagenti/adk/blob/main/docs/stable/agent-integration/files.mdx) documentation before implementation. Do not guess return types, async patterns, or attribute names.
 
-See the [form agent](https://github.com/i-am-bee/agentstack/blob/main/agents/form/src/form/agent.py) for `FileField` usage and the [Working with Files](https://agentstack.beeai.dev/stable/agent-integration/files.md) guide for the full File API.
+See the [form agent](https://github.com/kagenti/adk/blob/main/agents/form/src/form/agent.py) for `FileField` usage and the [Working with Files](https://github.com/kagenti/adk/blob/main/docs/stable/agent-integration/files.mdx) guide for the full File API.
 
 ## Default MIME Type Strategy
 
@@ -202,13 +202,13 @@ When the `FileField` accepts multiple MIME types, the agent handler must branch 
 
 Do not assume all uploaded files are plain text. Always check `content_type` before choosing the loading strategy.
 
-See the [Text extraction](https://agentstack.beeai.dev/stable/agent-integration/rag.md#text-extraction) section of the RAG guide for the full extraction pipeline and API details.
+See the [Text extraction](https://github.com/kagenti/adk/blob/main/docs/stable/agent-integration/rag.mdx#text-extraction) section of the RAG guide for the full extraction pipeline and API details.
 
 ## Mid-Conversation File Uploads (Multi-Turn)
 
 For multi-turn agents receiving files during conversation (not via initial form), files arrive as `FilePart` entries in A2A message history. Extract them by filtering `FilePart` with `FileWithUri`, parsing the `agentstack://` URI via `PlatformFileUrl`, and resolving with `File.get()`.
 
-See the [Working with Files](https://agentstack.beeai.dev/stable/agent-integration/files.md) guide for the full API and examples.
+See the [Working with Files](https://github.com/kagenti/adk/blob/main/docs/stable/agent-integration/files.mdx) guide for the full API and examples.
 
 ## Final Validation Checks
 

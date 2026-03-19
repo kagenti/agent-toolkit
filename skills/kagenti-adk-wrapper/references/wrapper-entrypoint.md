@@ -4,11 +4,11 @@ Use this reference for wrapper creation and server entrypoint implementation.
 
 Create a new file (e.g., `agent.py`) with wrapping code, adapting original inputs without altering core business logic. Prefer additive files and minimal adapters. Preserve legacy HTTP contract endpoints if asserted by tests.
 
-Follow the wrapping pattern from the official guide: **[Wrap Your Existing Agents](https://agentstack.beeai.dev/stable/deploy-agents/wrap-existing-agents.md)**
+Follow the wrapping pattern from the official guide: **[Wrap Your Existing Agents](https://github.com/kagenti/adk/blob/main/docs/stable/deploy-agents/wrap-existing-agents.mdx)**
 
-For building agents from scratch or understanding the full server pattern: **[Build New Agents](https://agentstack.beeai.dev/stable/deploy-agents/building-agents.md)**
+For building agents from scratch or understanding the full server pattern: **[Build New Agents](https://github.com/kagenti/adk/blob/main/docs/stable/deploy-agents/building-agents.mdx)**
 
-Real-world examples of wrapped agents are available at: **[agents/ on GitHub](https://github.com/i-am-bee/agentstack/tree/main/agents)**
+Real-world examples of wrapped agents are available at: **[agents/ on GitHub](https://github.com/kagenti/adk/tree/main/agents)**
 
 ## Metadata Extraction
 
@@ -16,7 +16,7 @@ Before writing the code, analyze the original source (docstrings, CLI help, READ
 
 - **Identity**: Set a user-friendly `name` and `version`.
 - **Documentation**: Use `documentation_url` pointing to the source.
-- **Detail**: Populate `AgentDetail` with `interaction_mode` (Step 2; must be either `"multi-turn"` or `"single-turn"`), `tools`, `author` (must be a dictionary, e.g., `{"name": "agentstack"}`), and `programming_language`.
+- **Detail**: Populate `AgentDetail` with `interaction_mode` (Step 2; must be either `"multi-turn"` or `"single-turn"`), `tools`, `author` (must be a dictionary, e.g., `{"name": "kagenti-adk"}`), and `programming_language`.
 - **Skills**: Define `AgentSkill` entries with `id`, `name`, `description`, `tags`, and `examples`.
 - **Function Docstring**: The wrapper function's docstring should be a concise summary shown in registries.
 - **Extensions**: Identify if the agent needs optional platform capabilities (Step 8) like Citations, Secrets, or Trajectory.
@@ -25,7 +25,7 @@ Before writing the code, analyze the original source (docstrings, CLI help, READ
 
 | Element                                      | Purpose                                                                                                       |
 | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `Server()`                                   | Creates the Agent Stack server instance                                                                       |
+| `Server()`                                   | Creates the Kagenti ADK server instance                                                                       |
 | `@server.agent()`                            | Registers the function as an agent; function name becomes agent ID, docstring becomes description             |
 | `input: Message`                             | A2A message from the caller; use `get_message_text(input)` (`from a2a.utils.message import get_message_text`) |
 | `context: RunContext`                        | Execution context (`task_id`, `context_id`, session store, history)                                           |
