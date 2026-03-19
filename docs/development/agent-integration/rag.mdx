@@ -171,7 +171,7 @@ the result. After extraction is completed, the `extraction` object will contain
 
 {/* <!-- embedme examples/agent-integration/rag/simple-rag-agent/src/simple_rag_agent/extraction.py--> */}
 ```python
-# Copyright 2025 © Kagenti a Series of LF Projects, LLC
+# Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
 
 import asyncio
@@ -207,7 +207,7 @@ This will split a long document into reasonably sized chunks based on the Markdo
 
 {/* <!-- embedme examples/agent-integration/rag/simple-rag-agent/src/simple_rag_agent/text_splitting.py--> */}
 ```python
-# Copyright 2025 © Kagenti a Series of LF Projects, LLC
+# Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
 
 from langchain_text_splitters import MarkdownTextSplitter
@@ -226,7 +226,7 @@ to create an `AsyncOpenAI` client:
 
 {/* <!-- embedme examples/agent-integration/rag/simple-rag-agent/src/simple_rag_agent/embedding/client.py--> */}
 ```python
-# Copyright 2025 © Kagenti a Series of LF Projects, LLC
+# Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
 
 from kagenti_adk.a2a.extensions import EmbeddingServiceExtensionServer
@@ -253,7 +253,7 @@ Now we can use this client to generate embeddings for our chunks and create vect
 
 {/* <!-- embedme examples/agent-integration/rag/simple-rag-agent/src/simple_rag_agent/embedding/embed.py--> */}
 ```python
-# Copyright 2025 © Kagenti a Series of LF Projects, LLC
+# Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
 
 from kagenti_adk.platform import File, VectorStoreItem
@@ -291,7 +291,7 @@ it in advance, we will create a test embedding request to calculate the dimensio
 
 {/* <!-- embedme examples/agent-integration/rag/simple-rag-agent/src/simple_rag_agent/vector_store/create.py--> */}
 ```python
-# Copyright 2025 © Kagenti a Series of LF Projects, LLC
+# Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
 
 from kagenti_adk.platform import VectorStore
@@ -318,7 +318,7 @@ query. The following function will retrieve five document chunks most similar to
 
 {/* <!-- embedme examples/agent-integration/rag/simple-rag-agent/src/simple_rag_agent/vector_store/search.py--> */}
 ```python
-# Copyright 2025 © Kagenti a Series of LF Projects, LLC
+# Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
 
 from kagenti_adk.platform import VectorStore, VectorStoreSearchResult
@@ -349,7 +349,7 @@ user query as `TextPart`. A new vector store is created for each message.
 
 {/* <!-- embedme examples/agent-integration/rag/simple-rag-agent/src/simple_rag_agent/agent.py--> */}
 ```python
-# Copyright 2025 © Kagenti a Series of LF Projects, LLC
+# Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
 
 import json
@@ -461,7 +461,7 @@ messages so you can ask multiple queries and or additional documents later on.
 
 {/* <!-- embedme examples/agent-integration/rag/conversation-rag-agent/src/conversation_rag_agent/agent.py--> */}
 ```python
-# Copyright 2025 © Kagenti a Series of LF Projects, LLC
+# Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
 
 

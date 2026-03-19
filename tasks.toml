@@ -92,7 +92,7 @@ depends = ["common:check:*"]
 
 ["common:check:license"]
 dir = "{{config_root}}"
-run = "addlicense -check -l apache -s=only -c '© BeeAI a Series of LF Projects, LLC' $(fd '\\.(py|[jt]sx?|html|s?css)$')"
+run = "addlicense -check -l apache -s=only -c '© IBM Corp.' $(fd '\\.(py|[jt]sx?|html|s?css)$')"
 
 ["common:check:version"]
 dir = "{{config_root}}"
@@ -123,7 +123,7 @@ depends = ["common:fix:*"]
 
 ["common:fix:license"]
 dir = "{{config_root}}"
-run = "addlicense -l apache -s=only -c '© BeeAI a Series of LF Projects, LLC' $(fd '\\.(py|[jt]sx?|html|s?css)$')"
+run = "addlicense -l apache -s=only -c '© IBM Corp.' $(fd '\\.(py|[jt]sx?|html|s?css)$')"
 
 ## test
 
