@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-declare module '@i-am-bee/lint-config/eslint' {
+declare module '@kagenti/adk-lint-config/eslint' {
   import type { Linter } from 'eslint';
 
   const config: Linter.Config[];
@@ -13,7 +13,7 @@ declare module '@i-am-bee/lint-config/eslint' {
   export default config;
 }
 
-declare module '@i-am-bee/lint-config/prettier' {
+declare module '@kagenti/adk-lint-config/prettier' {
   import type { Config } from 'prettier';
 
   const config: Config;
@@ -21,7 +21,7 @@ declare module '@i-am-bee/lint-config/prettier' {
   export default config;
 }
 
-declare module '@i-am-bee/lint-config/stylelint' {
+declare module '@kagenti/adk-lint-config/stylelint' {
   import type { Config } from 'stylelint';
 
   const config: Config;

@@ -5,7 +5,7 @@
 
 /** @type {import('stylelint').Config} */
 const config = {
-  extends: ['@i-am-bee/lint-config/stylelint'],
+  extends: ['@kagenti/adk-lint-config/stylelint'],
 };
 
 export default config;

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import baseConfig from '@i-am-bee/lint-config/eslint';
+import baseConfig from '@kagenti/adk-lint-config/eslint';
 import { defineConfig } from 'eslint/config';
 import reactHooks from 'eslint-plugin-react-hooks';
 
