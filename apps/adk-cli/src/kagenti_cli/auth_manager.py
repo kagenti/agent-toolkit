@@ -160,7 +160,7 @@ class AuthManager:
         server: str,
         username: str,
         password: str,
-        client_id: str = "agentstack-cli",
+        client_id: str = "kagenti-cli",
     ) -> AuthToken:
         """Authenticate using resource owner password grant (direct access)."""
         oauth_metadata = await self.fetch_oauth_protected_resource_metadata(server)

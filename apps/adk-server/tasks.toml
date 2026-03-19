@@ -209,7 +209,7 @@ run = """
 #!/bin/bash
 eval "cli_args=(${usage_cli_args})"
 {{ mise_bin }} run --force helm:build
-{{ mise_bin }} run --force agentstack-cli:build:copy-helm-chart
+{{ mise_bin }} run --force adk-cli:build:copy-helm-chart
 SKIP_PULL=true {{ mise_bin }} run adk-server:dev:start "${cli_args[@]}"
 """
 
@@ -228,7 +228,7 @@ dir = "{{config_root}}/apps/adk-server"
 usage = 'flag "--vm-name <vm_name>" default="agentstack-local-dev"'
 run = """
 VM_NAME="${usage_vm_name?}"
-{{ mise_bin }} run agentstack-cli:run -- platform delete --vm-name="$VM_NAME"
+{{ mise_bin }} run adk-cli:run -- platform delete --vm-name="$VM_NAME"
 """
 
 ["adk-server:dev:connect"]
@@ -325,9 +325,9 @@ set -euxo pipefail
 
 VM_NAME=e2e-test-run
 
-export AGENTSTACK__USERNAME=admin
-export AGENTSTACK__PASSWORD=admin
-export AGENTSTACK__CLIENT_ID=agentstack-cli
+export KAGENTI_ADK_USERNAME=admin
+export KAGENTI_ADK_PASSWORD=admin
+export KAGENTI_ADK_CLIENT_ID=kagenti-cli
 
 NO_CLEAN="${usage_no_clean:-false}"
 if [ "$NO_CLEAN" != "true" ]; then
@@ -353,7 +353,7 @@ eval "$( {{ mise_bin }} run agentstack:shell --vm-name="$VM_NAME" )"
 if [ -z "${TEST_AGENT_IMAGE:-}" ]; then
     echo "Building test agent..."
     TEST_AGENT_IMAGE=registry.cr-system.svc.cluster.local:5000/chat-test:latest
-    {{ mise_bin }} run agentstack-cli:run -- build -v "${PWD}/../.." --dockerfile "${PWD}/../../agents/chat/Dockerfile" --tag ${TEST_AGENT_IMAGE} --vm-name=${VM_NAME}
+    {{ mise_bin }} run adk-cli:run -- build -v "${PWD}/../.." --dockerfile "${PWD}/../../agents/chat/Dockerfile" --tag ${TEST_AGENT_IMAGE} --vm-name=${VM_NAME}
 fi
 export TEST_AGENT_IMAGE
 
@@ -373,9 +373,9 @@ if [ $result -ne 0 ]; then
 fi
 
 if [ "$NO_CLEAN" != "true" ]; then
-    {{ mise_bin }} run agentstack-cli:run -- platform delete --vm-name=${VM_NAME}
+    {{ mise_bin }} run adk-cli:run -- platform delete --vm-name=${VM_NAME}
 else
-    {{ mise_bin }} run agentstack-cli:run -- platform stop --vm-name=${VM_NAME}
+    {{ mise_bin }} run adk-cli:run -- platform stop --vm-name=${VM_NAME}
 fi
 
 rm -f "$CONFIG_FILE"
@@ -392,9 +392,9 @@ run = """
 #!/bin/bash
 VM_NAME=e2e-examples-test-run
 
-export AGENTSTACK__USERNAME=admin
-export AGENTSTACK__PASSWORD=admin
-export AGENTSTACK__CLIENT_ID=agentstack-cli
+export KAGENTI_ADK_USERNAME=admin
+export KAGENTI_ADK_PASSWORD=admin
+export KAGENTI_ADK_CLIENT_ID=kagenti-cli
 
 NO_CLEAN="${usage_no_clean:-false}"
 if [ "$NO_CLEAN" != "true" ]; then
@@ -440,9 +440,9 @@ if [ $result -ne 0 ]; then
 fi
 
 if [ "$NO_CLEAN" != "true" ]; then
-    {{ mise_bin }} run agentstack-cli:run -- platform delete --vm-name=${VM_NAME}
+    {{ mise_bin }} run adk-cli:run -- platform delete --vm-name=${VM_NAME}
 else
-    {{ mise_bin }} run agentstack-cli:run -- platform stop --vm-name=${VM_NAME}
+    {{ mise_bin }} run adk-cli:run -- platform stop --vm-name=${VM_NAME}
 fi
 
 rm -f "$CONFIG_FILE"

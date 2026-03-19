@@ -7,8 +7,8 @@ import sys
 
 from InquirerPy import inquirer
 
-from agentstack_cli.configuration import Configuration
-from agentstack_cli.console import console
+from kagenti_cli.configuration import Configuration
+from kagenti_cli.console import console
 
 
 def require_active_server() -> str:
@@ -17,7 +17,7 @@ def require_active_server() -> str:
         return url
     console.error("No server selected.")
     console.hint(
-        "Run [green]agentstack platform start[/green] to start a local server, or [green]agentstack server login[/green] to connect to a remote one."
+        "Run [green]kagenti-adk platform start[/green] to start a local server, or [green]kagenti-adk server login[/green] to connect to a remote one."
     )
     sys.exit(1)
 

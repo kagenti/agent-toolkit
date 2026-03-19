@@ -11,9 +11,9 @@ from kagenti_adk.platform import User
 from kagenti_adk.platform.user import UserRole
 from rich.table import Column
 
-from agentstack_cli.async_typer import AsyncTyper, console, create_table
-from agentstack_cli.configuration import Configuration
-from agentstack_cli.server_utils import announce_server_action, confirm_server_action
+from kagenti_cli.async_typer import AsyncTyper, console, create_table
+from kagenti_cli.configuration import Configuration
+from kagenti_cli.server_utils import announce_server_action, confirm_server_action
 
 app = AsyncTyper()
 configuration = Configuration()

@@ -42,7 +42,7 @@ Edit `[env]` in `mise.local.toml` in the project root ([documentation](https://m
 
 ### Running the platform from source
 
-Starting up the platform using the CLI (`agentstack platform start`, even `mise agentstack-cli:run -- platform start`)
+Starting up the platform using the CLI (`kagenti-adk platform start`, even `mise adk-cli:run -- platform start`)
 will use
 **published images** by default. To use local images, you need to build them and import them into the platform.
 
@@ -53,7 +53,7 @@ mise agentstack:start
 ```
 
 This will build the images (`adk-server` and `agentstack-ui`) and import them to the cluster. You can add other
-CLI arguments as you normally would when using `agentstack` CLI, for example:
+CLI arguments as you normally would when using `kagenti-adk` CLI, for example:
 
 ```shell
 mise agentstack:start --set docling.enabled=true --set oidc.enabled=true 
@@ -151,7 +151,7 @@ After the command succeeds, you can:
   `curl http://<service-name>:<service-port>`.
 * connect to postgresql using the default credentials `postgresql://agentstack-user:password@postgresql:5432/agentstack`
 * now you can start your server from your IDE or using `mise run adk-server:run` on port **18333**
-* run agentstack-cli using `mise agentstack-cli:run -- <command>` or HTTP requests to localhost:8333 or localhost:18333
+* run kagenti-adk using `mise adk-cli:run -- <command>` or HTTP requests to localhost:8333 or localhost:18333
   * localhost:8333 is port-forwarded from the cluster, so any requests will pass through the cluster networking to the
       agentstack pod, which is replaced by telepresence and forwarded back to your local machine to port 18333
   * localhost:18333 is where your local platform should be running
@@ -202,7 +202,7 @@ Make sure to have this model running locally.
 eval "$(mise run adk-server:dev:shell)"
 
 # Start platform
-mise agentstack-cli:run -- platform start --vm-name=agentstack-local-dev # optional --tag [tag] --import-images
+mise adk-cli:run -- platform start --vm-name=agentstack-local-dev # optional --tag [tag] --import-images
 mise x -- telepresence helm install
 mise x -- telepresence connect
 
@@ -222,7 +222,7 @@ mise x -- telepresence quit
 If you want to run this local setup against Ollama you must use a special option when setting up the LLM:
 
 ```
-agentstack model setup --use-true-localhost
+kagenti-adk model setup --use-true-localhost
 ```
 
 ### Examples
@@ -290,8 +290,8 @@ in [Running and debugging individual components](#running-and-debugging-individu
 #### CLI
 
 ```sh
-mise agentstack-cli:run -- agent list
-mise agentstack-cli:run -- agent run website_summarizer "summarize beeai.dev"
+mise adk-cli:run -- agent list
+mise adk-cli:run -- agent run website_summarizer "summarize beeai.dev"
 ```
 
 #### UI
@@ -346,7 +346,7 @@ There are two documentation folders: `docs/stable` and `docs/development`. Due t
 
 All PRs **must** either include corresponding documentation in `docs/development`, or include `[x] No Docs Needed` in the PR description. This is checked by GitHub Actions.
 
-Special care needs to be taken with the `docs/development/reference/cli-reference.mdx` file, which is automatically generated. Use `mise run agentstack-cli:docs` to regenerate this file when modifying the CLI interface.
+Special care needs to be taken with the `docs/development/reference/cli-reference.mdx` file, which is automatically generated. Use `mise run adk-cli:docs` to regenerate this file when modifying the CLI interface.
 
 Try to follow this structure:
 

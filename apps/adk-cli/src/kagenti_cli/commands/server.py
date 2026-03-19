@@ -21,8 +21,8 @@ from fastapi.responses import HTMLResponse
 from InquirerPy import inquirer
 from InquirerPy.base.control import Choice
 
-from agentstack_cli.async_typer import AsyncTyper, console
-from agentstack_cli.configuration import Configuration
+from kagenti_cli.async_typer import AsyncTyper, console
+from kagenti_cli.configuration import Configuration
 
 app = AsyncTyper()
 
@@ -54,7 +54,7 @@ async def _wait_for_auth_code(port: int = 9001) -> str:
             </head>
             <body>
                 <h1>Login successful!</h1>
-                <p>You can safely close this tab and return to the Agent Stack CLI.</p>
+                <p>You can safely close this tab and return to the Kagenti ADK CLI.</p>
             </body>
             </html>
             """,
@@ -287,7 +287,7 @@ async def server_login(
                     message="Enter Client ID:",
                     instruction=f"(Redirect URI: {REDIRECT_URI})",
                 ).execute_async()
-                or "agentstack-cli"
+                or "kagenti-cli"
             )
             if not client_id:
                 raise RuntimeError("Client ID is mandatory. Action cancelled.")
@@ -376,7 +376,7 @@ def server_show():
     if not config.auth_manager.active_server:
         console.info("No server selected.")
         console.hint(
-            "Run [green]agentstack server list[/green] to list available servers, and [green]agentstack server login[/green] to select one."
+            "Run [green]kagenti-adk server list[/green] to list available servers, and [green]kagenti-adk server login[/green] to select one."
         )
         return
     console.info(f"Active server: [cyan]{config.auth_manager.active_server}[/cyan]")
@@ -387,7 +387,7 @@ def server_list():
     if not config.auth_manager.servers:
         console.info("No servers found.")
         console.hint(
-            "Run [green]agentstack platform start[/green] to start a local server, or [green]agentstack server login[/green] to connect to a remote one."
+            "Run [green]kagenti-adk platform start[/green] to start a local server, or [green]kagenti-adk server login[/green] to connect to a remote one."
         )
         return
     for server in config.auth_manager.servers:

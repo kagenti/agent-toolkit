@@ -16,11 +16,11 @@ ADK server runs in a Kubernetes cluster inside Lima VM. Use mise scripts for loc
 |--------|---------|
 | Start dev cluster (user should do) | `mise run adk-server:dev:start` |
 | Run server locally (you should do) | `mise run adk-server:run` |
-| Run CLI | `mise run agentstack-cli:run -- <command>` |
-| CLI help | `mise run agentstack-cli:run -- --help` |
+| Run CLI | `mise run adk-cli:run -- <command>` |
+| CLI help | `mise run adk-cli:run -- --help` |
 
 ## Example
 
 ```bash
-mise run agentstack-cli:run -- list
+mise run adk-cli:run -- list
 ```

@@ -103,7 +103,7 @@ version=$(
   {
     yq -r .version              helm/Chart.yaml
     yq -r .appVersion           helm/Chart.yaml
-    yq -r .project.version      apps/agentstack-cli/pyproject.toml
+    yq -r .project.version      apps/adk-cli/pyproject.toml
     yq -r .project.version      apps/adk-py/pyproject.toml
     yq -r .version              apps/adk-ts/package.json
     yq -r .project.version      apps/adk-server/pyproject.toml
@@ -148,7 +148,7 @@ if [[ ! "$*" =~ 'ui.enabled=false' ]]; then
     UI_TAG="--set agentstack:ui.image.tag=local"
 fi
 
-if [[ -n "${AGENTSTACK__RUNNING_INSIDE_VM-}" ]]; then
+if [[ -n "${KAGENTI_ADK_RUNNING_INSIDE_VM-}" ]]; then
   PULL_MODE="skip"
 elif [[ -n "${CI-}" ]]; then
   PULL_MODE="hybrid"
@@ -158,12 +158,12 @@ else
   PULL_MODE="host"
 fi
 
-if [[ -z "${AGENTSTACK__RUNNING_INSIDE_VM-}" ]]; then
+if [[ -z "${KAGENTI_ADK_RUNNING_INSIDE_VM-}" ]]; then
   ARCH=$(uname -m | sed -e 's/arm64/aarch64/' -e 's/amd64/x86_64/')
   LIMA_IMAGE_FLAG="--lima-image={{config_root}}/apps/microshift-vm/dist/$ARCH/microshift-vm-$ARCH.qcow2"
 fi
 
-{{ mise_bin }} run agentstack-cli:run -- platform start -v \
+{{ mise_bin }} run adk-cli:run -- platform start -v \
     ${LIMA_IMAGE_FLAG-} \
     --image-pull-mode="$PULL_MODE" \
     --set agentstack:auth.nextauthDevUrl="http://localhost:3000" \
@@ -172,10 +172,10 @@ fi
 """
 
 ["agentstack:delete"]
-run = "{{ mise_bin }} run agentstack-cli:run -- platform delete"
+run = "{{ mise_bin }} run adk-cli:run -- platform delete"
 
 ["agentstack:stop"]
-run = "{{ mise_bin }} run agentstack-cli:run -- platform stop"
+run = "{{ mise_bin }} run adk-cli:run -- platform stop"
 
 ["agentstack:stop-all"]
 usage = 'flag "--except <except>" default=""'
@@ -186,11 +186,11 @@ run = """
 EXCEPT="${usage_except?}"
 
 {% raw %}
-TO_STOP="$(LIMA_HOME=~/.agentstack/lima limactl list -f '{{.Name}};{{.Status}}' | grep -v "Stopped" | cut -d';' -f1 2>/dev/null | sed '/^[^a-z]*$/d' | sed "/^$EXCEPT$/d")"
+TO_STOP="$(LIMA_HOME=~/.kagenti/adk/lima limactl list -f '{{.Name}};{{.Status}}' | grep -v "Stopped" | cut -d';' -f1 2>/dev/null | sed '/^[^a-z]*$/d' | sed "/^$EXCEPT$/d")"
 {% endraw %}
 
 {% raw %}
-echo "$TO_STOP" | xargs -rn 1 -I"{}" mise run agentstack-cli:run -- platform stop --vm-name="{}"
+echo "$TO_STOP" | xargs -rn 1 -I"{}" mise run adk-cli:run -- platform stop --vm-name="{}"
 {% endraw %}
 """
 
@@ -206,7 +206,7 @@ deactivate () {
   # Restore LIMA_HOME to its original state (set or unset)
   [[ -n "\\${__OLD_LIMA_HOME:-}" ]] && export LIMA_HOME="\\$__OLD_LIMA_HOME" || unset LIMA_HOME
   [[ -n "\\${__OLD_KUBECONFIG:-}" ]] && export KUBECONFIG="\\$__OLD_KUBECONFIG" || unset KUBECONFIG
-  [[ -n "\\${__OLD_ADMIN_PASSWORD:-}" ]] && export AGENTSTACK__ADMIN_PASSWORD="\\$__OLD_ADMIN_PASSWORD" || unset AGENTSTACK__ADMIN_PASSWORD
+  [[ -n "\\${__OLD_ADMIN_PASSWORD:-}" ]] && export KAGENTI_ADK_ADMIN_PASSWORD="\\$__OLD_ADMIN_PASSWORD" || unset KAGENTI_ADK_ADMIN_PASSWORD
 
   # Clean up the backup values
   unset __OLD_PS1
@@ -227,8 +227,8 @@ export __OLD_PS1="\\${PS1:-}"
 export __OLD_LIMA_HOME="\\${LIMA_HOME:-}"
 export __OLD_KUBECONFIG="\\${KUBECONFIG:-}"
 
-export KUBECONFIG="\\${AGENTSTACK__HOME:-\\${HOME}/.agentstack}/lima/${usage_vm_name?}/copied-from-guest/kubeconfig.yaml"
-export LIMA_HOME=\\${AGENTSTACK__HOME:-\\${HOME}/.agentstack}/lima
+export KUBECONFIG="\\${KAGENTI_ADK_HOME:-\\${HOME}/.kagenti/adk}/lima/${usage_vm_name?}/copied-from-guest/kubeconfig.yaml"
+export LIMA_HOME=\\${KAGENTI_ADK_HOME:-\\${HOME}/.kagenti/adk}/lima
 export PS1="(${usage_vm_name?}) \\${__OLD_PS1}"
 EOF
 """
@@ -379,7 +379,7 @@ git push
 set -x
 git checkout main
 git pull
-perl -pi -e "s/^(LATEST_AGENTSTACK_VERSION=).*/\${1}$current_version/" install.sh
+perl -pi -e "s/^(LATEST_KAGENTI_ADK_VERSION=).*/\${1}$current_version/" install.sh
 git add install.sh
 git commit --signoff --no-verify -m "chore: update install.sh prerelease version to v$current_version"
 git push
@@ -436,8 +436,8 @@ echo -e "✅ Pushed tag $publish_version to \x1b[36morigin/$release_branch\x1b[0
 set -x
 git checkout main
 git pull
-perl -pi -e "s/^(LATEST_AGENTSTACK_VERSION=).*/\${1}$publish_version/" install.sh
-perl -pi -e "s/^(LATEST_STABLE_AGENTSTACK_VERSION=).*/\${1}$publish_version/" install.sh
+perl -pi -e "s/^(LATEST_KAGENTI_ADK_VERSION=).*/\${1}$publish_version/" install.sh
+perl -pi -e "s/^(LATEST_STABLE_KAGENTI_ADK_VERSION=).*/\${1}$publish_version/" install.sh
 git add install.sh
 git commit --signoff --no-verify -m "chore: update install.sh version to v$publish_version"
 git push

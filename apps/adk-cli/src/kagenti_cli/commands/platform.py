@@ -34,10 +34,10 @@ from tenacity import (
     wait_fixed,
 )
 
-from agentstack_cli.async_typer import AsyncTyper
-from agentstack_cli.configuration import Configuration
-from agentstack_cli.console import console
-from agentstack_cli.utils import get_local_github_token, merge, run_command, verbosity
+from kagenti_cli.async_typer import AsyncTyper
+from kagenti_cli.configuration import Configuration
+from kagenti_cli.console import console
+from kagenti_cli.utils import get_local_github_token, merge, run_command, verbosity
 
 app = AsyncTyper()
 configuration = Configuration()
@@ -45,7 +45,7 @@ configuration = Configuration()
 
 @functools.cache
 def detect_driver() -> typing.Literal["lima", "wsl"]:
-    has_lima = (importlib.resources.files("agentstack_cli") / "data" / "bin" / "limactl").is_file() or shutil.which("limactl")
+    has_lima = (importlib.resources.files("kagenti_cli") / "data" / "bin" / "limactl").is_file() or shutil.which("limactl")
     arch = "aarch64" if platform_module.machine().lower() == "arm64" else platform_module.machine().lower()
 
     if platform_module.system() == "Windows" or shutil.which("wsl.exe"):
@@ -90,7 +90,7 @@ def detect_export_import_paths() -> tuple[str, str]:
 
 @functools.cache
 def detect_limactl() -> str:
-    bundled = importlib.resources.files("agentstack_cli") / "data" / "bin" / "limactl"
+    bundled = importlib.resources.files("kagenti_cli") / "data" / "bin" / "limactl"
     return str(bundled) if bundled.is_file() else str(shutil.which("limactl"))
 
 
@@ -105,7 +105,7 @@ async def detect_vm_status(vm_name: str) -> typing.Literal["running", "stopped",
     if detect_driver() == "lima":
         result = await run_command(
             [detect_limactl(), "--tty=false", "list", "--format=json"],
-            "Looking for existing Agent Stack platform",
+            "Looking for existing Kagenti ADK platform",
             env={"LIMA_HOME": str(Configuration().lima_home)},
             cwd="/",
         )
@@ -115,7 +115,7 @@ async def detect_vm_status(vm_name: str) -> typing.Literal["running", "stopped",
     else:
         wsl_env = {"WSL_UTF8": "1", "WSLENV": os.getenv("WSLENV", "") + ":WSL_UTF8"}
         for status, cmd in [("running", ["--running"]), ("stopped", [])]:
-            if vm_name in (await run_command(["wsl.exe", "--list", "--quiet", *cmd], f"Looking for {status} Agent Stack platform", env=wsl_env)).stdout.decode().splitlines():
+            if vm_name in (await run_command(["wsl.exe", "--list", "--quiet", *cmd], f"Looking for {status} Kagenti ADK platform", env=wsl_env)).stdout.decode().splitlines():
                 return typing.cast(typing.Literal["running", "stopped"], status)
     return "missing"
 
@@ -221,7 +221,7 @@ def parse_scoped_set_values(set_values_list: list[str]) -> dict[str, list[str]]:
     return result
 
 
-@app.command("start", help="Start Agent Stack platform. [Local only]")
+@app.command("start", help="Start Kagenti ADK platform. [Local only]")
 async def start_cmd(
     set_values_list: typing.Annotated[
         list[str],
@@ -261,7 +261,7 @@ async def start_cmd(
     skip_login: typing.Annotated[bool, typer.Option(hidden=True)] = False,
     no_wait_for_platform: typing.Annotated[bool, typer.Option(hidden=True)] = False,
 ):
-    import agentstack_cli.commands.server
+    import kagenti_cli.commands.server
 
     if values_file and not await anyio.Path(values_file).is_file():
         raise FileNotFoundError(f"Values file {values_file} not found.")
@@ -273,7 +273,7 @@ async def start_cmd(
     scoped_sets = parse_scoped_set_values(set_values_list)
 
     with verbosity(verbose):
-        version = importlib.metadata.version("agentstack-cli").replace("rc", "-rc")
+        version = importlib.metadata.version("kagenti-cli").replace("rc", "-rc")
         arch = "x86_64" if platform_module.machine().lower() in ["x86_64", "amd64"] else "aarch64"
         Configuration().home.mkdir(exist_ok=True)
         if Configuration().running_inside_vm:
@@ -291,7 +291,7 @@ async def start_cmd(
 
                             total_memory_gib = psutil.virtual_memory().total // (1024**3)
                             if total_memory_gib < 4:
-                                console.error("Not enough memory. Agent Stack platform requires at least 4 GB of RAM.")
+                                console.error("Not enough memory. Kagenti ADK platform requires at least 4 GB of RAM.")
                                 sys.exit(1)
                             if total_memory_gib < 8:
                                 console.warning("Less than 8 GB of RAM detected. Performance may be degraded.")
@@ -350,7 +350,7 @@ async def start_cmd(
                 case "wsl":
                     if (await run_command(["wsl.exe", "--status"], "Checking for WSL2", check=False)).returncode != 0:
                         console.error(
-                            "WSL is not installed. Please follow the Agent Stack installation instructions: https://agentstack.beeai.dev/stable/introduction/quickstart#windows"
+                            "WSL is not installed. Please follow the Kagenti ADK installation instructions: https://agentstack.beeai.dev/stable/introduction/quickstart#windows"
                         )
                         console.hint(
                             "Run [green]wsl.exe --install[/green] as administrator. If you just did this, restart your PC and run the same command again. Full installation may require up to two restarts. WSL is properly set up once you reach a working Linux terminal. You can verify this by running [green]wsl.exe[/green] without arguments."
@@ -385,7 +385,7 @@ async def start_cmd(
                             config.write(f)
                             if platform_module.system() == "Linux":
                                 console.warning(
-                                    "WSL networking mode updated. Please close WSL, run [green]wsl --shutdown[/green] from PowerShell, re-open WSL and run [green]agentstack platform start[/green] again."
+                                    "WSL networking mode updated. Please close WSL, run [green]wsl --shutdown[/green] from PowerShell, re-open WSL and run [green]kagenti-adk platform start[/green] again."
                                 )
                                 sys.exit(1)
                             await run_command(["wsl.exe", "--shutdown"], "Updating WSL2 networking")
@@ -421,8 +421,8 @@ async def start_cmd(
                                 ["wsl.exe", "--import", vm_name, str(install_dir), current_wsl_image],
                                 "Importing WSL distribution",
                             )
-                        await run_command(["wsl.exe", "--terminate", vm_name], "Restarting Agent Stack VM")
-                    await run_in_vm(vm_name, ["/usr/bin/setsid", "-f", "/usr/bin/sleep", "infinity"], "Ensuring persistence of Agent Stack VM")
+                        await run_command(["wsl.exe", "--terminate", vm_name], "Restarting Kagenti ADK VM")
+                    await run_in_vm(vm_name, ["/usr/bin/setsid", "-f", "/usr/bin/sleep", "infinity"], "Ensuring persistence of Kagenti ADK VM")
                     await run_in_vm(
                         vm_name,
                         [
@@ -440,7 +440,7 @@ async def start_cmd(
         )
         kubeconfig_local = anyio.Path(Configuration().lima_home / vm_name / "copied-from-guest" / "kubeconfig.yaml")
         await kubeconfig_local.parent.mkdir(parents=True, exist_ok=True)
-        await kubeconfig_local.write_text((await run_in_vm(vm_name, ["cat", "/var/lib/microshift/resources/kubeadmin/kubeconfig"], "Copying kubeconfig from Agent Stack platform")).stdout.decode())
+        await kubeconfig_local.write_text((await run_in_vm(vm_name, ["cat", "/var/lib/microshift/resources/kubeadmin/kubeconfig"], "Copying kubeconfig from Kagenti ADK platform")).stdout.decode())
         await run_in_vm(
             vm_name,
             ["bash", "-c", 'command -v helm && exit 0; case $(uname -m) in x86_64) ARCH="amd64" ;; aarch64) ARCH="arm64" ;; esac; curl -fsSL "https://get.helm.sh/helm-v4.1.1-linux-${ARCH}.tar.gz" | tar -xzf - --strip-components=1 -C /usr/local/bin "linux-${ARCH}/helm"; chmod +x /usr/local/bin/helm'],
@@ -451,7 +451,7 @@ async def start_cmd(
             vm_name,
             ["bash", "-c", "cat >/tmp/agentstack-chart.tgz"],
             "Preparing Helm chart",
-            input=(importlib.resources.files("agentstack_cli") / "data" / "helm-chart.tgz").read_bytes(),
+            input=(importlib.resources.files("kagenti_cli") / "data" / "helm-chart.tgz").read_bytes(),
         )
         await run_in_vm(
             vm_name,
@@ -650,7 +650,7 @@ async def start_cmd(
                             )
                             + "\nwait",
                         ],
-                        f"Importing image{'' if len(images_to_import_from_host) == 1 else 's'} {', '.join(images_to_import_from_host)} into Agent Stack platform",
+                        f"Importing image{'' if len(images_to_import_from_host) == 1 else 's'} {', '.join(images_to_import_from_host)} into Kagenti ADK platform",
                     )
                 finally:
                     await anyio.Path(host_path).unlink(missing_ok=True)
@@ -769,7 +769,7 @@ async def start_cmd(
                 "--wait",
                 *(f"--set={v}" for v in scoped_sets["agentstack"]),
             ],
-            "Deploying Agent Stack platform with Helm",
+            "Deploying Kagenti ADK platform with Helm",
         )
         await run_in_vm(
             vm_name,
@@ -808,7 +808,7 @@ async def start_cmd(
         )
 
         if not no_wait_for_platform:
-            with console.status("Waiting for Agent Stack platform to be ready...", spinner="dots"):
+            with console.status("Waiting for Kagenti ADK platform to be ready...", spinner="dots"):
                 async with httpx.AsyncClient() as client:
                     try:
                         async for attempt in AsyncRetrying(
@@ -829,7 +829,7 @@ async def start_cmd(
             ["bash", "-c", "kubectl wait --for=condition=Complete job/keycloak-provision -n agentstack --timeout=300s"],
             "Waiting for Keycloak provisioning to complete",
         )
-        console.success("Agent Stack platform started successfully!")
+        console.success("Kagenti ADK platform started successfully!")
         if phoenix_enabled:
             console.print(
                 "\nLicense Notice:\nPhoenix (provided by kagenti) is licensed under the Elastic License v2 (ELv2),\n"
@@ -840,11 +840,11 @@ async def start_cmd(
             )
 
         if not skip_login:
-            await agentstack_cli.commands.server.server_login("http://agentstack-api.localtest.me:8080")
+            await kagenti_cli.commands.server.server_login("http://agentstack-api.localtest.me:8080")
 
 
 
-@app.command("stop", help="Stop Agent Stack platform. [Local only]")
+@app.command("stop", help="Stop Kagenti ADK platform. [Local only]")
 async def stop_cmd(
     vm_name: typing.Annotated[str, typer.Option(hidden=True)] = "agentstack",
     verbose: typing.Annotated[bool, typer.Option("-v", "--verbose", help="Show verbose output")] = False,
@@ -860,25 +860,25 @@ async def stop_cmd(
                 ["sudo", "systemctl", "stop", "microshift"],
                 "Stopping MicroShift service",
             )
-            console.success("Agent Stack platform stopped successfully.")
+            console.success("Kagenti ADK platform stopped successfully.")
             return
         if await detect_vm_status(vm_name) == "missing":
-            console.info("Agent Stack platform not found. Nothing to stop.")
+            console.info("Kagenti ADK platform not found. Nothing to stop.")
             return
         if detect_driver() == "lima":
             await run_command(
                 [detect_limactl(), "--tty=false", "stop", "--force", vm_name],
-                "Stopping Agent Stack VM",
+                "Stopping Kagenti ADK VM",
                 env={"LIMA_HOME": str(Configuration().lima_home)},
                 cwd="/",
             )
         else:
-            await run_command(["wsl.exe", "--terminate", vm_name], "Stopping Agent Stack VM")
-        console.success("Agent Stack platform stopped successfully.")
+            await run_command(["wsl.exe", "--terminate", vm_name], "Stopping Kagenti ADK VM")
+        console.success("Kagenti ADK platform stopped successfully.")
 
 
 
-@app.command("delete", help="Delete Agent Stack platform. [Local only]")
+@app.command("delete", help="Delete Kagenti ADK platform. [Local only]")
 async def delete_cmd(
     vm_name: typing.Annotated[str, typer.Option(hidden=True)] = "agentstack",
     verbose: typing.Annotated[bool, typer.Option("-v", "--verbose", help="Show verbose output")] = False,
@@ -899,23 +899,23 @@ async def delete_cmd(
                 ["sudo", "bash", "-c", "rm -rf /var/lib/microshift/*"],
                 "Removing MicroShift data",
             )
-            console.success("Agent Stack platform deleted successfully.")
+            console.success("Kagenti ADK platform deleted successfully.")
             return
         if detect_driver() == "lima":
             await run_command(
                 [detect_limactl(), "--tty=false", "delete", "--force", vm_name],
-                "Deleting Agent Stack platform",
+                "Deleting Kagenti ADK platform",
                 env={"LIMA_HOME": str(Configuration().lima_home)},
                 check=False,
                 cwd="/",
             )
         else:
-            await run_command(["wsl.exe", "--unregister", vm_name], "Deleting Agent Stack platform", check=False)
-        console.success("Agent Stack platform deleted successfully.")
+            await run_command(["wsl.exe", "--unregister", vm_name], "Deleting Kagenti ADK platform", check=False)
+        console.success("Kagenti ADK platform deleted successfully.")
 
 
 
-@app.command("import", help="Import a local docker image into the Agent Stack platform. [Local only]")
+@app.command("import", help="Import a local docker image into the Kagenti ADK platform. [Local only]")
 async def import_cmd(
     tag: typing.Annotated[str, typer.Argument(help="Docker image tag to import")],
     vm_name: typing.Annotated[str, typer.Option(hidden=True)] = "agentstack",
@@ -923,7 +923,7 @@ async def import_cmd(
 ):
     with verbosity(verbose):
         if (await detect_vm_status(vm_name)) != "running":
-            console.error("Agent Stack platform is not running.")
+            console.error("Kagenti ADK platform is not running.")
             sys.exit(1)
         if Configuration().running_inside_vm:
             console.info("Running inside VM — images are already available to CRI-O via shared storage.")
@@ -934,14 +934,14 @@ async def import_cmd(
             await run_in_vm(
                 vm_name,
                 ["skopeo", "copy", f"docker-archive:{guest_path}:{tag}", f"containers-storage:{tag}"],
-                f"Importing image {tag} into Agent Stack platform",
+                f"Importing image {tag} into Kagenti ADK platform",
             )
         finally:
             await anyio.Path(host_path).unlink(missing_ok=True)
 
 
 
-@app.command("exec", help="For debugging -- execute a command inside the Agent Stack platform VM. [Local only]")
+@app.command("exec", help="For debugging -- execute a command inside the Kagenti ADK platform VM. [Local only]")
 async def exec_cmd(
     command: typing.Annotated[list[str] | None, typer.Argument()] = None,
     vm_name: typing.Annotated[str, typer.Option(hidden=True)] = "agentstack",
@@ -949,7 +949,7 @@ async def exec_cmd(
 ):
     with verbosity(verbose, show_success_status=False):
         if (await detect_vm_status(vm_name)) != "running":
-            console.error("Agent Stack platform is not running.")
+            console.error("Kagenti ADK platform is not running.")
             sys.exit(1)
         if Configuration().running_inside_vm:
             await anyio.run_process(

@@ -23,9 +23,9 @@ from google.protobuf.json_format import MessageToDict
 from httpx import HTTPStatusError
 from httpx._types import RequestFiles
 
-from agentstack_cli import configuration
-from agentstack_cli.configuration import Configuration
-from agentstack_cli.utils import pick
+from kagenti_cli import configuration
+from kagenti_cli.configuration import Configuration
+from kagenti_cli.utils import pick
 
 logger = logging.getLogger(__name__)
 
@@ -65,7 +65,7 @@ async def api_request(
             except Exception:
                 response.raise_for_status()
             if response.status_code == 401:
-                message = f'{error}\nexport AGENTSTACK__ADMIN_PASSWORD="<PASSWORD>" to set the admin password.'
+                message = f'{error}\nexport KAGENTI_ADK_ADMIN_PASSWORD="<PASSWORD>" to set the admin password.'
                 raise HTTPStatusError(message=message, request=response.request, response=response)
             raise HTTPStatusError(message=error, request=response.request, response=response)
         if response.content:

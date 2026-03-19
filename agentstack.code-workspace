@@ -17,8 +17,8 @@
       "path": "apps/adk-ts",
     },
     {
-      "name": "agentstack-cli",
-      "path": "apps/agentstack-cli",
+      "name": "adk-cli",
+      "path": "apps/adk-cli",
     },
     {
       "name": "agentstack-ui",

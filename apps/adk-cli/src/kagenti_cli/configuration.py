@@ -18,23 +18,23 @@ import pydantic_settings
 from kagenti_adk.platform import PlatformClient, use_platform_client
 from pydantic import SecretStr
 
-from agentstack_cli.auth_manager import AuthManager
-from agentstack_cli.console import console
+from kagenti_cli.auth_manager import AuthManager
+from kagenti_cli.console import console
 
 
 @functools.cache
 def version():
     # Python strips '-', we need to re-insert it: 1.2.3rc1 -> 1.2.3-rc1
-    return re.sub(r"([0-9])([a-z])", r"\1-\2", importlib.metadata.version("agentstack-cli"))
+    return re.sub(r"([0-9])([a-z])", r"\1-\2", importlib.metadata.version("kagenti-cli"))
 
 
 @functools.cache
 class Configuration(pydantic_settings.BaseSettings):
     model_config = pydantic_settings.SettingsConfigDict(
-        env_file=None, env_prefix="AGENTSTACK__", env_nested_delimiter="__", extra="allow"
+        env_file=None, env_prefix="KAGENTI_ADK_", env_nested_delimiter="__", extra="allow"
     )
     debug: bool = False
-    home: pathlib.Path = pydantic.Field(default_factory=lambda: pathlib.Path.home() / ".agentstack")
+    home: pathlib.Path = pydantic.Field(default_factory=lambda: pathlib.Path.home() / ".kagenti" / "adk")
     username: str = "admin"
     password: SecretStr | None = None
     server_metadata_ttl: int = 86400
@@ -65,7 +65,7 @@ class Configuration(pydantic_settings.BaseSettings):
         if self.auth_manager.active_server is None:
             console.error("No server selected.")
             console.hint(
-                "Run [green]agentstack platform start[/green] to start a local server, or [green]agentstack server login[/green] to connect to a remote one."
+                "Run [green]kagenti-adk platform start[/green] to start a local server, or [green]kagenti-adk server login[/green] to connect to a remote one."
             )
             sys.exit(1)
 
@@ -82,7 +82,7 @@ class Configuration(pydantic_settings.BaseSettings):
             if not auth_token:
                 console.error(f"Failed to load authentication: {e}")
                 console.hint(
-                    f"Run [green]agentstack server login {self.auth_manager.active_server}[/green] to re-authenticate."
+                    f"Run [green]kagenti-adk server login {self.auth_manager.active_server}[/green] to re-authenticate."
                 )
                 sys.exit(1)
 
@@ -95,7 +95,8 @@ class Configuration(pydantic_settings.BaseSettings):
 
     @pydantic.model_validator(mode="after")
     def _check_old_home(self) -> typing.Self:
-        old_home = pathlib.Path.home() / ".beeai"
-        if old_home.exists() and not self.home.exists():
-            old_home.rename(self.home)
+        for old_path in [pathlib.Path.home() / ".beeai", pathlib.Path.home() / ".agentstack"]:
+            if old_path.exists() and not self.home.exists():
+                self.home.parent.mkdir(parents=True, exist_ok=True)
+                old_path.rename(self.home)
         return self

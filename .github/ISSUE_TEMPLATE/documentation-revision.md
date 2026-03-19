@@ -17,5 +17,5 @@ Enter the requirements that would warrant success for this issue.
 - [ ] **Contributing Guideline Compliance:** I read and complied by "Documentation Contribution Guidelines" section of the Agent Stack project [CONTRIBUTING.md](https://github.com/i-am-bee/agentstack/blob/main/CONTRIBUTING.md) guide.
 - [ ] **Snippet Test:** Verified all code works in a fresh environment (fresh agent stack install and clean environment).
 - [ ] **Visual Preview:** Checked formatting/layout via Mintlify.
-- [ ] **CLI Sync:** Ran `mise run agentstack-cli:docs` (if applicable).
+- [ ] **CLI Sync:** Ran `mise run adk-cli:docs` (if applicable).
 - [ ] **Location:** Updates placed in `docs/development` for go live during next release or both `docs/development` and `docs/stable` for urgent go live.

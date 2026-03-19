@@ -5,13 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "agentstack cli",
+            "name": "kagenti-cli",
             "type": "debugpy",
             "env": {
-                "AGENTSTACK__DEBUG": "true"
+                "KAGENTI_ADK_DEBUG": "true"
             },
             "request": "launch",
-            "module": "agentstack_cli",
+            "module": "kagenti_cli",
             "justMyCode": false,
             "console": "integratedTerminal",
             "args": "${command:pickArgs}"
