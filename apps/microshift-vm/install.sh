@@ -45,13 +45,17 @@ systemctl stop microshift
 systemctl stop crio
 
 if [ -z "${CI:-}" ]; then
-    apt-get install -y -q --no-install-recommends \
-        git \
-        nftables \
-        podman
     printf '#!/bin/sh\nexec sudo podman "$@"\n' > /usr/local/bin/docker
     chmod +x /usr/local/bin/docker
     echo 'export KAGENTI_ADK_RUNNING_INSIDE_VM=true' > /etc/profile.d/agentstack-vm.sh
+    echo "deb [trusted=yes] https://mise.jdx.dev/deb stable main" | sudo tee /etc/apt/sources.list.d/mise.list
+    apt-get update -y -q
+    apt-get install -y -q --no-install-recommends \
+        git \
+        nftables \
+        mise \
+        podman
+    echo 'eval "$(mise activate bash)"' >> /etc/bash.bashrc
 fi
 
 passwd -l root
