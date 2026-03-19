@@ -28,7 +28,7 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/setup
         with:
-          save_cache: 'true'
+          save_cache: "true"
       - uses: dorny/paths-filter@668c092af3649c4b664c54e4b704aa46782f6f7c
         id: filter
         with:
@@ -80,8 +80,8 @@ jobs:
       - if: steps.cache-check.outputs.cache-hit != 'true'
         uses: ./.github/actions/setup
         with:
-          install_vm_deps: 'build'
-          save_cache: 'true'
+          install_vm_deps: "build"
+          save_cache: "true"
       - if: steps.cache-check.outputs.cache-hit != 'true'
         run: mise run microshift-vm:build:qemu
 
@@ -99,8 +99,8 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/setup
         with:
-          maximize_space: 'true'
-          install_vm_deps: 'run'
+          maximize_space: "true"
+          install_vm_deps: "run"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: mise run adk-server:test:integration
@@ -123,13 +123,13 @@ jobs:
     timeout-minutes: 45
     runs-on: ubuntu-latest
     env:
-      KAGENTI__HOME: ${{ github.workspace }}/.kagenti
+      KAGENTI_ADK_HOME: ${{ github.workspace }}/.kagenti/adk
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/setup
         with:
-          maximize_space: 'true'
-          install_vm_deps: 'run'
+          maximize_space: "true"
+          install_vm_deps: "run"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: mise run adk-server:test:e2e
@@ -155,13 +155,13 @@ jobs:
     timeout-minutes: 45
     runs-on: ubuntu-latest
     env:
-      KAGENTI__HOME: ${{ github.workspace }}/.kagenti
+      KAGENTI_ADK_HOME: ${{ github.workspace }}/.kagenti/adk
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/setup
         with:
-          maximize_space: 'true'
-          install_vm_deps: 'run'
+          maximize_space: "true"
+          install_vm_deps: "run"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: mise run adk-server:test:e2e-examples
@@ -187,7 +187,7 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/setup
         with:
-          install_vm_deps: 'run'
+          install_vm_deps: "run"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: mise run adk-py:test-all --python=${{ matrix.python }}
