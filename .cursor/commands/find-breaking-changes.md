@@ -1,6 +1,6 @@
 # Finding Breaking Changes
 
-Repo is i-am-bee/agentstack
+Repo is kagenti/adk
 
 Finding breaking changes requires GitHub MCP. You need to find all merged PRs that has been merged in main since the last release tag.
 

@@ -15,16 +15,18 @@ The user tells you for which version they want to generate the release notes, e.
 
 The start commit is the latest stable version of the Kagenti ADK.
 
-You can easily find the last release commit by looking at the `install` branch in `i-am-bee/agentstack` and checking the `install.sh` script in the root of the repo, which contains the `LATEST_STABLE_AGENTSTACK_VERSION` variable.
+You can easily find the last release commit by looking at the `install` branch in `kagenti/adk` and checking the `install.sh` script in the root of the repo, which contains the `LATEST_STABLE_AGENTSTACK_VERSION` variable.
 
 For example, you can do something like this:
+
 ```bash
-curl -s https://raw.githubusercontent.com/i-am-bee/agentstack/install/install.sh | grep 'LATEST_STABLE_AGENTSTACK_VERSION=' | cut -d'=' -f2
+curl -s https://raw.githubusercontent.com/kagenti/adk/install/install.sh | grep 'LATEST_STABLE_AGENTSTACK_VERSION=' | cut -d'=' -f2
 ```
 
 This gives you a version number (e.g., `0.5.0`). The corresponding git tag for the latest stable Kagenti ADK version is formed by prepending `release-v` to this number (e.g., `release-v0.5.0`).
 
 Now, knowing the start and end of the scope, you can figure out what the merged PRs are by calling the attached utility script:
+
 ```bash
 ./.claude/skills/release-notes/scripts/find-merged-prs.sh release-v0.5.2 release-v0.5.3
 ```
@@ -34,6 +36,7 @@ Now, knowing the start and end of the scope, you can figure out what the merged 
 Knowing the list of all merged PRs, you need to go through all of them and fetch their comments via the `gh` command.
 
 E.g.:
+
 ```bash
 gh pr view PR_NUMBER --comments
 ```
@@ -71,23 +74,27 @@ Then at the end, provide list of all merged PRs (links + titles)
 ### Example of great release notes
 
 ```markdown
-# 🚀 Kagenti ADK version 0.5.3 has been released 
+# 🚀 Kagenti ADK version 0.5.3 has been released
 
 This release brings a major TypeScript SDK restructuring, a new Canvas agent, comprehensive UI redesign, and significant improvements to authentication and CLI experience.
 
 ## Major Changes
 
 ### Breaking: TypeScript SDK Restructuring
+
 The `adk-ts` has been completely refactored with a new modular architecture. The API client is now organized into dedicated subdirectories (`auth`, `services`, `ui`, `configuration`, `connectors`, etc.) with proper `schemas.ts` and `types.ts` files. A new `buildApiClient` core function with `unwrapResult` utility provides standardized response handling. Error handling is now structured with `ApiErrorException` and specific error types (Http, Network, Parse, Validation). All consumers of the TS SDK need to update imports and usage patterns.
 
 ### New Canvas Agent
+
 A new agent for multi-turn artifact editing is now available. Users can select and modify specific sections of text content, enabling precise iterative refinement of generated artifacts.
 
 ### SDK: User Approval Extension
+
 New `ApprovalExtensionServer` and `ApprovalExtensionClient` enable explicit human-in-the-loop workflows. Agents can request user approval for critical actions using structured `ApprovalRequest`/`ApprovalResponse` models. The older `ToolCallRequest` and `ToolCallExtensionServer` are now deprecated.
 
 ## What's changed
-- [#1737 feat(ui): add agent management under Providers feature flag](https://github.com/i-am-bee/agentstack/pull/1737)
-- [#1737 feat(ui): add agent management under Providers feature flag](https://github.com/i-am-bee/agentstack/pull/1737)
-...
+
+- [#1737 feat(ui): add agent management under Providers feature flag](https://github.com/kagenti/adk/pull/1737)
+- [#1737 feat(ui): add agent management under Providers feature flag](https://github.com/kagenti/adk/pull/1737)
+  ...
 ```

@@ -1,6 +1,6 @@
 ---
 name: draft-issue
-description: Draft GitHub issues for i-am-bee/agentstack. Use when the user wants to report a bug, request a feature, or draft a general GitHub issue.
+description: Draft GitHub issues for kagenti/adk. Use when the user wants to report a bug, request a feature, or draft a general GitHub issue.
 ---
 
 # Draft GitHub Issue
@@ -12,8 +12,10 @@ Your goal is to draft GitHub issue in form of markdown that user can easily file
 1. Based on user request perform deep analysis of the code base to have as much context as possible
 2. Ask for clarification for anything that is unclear
 3. Explore templates in .github/ISSUE_TEMPLATE folder
-  - `bug_report.md` for bugs
-  - `feature_request.md` for features
+
+- `bug_report.md` for bugs
+- `feature_request.md` for features
+
 4. Search for potential duplicates: gh issue list -R kagenti/adk -S "<keywords>" --state all
 5. Fetch all available labels from Github using gh label list -R kagenti/adk
 6. Show draft as a markdown for user approval

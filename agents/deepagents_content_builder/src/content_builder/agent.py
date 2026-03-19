@@ -57,7 +57,7 @@ CURRENT_DIRECTORY = Path(__file__).parent
 
 @server.agent(
     name="Content Creator Agent (Deepagents)",
-    documentation_url=f"https://github.com/i-am-bee/agentstack/blob/{os.getenv('RELEASE_VERSION', 'main')}/agents/deepagents_content_builder",
+    documentation_url=f"https://github.com/kagenti/adk/blob/{os.getenv('RELEASE_VERSION', 'main')}/agents/deepagents_content_builder",
     default_input_modes=["text/plain"],
     default_output_modes=["text/plain", "image/jpeg", "image/png", "text/markdown"],
     description="A content writer for a technology company that creates engaging, informative content that educates readers about AI, software development, and emerging technologies.",

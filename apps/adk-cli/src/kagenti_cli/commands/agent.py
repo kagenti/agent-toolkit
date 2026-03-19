@@ -148,7 +148,7 @@ class ProviderUtils(BaseModel):
 
     @staticmethod
     def short_location(provider: Provider) -> str:
-        return re.sub(r"[a-z]*.io/i-am-bee/agentstack/", "", provider.source).lower()
+        return re.sub(r"[a-z]*.io/kagenti/adk/", "", provider.source).lower()
 
 
 app = AsyncTyper()

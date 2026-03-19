@@ -14,7 +14,7 @@ Enter the requirements that would warrant success for this issue.
 
 **Task Checklist**
 
-- [ ] **Contributing Guideline Compliance:** I read and complied by "Documentation Contribution Guidelines" section of the Kagenti ADK project [CONTRIBUTING.md](https://github.com/i-am-bee/agentstack/blob/main/CONTRIBUTING.md) guide.
+- [ ] **Contributing Guideline Compliance:** I read and complied by "Documentation Contribution Guidelines" section of the Kagenti ADK project [CONTRIBUTING.md](https://github.com/kagenti/adk/blob/main/CONTRIBUTING.md) guide.
 - [ ] **Snippet Test:** Verified all code works in a fresh environment (fresh Kagenti ADK install and clean environment).
 - [ ] **Visual Preview:** Checked formatting/layout via Mintlify.
 - [ ] **CLI Sync:** Ran `mise run adk-cli:docs` (if applicable).

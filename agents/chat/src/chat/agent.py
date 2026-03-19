@@ -63,7 +63,7 @@ server = Server()
 @server.agent(
     name="Chat",
     documentation_url=(
-        f"https://github.com/i-am-bee/agentstack/blob/{os.getenv('RELEASE_VERSION', 'main')}/agents/chat"
+        f"https://github.com/kagenti/adk/blob/{os.getenv('RELEASE_VERSION', 'main')}/agents/chat"
     ),
     version="1.0.0",
     default_input_modes=["text", "text/plain"],
