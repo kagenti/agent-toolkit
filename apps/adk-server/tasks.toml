@@ -339,7 +339,7 @@ fi
 CONFIG_FILE="/tmp/config_e2e_test_$(date +%s).yaml"
 
 echo '
-adk:
+kagenti-adk:
   ui:
     enabled: true
   docling:
@@ -406,7 +406,7 @@ fi
 CONFIG_FILE="/tmp/config_e2e_test_$(date +%s).yaml"
 
 echo '
-adk:
+kagenti-adk:
   ui:
     enabled: false
   docling:
