@@ -15,15 +15,14 @@ import type {
   agentSkillSchema,
   apiKeySecuritySchemeSchema,
   artifactSchema,
-  authenticatedExtendedCardNotConfiguredErrorSchema,
   authorizationCodeOAuthFlowSchema,
   clientCredentialsOAuthFlowSchema,
   contentTypeNotSupportedErrorSchema,
   dataPartSchema,
   deviceCodeOAuthFlowSchema,
+  extendedAgentCardNotConfiguredErrorSchema,
+  extensionSupportRequiredErrorSchema,
   filePartSchema,
-  getTaskResponseSchema,
-  getTaskSuccessResponseSchema,
   httpAuthSecuritySchemeSchema,
   implicitOAuthFlowSchema,
   internalErrorSchema,
@@ -42,6 +41,7 @@ import type {
   partSchema,
   passwordOAuthFlowSchema,
   pushNotificationNotSupportedErrorSchema,
+  roleSchema,
   securityRequirementSchema,
   securitySchemeSchema,
   streamResponseSchema,
@@ -49,10 +49,12 @@ import type {
   taskNotCancelableErrorSchema,
   taskNotFoundErrorSchema,
   taskSchema,
+  taskStateSchema,
   taskStatusSchema,
   taskStatusUpdateEventSchema,
   textPartSchema,
   unsupportedOperationErrorSchema,
+  versionNotSupportedErrorSchema,
 } from './schemas';
 
 export type AgentInterface = z.infer<typeof agentInterfaceSchema>;
@@ -66,6 +68,8 @@ export type AgentProvider = z.infer<typeof agentProviderSchema>;
 export type AgentCardSignature = z.infer<typeof agentCardSignatureSchema>;
 
 export type AgentSkill = z.infer<typeof agentSkillSchema>;
+
+export type AgentCard = z.infer<typeof agentCardSchema>;
 
 export type AuthorizationCodeOAuthFlow = z.infer<typeof authorizationCodeOAuthFlowSchema>;
 export type ClientCredentialsOAuthFlow = z.infer<typeof clientCredentialsOAuthFlowSchema>;
@@ -84,8 +88,6 @@ export type MutualTLSSecurityScheme = z.infer<typeof mutualTlsSecuritySchemeSche
 export type SecurityScheme = z.infer<typeof securitySchemeSchema>;
 export type SecurityRequirement = z.infer<typeof securityRequirementSchema>;
 
-export type AgentCard = z.infer<typeof agentCardSchema>;
-
 export type TextPart = z.infer<typeof textPartSchema>;
 export type FilePart = z.infer<typeof filePartSchema>;
 export type DataPart = z.infer<typeof dataPartSchema>;
@@ -94,7 +96,11 @@ export type Part = z.infer<typeof partSchema>;
 
 export type Artifact = z.infer<typeof artifactSchema>;
 
+export type Role = z.infer<typeof roleSchema>;
+
 export type Message = z.infer<typeof messageSchema>;
+
+export type TaskState = z.infer<typeof taskStateSchema>;
 
 export type TaskStatus = z.infer<typeof taskStatusSchema>;
 
@@ -118,12 +124,8 @@ export type PushNotificationNotSupportedError = z.infer<typeof pushNotificationN
 export type UnsupportedOperationError = z.infer<typeof unsupportedOperationErrorSchema>;
 export type ContentTypeNotSupportedError = z.infer<typeof contentTypeNotSupportedErrorSchema>;
 export type InvalidAgentResponseError = z.infer<typeof invalidAgentResponseErrorSchema>;
-export type AuthenticatedExtendedCardNotConfiguredError = z.infer<
-  typeof authenticatedExtendedCardNotConfiguredErrorSchema
->;
+export type ExtendedAgentCardNotConfiguredError = z.infer<typeof extendedAgentCardNotConfiguredErrorSchema>;
+export type ExtensionSupportRequiredError = z.infer<typeof extensionSupportRequiredErrorSchema>;
+export type VersionNotSupportedError = z.infer<typeof versionNotSupportedErrorSchema>;
 
 export type JSONRPCErrorResponse = z.infer<typeof jsonRpcErrorResponseSchema>;
-
-export type GetTaskSuccessResponse = z.infer<typeof getTaskSuccessResponseSchema>;
-
-export type GetTaskResponse = z.infer<typeof getTaskResponseSchema>;
