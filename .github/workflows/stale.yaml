@@ -5,6 +5,8 @@ on:
     - cron: "30 6 * * *"
   workflow_dispatch:
 
+permissions: {}
+
 jobs:
   stale:
     uses: kagenti/.github/.github/workflows/stale.yaml@171594de65b6274b547f686b7f68cafb82f11090  # main
