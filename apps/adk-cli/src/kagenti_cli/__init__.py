@@ -33,6 +33,7 @@ Usage: kagenti-adk [OPTIONS] COMMAND [ARGS]...
 
 ╭─ Getting Started ──────────────────────────────────────────────────────────╮
 │ ui       Launch the web interface                                          │
+│ admin    Launch the admin console                                          │
 │ list     View all available agents                                         │
 │ info     Show agent details                                                │
 │ run      Run an agent interactively                                        │
@@ -166,6 +167,27 @@ async def ui():
         ui_url = "http://adk.localtest.me:8080"
 
     webbrowser.open(ui_url)
+
+
+@app.command("admin")
+async def admin():
+    """Launch the admin console."""
+    import webbrowser
+
+    config = Configuration()
+    active_server = config.auth_manager.active_server
+
+    if active_server:
+        if "localtest.me" in active_server:
+            admin_url = re.sub(r"://[^:/]+\.localtest\.me", "://keycloak.localtest.me", active_server)
+        elif re.search(r"(localhost|127\.0\.0\.1):8333", active_server):
+            admin_url = re.sub(r"(localhost|127\.0\.0\.1):8333", "keycloak.localtest.me:8080", active_server)
+        else:
+            admin_url = active_server
+    else:
+        admin_url = "http://keycloak.localtest.me:8080"
+
+    webbrowser.open(admin_url)
 
 
 if __name__ == "__main__":
