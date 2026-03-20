@@ -179,13 +179,13 @@ async def admin():
 
     if active_server:
         if "localtest.me" in active_server:
-            admin_url = re.sub(r"://[^:/]+\.localtest\.me", "://keycloak.localtest.me", active_server)
+            admin_url = re.sub(r"://[^:/]+\.localtest\.me", "://kagenti-ui.localtest.me", active_server)
         elif re.search(r"(localhost|127\.0\.0\.1):8333", active_server):
-            admin_url = re.sub(r"(localhost|127\.0\.0\.1):8333", "keycloak.localtest.me:8080", active_server)
+            admin_url = re.sub(r"(localhost|127\.0\.0\.1):8333", "kagenti-ui.localtest.me:8080", active_server)
         else:
             admin_url = active_server
     else:
-        admin_url = "http://keycloak.localtest.me:8080"
+        admin_url = "http://kagenti-ui.localtest.me:8080"
 
     webbrowser.open(admin_url)
 
