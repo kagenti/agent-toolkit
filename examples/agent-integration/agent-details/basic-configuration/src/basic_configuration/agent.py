@@ -23,7 +23,7 @@ server = Server()
                 name="Document Reader", description="Reads and extracts key insights from uploaded PDFs or text files."
             ),
         ],
-        framework="Kagenti ADK",
+        framework="BeeAI",
         author=AgentDetailContributor(
             name="Kagenti ADK Team",
             email="team@example.com",

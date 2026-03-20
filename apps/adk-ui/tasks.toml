@@ -93,4 +93,4 @@ outputs = [".next/standalone/**/*"]
 
 ["adk-ui:schema:generate"]
 dir = "{{config_root}}/apps/adk-ui"
-run = "./scripts/generate-schema.sh http://agentstack-api.localtest.me:8080/api/v1/openapi.json ./src/api/schema.d.ts"
+run = "./scripts/generate-schema.sh http://adk-api.localtest.me:8080/api/v1/openapi.json ./src/api/schema.d.ts"

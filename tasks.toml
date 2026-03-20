@@ -197,7 +197,7 @@ echo "$TO_STOP" | xargs -rn 1 -I"{}" mise run adk-cli:run -- platform stop --vm-
 ["adk:shell"]
 raw = true
 dir = "{{cwd}}"
-usage = 'flag "--vm-name <vm_name>" default="agentstack"'
+usage = 'flag "--vm-name <vm_name>" default="adk"'
 run = """
 cat <<EOF
 deactivate () {

@@ -156,14 +156,14 @@ async def ui():
     active_server = config.auth_manager.active_server
 
     if active_server:
-        if "agentstack-api.localtest.me" in active_server:
-            ui_url = active_server.replace("agentstack-api.localtest.me", "agentstack.localtest.me")
+        if "adk-api.localtest.me" in active_server:
+            ui_url = active_server.replace("adk-api.localtest.me", "adk.localtest.me")
         elif re.search(r"(localhost|127\.0\.0\.1):8333", active_server):
             ui_url = re.sub(r":8333", ":8334", active_server)
         else:
             ui_url = active_server
     else:
-        ui_url = "http://agentstack.localtest.me:8080"
+        ui_url = "http://adk.localtest.me:8080"
 
     webbrowser.open(ui_url)
 

@@ -54,7 +54,7 @@ The "dev mode" stack is complex, utilizing **Lima** (VM), **Kubernetes**, and **
 - **Startup**: It takes ~10 minutes to start (`mise run adk-server:dev:start`).
 - **Your Role**: **Do not attempt to start the stack yourself.** Ask the developer to ensure it is running if you need it.
 - **Verification**: Run `curl localhost:8333/healthcheck` to see if the stack is up.
-- **Database Access**: `agentstack-user:password@postgresql:5432/agentstack` (only available in dev mode).
+- **Database Access**: `adk-user:password@postgresql:5432/adk` (only available in dev mode).
 
 ## 4. Testing Strategies
 

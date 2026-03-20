@@ -54,12 +54,12 @@ dir = "{{config_root}}/apps/adk-server"
 # spec = get_openapi(title='ADK server', version=get_version(), routes=app.routes)
 # spec.pop('servers', None)
 # print(json.dumps(spec, indent=2))
-# " > /tmp/agentstack-openapi-generated.json
-# jq --sort-keys 'del(.servers) | del(.. | .operationId?)' /tmp/agentstack-openapi-generated.json > /tmp/agentstack-openapi-generated-normalized.json
-# jq --sort-keys 'del(.servers) | del(.. | .operationId?)' ../../docs/development/api-reference/openapi.json > /tmp/agentstack-openapi-committed-normalized.json
+# " > /tmp/adk-openapi-generated.json
+# jq --sort-keys 'del(.servers) | del(.. | .operationId?)' /tmp/adk-openapi-generated.json > /tmp/adk-openapi-generated-normalized.json
+# jq --sort-keys 'del(.servers) | del(.. | .operationId?)' ../../docs/development/api-reference/openapi.json > /tmp/adk-openapi-committed-normalized.json
 # if ! jq --null-input --exit-status \
-#     --slurpfile generated /tmp/agentstack-openapi-generated-normalized.json \
-#     --slurpfile committed /tmp/agentstack-openapi-committed-normalized.json \
+#     --slurpfile generated /tmp/adk-openapi-generated-normalized.json \
+#     --slurpfile committed /tmp/adk-openapi-committed-normalized.json \
 #     '$generated[0] == $committed[0]' > /dev/null; then
 #   echo "ERROR: docs/development/api-reference/openapi.json is out of sync with server routes."
 #   echo "Run: mise run adk-server:fix:docs"
@@ -176,12 +176,12 @@ run = "{{ mise_bin }} run adk-server:migrations:alembic revision --autogenerate 
 
 ["adk-server:dev:shell"]
 dir = "{{config_root}}/apps/adk-server"
-run = "{{ mise_bin }} run adk:shell --vm-name=agentstack-local-dev"
+run = "{{ mise_bin }} run adk:shell --vm-name=adk-local-dev"
 
 ["adk-server:dev:start"]
 dir = "{{config_root}}/apps/adk-server"
 usage = '''
-flag "--vm-name <vm_name>" default="agentstack-local-dev"
+flag "--vm-name <vm_name>" default="adk-local-dev"
 arg "[cli_args]..."
 '''
 run = """
@@ -215,7 +215,7 @@ SKIP_PULL=true {{ mise_bin }} run adk-server:dev:start "${cli_args[@]}"
 
 ["adk-server:dev:stop"]
 dir = "{{config_root}}/apps/adk-server"
-usage = 'flag "--vm-name <vm_name>" default="agentstack-local-dev"'
+usage = 'flag "--vm-name <vm_name>" default="adk-local-dev"'
 run = """
 #!/bin/bash
 VM_NAME="${usage_vm_name?}"
@@ -225,7 +225,7 @@ VM_NAME="${usage_vm_name?}"
 
 ["adk-server:dev:delete"]
 dir = "{{config_root}}/apps/adk-server"
-usage = 'flag "--vm-name <vm_name>" default="agentstack-local-dev"'
+usage = 'flag "--vm-name <vm_name>" default="adk-local-dev"'
 run = """
 VM_NAME="${usage_vm_name?}"
 {{ mise_bin }} run adk-cli:run -- platform delete --vm-name="$VM_NAME"
@@ -233,7 +233,7 @@ VM_NAME="${usage_vm_name?}"
 
 ["adk-server:dev:connect"]
 dir = "{{config_root}}/apps/adk-server"
-usage = 'flag "--vm-name <vm_name>" default="agentstack-local-dev"'
+usage = 'flag "--vm-name <vm_name>" default="adk-local-dev"'
 run = """
 #!/bin/bash
 NAMESPACE=kagenti-adk
@@ -285,7 +285,7 @@ $tele replace adk-server --port 18333:8333
 
 ["adk-server:dev:disconnect"]
 dir = "{{config_root}}/apps/adk-server"
-usage = 'flag "--vm-name <vm_name>" default="agentstack-local-dev"'
+usage = 'flag "--vm-name <vm_name>" default="adk-local-dev"'
 run = """
 #!/bin/bash
 NAMESPACE=kagenti-adk
@@ -301,7 +301,7 @@ $tele quit
 
 ["adk-server:dev:reconnect"]
 dir = "{{config_root}}/apps/adk-server"
-usage = 'flag "--vm-name <vm_name>" default="agentstack-local-dev"'
+usage = 'flag "--vm-name <vm_name>" default="adk-local-dev"'
 run = """
 VM_NAME="${usage_vm_name?}"
 {{ mise_bin }} run adk-server:dev:disconnect --vm-name="$VM_NAME"
@@ -333,13 +333,13 @@ NO_CLEAN="${usage_no_clean:-false}"
 if [ "$NO_CLEAN" != "true" ]; then
     {{ mise_bin }} run adk:stop-all
     {{ mise_bin }} run adk:delete --vm-name=${VM_NAME} || true
-    curl http://kagenti-api.localtest.me:8080 >/dev/null 2>&1 && echo "Another instance at kagenti-api.localtest.me:8080 is already running" && exit 2
+    curl http://adk-api.localtest.me:8080 >/dev/null 2>&1 && echo "Another instance at adk-api.localtest.me:8080 is already running" && exit 2
 fi
 
 CONFIG_FILE="/tmp/config_e2e_test_$(date +%s).yaml"
 
 echo '
-agentstack:
+kagenti-adk:
   ui:
     enabled: true
   docling:
@@ -406,7 +406,7 @@ fi
 CONFIG_FILE="/tmp/config_e2e_test_$(date +%s).yaml"
 
 echo '
-agentstack:
+kagenti-adk:
   ui:
     enabled: false
   docling:

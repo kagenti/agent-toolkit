@@ -293,7 +293,7 @@ When building and testing the wrapper, ensure you avoid these common pitfalls:
 - **Never guess platform object attributes.** `FormRender` uses `fields` (not `items`), `TextField` uses `label` (not `title`).
 - **Never skip null-path handling for forms.** Handle `None` for cancelled or unsubmitted forms.
 - **Never use `parse_initial_form(...)` truthiness to route turns in multi-turn agents.** Route by presence/absence of persisted session state from `context.load_history()`.
-- **Never assume uploaded file URIs are HTTP URLs.** Parse `agentstack://` URIs with `PlatformFileUrl`.
+- **Never assume uploaded file URIs are HTTP URLs.** Parse `adk://` URIs with `PlatformFileUrl`.
 - **Never skip extraction polling.** `create_extraction()` is async — poll `get_extraction()` until `status == 'completed'`.
 
 ## Failure Conditions

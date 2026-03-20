@@ -106,6 +106,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: mkdir -p "$KAGENTI_ADK_HOME"
+      - name: Configure telepresence timeouts
+        run: |
+          mkdir -p "$HOME/.config/telepresence"
+          printf '%s\n' \
+            'timeouts:' \
+            '  agentInstall: 5m' \
+            '  intercept: 2m' \
+            '  helm: 2m' \
+            '  trafficManagerConnect: 2m' \
+            > "$HOME/.config/telepresence/config.yml"
       - run: mise run adk-server:test:integration
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

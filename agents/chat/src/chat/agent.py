@@ -94,7 +94,7 @@ server = Server()
         ],
         framework="BeeAI",
         programming_language="Python",
-        author=AgentDetailContributor(name="BeeAI contributors"),
+        author=AgentDetailContributor(name="Kagenti contributors"),
         contributors=[],
         license="Apache 2.0",
     ),

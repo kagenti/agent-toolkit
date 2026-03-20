@@ -160,7 +160,7 @@ def mount_routes(app: FastAPI):
 
         return get_swagger_ui_html(
             openapi_url=str(openapi_url),
-            title="BeeAI Platform API Docs",
+            title="Kagenti Platform API Docs",
         )
 
     @app.get("/healthcheck", include_in_schema=False)

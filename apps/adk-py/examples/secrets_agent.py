@@ -25,7 +25,7 @@ server = Server()
     name="Agent with secrets",
     detail=AgentDetail(
         interaction_mode="multi-turn",
-        author=AgentDetailContributor(name="BeeAI contributors"),
+        author=AgentDetailContributor(name="Kagenti contributors"),
         contributors=[AgentDetailContributor(name="John"), AgentDetailContributor(name="Kate")],
         license="Apache 2.0",
     ),

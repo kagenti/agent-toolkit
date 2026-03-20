@@ -4,7 +4,7 @@ The Kagenti ADK helm chart is packaged and uploaded to the container registry fo
 You can install the chart using the following command:
 
 ```bash
-helm install agentstack -f config.yaml oci://ghcr.io/kagenti/adk/chart/adk:<release-version>
+helm install adk -f config.yaml oci://ghcr.io/kagenti/adk/chart/adk:<release-version>
 ```
 
 Check out the [documentation](https://github.com/kagenti/adk/blob/main/docs/stable/how-to/deployment-guide) for a detailed deployment guide.

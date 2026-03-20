@@ -28,7 +28,7 @@ Scan the original code for: `open()`, `pathlib.Path.read_*()`, `with open(...)`,
 
 1. Add a `FileField` (from `kagenti_adk.a2a.extensions`) to the form with appropriate `accept` MIME types matching the original agent's supported file types. Use `FileInfo` in the Pydantic model (`list[FileInfo] | None`).
 2. Parse the form via `form.parse_initial_form(model=...)` (same as Step 6).
-3. Resolve `FileInfo.uri` (an `agentstack://` URI) to a `File` object: extract the file ID using `PlatformFileUrl(file.uri)`, then call `File.get(file_id)`.
+3. Resolve `FileInfo.uri` (an `adk://` URI) to a `File` object: extract the file ID using `PlatformFileUrl(file.uri)`, then call `File.get(file_id)`.
 4. Load file content via `file.load_content()` (raw bytes) or `file.load_text_content()` (extracted text).
 5. The platform `File` API requires `PlatformApiExtensionSpec` declared as an agent parameter (see Step 7 extensions table).
 
@@ -206,7 +206,7 @@ See the [Text extraction](https://github.com/kagenti/adk/blob/main/docs/stable/a
 
 ## Mid-Conversation File Uploads (Multi-Turn)
 
-For multi-turn agents receiving files during conversation (not via initial form), files arrive as `FilePart` entries in A2A message history. Extract them by filtering `FilePart` with `FileWithUri`, parsing the `agentstack://` URI via `PlatformFileUrl`, and resolving with `File.get()`.
+For multi-turn agents receiving files during conversation (not via initial form), files arrive as `FilePart` entries in A2A message history. Extract them by filtering `FilePart` with `FileWithUri`, parsing the `adk://` URI via `PlatformFileUrl`, and resolving with `File.get()`.
 
 See the [Working with Files](https://github.com/kagenti/adk/blob/main/docs/stable/agent-integration/files.mdx) guide for the full API and examples.
 

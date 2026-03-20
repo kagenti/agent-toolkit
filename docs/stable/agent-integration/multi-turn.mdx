@@ -83,7 +83,7 @@ from typing import Annotated
 
 from a2a.types import Message, Role
 from a2a.utils.message import get_message_text
-from beeai_framework.adapters.agentstack.backend.chat import Kagenti ADKChatModel
+from beeai_framework.adapters.agentstack.backend.chat import AgentStackChatModel
 from beeai_framework.agents.requirement import RequirementAgent
 from beeai_framework.agents.requirement.requirements.conditional import ConditionalRequirement
 from beeai_framework.backend import AssistantMessage, UserMessage
@@ -129,7 +129,7 @@ async def multi_turn_chat_agent(
     history = [message async for message in context.load_history() if isinstance(message, Message) and message.parts]
 
     # Initialize BeeAI Framework LLM client
-    llm_client = Kagenti ADKChatModel()
+    llm_client = AgentStackChatModel()
     llm_client.set_context(llm)
 
     # Create a RequirementAgent with conversation memory

@@ -3,4 +3,4 @@
 
 from __future__ import annotations
 
-AGENTSTACK_PROXY_VERSION = 1
+ADK_PROXY_VERSION = 1

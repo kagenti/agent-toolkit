@@ -212,7 +212,7 @@ class LoadedFileWithUri:
 
 
 class PlatformFileUrl(AnyUrl):
-    _constraints = UrlConstraints(allowed_schemes=["agentstack"])
+    _constraints = UrlConstraints(allowed_schemes=["adk"])
 
     @property
     def file_id(self) -> str:

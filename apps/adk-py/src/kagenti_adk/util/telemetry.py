@@ -17,7 +17,7 @@ from opentelemetry.trace import SpanKind, StatusCode
 
 from kagenti_adk import __version__
 
-INSTRUMENTING_MODULE_NAME = "agentstack-python-sdk"
+INSTRUMENTING_MODULE_NAME = "adk-python-sdk"
 INSTRUMENTING_MODULE_VERSION = __version__
 
 logger = logging.getLogger(__name__)

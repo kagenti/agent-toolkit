@@ -22,7 +22,7 @@ from deepagents.backends.utils import FileInfo, GrepMatch, format_content_with_l
 from kagenti_adk.platform import File
 
 
-class AgentStackBackend(BackendProtocol):
+class ADKBackend(BackendProtocol):
     def __init__(self, prefix: str = ""):
         self.prefix = prefix.rstrip("/")
 

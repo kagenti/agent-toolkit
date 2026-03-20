@@ -247,7 +247,7 @@ Here is an example how you can create a context and generate a custom token with
 
     ```bash REST API
     # 1. Create a context
-    curl -X POST "https://api.agentstack.example.com/api/v1/contexts" \
+    curl -X POST "https://api.adk.example.com/api/v1/contexts" \
         -H "Authorization: Bearer YOUR_USER_TOKEN" \
         -H "Content-Type: application/json"
 
@@ -258,7 +258,7 @@ Here is an example how you can create a context and generate a custom token with
     }
 
     # 2. Generate a context token
-    curl -X POST "https://api.agentstack.example.com/api/v1/contexts/{context_id}/token" \
+    curl -X POST "https://api.adk.example.com/api/v1/contexts/{context_id}/token" \
         -H "Authorization: Bearer YOUR_USER_TOKEN" \
         -H "Content-Type: application/json" \
         -d '{
