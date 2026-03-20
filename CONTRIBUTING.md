@@ -1,4 +1,4 @@
-# Contributing to Agent Toolkit
+# Contributing to Kagenti ADK
 
 We are grateful for your interest in joining the Kagenti community and making
 a positive impact. Whether you're raising issues, enhancing documentation,
@@ -16,19 +16,18 @@ don't need to install them yourself.
 Clone this project, then run these setup steps:
 
 ```sh
-git clone https://github.com/kagenti/agent-toolkit.git
-cd agent-toolkit
+git clone https://github.com/kagenti/adk.git
+cd adk
 brew install mise # more ways to install: https://mise.jdx.dev/installing-mise.html
 mise trust
 mise install
 brew install qemu # if not using Brew: install QEMU through some other package manager
 ```
 
-Install pre-commit hooks:
+Install git hooks:
 
 ```bash
-pip install pre-commit
-make install-hooks
+mise run common:setup:git-hooks
 ```
 
 After setup, you can use:
@@ -113,9 +112,9 @@ You can also automate this by creating a file `config.yaml`:
 ```yaml
 auth:
   enabled: true
-keycloak:
-  auth:
-    seedAdkUsers:
+  keycloakProvisionJob:
+    enabled: true
+    seedUsers:
       - username: admin
         password: admin
         firstName: Admin
@@ -153,8 +152,8 @@ mise run adk-server:dev:start
 This will do the following:
 
 1. Create .env file if it doesn't exist yet (you can add your configuration here)
-2. Stop default platform VM ("adk") if it exists
-3. Start a new VM named "adk-local-dev" separate from the "adk" VM used by default
+2. Stop default platform VM ("kagenti-adk") if it exists
+3. Start a new VM named "adk-local-dev" separate from the "kagenti-adk" VM used by default
 4. Install telepresence into the cluster
    > Note that this will require **root access** on your machine, due to setting up a networking stack.
 5. Replace kagenti-adk in the cluster and forward any incoming traffic to localhost
@@ -324,7 +323,7 @@ mise adk-server:run
 1. Fork the repository
 2. Create a feature branch from `main`
 3. Make your changes with tests
-4. Run pre-commit hooks: `pre-commit run --all-files`
+4. Run checks: `mise run check`
 5. Submit a pull request
 
 Smaller pull requests are typically easier to review and merge. If your pull
@@ -411,5 +410,5 @@ By contributing to this project you agree to the
 
 ## Licensing
 
-Agent Toolkit is [Apache 2.0 licensed](LICENSE) and we accept contributions
+Kagenti ADK is [Apache 2.0 licensed](LICENSE) and we accept contributions
 via GitHub pull requests.
