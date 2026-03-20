@@ -236,7 +236,7 @@ dir = "{{config_root}}/apps/adk-server"
 usage = 'flag "--vm-name <vm_name>" default="agentstack-local-dev"'
 run = """
 #!/bin/bash
-NAMESPACE=agentstack
+NAMESPACE=kagenti-adk
 VM_NAME="${usage_vm_name?}"
 eval "$( {{ mise_bin }} run agentstack:shell --vm-name="$VM_NAME" )"
 
@@ -288,7 +288,7 @@ dir = "{{config_root}}/apps/adk-server"
 usage = 'flag "--vm-name <vm_name>" default="agentstack-local-dev"'
 run = """
 #!/bin/bash
-NAMESPACE=agentstack
+NAMESPACE=kagenti-adk
 VM_NAME="${usage_vm_name?}"
 eval "$( {{ mise_bin }} run agentstack:shell --vm-name="$VM_NAME" )"
 
@@ -333,7 +333,7 @@ NO_CLEAN="${usage_no_clean:-false}"
 if [ "$NO_CLEAN" != "true" ]; then
     {{ mise_bin }} run agentstack:stop-all
     {{ mise_bin }} run agentstack:delete --vm-name=${VM_NAME} || true
-    curl http://agentstack-api.localtest.me:8080 >/dev/null 2>&1 && echo "Another instance at agentstack-api.localtest.me:8080 is already running" && exit 2
+    curl http://kagenti-api.localtest.me:8080 >/dev/null 2>&1 && echo "Another instance at kagenti-api.localtest.me:8080 is already running" && exit 2
 fi
 
 CONFIG_FILE="/tmp/config_e2e_test_$(date +%s).yaml"
@@ -357,10 +357,10 @@ if [ -z "${TEST_AGENT_IMAGE:-}" ]; then
 fi
 export TEST_AGENT_IMAGE
 
-export DB_URL="postgresql+asyncpg://agentstack-user:password@localhost:5432/agentstack"
+export DB_URL="postgresql+asyncpg://adk-user:password@localhost:5432/adk"
 export LLM_API_BASE="${LLM_API_BASE:-http://host.docker.internal:11434/v1}"
 
-kubectl port-forward -n agentstack svc/postgresql 5432:5432 2>/dev/null 1>&2 &
+kubectl port-forward -n kagenti-adk svc/postgresql 5432:5432 2>/dev/null 1>&2 &
 uv run pytest -m e2e --ignore=tests/e2e/examples
 result=$?
 
@@ -400,7 +400,7 @@ NO_CLEAN="${usage_no_clean:-false}"
 if [ "$NO_CLEAN" != "true" ]; then
     {{ mise_bin }} run agentstack:stop-all
     {{ mise_bin }} run agentstack:delete --vm-name=${VM_NAME}
-    curl http://agentstack-api.localtest.me:8080 >/dev/null 2>&1 && echo "Another instance at agentstack-api.localtest.me:8080 is already running" && exit 2
+    curl http://kagenti-api.localtest.me:8080 >/dev/null 2>&1 && echo "Another instance at kagenti-api.localtest.me:8080 is already running" && exit 2
 fi
 
 CONFIG_FILE="/tmp/config_e2e_test_$(date +%s).yaml"
@@ -418,7 +418,7 @@ agentstack:
 
 eval "$( {{ mise_bin }} run agentstack:shell --vm-name="$VM_NAME" )"
 
-export DB_URL="postgresql+asyncpg://agentstack-user:password@localhost:5432/agentstack"
+export DB_URL="postgresql+asyncpg://adk-user:password@localhost:5432/adk"
 export LLM_API_BASE="${LLM_API_BASE:-http://host.docker.internal:11434/v1}"
 
 echo "Waiting for adk-server deployment to be ready..."
