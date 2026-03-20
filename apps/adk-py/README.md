@@ -8,7 +8,7 @@ Python SDK for packaging agents for deployment to Kagenti ADK infrastructure.
 
 ## Overview
 
-The `kagenti-adk` provides Python utilities for wrapping agents built with any framework (LangChain, CrewAI, Kagenti Framework, etc.) for deployment on Kagenti ADK. It handles the A2A (Agent-to-Agent) protocol implementation, platform service integration, and runtime requirements so you can focus on agent logic.
+The `kagenti-adk` provides Python utilities for wrapping agents built with any framework (LangChain, CrewAI, BeeAI Framework, etc.) for deployment on Kagenti ADK. It handles the A2A (Agent-to-Agent) protocol implementation, platform service integration, and runtime requirements so you can focus on agent logic.
 
 ## Key Features
 

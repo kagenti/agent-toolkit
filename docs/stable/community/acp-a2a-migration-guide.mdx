@@ -62,7 +62,7 @@ from kagenti_adk.util.file import load_file
 ```py
 @server.agent(
     name="jennas_granite_chat",
-    description="This is a general-purpose chat assistant prototype built with the Kagenti Framework and powered by Granite.",
+    description="This is a general-purpose chat assistant prototype built with the BeeAI Framework and powered by Granite.",
     metadata=Metadata(
         annotations=Annotations(
             kagenti_ui=PlatformUIAnnotation(
@@ -78,7 +78,7 @@ from kagenti_adk.util.file import load_file
         author={"name": "Jenna Winkler"},
         contributors=[{"name": "Tomas Weiss"}, {"name": "Tomas Dvorak"}],
         recommended_models=["granite3.3:8b-kagenti"],
-        tags=["Granite", "Chat", "Research"], framework="Kagenti", license="Apache 2.0",
+        tags=["Granite", "Chat", "Research"], framework="BeeAI", license="Apache 2.0",
         links=[{"type": "source-code", "url": "https://github.com/jenna-winkler/granite_chat"}])
 async def agent_function(input: list[Message], context: Context) -> AsyncGenerator:
 ```
@@ -108,7 +108,7 @@ async def agent_function(input: list[Message], context: Context) -> AsyncGenerat
                 description="Read and analyze uploaded files including PDFs, text files, CSV data, and JSON documents."
             )
         ],
-        framework="Kagenti",
+        framework="BeeAI",
         author={
             "name": "Jenna Winkler"
         },

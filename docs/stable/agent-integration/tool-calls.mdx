@@ -8,7 +8,7 @@ The **Approval Extension** pauses execution and prompts the user with the tool d
 
 ## Basic Implementation
 To implement approvals, you inject the extension and call `request_approval()` within your tool execution logic or a framework handler. 
-This example uses the [Kagenti Framework](https://framework.beeai.dev/modules/agents/requirement-agent#ask-permission-requirement) to request user approval before executing a tool call:
+This example uses the [BeeAI Framework](https://framework.beeai.dev/modules/agents/requirement-agent#ask-permission-requirement) to request user approval before executing a tool call:
 
 ```python
 from typing import Annotated, Any

@@ -12,7 +12,7 @@ dependencies = [
     "fastuuid>=0.14.0",  # constraint for beeai-framework dependency (first version with musl arm64 wheel)
     "openai>=1.107.1",
     "kagenti-adk",
-    "openinference-instrumentation-kagenti>=0.1.14",
+    "openinference-instrumentation-beeai>=0.1.14",
     "pydantic-settings>=2.9.0",
     "uvicorn>=0.37.0,<0.38.0",
 ]

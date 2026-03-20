@@ -37,7 +37,7 @@ from beeai_framework.memory import UnconstrainedMemory
 from beeai_framework.middleware.trajectory import GlobalTrajectoryMiddleware
 from beeai_framework.tools import Tool
 from openai import AsyncOpenAI
-from openinference.instrumentation.kagenti import KagentiInstrumentor
+from openinference.instrumentation.beeai import BeeAIInstrumentor
 
 from rag.helpers.citations import extract_citations
 from rag.helpers.event_binder import EventBinder
@@ -56,9 +56,9 @@ from rag.tools.general.act import ActAlwaysFirstRequirement, ActTool, act_tool_m
 from rag.tools.general.clarification import ClarificationTool, clarification_tool_middleware
 from rag.tools.general.current_time import CurrentTimeTool
 
-kagenti_instrumentor = KagentiInstrumentor()
-if kagenti_instrumentor:
-    kagenti_instrumentor.instrument()
+beeai_instrumentor = BeeAIInstrumentor()
+if beeai_instrumentor:
+    beeai_instrumentor.instrument()
 
 logger = logging.getLogger(__name__)
 
@@ -95,7 +95,7 @@ server = Server()
         interaction_mode="multi-turn",
         user_greeting="What would you like to read?",
         tools=[],
-        framework="Kagenti",
+        framework="BeeAI",
     ),
     skills=[
         AgentSkill(
