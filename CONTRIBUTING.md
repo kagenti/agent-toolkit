@@ -49,28 +49,28 @@ will use
 Instead, use:
 
 ```shell
-mise agentstack:start
+mise adk:start
 ```
 
 This will build the images (`adk-server` and `adk-ui`) and import them to the cluster. You can add other
 CLI arguments as you normally would when using `kagenti-adk` CLI, for example:
 
 ```shell
-mise agentstack:start --set docling.enabled=true --set oidc.enabled=true
+mise adk:start --set docling.enabled=true --set oidc.enabled=true
 ```
 
 To stop or delete the platform use
 
 ```shell
-mise agentstack:stop
-mise agentstack:delete
+mise adk:stop
+mise adk:delete
 ```
 
 For debugging and direct access to kubernetes, setup `KUBECONFIG` and other environment variables using:
 
 ```shell
 # Activate environment
-eval "$(mise run agentstack:shell)"
+eval "$(mise run adk:shell)"
 
 # Deactivate environment
 deactivate
@@ -83,7 +83,7 @@ By default, authentication and authorization are disabled.
 Starting the platform with OIDC enabled:
 
 ```bash
-mise agentstack:start --set auth.enabled=true
+mise adk:start --set auth.enabled=true
 ```
 
 This will setup keycloak (with no platform users out of the box).
@@ -111,7 +111,7 @@ keycloak:
         enabled: true
 ```
 
-Then run `mise run agentstack:start -f config.yaml`
+Then run `mise run adk:start -f config.yaml`
 
 **Available endpoints:**
 
