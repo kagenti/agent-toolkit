@@ -1,6 +1,6 @@
 ---
 title: ACP to A2A Migration Guide
-description: "Migrate from ACP (Agent Communication Protocol) to A2A (Agent2Agent) Protocol for Kagenti ADK v0.3.x+."
+description: 'Migrate from ACP (Agent Communication Protocol) to A2A (Agent2Agent) Protocol for Kagenti ADK v0.3.x+.'
 ---
 
 ## Quick Migration Checklist
@@ -82,7 +82,7 @@ from kagenti_adk.util.file import load_file
         ),
         author={"name": "Jenna Winkler"},
         contributors=[{"name": "Tomas Weiss"}, {"name": "Tomas Dvorak"}],
-        recommended_models=["granite3.3:8b-kagenti"],
+        recommended_models=["granite3.3:8b-beeai"],
         tags=["Granite", "Chat", "Research"], framework="BeeAI", license="Apache 2.0",
         links=[{"type": "source-code", "url": "https://github.com/jenna-winkler/granite_chat"}])
 async def agent_function(input: list[Message], context: Context) -> AsyncGenerator:
@@ -101,15 +101,15 @@ async def agent_function(input: list[Message], context: Context) -> AsyncGenerat
         version="0.0.10",
         tools=[
             AgentDetailTool(
-                name="Think", 
+                name="Think",
                 description="Advanced reasoning and analysis to provide thoughtful, well-structured responses to complex questions and topics."
             ),
             AgentDetailTool(
-                name="DuckDuckGo", 
+                name="DuckDuckGo",
                 description="Search the web for current information, news, and real-time updates on any topic."
             ),
             AgentDetailTool(
-                name="File Processing", 
+                name="File Processing",
                 description="Read and analyze uploaded files including PDFs, text files, CSV data, and JSON documents."
             )
         ],
@@ -185,7 +185,7 @@ for part in message.parts:
 # Simple file processing (if needed)
 if uploaded_files:
     from kagenti_adk.util.file import load_file
-    
+
     for file_part in uploaded_files:
         async with load_file(file_part) as loaded_content:
             # Process file content as needed
@@ -242,7 +242,7 @@ async def agent_function(
     if llm_ext:
         # Get platform-managed LLM configuration
         llm_config = llm_ext.data.llm_fulfillments.get("default")
-        
+
         llm = OpenAIChatModel(
             model_id=llm_config.api_model,
             api_key=llm_config.api_key,
@@ -258,17 +258,17 @@ async def agent_function(
 
 ```py
 yield MessagePart(metadata=TrajectoryMetadata(
-    kind="trajectory", 
+    kind="trajectory",
     key=str(uuid.uuid4()),
     message="Processing..."
 ))
 
 citations.append(CitationMetadata(
-    kind="citation", 
+    kind="citation",
     url=url,
     title=title,
     description=description,
-    start_index=start, 
+    start_index=start,
     end_index=end
 ))
 for citation in citations:
@@ -312,4 +312,4 @@ yield response_text
 ## Complete Examples
 
 1. https://github.com/kagenti/adk/blob/main/agents/chat/src/chat/agent.py
-2. https://github.com/jenna-winkler/adk-showcase/blob/main/src/adk_agents/agent.py
+2. https://github.com/jenna-winkler/agentstack-showcase/blob/main/src/agentstack_agents/agent.py
