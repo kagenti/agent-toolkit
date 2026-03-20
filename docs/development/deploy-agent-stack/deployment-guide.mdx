@@ -89,7 +89,7 @@ auth:
 Deploy the stack to your cluster using Helm.
 
 ```shell
-helm upgrade --install agentstack -f config.yaml oci://ghcr.io/kagenti/adk/chart/adk:0.4.3
+helm upgrade --install adk -f config.yaml oci://ghcr.io/kagenti/adk/chart/adk:0.4.3
 ```
 
 It may take a few minutes for the pods to start.
@@ -100,7 +100,7 @@ By default, ingress is not configured. You can port-forward the service to acces
 run:
 
 ```shell
-kubectl port-forward svc/agentstack-svc 8333:8333 &
+kubectl port-forward svc/adk-svc 8333:8333 &
 ```
 
 ### 5. Setup the LLM
@@ -178,8 +178,8 @@ auth:
     enabled: true
 
   oidcProvider:
-    issuerUrl: 'http://keycloak-service.keycloak:8080/realms/agentstack'
-    publicIssuerUrl: 'https://keycloak.example.com/realms/agentstack'
+    issuerUrl: 'http://keycloak-service.keycloak:8080/realms/adk'
+    publicIssuerUrl: 'https://keycloak.example.com/realms/adk'
 ```
 
 #### External OIDC Provider
@@ -234,9 +234,9 @@ or other tools:
 
 ### Accessing & Configuring Keycloak
 
-- **Local Access**: kubectl port-forward `svc/agentstack-keycloak 8336:8336` -> Access at `http://localhost:8336`
+- **Local Access**: kubectl port-forward `svc/adk-keycloak 8336:8336` -> Access at `http://localhost:8336`
 - **Production Access:** Create an [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) for the
-  `agentstack-keycloak` service.
+  `adk-keycloak` service.
 - **Setup:** Log in (default credentials: `admin` / retrieve from secret). -> navigate to Identity Providers -> add your
   provider (GitHub, Google, etc.).
 
@@ -256,7 +256,7 @@ Without verified emails, authentication will fail with "Verified email not found
 <Accordion title="Keycloak Architecture & Roles">
   The Kagenti ADK Keycloak integration is automatically provisioned with the following architecture:
 
-**Realm:** `agentstack`
+**Realm:** `adk`
 
 **Clients:**
 
@@ -266,8 +266,8 @@ Without verified emails, authentication will fail with "Verified email not found
 
 **Roles:**
 
-- `agentstack-admin`: Full system access.
-- `agentstack-developer`: Access to agent management.
+- `adk-admin`: Full system access.
+- `adk-developer`: Access to agent management.
 
 **Audiences:**
 
@@ -285,7 +285,7 @@ To move beyond local port-forwarding, you must expose the following services usi
 | ------------------------------- | --------------------- | --------------------------------------------------------- |
 | <b>UI Endpoint</b>              | `adk-ui-svc`          | Access to the web interface (includes API proxy).         |
 | <b>API Endpoint (optional)</b>  | `adk-server-svc`      | Direct server API access; Required for CLI usage.         |
-| <b>Auth Endpoint (optional)</b> | `agentstack-keycloak` | Required for UI and CLI authentication if using Keycloak. |
+| <b>Auth Endpoint (optional)</b> | `adk-keycloak` | Required for UI and CLI authentication if using Keycloak. |
 
 ## Configuring External Services & Storage
 
@@ -599,11 +599,11 @@ Once Kagenti ADK is running, use these Helm and `kubectl` commands to manage the
 
 | Task               | Command                                                                                          |
 | ------------------ | ------------------------------------------------------------------------------------------------ |
-| Upgrade Platform   | `helm upgrade --install agentstack -f config.yaml oci://ghcr.io/kagenti/adk/chart/adk:<version>` |
-| View Active Config | `helm get values agentstack`                                                                     |
-| Deployment Status  | `helm status agentstack`                                                                         |
+| Upgrade Platform   | `helm upgrade --install adk -f config.yaml oci://ghcr.io/kagenti/adk/chart/adk:<version>` |
+| View Active Config | `helm get values adk`                                                                     |
+| Deployment Status  | `helm status adk`                                                                         |
 | Resource Health    | `kubectl get pods` , `kubectl logs deployment/adk-server`                                        |
-| Uninstall          | `helm uninstall agentstack`                                                                      |
+| Uninstall          | `helm uninstall adk`                                                                      |
 
 ## Troubleshooting
 

@@ -15,12 +15,12 @@ The user tells you for which version they want to generate the release notes, e.
 
 The start commit is the latest stable version of the Kagenti ADK.
 
-You can easily find the last release commit by looking at the `install` branch in `kagenti/adk` and checking the `install.sh` script in the root of the repo, which contains the `LATEST_STABLE_AGENTSTACK_VERSION` variable.
+You can easily find the last release commit by looking at the `install` branch in `kagenti/adk` and checking the `install.sh` script in the root of the repo, which contains the `LATEST_STABLE_ADK_VERSION` variable.
 
 For example, you can do something like this:
 
 ```bash
-curl -s https://raw.githubusercontent.com/kagenti/adk/install/install.sh | grep 'LATEST_STABLE_AGENTSTACK_VERSION=' | cut -d'=' -f2
+curl -s https://raw.githubusercontent.com/kagenti/adk/install/install.sh | grep 'LATEST_STABLE_ADK_VERSION=' | cut -d'=' -f2
 ```
 
 This gives you a version number (e.g., `0.5.0`). The corresponding git tag for the latest stable Kagenti ADK version is formed by prepending `release-v` to this number (e.g., `release-v0.5.0`).

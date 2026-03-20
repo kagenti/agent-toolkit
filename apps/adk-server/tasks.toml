@@ -54,12 +54,12 @@ dir = "{{config_root}}/apps/adk-server"
 # spec = get_openapi(title='ADK server', version=get_version(), routes=app.routes)
 # spec.pop('servers', None)
 # print(json.dumps(spec, indent=2))
-# " > /tmp/agentstack-openapi-generated.json
-# jq --sort-keys 'del(.servers) | del(.. | .operationId?)' /tmp/agentstack-openapi-generated.json > /tmp/agentstack-openapi-generated-normalized.json
-# jq --sort-keys 'del(.servers) | del(.. | .operationId?)' ../../docs/development/api-reference/openapi.json > /tmp/agentstack-openapi-committed-normalized.json
+# " > /tmp/adk-openapi-generated.json
+# jq --sort-keys 'del(.servers) | del(.. | .operationId?)' /tmp/adk-openapi-generated.json > /tmp/adk-openapi-generated-normalized.json
+# jq --sort-keys 'del(.servers) | del(.. | .operationId?)' ../../docs/development/api-reference/openapi.json > /tmp/adk-openapi-committed-normalized.json
 # if ! jq --null-input --exit-status \
-#     --slurpfile generated /tmp/agentstack-openapi-generated-normalized.json \
-#     --slurpfile committed /tmp/agentstack-openapi-committed-normalized.json \
+#     --slurpfile generated /tmp/adk-openapi-generated-normalized.json \
+#     --slurpfile committed /tmp/adk-openapi-committed-normalized.json \
 #     '$generated[0] == $committed[0]' > /dev/null; then
 #   echo "ERROR: docs/development/api-reference/openapi.json is out of sync with server routes."
 #   echo "Run: mise run adk-server:fix:docs"
@@ -176,12 +176,12 @@ run = "{{ mise_bin }} run adk-server:migrations:alembic revision --autogenerate 
 
 ["adk-server:dev:shell"]
 dir = "{{config_root}}/apps/adk-server"
-run = "{{ mise_bin }} run agentstack:shell --vm-name=agentstack-local-dev"
+run = "{{ mise_bin }} run adk:shell --vm-name=adk-local-dev"
 
 ["adk-server:dev:start"]
 dir = "{{config_root}}/apps/adk-server"
 usage = '''
-flag "--vm-name <vm_name>" default="agentstack-local-dev"
+flag "--vm-name <vm_name>" default="adk-local-dev"
 arg "[cli_args]..."
 '''
 run = """
@@ -189,12 +189,12 @@ run = """
 
 set -e
 VM_NAME="${usage_vm_name?}"
-eval "$( {{ mise_bin }} run agentstack:shell --vm-name="$VM_NAME" )"
+eval "$( {{ mise_bin }} run adk:shell --vm-name="$VM_NAME" )"
 {{ mise_bin }} run adk-server:dev:disconnect --vm-name="$VM_NAME"
-{{ mise_bin }} run agentstack:stop-all --except "$VM_NAME"
+{{ mise_bin }} run adk:stop-all --except "$VM_NAME"
 eval "cli_args=(${usage_cli_args})"
 export SKIP_PULL
-{{ mise_bin }} agentstack:start --vm-name="$VM_NAME" \
+{{ mise_bin }} adk:start --vm-name="$VM_NAME" \
     --no-wait-for-platform \
     "${cli_args[@]}"
 {{ mise_bin }} run adk-server:dev:connect --vm-name="$VM_NAME"
@@ -215,17 +215,17 @@ SKIP_PULL=true {{ mise_bin }} run adk-server:dev:start "${cli_args[@]}"
 
 ["adk-server:dev:stop"]
 dir = "{{config_root}}/apps/adk-server"
-usage = 'flag "--vm-name <vm_name>" default="agentstack-local-dev"'
+usage = 'flag "--vm-name <vm_name>" default="adk-local-dev"'
 run = """
 #!/bin/bash
 VM_NAME="${usage_vm_name?}"
 {{ mise_bin }} run adk-server:dev:disconnect --vm-name="$VM_NAME"
-{{ mise_bin }} run agentstack:stop --vm-name="$VM_NAME"
+{{ mise_bin }} run adk:stop --vm-name="$VM_NAME"
 """
 
 ["adk-server:dev:delete"]
 dir = "{{config_root}}/apps/adk-server"
-usage = 'flag "--vm-name <vm_name>" default="agentstack-local-dev"'
+usage = 'flag "--vm-name <vm_name>" default="adk-local-dev"'
 run = """
 VM_NAME="${usage_vm_name?}"
 {{ mise_bin }} run adk-cli:run -- platform delete --vm-name="$VM_NAME"
@@ -233,12 +233,12 @@ VM_NAME="${usage_vm_name?}"
 
 ["adk-server:dev:connect"]
 dir = "{{config_root}}/apps/adk-server"
-usage = 'flag "--vm-name <vm_name>" default="agentstack-local-dev"'
+usage = 'flag "--vm-name <vm_name>" default="adk-local-dev"'
 run = """
 #!/bin/bash
-NAMESPACE=agentstack
+NAMESPACE=adk
 VM_NAME="${usage_vm_name?}"
-eval "$( {{ mise_bin }} run agentstack:shell --vm-name="$VM_NAME" )"
+eval "$( {{ mise_bin }} run adk:shell --vm-name="$VM_NAME" )"
 
 # MicroShift/OpenShift specific setup for Telepresence
 kubectl create namespace ambassador --dry-run=client -o yaml | kubectl apply -f -
@@ -285,12 +285,12 @@ $tele replace adk-server --port 18333:8333
 
 ["adk-server:dev:disconnect"]
 dir = "{{config_root}}/apps/adk-server"
-usage = 'flag "--vm-name <vm_name>" default="agentstack-local-dev"'
+usage = 'flag "--vm-name <vm_name>" default="adk-local-dev"'
 run = """
 #!/bin/bash
-NAMESPACE=agentstack
+NAMESPACE=adk
 VM_NAME="${usage_vm_name?}"
-eval "$( {{ mise_bin }} run agentstack:shell --vm-name="$VM_NAME" )"
+eval "$( {{ mise_bin }} run adk:shell --vm-name="$VM_NAME" )"
 
 tele="telepresence --use .*${NAMESPACE}.*"
 if ! ($tele status --output json | jq '.user_daemon.status' | grep -q "Not connected"); then
@@ -301,7 +301,7 @@ $tele quit
 
 ["adk-server:dev:reconnect"]
 dir = "{{config_root}}/apps/adk-server"
-usage = 'flag "--vm-name <vm_name>" default="agentstack-local-dev"'
+usage = 'flag "--vm-name <vm_name>" default="adk-local-dev"'
 run = """
 VM_NAME="${usage_vm_name?}"
 {{ mise_bin }} run adk-server:dev:disconnect --vm-name="$VM_NAME"
@@ -331,24 +331,24 @@ export KAGENTI_ADK_CLIENT_ID=kagenti-cli
 
 NO_CLEAN="${usage_no_clean:-false}"
 if [ "$NO_CLEAN" != "true" ]; then
-    {{ mise_bin }} run agentstack:stop-all
-    {{ mise_bin }} run agentstack:delete --vm-name=${VM_NAME} || true
-    curl http://agentstack-api.localtest.me:8080 >/dev/null 2>&1 && echo "Another instance at agentstack-api.localtest.me:8080 is already running" && exit 2
+    {{ mise_bin }} run adk:stop-all
+    {{ mise_bin }} run adk:delete --vm-name=${VM_NAME} || true
+    curl http://adk-api.localtest.me:8080 >/dev/null 2>&1 && echo "Another instance at adk-api.localtest.me:8080 is already running" && exit 2
 fi
 
 CONFIG_FILE="/tmp/config_e2e_test_$(date +%s).yaml"
 
 echo '
-agentstack:
+adk:
   ui:
     enabled: true
   docling:
     enabled: true
 ' > "$CONFIG_FILE"
 
-{{ mise_bin }} run agentstack:start -v --vm-name=${VM_NAME} --skip-login -f "$CONFIG_FILE"
+{{ mise_bin }} run adk:start -v --vm-name=${VM_NAME} --skip-login -f "$CONFIG_FILE"
 
-eval "$( {{ mise_bin }} run agentstack:shell --vm-name="$VM_NAME" )"
+eval "$( {{ mise_bin }} run adk:shell --vm-name="$VM_NAME" )"
 
 if [ -z "${TEST_AGENT_IMAGE:-}" ]; then
     echo "Building test agent..."
@@ -357,10 +357,10 @@ if [ -z "${TEST_AGENT_IMAGE:-}" ]; then
 fi
 export TEST_AGENT_IMAGE
 
-export DB_URL="postgresql+asyncpg://agentstack-user:password@localhost:5432/agentstack"
+export DB_URL="postgresql+asyncpg://adk-user:password@localhost:5432/adk"
 export LLM_API_BASE="${LLM_API_BASE:-http://host.docker.internal:11434/v1}"
 
-kubectl port-forward -n agentstack svc/postgresql 5432:5432 2>/dev/null 1>&2 &
+kubectl port-forward -n adk svc/postgresql 5432:5432 2>/dev/null 1>&2 &
 uv run pytest -m e2e --ignore=tests/e2e/examples
 result=$?
 
@@ -398,27 +398,27 @@ export KAGENTI_ADK_CLIENT_ID=kagenti-cli
 
 NO_CLEAN="${usage_no_clean:-false}"
 if [ "$NO_CLEAN" != "true" ]; then
-    {{ mise_bin }} run agentstack:stop-all
-    {{ mise_bin }} run agentstack:delete --vm-name=${VM_NAME}
-    curl http://agentstack-api.localtest.me:8080 >/dev/null 2>&1 && echo "Another instance at agentstack-api.localtest.me:8080 is already running" && exit 2
+    {{ mise_bin }} run adk:stop-all
+    {{ mise_bin }} run adk:delete --vm-name=${VM_NAME}
+    curl http://adk-api.localtest.me:8080 >/dev/null 2>&1 && echo "Another instance at adk-api.localtest.me:8080 is already running" && exit 2
 fi
 
 CONFIG_FILE="/tmp/config_e2e_test_$(date +%s).yaml"
 
 echo '
-agentstack:
+adk:
   ui:
     enabled: false
   docling:
     enabled: true
 ' > "$CONFIG_FILE"
 
-{{ mise_bin }} run agentstack:start --vm-name=${VM_NAME} --skip-login -f "$CONFIG_FILE"
+{{ mise_bin }} run adk:start --vm-name=${VM_NAME} --skip-login -f "$CONFIG_FILE"
 
 
-eval "$( {{ mise_bin }} run agentstack:shell --vm-name="$VM_NAME" )"
+eval "$( {{ mise_bin }} run adk:shell --vm-name="$VM_NAME" )"
 
-export DB_URL="postgresql+asyncpg://agentstack-user:password@localhost:5432/agentstack"
+export DB_URL="postgresql+asyncpg://adk-user:password@localhost:5432/adk"
 export LLM_API_BASE="${LLM_API_BASE:-http://host.docker.internal:11434/v1}"
 
 echo "Waiting for adk-server deployment to be ready..."
@@ -459,14 +459,14 @@ run = """
 set -euxo pipefail
 VM_NAME=integration-test-run
 
-# {{ mise_bin }} run agentstack:delete --vm-name="$VM_NAME"
+# {{ mise_bin }} run adk:delete --vm-name="$VM_NAME"
 
-{{ mise_bin }} run agentstack:start \
+{{ mise_bin }} run adk:start \
     --vm-name="$VM_NAME" \
     --set kagenti-adk:redis.enabled=true \
     --set kagenti-adk:ui.enabled=false
 
-eval "$( {{ mise_bin }} run agentstack:shell --vm-name="$VM_NAME" )"
+eval "$( {{ mise_bin }} run adk:shell --vm-name="$VM_NAME" )"
 
 {{ mise_bin }} run adk-server:dev:disconnect --vm-name="$VM_NAME"
 {{ mise_bin }} run adk-server:dev:connect --vm-name="$VM_NAME"

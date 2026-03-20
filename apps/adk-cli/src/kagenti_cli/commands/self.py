@@ -160,7 +160,7 @@ async def install(
         ):
             import webbrowser
 
-            webbrowser.open("http://agentstack.localtest.me:8080")
+            webbrowser.open("http://adk.localtest.me:8080")
 
         console.print()
         console.success("Installation complete!")
@@ -174,7 +174,7 @@ async def install(
             "Use [green]kagenti-adk ui[/green] to open the web GUI, or [green]kagenti-adk run chat[/green] to talk to an agent on the command line."
         )
         console.hint(
-            "Run [green]kagenti-adk --help[/green] to learn about available commands, or check the documentation at https://agentstack.beeai.dev/"
+            "Run [green]kagenti-adk --help[/green] to learn about available commands, or check the documentation at https://adk.kagenti.dev/"
         )
 
 

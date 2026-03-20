@@ -132,7 +132,7 @@ run = "true" # Empty tests in case there are no tests
 
 # platform tasks
 
-["agentstack:start"]
+["adk:start"]
 depends = [
   "adk-server:build",
   "microshift-vm:build:qemu",
@@ -171,13 +171,13 @@ fi
     ${UI_TAG-} "$@"
 """
 
-["agentstack:delete"]
+["adk:delete"]
 run = "{{ mise_bin }} run adk-cli:run -- platform delete"
 
-["agentstack:stop"]
+["adk:stop"]
 run = "{{ mise_bin }} run adk-cli:run -- platform stop"
 
-["agentstack:stop-all"]
+["adk:stop-all"]
 usage = 'flag "--except <except>" default=""'
 run = """
 #!/bin/bash
@@ -194,10 +194,10 @@ echo "$TO_STOP" | xargs -rn 1 -I"{}" mise run adk-cli:run -- platform stop --vm-
 {% endraw %}
 """
 
-["agentstack:shell"]
+["adk:shell"]
 raw = true
 dir = "{{cwd}}"
-usage = 'flag "--vm-name <vm_name>" default="agentstack"'
+usage = 'flag "--vm-name <vm_name>" default="adk"'
 run = """
 cat <<EOF
 deactivate () {

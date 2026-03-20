@@ -64,10 +64,10 @@ You must initialize instrumentation at the agent logic level and enable the expo
 ```python
 from kagenti_adk.server import Server
 # 1. Agent Level: Import your specific instrumentor
-# from openinference.instrumentation.beeai import BeeAIInstrumentor
+# from openinference.instrumentation.kagenti import KagentiInstrumentor
 
 # Initialize the instrumentor to capture framework events
-# BeeAIInstrumentor().instrument()
+# KagentiInstrumentor().instrument()
 
 server = Server()
 
@@ -88,7 +88,7 @@ server.run(configure_telemetry=True)
 The quickest way to see what your agent is doing is by streaming its logs directly to your terminal. This is ideal for debugging container lifecycle events and immediate request errors.
 
 ```bash
-agentstack logs
+adk logs
 ```
 
 What you'll see:

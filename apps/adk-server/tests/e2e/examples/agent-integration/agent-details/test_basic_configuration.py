@@ -38,7 +38,7 @@ async def test_basic_configuration_example(subtests, get_final_task_from_stream,
             assert (
                 params["user_greeting"] == "Hi there! I can help you research topics or summarize uploaded documents."
             )
-            assert params["framework"] == "BeeAI Framework"
+            assert params["framework"] == "Kagenti Framework"
             assert params["source_code_url"] == "https://github.com/example/example-research-assistant"
 
         with subtests.test("agent detail has author info"):

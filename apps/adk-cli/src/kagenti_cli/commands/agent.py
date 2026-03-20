@@ -231,7 +231,7 @@ async def add_agent(
     if is_image:
         await _add_agent_via_kagenti(location, name=name, namespace=namespace, port=port, env=env, env_file=env_file)
     else:
-        # Legacy path: register network URL directly with agentstack
+        # Legacy path: register network URL directly with adk
         try:
             with status("Registering agent to platform"):
                 async with configuration.use_platform_client():
@@ -275,7 +275,7 @@ async def _add_agent_via_kagenti(
     try:
         auth_token = await configuration.auth_manager.load_auth_token()
     except Exception:
-        if configuration.auth_manager.active_server and "agentstack-api.localtest.me" in configuration.auth_manager.active_server:
+        if configuration.auth_manager.active_server and "adk-api.localtest.me" in configuration.auth_manager.active_server:
             with contextlib.suppress(Exception):
                 auth_token = await configuration.auth_manager.login_with_password(
                     configuration.auth_manager.active_server, username="admin", password="admin"
@@ -291,7 +291,7 @@ async def _add_agent_via_kagenti(
     env_vars: dict[str, str] = {
         "PORT": "8000",
         "HOST": "0.0.0.0",
-        "PLATFORM_URL": "http://adk-server-svc.agentstack:8333",
+        "PLATFORM_URL": "http://adk-server-svc.adk:8333",
         "PLATFORM_AUTH__SKIP_AUDIENCE_VALIDATION": "true",
         "OTEL_EXPORTER_OTLP_ENDPOINT": "http://otel-collector.kagenti-system:8335",
     }
@@ -552,7 +552,7 @@ async def uninstall_agent(
             try:
                 auth_token = await configuration.auth_manager.load_auth_token()
             except Exception:
-                if configuration.auth_manager.active_server and "agentstack-api.localtest.me" in configuration.auth_manager.active_server:
+                if configuration.auth_manager.active_server and "adk-api.localtest.me" in configuration.auth_manager.active_server:
                     with contextlib.suppress(Exception):
                         auth_token = await configuration.auth_manager.login_with_password(
                             configuration.auth_manager.active_server, username="admin", password="admin"
@@ -976,8 +976,8 @@ async def _run_agent(
                             console.print(f"📁 Saved {full_path}")
                         elif part.HasField("url"):
                             uri = part.url
-                            if uri.startswith("agentstack://"):
-                                async with File.load_content(uri.removeprefix("agentstack://")) as file:
+                            if uri.startswith("adk://"):
+                                async with File.load_content(uri.removeprefix("adk://")) as file:
                                     full_path.write_bytes(file.content)
                             else:
                                 async with httpx.AsyncClient() as httpx_client:

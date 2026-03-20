@@ -43,7 +43,7 @@ from beeai_framework.tools import AnyTool, Tool
 from beeai_framework.tools.search.duckduckgo import DuckDuckGoSearchTool
 from beeai_framework.tools.search.wikipedia import WikipediaTool
 from beeai_framework.tools.weather import OpenMeteoTool
-from openinference.instrumentation.beeai import BeeAIInstrumentor
+from openinference.instrumentation.kagenti import KagentiInstrumentor
 
 from chat.helpers.citations import extract_citations
 from chat.helpers.trajectory import TrajectoryContent
@@ -51,9 +51,9 @@ from chat.tools.files.file_creator import FileCreatorTool, FileCreatorToolOutput
 from chat.tools.files.file_reader import FileReaderTool
 from chat.tools.files.utils import extract_files, to_framework_message
 
-beeai_instrumentor = BeeAIInstrumentor()
-if beeai_instrumentor:
-    beeai_instrumentor.instrument()
+kagenti_instrumentor = KagentiInstrumentor()
+if kagenti_instrumentor:
+    kagenti_instrumentor.instrument()
 
 logger = logging.getLogger(__name__)
 
@@ -92,9 +92,9 @@ server = Server()
                 description="Creates new files with specified content and metadata, uploading them to the platform for download or further processing.",
             ),
         ],
-        framework="BeeAI",
+        framework="Kagenti",
         programming_language="Python",
-        author=AgentDetailContributor(name="BeeAI contributors"),
+        author=AgentDetailContributor(name="Kagenti contributors"),
         contributors=[],
         license="Apache 2.0",
     ),
@@ -105,7 +105,7 @@ server = Server()
             description=dedent(
                 """\
                 The agent is an AI-powered conversational system designed to process user messages, maintain context,
-                and generate intelligent responses. Built on the **BeeAI framework**, it leverages memory and external
+                and generate intelligent responses. Built on the **Kagenti framework**, it leverages memory and external
                 tools to enhance interactions. It supports real-time web search, Wikipedia lookups, file manipulations,
                 and weather updates, making it a versatile assistant for various applications.
 
@@ -163,7 +163,7 @@ async def chat(
     # Build dynamic instructions based on available files
     base_instructions = dedent(
         """\
-        You are a helpful AI assistant built on the BeeAI framework. You have access to various tools and capabilities to assist users effectively.
+        You are a helpful AI assistant built on the Kagenti framework. You have access to various tools and capabilities to assist users effectively.
 
         ## Core Behavior Guidelines:
         - Always be helpful, accurate, and concise in your responses

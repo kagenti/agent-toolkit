@@ -187,9 +187,9 @@ if __name__ == "__main__":
 - Use **stream + buffer + single store** when your agent emits multiple partial chunks which are streamed to the user.
 - With `PlatformContextStore`, each `context.store()` call creates a persisted history item, so buffering prevents chunk-level history fragmentation.
 
-## Advanced BeeAI Framework Example
+## Advanced Kagenti Framework Example
 
-Here's a sophisticated example using the BeeAI Framework to build a multi-turn chat agent that leverages conversation history and LLM capabilities:
+Here's a sophisticated example using the Kagenti Framework to build a multi-turn chat agent that leverages conversation history and LLM capabilities:
 
 {/* <!-- embedme examples/agent-integration/multi-turn/advanced-history/src/advanced_history/agent.py--> */}
 ```python
@@ -292,7 +292,7 @@ if __name__ == "__main__":
 This advanced example demonstrates several key concepts:
 
 - **LLM Integration:** Uses the platform's LLM service extension to get model access
-- **Framework Integration:** Leverages the BeeAI Framework for sophisticated agent capabilities
+- **Framework Integration:** Leverages the Kagenti Framework for sophisticated agent capabilities
 - **Memory Management:** Converts conversation history to framework format and loads it into agent memory
 - **Tool Usage:** Includes thinking tools and conditional requirements for better reasoning
 - **Persistent Storage:** Uses `PlatformContextStore` for conversation persistence

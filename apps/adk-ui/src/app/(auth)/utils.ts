@@ -46,7 +46,7 @@ export async function jwtWithRefresh(
     const { clientId, clientSecret, issuer: issuerUrl } = providerOptions;
 
     // OIDC_PROVIDER_ISSUER should point to the internal endpoint, while issuerUrl might be external url
-    // e.g. http://keycloak:8336/realms/agentstack (internal) vs https://localhost:8336/realms/agentstack (external)
+    // e.g. http://keycloak:8336/realms/adk (internal) vs https://localhost:8336/realms/adk (external)
     const issuer = process.env.OIDC_PROVIDER_ISSUER ?? issuerUrl;
     const refreshTokenUrl = await getTokenEndpoint(issuer, clientId, clientSecret);
 

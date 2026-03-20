@@ -49,28 +49,28 @@ will use
 Instead, use:
 
 ```shell
-mise agentstack:start
+mise adk:start
 ```
 
 This will build the images (`adk-server` and `adk-ui`) and import them to the cluster. You can add other
 CLI arguments as you normally would when using `kagenti-adk` CLI, for example:
 
 ```shell
-mise agentstack:start --set docling.enabled=true --set oidc.enabled=true
+mise adk:start --set docling.enabled=true --set oidc.enabled=true
 ```
 
 To stop or delete the platform use
 
 ```shell
-mise agentstack:stop
-mise agentstack:delete
+mise adk:stop
+mise adk:delete
 ```
 
 For debugging and direct access to kubernetes, setup `KUBECONFIG` and other environment variables using:
 
 ```shell
 # Activate environment
-eval "$(mise run agentstack:shell)"
+eval "$(mise run adk:shell)"
 
 # Deactivate environment
 deactivate
@@ -83,7 +83,7 @@ By default, authentication and authorization are disabled.
 Starting the platform with OIDC enabled:
 
 ```bash
-mise agentstack:start --set auth.enabled=true
+mise adk:start --set auth.enabled=true
 ```
 
 This will setup keycloak (with no platform users out of the box).
@@ -91,7 +91,7 @@ This will setup keycloak (with no platform users out of the box).
 You can add users at <http://localhost:8336>, by loggin in with the admin user (admin:admin in dev)
 and going to "Manage realms" -> "Users".
 
-You can promote users by assigning `agentstack-admin` or `agentstack-developer` roles to them. Make sure to add a
+You can promote users by assigning `adk-admin` or `adk-developer` roles to them. Make sure to add a
 password in the "Credentials" tab and set their email to verified.
 
 You can also automate this by creating a file `config.yaml`:
@@ -101,17 +101,17 @@ auth:
   enabled: true
 keycloak:
   auth:
-    seedAgentstackUsers:
+    seedAdkUsers:
       - username: admin
         password: admin
         firstName: Admin
         lastName: User
         email: admin@beeai.dev
-        roles: ["agentstack-admin"]
+        roles: ["adk-admin"]
         enabled: true
 ```
 
-Then run `mise run agentstack:start -f config.yaml`
+Then run `mise run adk:start -f config.yaml`
 
 **Available endpoints:**
 
@@ -139,8 +139,8 @@ mise run adk-server:dev:start
 This will do the following:
 
 1. Create .env file if it doesn't exist yet (you can add your configuration here)
-2. Stop default platform VM ("agentstack") if it exists
-3. Start a new VM named "agentstack-local-dev" separate from the "agentstack" VM used by default
+2. Stop default platform VM ("adk") if it exists
+3. Start a new VM named "adk-local-dev" separate from the "adk" VM used by default
 4. Install telepresence into the cluster
    > Note that this will require **root access** on your machine, due to setting up a networking stack.
 5. Replace kagenti-adk in the cluster and forward any incoming traffic to localhost
@@ -150,7 +150,7 @@ After the command succeeds, you can:
 - send requests as if your machine was running inside the cluster. For example:
   `curl http://<service-name>:<service-port>`.
 
-* connect to postgresql using the default credentials `postgresql://agentstack-user:password@postgresql:5432/agentstack`
+* connect to postgresql using the default credentials `postgresql://adk-user:password@postgresql:5432/adk`
 * now you can start your server from your IDE or using `mise run adk-server:run` on port **18333**
 * run kagenti-adk using `mise adk-cli:run -- <command>` or HTTP requests to localhost:8333 or localhost:18333
   - localhost:8333 is port-forwarded from the cluster, so any requests will pass through the cluster networking to the
@@ -203,7 +203,7 @@ Make sure to have this model running locally.
 eval "$(mise run adk-server:dev:shell)"
 
 # Start platform
-mise adk-cli:run -- platform start --vm-name=agentstack-local-dev # optional --tag [tag] --import-images
+mise adk-cli:run -- platform start --vm-name=adk-local-dev # optional --tag [tag] --import-images
 mise x -- telepresence helm install
 mise x -- telepresence connect
 

@@ -285,7 +285,7 @@ async def start_cmd(
                     lima_env = {"LIMA_HOME": str(Configuration().lima_home)}
                     match await detect_vm_status(vm_name):
                         case "missing":
-                            for name, label in [(vm_name, "previous"), ("beeai-platform", "legacy")]:
+                            for name, label in [(vm_name, "previous"), ("kagenti-platform", "legacy")]:
                                 await run_command([detect_limactl(), "--tty=false", "delete", "--force", name], f"Cleaning up remains of {label} instance", env=lima_env, check=False, cwd="/")
                             import psutil
 
@@ -395,7 +395,7 @@ async def start_cmd(
                             ["wsl.exe", "--unregister", vm_name], "Cleaning up remains of previous instance", check=False
                         )
                         await run_command(
-                            ["wsl.exe", "--unregister", "beeai-platform"],
+                            ["wsl.exe", "--unregister", "kagenti-platform"],
                             "Cleaning up remains of legacy instance",
                             check=False,
                         )

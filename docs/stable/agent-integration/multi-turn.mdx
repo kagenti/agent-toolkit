@@ -73,9 +73,9 @@ if __name__ == "__main__":
 1. **Store agent responses:** Use `await context.store(response)` to store your agent's responses for future conversation context.
 
 
-## Advanced BeeAI Framework Example
+## Advanced Kagenti Framework Example
 
-Here's a sophisticated example using the BeeAI Framework to build a multi-turn chat agent that leverages conversation history and LLM capabilities:
+Here's a sophisticated example using the Kagenti Framework to build a multi-turn chat agent that leverages conversation history and LLM capabilities:
 
 ```python
 import os
@@ -83,7 +83,7 @@ from typing import Annotated
 
 from a2a.types import Message, Role
 from a2a.utils.message import get_message_text
-from beeai_framework.adapters.agentstack.backend.chat import Kagenti ADKChatModel
+from beeai_framework.adapters.agentstack.backend.chat import AgentStackChatModel
 from beeai_framework.agents.requirement import RequirementAgent
 from beeai_framework.agents.requirement.requirements.conditional import ConditionalRequirement
 from beeai_framework.backend import AssistantMessage, UserMessage
@@ -105,7 +105,7 @@ FrameworkMessage = UserMessage | AssistantMessage
 
 
 def to_framework_message(message: Message) -> FrameworkMessage:
-    """Convert A2A Message to BeeAI Framework Message format"""
+    """Convert A2A Message to Kagenti Framework Message format"""
     message_text = "".join(part.root.text for part in message.parts if part.root.kind == "text")
 
     if message.role == Role.agent:
@@ -128,8 +128,8 @@ async def multi_turn_chat_agent(
     # Load conversation history
     history = [message async for message in context.load_history() if isinstance(message, Message) and message.parts]
 
-    # Initialize BeeAI Framework LLM client
-    llm_client = Kagenti ADKChatModel()
+    # Initialize Kagenti Framework LLM client
+    llm_client = AgentStackChatModel()
     llm_client.set_context(llm)
 
     # Create a RequirementAgent with conversation memory
@@ -178,7 +178,7 @@ if __name__ == "__main__":
 This advanced example demonstrates several key concepts:
 
 - **LLM Integration:** Uses the platform's LLM service extension to get model access
-- **Framework Integration:** Leverages the BeeAI Framework for sophisticated agent capabilities
+- **Framework Integration:** Leverages the Kagenti Framework for sophisticated agent capabilities
 - **Memory Management:** Converts conversation history to framework format and loads it into agent memory
 - **Tool Usage:** Includes thinking tools and conditional requirements for better reasoning
 - **Persistent Storage:** Uses `PlatformContextStore` for conversation persistence

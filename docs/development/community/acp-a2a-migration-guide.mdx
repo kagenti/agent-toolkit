@@ -67,10 +67,10 @@ from kagenti_adk.util.file import load_file
 ```py
 @server.agent(
     name="jennas_granite_chat",
-    description="This is a general-purpose chat assistant prototype built with the BeeAI Framework and powered by Granite.",
+    description="This is a general-purpose chat assistant prototype built with the Kagenti Framework and powered by Granite.",
     metadata=Metadata(
         annotations=Annotations(
-            beeai_ui=PlatformUIAnnotation(
+            kagenti_ui=PlatformUIAnnotation(
                 ui_type=PlatformUIType.CHAT,
                 user_greeting="Hi! I'm your Granite-powered AI assistant—here to help with questions, research, and more. What can I do for you today?",
                 display_name="Jenna's Granite Chat",
@@ -82,8 +82,8 @@ from kagenti_adk.util.file import load_file
         ),
         author={"name": "Jenna Winkler"},
         contributors=[{"name": "Tomas Weiss"}, {"name": "Tomas Dvorak"}],
-        recommended_models=["granite3.3:8b-beeai"],
-        tags=["Granite", "Chat", "Research"], framework="BeeAI", license="Apache 2.0",
+        recommended_models=["granite3.3:8b-kagenti"],
+        tags=["Granite", "Chat", "Research"], framework="Kagenti", license="Apache 2.0",
         links=[{"type": "source-code", "url": "https://github.com/jenna-winkler/granite_chat"}])
 async def agent_function(input: list[Message], context: Context) -> AsyncGenerator:
 ```
@@ -113,7 +113,7 @@ async def agent_function(input: list[Message], context: Context) -> AsyncGenerat
                 description="Read and analyze uploaded files including PDFs, text files, CSV data, and JSON documents."
             )
         ],
-        framework="BeeAI",
+        framework="Kagenti",
         author={
             "name": "Jenna Winkler"
         },
@@ -312,4 +312,4 @@ yield response_text
 ## Complete Examples
 
 1. https://github.com/kagenti/adk/blob/main/agents/chat/src/chat/agent.py
-2. https://github.com/jenna-winkler/agentstack-showcase/blob/main/src/agentstack_agents/agent.py
+2. https://github.com/jenna-winkler/adk-showcase/blob/main/src/adk_agents/agent.py

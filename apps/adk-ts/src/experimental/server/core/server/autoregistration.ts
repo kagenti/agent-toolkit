@@ -11,7 +11,7 @@ import type { AutoregistrationOptions } from './types';
 
 const VARIABLE_RELOAD_INTERVAL_MS = 5000;
 
-export function createAutoregisterToAgentstack(options: AutoregistrationOptions): () => void {
+export function createAutoregisterToAdk(options: AutoregistrationOptions): () => void {
   const { selfRegistrationId, agentCard, host, port, api } = options;
 
   let providerId: string | null = null;

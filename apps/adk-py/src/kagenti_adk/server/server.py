@@ -287,7 +287,7 @@ class Server:
 
     @property
     def _platform_url(self) -> str:
-        return os.getenv("PLATFORM_URL", "http://agentstack-api.localtest.me:8080")
+        return os.getenv("PLATFORM_URL", "http://adk-api.localtest.me:8080")
 
     @property
     def _production_mode(self) -> bool:

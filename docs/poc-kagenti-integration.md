@@ -1,4 +1,4 @@
-# PoC: Kagenti Integration into Agentstack
+# PoC: Kagenti Integration into ADK
 
 ## Status: Draft / Brainstorming
 
@@ -6,7 +6,7 @@
 
 ## 1. Executive Summary
 
-This document outlines the plan to refactor the agentstack platform so that agent scaling, deployment, and discovery are
+This document outlines the plan to refactor the adk platform so that agent scaling, deployment, and discovery are
 handled by **kagenti** instead of our custom Kubernetes provider management. The goal is a lightweight local developer
 experience with optional enterprise features (Istio, SPIRE, Shipwright).
 
@@ -31,12 +31,12 @@ experience with optional enterprise features (Istio, SPIRE, Shipwright).
 
 ## 2. Architecture Comparison
 
-### Current Agentstack
+### Current ADK
 
 ```
 Lima VM (MicroShift)
-└── agentstack namespace
-    ├── agentstack-server (FastAPI)
+└── adk namespace
+    ├── adk-server (FastAPI)
     │   ├── KubernetesProviderDeploymentManager (kr8s)
     │   ├── KubernetesProviderBuildManager (Kaniko)
     │   ├── A2A Proxy Service
@@ -46,15 +46,15 @@ Lima VM (MicroShift)
     ├── Redis
     ├── SeaweedFS
     ├── Phoenix (observability)
-    └── agentstack-provider-{id}-svc (per-agent deployments)
+    └── adk-provider-{id}-svc (per-agent deployments)
 ```
 
-### Target: Agentstack + Kagenti
+### Target: ADK + Kagenti
 
 ```
 Lima VM (MicroShift)
-├── agentstack namespace
-│   ├── agentstack-server (FastAPI, slimmed down)
+├── adk namespace
+│   ├── adk-server (FastAPI, slimmed down)
 │   │   ├── A2A Proxy → delegates to kagenti agent services
 │   │   └── Provider Registry → reads from kagenti API / agent cards
 │   ├── PostgreSQL
@@ -126,7 +126,7 @@ Modify kagenti's Ansible playbook to target an existing MicroShift cluster inste
 
 #### Option C: Umbrella Helm chart
 
-Create a single umbrella chart that includes agentstack + kagenti + kagenti-deps as subcharts.
+Create a single umbrella chart that includes adk + kagenti + kagenti-deps as subcharts.
 
 **Pros:**
 
@@ -180,7 +180,7 @@ kagenti:
 
 ### 3.3 Keycloak Namespace
 
-**Problem:** Agentstack deploys Keycloak in the same namespace as the server. Kagenti deploys it in a dedicated
+**Problem:** ADK deploys Keycloak in the same namespace as the server. Kagenti deploys it in a dedicated
 `keycloak` namespace. We need to converge.
 
 **Options:**
@@ -193,7 +193,7 @@ Move Keycloak to its own namespace, matching kagenti's approach.
 
 - Clean separation of concerns
 - Matches kagenti convention
-- Keycloak can be shared across agentstack + kagenti components
+- Keycloak can be shared across adk + kagenti components
 - Independent scaling and RBAC
 
 **Cons:**
@@ -204,18 +204,18 @@ Move Keycloak to its own namespace, matching kagenti's approach.
 
 **Implementation:**
 
-- Remove Keycloak from agentstack Helm chart
+- Remove Keycloak from adk Helm chart
 - Use kagenti-deps chart to deploy Keycloak (or a standalone Keycloak chart)
-- Update agentstack-server config to point to `keycloak-service.keycloak:8080`
-- Both agentstack and kagenti configure their OAuth clients in the same realm
+- Update adk-server config to point to `keycloak-service.keycloak:8080`
+- Both adk and kagenti configure their OAuth clients in the same realm
 
-#### Option B: Keep in agentstack namespace, kagenti references it
+#### Option B: Keep in adk namespace, kagenti references it
 
 Keep current setup, configure kagenti to use the existing Keycloak instance.
 
 **Pros:**
 
-- Minimal changes to agentstack
+- Minimal changes to adk
 - Single chart still works
 
 **Cons:**
@@ -223,9 +223,9 @@ Keep current setup, configure kagenti to use the existing Keycloak instance.
 - Non-standard for kagenti (may need chart modifications)
 - Namespace coupling
 
-#### Option C: Let kagenti-deps own Keycloak, agentstack consumes it
+#### Option C: Let kagenti-deps own Keycloak, adk consumes it
 
-Kagenti-deps deploys Keycloak in `keycloak` namespace. Agentstack Helm chart declares Keycloak as disabled and
+Kagenti-deps deploys Keycloak in `keycloak` namespace. ADK Helm chart declares Keycloak as disabled and
 references the external instance.
 
 **Pros:**
@@ -235,31 +235,31 @@ references the external instance.
 
 **Cons:**
 
-- Deployment order dependency (keycloak must be up before agentstack)
-- Agentstack still needs its own realm provisioning (see below)
+- Deployment order dependency (keycloak must be up before adk)
+- ADK still needs its own realm provisioning (see below)
 
-**Decision:** **Option C** - Let kagenti-deps own Keycloak. Agentstack becomes a consumer. This is the cleanest
+**Decision:** **Option C** - Let kagenti-deps own Keycloak. ADK becomes a consumer. This is the cleanest
 separation.
 
 **Helm chart implications:**
 
 - This works fine even with multiple charts. The deployment order is:
   1. `helm install kagenti-deps` (includes Keycloak, optionally Istio, SPIRE, etc.)
-  2. `helm install agentstack` (references Keycloak via service DNS)
+  2. `helm install adk` (references Keycloak via service DNS)
   3. `helm install kagenti` (references Keycloak via service DNS)
 - Or with an umbrella chart using `weight` annotations for ordering.
 
 ### 3.4 Keycloak Realm Provisioning
 
 **Problem:** Both systems need Keycloak realm/client configuration. Moving Keycloak to kagenti-deps doesn't eliminate
-the need for agentstack's own realm bootstrapping.
+the need for adk's own realm bootstrapping.
 
-**Agentstack's provision job** (`helm/templates/keycloak/provision-job.yaml`) does:
+**ADK's provision job** (`helm/templates/keycloak/provision-job.yaml`) does:
 
-- Creates `agentstack` realm with custom login theme
-- Creates roles: `agentstack-admin`, `agentstack-developer`
+- Creates `adk` realm with custom login theme
+- Creates roles: `adk-admin`, `adk-developer`
 - Creates OAuth clients:
-  - `agentstack-server` (confidential, service accounts + direct access grants)
+  - `adk-server` (confidential, service accounts + direct access grants)
   - `adk-ui` (confidential, standard flow + direct access grants)
   - `kagenti-adk` (public, standard flow + direct access grants, localhost redirect)
 - Configures audience mappers per client (UI URL, API URL)
@@ -275,18 +275,18 @@ the need for agentstack's own realm bootstrapping.
 
 #### Option 1: Separate realms (DECIDED)
 
-Keep `agentstack` realm and `kagenti` realm side by side. Each system provisions its own realm independently.
+Keep `adk` realm and `kagenti` realm side by side. Each system provisions its own realm independently.
 
 Kagenti uses a dedicated `kagenti` realm (configured via `keycloak_realm` in backend config, bootstrapped via
 `autoBootstrapRealm`). This is their own realm, not the master realm.
 
-Agentstack keeps its own `agentstack` realm. Both realms live in the same Keycloak instance but are fully independent.
+ADK keeps its own `adk` realm. Both realms live in the same Keycloak instance but are fully independent.
 
 **Pros:**
 
 - Zero coupling between the two provisioning jobs
 - Each system owns its auth config completely
-- Agentstack's provision-job.yaml stays unchanged (just point at new Keycloak URL)
+- ADK's provision-job.yaml stays unchanged (just point at new Keycloak URL)
 - Clean separation - no risk of role/client name collisions
 
 **Cons:**
@@ -308,7 +308,7 @@ unified SSO.
 
 **What changes in the provision job:**
 
-- Keep `provision-job.yaml` in the agentstack Helm chart
+- Keep `provision-job.yaml` in the adk Helm chart
 - Remove Keycloak StatefulSet, Service, and Secret templates (those move to kagenti-deps)
 - Update the job to target the external Keycloak: `keycloak-service.keycloak:8080`
 - Admin credentials need to be shared (either a shared secret or a dedicated admin client for provisioning)
@@ -317,9 +317,9 @@ unified SSO.
 
 ## 4. Component Mapping
 
-### What agentstack drops (delegates to kagenti)
+### What adk drops (delegates to kagenti)
 
-| Agentstack Component                                 | Kagenti Replacement                                                            |
+| ADK Component                                 | Kagenti Replacement                                                            |
 | ---------------------------------------------------- | ------------------------------------------------------------------------------ |
 | `KubernetesProviderDeploymentManager`                | Kagenti operator deploys agents as standard K8s Deployments in team namespaces |
 | `KubernetesProviderBuildManager` (Kaniko)            | Shipwright + Tekton builds (optional)                                          |
@@ -330,18 +330,18 @@ unified SSO.
 | `build-provider-job.yaml` (Kaniko + Crane)           | Shipwright BuildRun with Buildah strategy                                      |
 | Keycloak deployment                                  | kagenti-deps Keycloak deployment                                               |
 
-### What agentstack keeps
+### What adk keeps
 
 | Component              | Reason                                              |
 | ---------------------- | --------------------------------------------------- |
 | A2A Proxy Service      | Core routing/auth logic, user task tracking         |
 | Provider Registry sync | Can evolve to sync with kagenti's agent namespaces  |
-| PostgreSQL             | Agentstack's own data (users, tasks, conversations) |
+| PostgreSQL             | ADK's own data (users, tasks, conversations) |
 | Redis                  | Caching, rate limiting                              |
 | SeaweedFS              | Object storage for artifacts                        |
 | Phoenix                | LLM observability (kagenti also supports this)      |
 
-### What changes in agentstack-server
+### What changes in adk-server
 
 | Area                   | Change                                                                                        |
 | ---------------------- | --------------------------------------------------------------------------------------------- |
@@ -356,12 +356,12 @@ unified SSO.
 
 ## 5. Multi-Tenancy, Agent Discovery, and Data Scoping
 
-This is a critical design area. Agentstack currently has user-scoped data (conversations, tasks, files) but no
+This is a critical design area. ADK currently has user-scoped data (conversations, tasks, files) but no
 namespace/team concept. Kagenti has namespace-based isolation but no per-user data scoping. We need to bridge these.
 
 ### 5.1 Current State
 
-**Agentstack multi-tenancy:**
+**ADK multi-tenancy:**
 
 - User-per-tenant model: each user has isolated data via `created_by` FK
 - Data scoped per-user: contexts, files, vector_stores, a2a_request_tasks, a2a_request_contexts
@@ -378,22 +378,22 @@ namespace/team concept. Kagenti has namespace-based isolation but no per-user da
 - K8s RBAC on the backend service account controls what namespaces are actually accessible
 - No user data storage (stateless - queries K8s API on every request)
 
-### 5.2 Agent Discovery: How Should Agentstack Find Kagenti Agents?
+### 5.2 Agent Discovery: How Should ADK Find Kagenti Agents?
 
 #### Option A: Call Kagenti Backend API (DECIDED)
 
-Agentstack calls `GET http://kagenti-backend.kagenti-system:8080/api/v1/agents?namespace=<ns>` to discover agents.
+ADK calls `GET http://kagenti-backend.kagenti-system:8080/api/v1/agents?namespace=<ns>` to discover agents.
 
 ```
-agentstack-server → HTTP → kagenti-backend → K8s API → Deployments with kagenti.io/type=agent
+adk-server → HTTP → kagenti-backend → K8s API → Deployments with kagenti.io/type=agent
 ```
 
 **Pros:**
 
-- Clean separation - agentstack doesn't need K8s RBAC for agent namespaces
+- Clean separation - adk doesn't need K8s RBAC for agent namespaces
 - Kagenti handles the label scanning, status aggregation, protocol detection
-- Easier to evolve (kagenti can add caching, watching, CRDs without agentstack changes)
-- Shared auth via Keycloak - agentstack can forward user tokens to kagenti API
+- Easier to evolve (kagenti can add caching, watching, CRDs without adk changes)
+- Shared auth via Keycloak - adk can forward user tokens to kagenti API
 
 **Cons:**
 
@@ -401,9 +401,9 @@ agentstack-server → HTTP → kagenti-backend → K8s API → Deployments with 
 - Extra network hop
 - Polling-based (kagenti has no watch/event mechanism either)
 
-**Auth for kagenti API access:** Agentstack-server will need a dedicated Keycloak client in the `kagenti` realm (e.g.,
-`agentstack-api`) to authenticate against the kagenti backend API. This client would use client credentials grant
-(service-to-service). The kagenti provision job (or agentstack's provision job targeting the kagenti realm) needs to
+**Auth for kagenti API access:** ADK-server will need a dedicated Keycloak client in the `kagenti` realm (e.g.,
+`adk-api`) to authenticate against the kagenti backend API. This client would use client credentials grant
+(service-to-service). The kagenti provision job (or adk's provision job targeting the kagenti realm) needs to
 create this client with at least `kagenti-viewer` role.
 
 **Implementation:**
@@ -428,9 +428,9 @@ class KagentiAgentDiscovery:
 
 #### Option B: Direct K8s Label Scanning (Rejected)
 
-Agentstack's service account scans Deployments with label `kagenti.io/type=agent` across namespaces.
+ADK's service account scans Deployments with label `kagenti.io/type=agent` across namespaces.
 
-**Why rejected:** K8s RBAC is namespace-scoped by default. Agentstack's service account in the `agentstack` namespace
+**Why rejected:** K8s RBAC is namespace-scoped by default. ADK's service account in the `adk` namespace
 cannot list Deployments in `team1` or `team2` unless we grant it a ClusterRole. This is a significant RBAC escalation.
 An alternative would be deploying a "service agent" sidecar into each team namespace, but that adds complexity.
 
@@ -439,19 +439,19 @@ Note: this is a **K8s API RBAC** limitation, not a networking limitation. Networ
 
 #### Option C: K8s Watch + Local Cache (Future - Best for Production)
 
-Same RBAC concern as Option B. Could be revisited if we add a ClusterRole for agentstack or use kagenti's operator to
+Same RBAC concern as Option B. Could be revisited if we add a ClusterRole for adk or use kagenti's operator to
 push events.
 
-**Decision:** **Option A** (kagenti API). We will create a dedicated Keycloak client for agentstack-server in the
+**Decision:** **Option A** (kagenti API). We will create a dedicated Keycloak client for adk-server in the
 kagenti realm to authenticate API calls.
 
 ### 5.3 Multi-Tenancy Model: Per-Namespace vs Global
 
-The core question: **When a user opens agentstack, which agents do they see?**
+The core question: **When a user opens adk, which agents do they see?**
 
 #### Pattern 1: Global Agent Catalog + Per-User Data (Recommended)
 
-All agents across all kagenti namespaces are visible to all agentstack users. User data (conversations, tasks, files)
+All agents across all kagenti namespaces are visible to all adk users. User data (conversations, tasks, files)
 remains per-user as today.
 
 ```
@@ -466,11 +466,11 @@ Files:         PER-USER (uploaded documents)
 - Small teams, local development, PoC
 - All agents are shared resources (like shared microservices)
 - Users don't need to hide agents from each other
-- Simplest to implement - mirrors current agentstack behavior
+- Simplest to implement - mirrors current adk behavior
 
 **Implementation:**
 
-- Agentstack discovers all agents across all `kagenti-enabled=true` namespaces
+- ADK discovers all agents across all `kagenti-enabled=true` namespaces
 - Provider list in Kagenti ADK UI shows agents grouped by namespace
 - No changes to user model or data scoping
 
@@ -494,7 +494,7 @@ Files:         PER-USER
 **Implementation:**
 
 - Add `user_namespaces` mapping (DB table or Keycloak groups → namespaces)
-- Agentstack filters agent list by user's allowed namespaces
+- ADK filters agent list by user's allowed namespaces
 - Keycloak groups could map to kagenti namespaces (e.g., group `team1` → namespace `team1`)
 - OR: Keycloak realm roles with namespace claims in JWT
 
@@ -504,10 +504,10 @@ Files:         PER-USER
 Keycloak realm: kagenti
 ├── Group: team1 → users who can access team1 namespace
 ├── Group: team2 → users who can access team2 namespace
-└── Client: agentstack → includes group memberships in token claims
+└── Client: adk → includes group memberships in token claims
 ```
 
-Agentstack reads group claims from JWT → maps to allowed namespaces → filters agent discovery.
+ADK reads group claims from JWT → maps to allowed namespaces → filters agent discovery.
 
 #### Pattern 3: Hybrid - Global Catalog + Namespace Permissions
 
@@ -524,7 +524,7 @@ Conversations:  PER-USER
 - Users want to discover what's available but access is controlled
 - Self-service model: "request access to namespace X"
 
-**Recommendation for PoC:** Start with **Pattern 1** (global catalog). It matches current agentstack behavior and is
+**Recommendation for PoC:** Start with **Pattern 1** (global catalog). It matches current adk behavior and is
 simplest. Add namespace scoping later when we have real multi-team requirements.
 
 ### 5.4 DNS and URL Resolution
@@ -538,21 +538,21 @@ Agent URL patterns:
 - **In-cluster (service DNS):** `http://{agent-name}.{namespace}.svc.cluster.local:8080`
 - **External (localtest.me):** `http://{agent-name}.{namespace}.localtest.me:8080` (requires ingress/port-forward)
 - **Via kagenti API proxy:** `POST http://kagenti-backend.kagenti-system:8080/api/v1/chat/{ns}/{name}/send`
-- **Via agentstack A2A proxy:** agentstack continues to proxy A2A requests, but resolves URLs to in-cluster service DNS
+- **Via adk A2A proxy:** adk continues to proxy A2A requests, but resolves URLs to in-cluster service DNS
 
 ### 5.5 Auth Token Flow
 
-Both systems use Keycloak. The question is whether agentstack forwards user tokens to agents or mints its own.
+Both systems use Keycloak. The question is whether adk forwards user tokens to agents or mints its own.
 
 ```
-User → (Keycloak JWT) → agentstack-server → (???) → agent in team1 namespace
+User → (Keycloak JWT) → adk-server → (???) → agent in team1 namespace
 ```
 
 **Options:**
 
 1. **Forward user token** - Agent receives the user's JWT. Agent can validate it against Keycloak. Simple but exposes
    user identity to agents.
-2. **Token exchange** - Agentstack exchanges user token for a scoped service token (Keycloak token exchange). More
+2. **Token exchange** - ADK exchanges user token for a scoped service token (Keycloak token exchange). More
    secure, agents see a service identity.
 3. **No auth to agents** (PoC) - Agents trust in-cluster traffic. Simplest for PoC, add auth later.
 
@@ -562,7 +562,7 @@ Kagenti's current approach: forwards the user's Authorization header to agents (
 
 ### 5.6 Multi-Agent Communication
 
-**Scenario:** Agent A needs to call Agent B. Both are in `team1` namespace. Agentstack runs in `agentstack` namespace.
+**Scenario:** Agent A needs to call Agent B. Both are in `team1` namespace. ADK runs in `adk` namespace.
 How should this work?
 
 #### Networking: Cross-namespace is not a problem
@@ -573,7 +573,7 @@ via standard K8s DNS. Cross-namespace traffic gets automatic mTLS from the ztunn
 ```
 agent-a.team1 → agent-b.team1                    # same namespace, trivial
 agent-a.team1 → agent-b.team2.svc.cluster.local  # cross namespace, also fine
-agent-a.team1 → agentstack-server.agentstack.svc  # cross namespace, fine
+agent-a.team1 → adk-server.adk.svc  # cross namespace, fine
 ```
 
 Access restrictions are opt-in via Istio policies:
@@ -582,49 +582,49 @@ Access restrictions are opt-in via Istio policies:
 - **Waypoint proxies**: L7 policy enforcement (kagenti sets these up per agent namespace)
 - **SPIRE identities**: each agent gets `spiffe://domain/ns/team1/sa/agent-a` for mutual authentication
 
-#### The real question: should agent-to-agent go through agentstack?
+#### The real question: should agent-to-agent go through adk?
 
 **Option 1: Direct agent-to-agent (kagenti native)**
 
 ```
-User → agentstack → Agent A → Agent B (direct, same namespace)
+User → adk → Agent A → Agent B (direct, same namespace)
                            ↘ Agent C (direct, cross namespace)
 ```
 
 - Agents discover each other via K8s DNS or agent cards
 - Lowest latency, no bottleneck
 - Istio + SPIRE handle auth and mTLS
-- **Problem:** agentstack loses visibility. No audit trail, no task tracking, no rate limiting for agent-to-agent calls.
-  Agentstack only sees the user→Agent A leg.
+- **Problem:** adk loses visibility. No audit trail, no task tracking, no rate limiting for agent-to-agent calls.
+  ADK only sees the user→Agent A leg.
 
-**Option 2: All traffic through agentstack proxy**
+**Option 2: All traffic through adk proxy**
 
 ```
-User → agentstack → Agent A
-       agentstack ← Agent A (Agent A calls back to agentstack to reach Agent B)
-       agentstack → Agent B
-       agentstack ← Agent B (response)
-       agentstack → Agent A (forwarded response)
+User → adk → Agent A
+       adk ← Agent A (Agent A calls back to adk to reach Agent B)
+       adk → Agent B
+       adk ← Agent B (response)
+       adk → Agent A (forwarded response)
 ```
 
 - Full audit trail, task ownership tracking, token management
-- Agentstack can enforce rate limits, quotas, access policies
-- **Problem:** agentstack is a bottleneck and single point of failure for multi-agent workflows. Higher latency. Every
+- ADK can enforce rate limits, quotas, access policies
+- **Problem:** adk is a bottleneck and single point of failure for multi-agent workflows. Higher latency. Every
   agent-to-agent hop is 2 extra network hops.
 
-**Option 3: Hybrid - agentstack for orchestration, direct for execution (Recommended)**
+**Option 3: Hybrid - adk for orchestration, direct for execution (Recommended)**
 
 ```
-User → agentstack → Agent A (orchestrator)
+User → adk → Agent A (orchestrator)
                      Agent A → Agent B (direct, fast)
                      Agent A → Agent C (direct, fast)
-                     Agent A → agentstack (report task status/results)
+                     Agent A → adk (report task status/results)
 ```
 
-- Agentstack handles the user-facing session: auth, task creation, context management
+- ADK handles the user-facing session: auth, task creation, context management
 - Agent A (the orchestrator) talks to sub-agents directly within the cluster
 - Sub-agent calls use Istio mTLS + SPIRE identities for auth (no Keycloak tokens needed)
-- Agentstack gets task results when the orchestrator reports back
+- ADK gets task results when the orchestrator reports back
 - **Best of both worlds:** fast agent-to-agent, user-level tracking at the edges
 
 **Istio policy example for namespace isolation:**
@@ -642,15 +642,15 @@ spec:
         - source:
             namespaces: ['team1'] # same namespace agents
         - source:
-            namespaces: ['agentstack'] # agentstack proxy
-            principals: ['cluster.local/ns/agentstack/sa/agentstack-server']
+            namespaces: ['adk'] # adk proxy
+            principals: ['cluster.local/ns/adk/sa/adk-server']
 ```
 
-This allows agents within `team1` to talk freely to each other, and allows agentstack to call into `team1` agents.
+This allows agents within `team1` to talk freely to each other, and allows adk to call into `team1` agents.
 Cross-namespace agent-to-agent (e.g., `team1` → `team2`) would require explicit policy.
 
-**Recommendation for PoC:** Option 2 (all through agentstack). Agentstack issues custom tokens and controls which agent
-can call which - this requires agentstack to remain in the request path. Direct agent-to-agent bypasses these controls.
+**Recommendation for PoC:** Option 2 (all through adk). ADK issues custom tokens and controls which agent
+can call which - this requires adk to remain in the request path. Direct agent-to-agent bypasses these controls.
 Option 3 can be explored later when we have Istio + SPIRE providing network-level identity and policy enforcement as an
 alternative to token-based control.
 
@@ -659,10 +659,10 @@ alternative to token-based control.
 Regardless of which option we choose, **cross-namespace networking just works in K8s**. There is no restriction:
 
 ```
-# Agent (team1) → agentstack API (agentstack namespace)
-http://agentstack-server.agentstack.svc.cluster.local:8000/...  ← works
+# Agent (team1) → adk API (adk namespace)
+http://adk-server.adk.svc.cluster.local:8000/...  ← works
 
-# Agentstack (agentstack namespace) → agent (team1)
+# ADK (adk namespace) → agent (team1)
 http://weather-agent.team1.svc.cluster.local:8080/...  ← works
 
 # Agent (team1) → agent (team2)
@@ -674,8 +674,8 @@ service DNS is a core K8s guarantee. Nothing in Istio, MicroShift, or kagenti ch
 top** of existing connectivity - it doesn't restrict it. Restrictions are only created by explicit `NetworkPolicy` (K8s)
 or `AuthorizationPolicy` (Istio), and neither system creates deny-all policies by default.
 
-**This means agentstack can safely live in its own namespace.** There is no architectural concern about agents calling
-back to agentstack or agentstack calling into agent namespaces.
+**This means adk can safely live in its own namespace.** There is no architectural concern about agents calling
+back to adk or adk calling into agent namespaces.
 
 ---
 
@@ -683,7 +683,7 @@ back to agentstack or agentstack calling into agent namespaces.
 
 (See also section 5.2 for discovery mechanism discussion)
 
-### Current (agentstack)
+### Current (adk)
 
 ```
 Build time: agent-card.json → base64 → Docker label → stored in DB
@@ -718,7 +718,7 @@ Alternative: Kagenti operator could maintain a card cache (future)
 
 ### Current Lima Setup
 
-Agentstack uses Lima VMs with MicroShift for local development. The kagenti Helm charts need to install cleanly into
+ADK uses Lima VMs with MicroShift for local development. The kagenti Helm charts need to install cleanly into
 this environment.
 
 ### Required Lima Changes
@@ -747,7 +747,7 @@ this environment.
 2. [ ] Move Keycloak to separate namespace
 3. [ ] Deploy a test agent via kagenti (manual kubectl)
 4. [ ] Verify agent card discovery via HTTP
-5. [ ] Update agentstack A2A proxy to route to kagenti-managed agents
+5. [ ] Update adk A2A proxy to route to kagenti-managed agents
 
 ### Phase 2: Feature Parity (Week 3-4)
 
@@ -770,12 +770,12 @@ this environment.
 ## 9. Open Questions
 
 1. **Kagenti operator on MicroShift**: Has this been tested? Any known issues?
-2. **Agent namespaces**: Should agentstack create team namespaces, or delegate to kagenti?
-3. **Auth flow**: Both systems use Keycloak OAuth. Do we need token exchange between agentstack and kagenti agents, or
+2. **Agent namespaces**: Should adk create team namespaces, or delegate to kagenti?
+3. **Auth flow**: Both systems use Keycloak OAuth. Do we need token exchange between adk and kagenti agents, or
    can we share the same realm/client?
 4. **UI**: Do we keep Kagenti ADK UI only, or also deploy kagenti UI for agent management?
-5. **MCP Gateway**: Agentstack has managed MCP service. Kagenti also has MCP Gateway. Which wins?
-6. **Provider registry**: Current agentstack syncs from Git-based registries. Does kagenti have an equivalent, or do we
+5. **MCP Gateway**: ADK has managed MCP service. Kagenti also has MCP Gateway. Which wins?
+6. **Provider registry**: Current adk syncs from Git-based registries. Does kagenti have an equivalent, or do we
    keep this?
 7. **Observability**: Both use Phoenix. Consolidate to one instance?
 8. **Helm chart publishing**: Should we publish a combined chart, or keep them separate with documentation?
@@ -784,7 +784,7 @@ this environment.
 
 ## 10. File Reference
 
-### Agentstack - Key Files Modified/Removed
+### ADK - Key Files Modified/Removed
 
 - `infrastructure/kubernetes/provider_deployment_manager.py` - **Removed**
 - `infrastructure/kubernetes/provider_build_manager.py` - **Removed**

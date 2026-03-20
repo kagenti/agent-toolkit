@@ -1111,7 +1111,7 @@ export interface components {
       tags: string[];
     };
     /** ProviderResponse */
-    agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__1: {
+    adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__1: {
       agent_card: components['schemas']['AgentCard-Output'];
       /**
        * Created At
@@ -1147,7 +1147,7 @@ export interface components {
       updated_at?: string;
     };
     /** ProviderResponse */
-    agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__2: {
+    adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__2: {
       agent_card: components['schemas']['AgentCard-Output'];
       /**
        * Created At
@@ -1183,7 +1183,7 @@ export interface components {
       updated_at?: string;
     };
     /** ProviderResponse */
-    agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__3: {
+    adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__3: {
       agent_card: components['schemas']['AgentCard-Output'];
       /**
        * Created At
@@ -1219,7 +1219,7 @@ export interface components {
       updated_at?: string;
     };
     /** ModelProviderResponse */
-    agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__4: {
+    adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__4: {
       /**
        * Base Url
        * Format: uri
@@ -1255,7 +1255,7 @@ export interface components {
       type: components['schemas']['ModelProviderType'];
     };
     /** ModelProviderResponse */
-    agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__5: {
+    adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__5: {
       /**
        * Base Url
        * Format: uri
@@ -1291,7 +1291,7 @@ export interface components {
       type: components['schemas']['ModelProviderType'];
     };
     /** SystemConfigurationResponse */
-    agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__6: {
+    adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__6: {
       /**
        * Created By
        * Format: uuid
@@ -1319,7 +1319,7 @@ export interface components {
       updated_at?: string;
     };
     /** SystemConfigurationResponse */
-    agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__7: {
+    adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__7: {
       /**
        * Created By
        * Format: uuid
@@ -1347,7 +1347,7 @@ export interface components {
       updated_at?: string;
     };
     /** FileResponse */
-    agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__8: {
+    adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__8: {
       /** Content Type */
       content_type: string;
       /** Context Id */
@@ -1377,7 +1377,7 @@ export interface components {
       parent_file_id?: string | null;
     };
     /** FileResponse */
-    agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__9: {
+    adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__9: {
       /** Content Type */
       content_type: string;
       /** Context Id */
@@ -1407,7 +1407,7 @@ export interface components {
       parent_file_id?: string | null;
     };
     /** TextExtractionResponse */
-    agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__10: {
+    adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__10: {
       /**
        * Created At
        * Format: date-time
@@ -1438,7 +1438,7 @@ export interface components {
       status: components['schemas']['ExtractionStatus'];
     };
     /** TextExtractionResponse */
-    agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__11: {
+    adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__11: {
       /**
        * Created At
        * Format: date-time
@@ -1469,7 +1469,7 @@ export interface components {
       status: components['schemas']['ExtractionStatus'];
     };
     /** ContextResponse */
-    agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__12: {
+    adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__12: {
       /**
        * Created At
        * Format: date-time
@@ -1503,7 +1503,7 @@ export interface components {
       updated_at?: string;
     };
     /** ContextResponse */
-    agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__13: {
+    adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__13: {
       /**
        * Created At
        * Format: date-time
@@ -1537,7 +1537,7 @@ export interface components {
       updated_at?: string;
     };
     /** ContextResponse */
-    agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__14: {
+    adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__14: {
       /**
        * Created At
        * Format: date-time
@@ -1571,7 +1571,7 @@ export interface components {
       updated_at?: string;
     };
     /** ContextResponse */
-    agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__15: {
+    adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__15: {
       /**
        * Created At
        * Format: date-time
@@ -1605,7 +1605,7 @@ export interface components {
       updated_at?: string;
     };
     /** VectorStoreResponse */
-    agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__16: {
+    adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__16: {
       /** Context Id */
       context_id?: string | null;
       /**
@@ -1637,7 +1637,7 @@ export interface components {
       stats?: components['schemas']['VectorStoreStats'] | null;
     };
     /** VectorStoreResponse */
-    agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__17: {
+    adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__17: {
       /** Context Id */
       context_id?: string | null;
       /**
@@ -3251,7 +3251,7 @@ export interface components {
        */
       has_more: boolean;
       /** Items */
-      items: components['schemas']['agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__1'][];
+      items: components['schemas']['adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__1'][];
       /** Next Page Token */
       readonly next_page_token: string | null;
       /** Total Count */
@@ -4349,7 +4349,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__6'];
+          'application/json': components['schemas']['adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__6'];
         };
       };
     };
@@ -4373,7 +4373,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__7'];
+          'application/json': components['schemas']['adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__7'];
         };
       };
       /** @description Validation Error */
@@ -4736,7 +4736,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__12'];
+          'application/json': components['schemas']['adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__12'];
         };
       };
       /** @description Validation Error */
@@ -4767,7 +4767,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__13'];
+          'application/json': components['schemas']['adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__13'];
         };
       };
       /** @description Validation Error */
@@ -4802,7 +4802,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__14'];
+          'application/json': components['schemas']['adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__14'];
         };
       };
       /** @description Validation Error */
@@ -4968,7 +4968,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__15'];
+          'application/json': components['schemas']['adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__15'];
         };
       };
       /** @description Validation Error */
@@ -5070,7 +5070,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__8'];
+          'application/json': components['schemas']['adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__8'];
         };
       };
       /** @description Validation Error */
@@ -5103,7 +5103,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__9'];
+          'application/json': components['schemas']['adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__9'];
         };
       };
       /** @description Validation Error */
@@ -5200,7 +5200,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__11'];
+          'application/json': components['schemas']['adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__11'];
         };
       };
       /** @description Validation Error */
@@ -5237,7 +5237,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__10'];
+          'application/json': components['schemas']['adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__10'];
         };
       };
       /** @description Validation Error */
@@ -5354,7 +5354,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__4'];
+          'application/json': components['schemas']['adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__4'];
         };
       };
       /** @description Validation Error */
@@ -5385,7 +5385,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__5'];
+          'application/json': components['schemas']['adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__5'];
         };
       };
       /** @description Validation Error */
@@ -5629,7 +5629,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__2'];
+          'application/json': components['schemas']['adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__2'];
         };
       };
       /** @description Validation Error */
@@ -5689,7 +5689,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__3'];
+          'application/json': components['schemas']['adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__3'];
         };
       };
       /** @description Validation Error */
@@ -5916,7 +5916,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__16'];
+          'application/json': components['schemas']['adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__16'];
         };
       };
       /** @description Validation Error */
@@ -5949,7 +5949,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__17'];
+          'application/json': components['schemas']['adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__17'];
         };
       };
       /** @description Validation Error */

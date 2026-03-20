@@ -34,7 +34,7 @@ If you encounter a name length error when starting VM, shorten the name and retr
 - Project commands (`mise`, `uv run`, `pnpm`, etc.) run **inside the VM** using `limactl shell <vm-name> -- <command>`.
 - Absolute path of worktree is same on host and guest, cwd is preserved by `limactl shell`.
 - Use the normal Edit/Write tools directly on `.worktrees/<branch>/...` paths.
-- To start the platform: `limactl shell <vm-name> -- mise run agentstack:start`
+- To start the platform: `limactl shell <vm-name> -- mise run adk:start`
 - Keep iterating until the feature is working and validated.
 
 ## When user confirms work is done
