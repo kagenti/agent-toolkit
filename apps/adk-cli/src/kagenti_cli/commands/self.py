@@ -143,7 +143,8 @@ async def install(
         if already_started and (
             yes
             or await inquirer.confirm(
-                message="Do you want to configure your LLM provider now? Will run: kagenti-adk model setup", default=True
+                message="Do you want to configure your LLM provider now? Will run: kagenti-adk model setup",
+                default=True,
             ).execute_async()
         ):
             try:
@@ -174,7 +175,7 @@ async def install(
             "Use [green]kagenti-adk ui[/green] to open the web GUI, or [green]kagenti-adk run chat[/green] to talk to an agent on the command line."
         )
         console.hint(
-            "Run [green]kagenti-adk --help[/green] to learn about available commands, or check the documentation at https://adk.kagenti.dev/"
+            "Run [green]kagenti-adk --help[/green] to learn about available commands, or check the documentation at https://agentstack.beeai.dev/"
         )
 
 
