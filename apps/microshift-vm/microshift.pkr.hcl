@@ -55,7 +55,7 @@ source "qemu" "microshift" {
   iso_url      = local.image_url
   iso_checksum = local.image_checksum
   disk_image   = true
-  disk_size    = "20G"
+  disk_size    = "10G"
 
   qemu_binary  = local.qemu_binary
   machine_type = local.machine
@@ -101,13 +101,24 @@ build {
     inline = ["cp -a /tmp/rootfs/. / && rm -rf /tmp/rootfs"]
   }
 
+  provisioner "shell" {
+    environment_vars = ["CI=${var.ci}"]
+    inline           = ["bash /build/install.sh"]
+  }
+
   provisioner "file" {
-    source      = "install.sh"
-    destination = "/tmp/install.sh"
+    source      = "/build/artifacts/incus.tar.gz"
+    destination = "${var.output_dir}/${var.arch}/microshift-vm-${var.arch}.incus.tar.gz"
+    direction   = "download"
+  }
+
+  provisioner "file" {
+    source      = "/build/artifacts/rootfs.wsl"
+    destination = "${var.output_dir}/${var.arch}/microshift-vm-${var.arch}.wsl"
+    direction   = "download"
   }
 
   provisioner "shell" {
-    environment_vars = ["CI=${var.ci}"]
-    inline           = ["bash /tmp/install.sh"]
+    inline = ["rm -rf /build"]
   }
 }
