@@ -441,11 +441,6 @@ async def start_cmd(
         kubeconfig_local = anyio.Path(Configuration().lima_home / vm_name / "copied-from-guest" / "kubeconfig.yaml")
         await kubeconfig_local.parent.mkdir(parents=True, exist_ok=True)
         await kubeconfig_local.write_text((await run_in_vm(vm_name, ["cat", "/var/lib/microshift/resources/kubeadmin/kubeconfig"], "Copying kubeconfig from Kagenti ADK platform")).stdout.decode())
-        await run_in_vm(
-            vm_name,
-            ["bash", "-c", 'command -v helm && exit 0; case $(uname -m) in x86_64) ARCH="amd64" ;; aarch64) ARCH="arm64" ;; esac; curl -fsSL "https://get.helm.sh/helm-v4.1.1-linux-${ARCH}.tar.gz" | tar -xzf - --strip-components=1 -C /usr/local/bin "linux-${ARCH}/helm"; chmod +x /usr/local/bin/helm'],
-            "Installing Helm",
-        )
         # --- Prepare kagenti-adk chart and import images before any deployments ---
         await run_in_vm(
             vm_name,
@@ -803,7 +798,13 @@ async def start_cmd(
         )
         await run_in_vm(
             vm_name,
-            ["bash", "-euxc", 'systemctl daemon-reload; systemctl start "kubectl-port-forward@kagenti-system:http-istio:8080:80" & systemctl start "kubectl-port-forward@kagenti-system:otel-collector:4318" &'],
+            [
+                "bash",
+                "-euxc",
+                "systemctl daemon-reload; "
+                "systemctl enable --now kubectl-port-forward@kagenti-system:http-istio:8080:80; "
+                "systemctl enable --now kubectl-port-forward@kagenti-system:otel-collector:4318; "
+            ],
             "Forwarding VM services to host",
         )
 
