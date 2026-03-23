@@ -169,7 +169,7 @@ jobs:
 
       - run: mise run helm:build
       - run: echo '${{ secrets.GITHUB_TOKEN }}' | helm registry login --username '${{ github.actor }}' --password-stdin ghcr.io
-      - run: helm push ./helm/dist/adk-*.tgz 'oci://ghcr.io/${{ github.repository }}/chart'
+      - run: helm push ./helm/dist/kagenti-adk-*.tgz 'oci://ghcr.io/${{ github.repository }}/chart'
 
       - run: mise run adk-py:build
       - uses: pypa/gh-action-pypi-publish@release/v1
