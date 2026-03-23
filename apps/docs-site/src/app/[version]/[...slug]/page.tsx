@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
@@ -52,13 +53,13 @@ function Sidebar({
               .replace(/-/g, " ")
               .replace(/\b\w/g, (c) => c.toUpperCase());
             return (
-              <a
+              <Link
                 key={page}
                 href={`/${page}`}
                 className={`nav-link${slug === currentSlug ? " active" : ""}`}
               >
                 {label}
-              </a>
+              </Link>
             );
           })}
         </div>

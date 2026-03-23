@@ -15,6 +15,7 @@
  */
 
 import React from "react";
+import Link from "next/link";
 
 function Callout({
   type,
@@ -115,7 +116,7 @@ export function Card({
   );
 
   if (href) {
-    return <a href={href}>{content}</a>;
+    return <Link href={href}>{content}</Link>;
   }
   return content;
 }
@@ -162,7 +163,16 @@ export function ApiResult({ children }: { children: React.ReactNode }) {
   return <div className="api-result">{children}</div>;
 }
 
+function MdxLink(props: React.AnchorHTMLAttributes<HTMLAnchorElement>) {
+  const href = props.href ?? "";
+  if (href.startsWith("/") || href.startsWith("./") || href.startsWith("../")) {
+    return <Link {...props} href={href} />;
+  }
+  return <a {...props} />;
+}
+
 export const mintlifyComponents = {
+  a: MdxLink,
   Tip,
   Warning,
   Note,
