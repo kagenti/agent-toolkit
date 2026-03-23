@@ -1,4 +1,4 @@
-# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
 
 
@@ -58,7 +58,7 @@ class PlatformApiExtensionMetadata(SecureBaseModel):
 
 class PlatformApiExtension(pydantic.BaseModel):
     """
-    Request authentication token and url to be able to access the agentstack API
+    Request authentication token and url to be able to access the kagenti-adk API
     """
 
 
@@ -106,7 +106,7 @@ class PlatformApiExtensionServer(BaseExtensionServer[PlatformApiExtensionSpec, P
 
         self._metadata_from_client = self._metadata_from_client or PlatformApiExtensionMetadata()
         data = self._metadata_from_client
-        data.base_url = data.base_url or HttpUrl(os.getenv("PLATFORM_URL", "http://agentstack-api.localtest.me:8080"))
+        data.base_url = data.base_url or HttpUrl(os.getenv("PLATFORM_URL", "http://adk-api.localtest.me:8080"))
         auth_token = data.auth_token or self._get_header_token(request_context)
         data.auth_token = pydantic.SecretStr(auth_token.get_secret_value()) if auth_token else None
 

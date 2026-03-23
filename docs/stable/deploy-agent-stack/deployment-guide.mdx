@@ -1,36 +1,50 @@
 ---
-title: "Agent Stack Deployment Guide"
-description: "Deploying Agent Stack"
+title: 'Kagenti ADK Deployment Guide'
+description: 'Deploying Kagenti ADK'
 ---
 
-This guide walks you through running Agent Stack in your own self-hosted environment so you can evaluate, develop, and integrate agents as backend services. Agent Stack provides a consistent runtime for agents—handling model access, storage, authentication, and service wiring—so teams can move from agent code to a running service with minimal setup. Agent Stack deploys with Kubernetes via our provided Helm chart, ensuring a standardized setup within your infrastructure.
+This guide walks you through running Kagenti ADK in your own self-hosted environment so you can evaluate, develop, and
+integrate agents as backend services. Kagenti ADK provides a consistent runtime for agents—handling model access,
+storage, authentication, and service wiring—so teams can move from agent code to a running service with minimal setup.
+Kagenti ADK deploys with Kubernetes via our provided Helm chart, ensuring a standardized setup within your
+infrastructure.
 
-Agent Stack is designed for trusted environments and early-stage integration work. It’s well suited for local development, shared team environments, and internal evaluation. It is not intended to be directly exposed to untrusted public traffic or used as a hardened, multi-tenant production platform today. If you’re evaluating Agent Stack for broader organizational use, deploy it behind your existing network and security boundaries.
+Kagenti ADK is designed for trusted environments and early-stage integration work. It’s well suited for local
+development, shared team environments, and internal evaluation. It is not intended to be directly exposed to untrusted
+public traffic or used as a hardened, multi-tenant production platform today. If you’re evaluating Kagenti ADK for
+broader organizational use, deploy it behind your existing network and security boundaries.
 
-If you’re an application or agent developer, this guide helps you get agents running in your deployment environment and callable from your application. If you’re part of a platform or IT team, this guide provides a concrete runtime to assess how agent services run inside your infrastructure using our Helm-based deployment, how they integrate with your security and observability tooling, and how they fit your deployment standards. 
+If you’re an application or agent developer, this guide helps you get agents running in your deployment environment and
+callable from your application. If you’re part of a platform or IT team, this guide provides a concrete runtime to
+assess how agent services run inside your infrastructure using our Helm-based deployment, how they integrate with your
+security and observability tooling, and how they fit your deployment standards.
 
-Proceed to the installation guide below to configure your environment and deploy the Agent Stack cluster.
-
+Proceed to the installation guide below to configure your environment and deploy the Kagenti ADK cluster.
 
 ## Requirements
+
 Before deployment, ensure your environment meets these specifications:
 
-| Category| Requirement |
-|--------|--------------|
-|**Kubernetes**|Version 1.24+ with admin access| 
-|**Tooling**  | Helm 3.8+ and kubectl configured|
-|**Storage**  | 20GB+ available for PostgreSQL|
-|**Providers**| API access for LLMs (OpenAI, Anthropic, etc.)|
-|**Agent Stack CLI**| Agent Stack CLI installed for post-deploy config|
+| Category            | Requirement                                      |
+| ------------------- | ------------------------------------------------ |
+| **Kubernetes**      | Version 1.24+ with admin access                  |
+| **Tooling**         | Helm 3.8+ and kubectl configured                 |
+| **Storage**         | 20GB+ available for PostgreSQL                   |
+| **Providers**       | API access for LLMs (OpenAI, Anthropic, etc.)    |
+| **Kagenti ADK CLI** | Kagenti ADK CLI installed for post-deploy config |
 
 <Tip>
   **OpenShift Users**: Use the [OpenShift
-  CLI](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/cli_tools/openshift-cli-oc) for login and administration.
+  CLI](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/cli_tools/openshift-cli-oc) for
+  login and administration.
 </Tip>
 
 ## Deployment Steps
+
 ### 1. Generate Encryption Key
-Agent Stack requires an encryption key for secure data handling. Generate this using Python before creating your configuration file.
+
+Kagenti ADK requires an encryption key for secure data handling. Generate this using Python before creating your
+configuration file.
 
 ```shell
 # Option A: Using UV
@@ -44,17 +58,15 @@ python3 -c 'from cryptography.fernet import Fernet; print(Fernet.generate_key().
 
 ```
 
-
-
 ### 2. Create Configuration File
 
-Create a `config.yaml` file to define your registry, agents, and security keys. This is a minimal example, more advanced options
-are explained in the [Configuration Options](#configuration-options) section.
+Create a `config.yaml` file to define your registry, agents, and security keys. This is a minimal example, more advanced
+options are explained in the [Configuration Options](#configuration-options) section.
 
 ```yaml
 # External registries for default catalogs (change release/tag accordingly):
 externalRegistries:
-  public_github: "https://github.com/kagenti/adk@v0.4.3#path=agent-registry.yaml"
+  public_github: 'https://github.com/kagenti/adk@v0.4.3#path=agent-registry.yaml'
 
 # Custom agents as docker images
 providers:
@@ -62,32 +74,33 @@ providers:
   # e.g. location: ghcr.io/kagenti/adk-starter/my-agent:latest
 
 # Use the key generated in Step 1
-encryptionKey: "encryption-key-from-command"
+encryptionKey: 'encryption-key-from-command'
 
 # Basic authentication settings requires passing an admin password to certain endpoints, you can disable auth for insecure deployments
 auth:
   enabled: true
   basic:
     enabled: true
-    adminPassword: "my-secret-password"
+    adminPassword: 'my-secret-password'
 ```
 
 ### 3. Install the Chart
 
-Deploy the stack to your cluster using Helm. 
+Deploy the stack to your cluster using Helm.
 
 ```shell
-helm upgrade --install agentstack -f config.yaml oci://ghcr.io/kagenti/adk/chart/adk:0.4.3
+helm upgrade --install adk -f config.yaml oci://ghcr.io/kagenti/adk/chart/adk:0.4.3
 ```
+
 It may take a few minutes for the pods to start.
 
 ### 4. Port-Forwarding
 
-By default, ingress is not configured. You can port-forward the service to access the platform.
-In a separate terminal, run:
+By default, ingress is not configured. You can port-forward the service to access the platform. In a separate terminal,
+run:
 
 ```shell
-kubectl port-forward svc/agentstack-svc 8333:8333 &
+kubectl port-forward svc/adk-svc 8333:8333 &
 ```
 
 ### 5. Setup the LLM
@@ -112,17 +125,16 @@ kagenti-adk run chat hi
 
 ### Authentication & Security Settings
 
-| Option| Description |
-|--------|--------------|
-|**Disabled**|No security. Simplest for isolated testing.| 
-|**Basic Auth**  | Simple username/password (adminPassword).|
-|**Bundled Keycloak**  | OIDC using an internal instance of Keycloak.|
-|**External OIDC**| Integration with existing Auth0, Okta, or Enterprise IDPs.|
+| Option               | Description                                                |
+| -------------------- | ---------------------------------------------------------- |
+| **Disabled**         | No security. Simplest for isolated testing.                |
+| **Basic Auth**       | Simple username/password (adminPassword).                  |
+| **Bundled Keycloak** | OIDC using an internal instance of Keycloak.               |
+| **External OIDC**    | Integration with existing Auth0, Okta, or Enterprise IDPs. |
 
 <Warning>
-  The current authentication model is basic and intended for development use.
-  For any deployment beyond local testing, carefully consider your security
-  requirements and network access controls.
+  The current authentication model is basic and intended for development use. For any deployment beyond local testing,
+  carefully consider your security requirements and network access controls.
 </Warning>
 
 #### Disable Authentication
@@ -144,13 +156,13 @@ auth:
   enabled: true
   basic:
     enabled: true
-    adminPassword: "my-secret-password"
+    adminPassword: 'my-secret-password'
 ```
 
 #### Bundled Keycloak (Default OIDC)
 
-Use an internal Keycloak instance to handle OIDC and bridge to GitHub, Google, or SAML.
-Keycloak is deployed automatically when `auth.enabled` is `true`.
+Use an internal Keycloak instance to handle OIDC and bridge to GitHub, Google, or SAML. Keycloak is deployed
+automatically when `auth.enabled` is `true`.
 
 ```yaml
 trustProxyHeaders: true # This is important if validate_audience is enabled
@@ -159,18 +171,19 @@ auth:
   enabled: true
 
   # Next.js settings
-  nextauthUrl: "https://example.com" # Public URL of the UI
-  apiUrl: "https://api.example.com" # Public URL of the API
+  nextauthUrl: 'https://example.com' # Public URL of the UI
+  apiUrl: 'https://api.example.com' # Public URL of the API
 
 keycloak:
   enabled: true
   # Internal URL used by the server for token validation (default shown)
-  internalIssuerUrl: "http://keycloak:8336/realms/agentstack"
+  internalIssuerUrl: 'http://keycloak:8336/realms/adk'
   # Public URL used by the browser
-  publicIssuerUrl: "https://keycloak.example.com/realms/agentstack"
+  publicIssuerUrl: 'https://keycloak.example.com/realms/adk'
 ```
 
 #### External OIDC Provider
+
 Connect your own OIDC provider (e.g., Auth0, Okta, or your own Keycloak) by disabling the bundled Keycloak.
 
 ```yaml
@@ -178,24 +191,24 @@ auth:
   enabled: true
 
   # Next.js settings
-  nextauthUrl: "https://example.com" # Public URL of the UI
-  apiUrl: "https://api.example.com" # Public URL of the API
+  nextauthUrl: 'https://example.com' # Public URL of the UI
+  apiUrl: 'https://api.example.com' # Public URL of the API
 
 keycloak:
   enabled: false
 
 externalOidcProvider:
-  issuerUrl: "https://your-oidc-provider.com"
-  name: "My IDP" # Optional display name used in the UI
-  id: "my-idp" # Optional ID used internally
-  rolesPath: "realm_access.roles" # JSON path to roles in JWT claims (can be an array or a semicolon separated string)
+  issuerUrl: 'https://your-oidc-provider.com'
+  name: 'My IDP' # Optional display name used in the UI
+  id: 'my-idp' # Optional ID used internally
+  rolesPath: 'realm_access.roles' # JSON path to roles in JWT claims (can be an array or a semicolon separated string)
 
-  uiClientId: "agentstack-ui"
-  serverClientId: "adk-server"
+  uiClientId: 'adk-ui'
+  serverClientId: 'adk-server'
 
   # Secrets can be provided directly or via existing secrets
-  uiClientSecret: "..."
-  serverClientSecret: "..."
+  uiClientSecret: '...'
+  serverClientSecret: '...'
   # existingSecret: "my-oidc-secret"
   # uiClientSecretKey: "ui-secret-key"         # Key in my-oidc-secret
   # serverClientSecretKey: "server-secret-key" # Key in my-oidc-secret
@@ -204,7 +217,11 @@ externalOidcProvider:
 <Warning>
 **Critical: Endpoint Exposure**
 
-If using OIDC (Bundled or External), you must expose the following endpoints publicly via [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/), [Gateway API](https://kubernetes.io/docs/concepts/services-networking/gateway/), [OpenShift Routes](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/ingress_and_load_balancing/routes), or other tools:
+If using OIDC (Bundled or External), you must expose the following endpoints publicly via
+[Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/),
+[Gateway API](https://kubernetes.io/docs/concepts/services-networking/gateway/),
+[OpenShift Routes](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/ingress_and_load_balancing/routes),
+or other tools:
 
 - UI: `https://example.com`
 - API: `https://api.example.com` used by the CLI to authenticate
@@ -215,15 +232,18 @@ If using OIDC (Bundled or External), you must expose the following endpoints pub
 </Warning>
 
 ### Accessing & Configuring Keycloak
-- **Local Access**: kubectl port-forward `svc/agentstack-keycloak 8336:8336` -> Access at `http://localhost:8336`
-- **Production Access:** Create an [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) for the `agentstack-keycloak` service.
-- **Setup:** Log in (default credentials: `admin` / retrieve from secret). -> navigate to Identity Providers -> add your provider (GitHub, Google, etc.).
 
+- **Local Access**: kubectl port-forward `svc/adk-keycloak 8336:8336` -> Access at `http://localhost:8336`
+- **Production Access:** Create an [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) for the
+  `adk-keycloak` service.
+- **Setup:** Log in (default credentials: `admin` / retrieve from secret). -> navigate to Identity Providers -> add your
+  provider (GitHub, Google, etc.).
 
 <Warning>
-**Email Verification Required:** 
+**Email Verification Required:**
 
-Agent Stack requires the `email_verified` claim to be `true` in JWT tokens. Ensure:
+Kagenti ADK requires the `email_verified` claim to be `true` in JWT tokens. Ensure:
+
 - Users verify emails before authenticating
 - The `email_verified` claim is mapped to the token (included by default in the `email` scope)
 - External providers pass the email verification status correctly
@@ -233,38 +253,48 @@ Without verified emails, authentication will fail with "Verified email not found
 </Warning>
 
 <Accordion title="Keycloak Architecture & Roles">
-  The Agent Stack Keycloak integration is automatically provisioned with the following architecture:
+  The Kagenti ADK Keycloak integration is automatically provisioned with the following architecture:
 
-  **Realm:** `agentstack`
+**Realm:** `adk`
 
-  **Clients:**
-  - `adk-server`: Backend service client (Confidential, Service Accounts enabled).
-  - `agentstack-ui`: Frontend UI client (Confidential, Standard Flow).
-  - `kagenti-adk`: Command Line Interface client (Public, Standard Flow).
+**Clients:**
 
-  **Roles:**
-  - `agentstack-admin`: Full system access.
-  - `agentstack-developer`: Access to agent management.
+- `adk-server`: Backend service client (Confidential, Service Accounts enabled).
+- `adk-ui`: Frontend UI client (Confidential, Standard Flow).
+- `kagenti-adk`: Command Line Interface client (Public, Standard Flow).
 
-  **Audiences:**
-  - Audience mappers are dynamically configured to ensure tokens are valid for the UI and API URLs defined in your config.
+**Roles:**
+
+- `adk-admin`: Full system access.
+- `adk-developer`: Access to agent management.
+
+**Audiences:**
+
+- Audience mappers are dynamically configured to ensure tokens are valid for the UI and API URLs defined in your config.
+
 </Accordion>
 
 ## Exposing the Platform
-To move beyond local port-forwarding, you must expose the following services using [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) or [OpenShift Routes](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/ingress_and_load_balancing/configuring-routes).
 
-| Service| Internal Target | Purpose |
-|--------|-----------------|---------|
-|<b>UI Endpoint</b>|`agentstack-ui-svc`| Access to the web interface (includes API proxy).
-|<b>API Endpoint (optional)</b>  | `adk-server-svc`| Direct server API access; Required for CLI usage.
-|<b>Auth Endpoint (optional)</b>  | `agentstack-keycloak`| Required for UI and CLI authentication if using Keycloak.
+To move beyond local port-forwarding, you must expose the following services using
+[Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) or
+[OpenShift Routes](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/ingress_and_load_balancing/configuring-routes).
+
+| Service                         | Internal Target       | Purpose                                                   |
+| ------------------------------- | --------------------- | --------------------------------------------------------- |
+| <b>UI Endpoint</b>              | `adk-ui-svc`          | Access to the web interface (includes API proxy).         |
+| <b>API Endpoint (optional)</b>  | `adk-server-svc`      | Direct server API access; Required for CLI usage.         |
+| <b>Auth Endpoint (optional)</b> | `adk-keycloak` | Required for UI and CLI authentication if using Keycloak. |
 
 ## Configuring External Services & Storage
 
-By default, Agent Stack includes PostgreSQL and SeaweedFS (S3-compatible storage). For production environments, it is highly recommended to use external, managed services.
+By default, Kagenti ADK includes PostgreSQL and SeaweedFS (S3-compatible storage). For production environments, it is
+highly recommended to use external, managed services.
 
 ### External PostgreSQL
-To use an external PostgreSQL instance, disable the built-in subchart and provide connection details. This is required if you prefer a managed database like AWS RDS or Google Cloud SQL.
+
+To use an external PostgreSQL instance, disable the built-in subchart and provide connection details. This is required
+if you prefer a managed database like AWS RDS or Google Cloud SQL.
 
 Example configuration:
 
@@ -272,16 +302,16 @@ Example configuration:
 postgresql:
   enabled: false # disable builtin subchart
 externalDatabase:
-  host: "<your-postgres-host>"
+  host: '<your-postgres-host>'
   port: 5432
-  user: "<your-postgres-user>"
-  database: "<your-postgres-database>"
-  password: "<your-postgres-password>"
+  user: '<your-postgres-user>'
+  database: '<your-postgres-database>'
+  password: '<your-postgres-password>'
   # Required when initContainers.createVectorDbExtension is enabled
-  adminUser: "<postgres-admin-user>"
-  adminPassword: "<postgres-admin-password>"
+  adminUser: '<postgres-admin-user>'
+  adminPassword: '<postgres-admin-password>'
   ssl: true
-  sslRootCert: ""
+  sslRootCert: ''
   # SSL certificate for the external database to ensure ssl connection, for example:
   # sslRootCert: |
   #   -----BEGIN CERTIFICATE-----
@@ -289,7 +319,9 @@ externalDatabase:
   #   -----END CERTIFICATE-----
 ```
 
-If the migration fails while installing the vector extension, you can disable automated creation and run the SQL manually.
+If the migration fails while installing the vector extension, you can disable automated creation and run the SQL
+manually.
+
 ```yaml
 initContainers.createVectorDbExtension=false
 ```
@@ -307,25 +339,25 @@ SET hnsw.max_scan_tuples = 1000000;
 
 ### External S3 support
 
-You may want to have Agent Stack connect to an external object storage rather than installing seaweedfs inside
-your cluster. This chart allows you to specify credentials for an external storage streaming with the
-`externalS3`. You should also disable the seaweedfs installation with the `seaweedfs.enabled`
-option. 
+You may want to have Kagenti ADK connect to an external object storage rather than installing seaweedfs inside your
+cluster. This chart allows you to specify credentials for an external storage streaming with the `externalS3`. You
+should also disable the seaweedfs installation with the `seaweedfs.enabled` option.
 
 Example configuration:
 
 ```yaml
 seaweedfs:
-    enabled: false
+  enabled: false
 externalS3:
-    host: <your-s3-host>
-    accessKeyID: <your-s3-access-key>
-    accessKeySecret: <your-s3-access-key-secret>
+  host: <your-s3-host>
+  accessKeyID: <your-s3-access-key>
+  accessKeySecret: <your-s3-access-key-secret>
 ```
 
 ### Redis
 
-Redis is used for rate limiting and caching. While disabled by default, it is required if replicaCount > 1 to ensure counters are synchronized across replicas.
+Redis is used for rate limiting and caching. While disabled by default, it is required if replicaCount > 1 to ensure
+counters are synchronized across replicas.
 
 **Enable Built-in Redis:**
 
@@ -342,13 +374,14 @@ To use an external Redis instance, ensure the built-in subchart is disabled (def
 redis:
   enabled: false
 externalRedis:
-  host: "<your-redis-host>"
+  host: '<your-redis-host>'
   port: 6379
-  password: "<your-redis-password>"
+  password: '<your-redis-password>'
   # Optional: use existing secret for password
   # existingSecret: "my-redis-secret"
   # existingSecretPasswordKey: "redis-password"
 ```
+
 ## Security and Traffic Control
 
 ### Rate Limiting
@@ -359,8 +392,8 @@ Rate limiting is recommended for production environments as a protection against
 rateLimit:
   enabled: true
   globalLimits:
-    - "20/second"
-    - "100/minute"
+    - '20/second'
+    - '100/minute'
   roleBasedLimits:
     user:
       openai_chat_completion_tokens: []
@@ -374,7 +407,7 @@ rateLimit:
       openai_chat_completion_tokens: []
       openai_chat_completion_requests: []
       openai_embedding_inputs: []
-  strategy: "sliding-window-counter" # Options: fixed-window, moving-window, sliding-window-counter
+  strategy: 'sliding-window-counter' # Options: fixed-window, moving-window, sliding-window-counter
 ```
 
 <Warning>
@@ -386,7 +419,8 @@ rateLimit:
 
 ### Cross-Origin Resource Sharing Configuration
 
-Agent Stack supports Cross-Origin Resource Sharing (CORS) to allow web applications hosted on different domains to interact with the Agent Stack API.
+Kagenti ADK supports Cross-Origin Resource Sharing (CORS) to allow web applications hosted on different domains to
+interact with the Kagenti ADK API.
 
 ```yaml
 cors:
@@ -407,22 +441,30 @@ cors:
 ```
 
 - `cors.enabled`: Set to `true` to enable CORS. Default is `false`.
-- `cors.allowOrigins`: A list of origins (e.g., `http://localhost:3000`) that are allowed to make cross-site requests to the Agent Stack API.
-- `cors.allowMethods`: A list of HTTP methods (e.g., `GET`, `POST`) that are allowed for cross-origin requests. Default is `["*"]`.
-- `cors.allowHeaders`: A list of HTTP request headers (e.g., `Content-Type`, `Authorization`) that can be used when making the actual cross-origin request. Default is `["*"]`.
-- `cors.allowCredentials`: Set to `true` to indicate that the client can send cookies and HTTP authentication credentials with the cross-origin request. Note that `allowOrigins` cannot be `["*"]` when `allowCredentials` is `true`. Default is `false`.
-
-
+- `cors.allowOrigins`: A list of origins (e.g., `http://localhost:3000`) that are allowed to make cross-site requests to
+  the Kagenti ADK API.
+- `cors.allowMethods`: A list of HTTP methods (e.g., `GET`, `POST`) that are allowed for cross-origin requests. Default
+  is `["*"]`.
+- `cors.allowHeaders`: A list of HTTP request headers (e.g., `Content-Type`, `Authorization`) that can be used when
+  making the actual cross-origin request. Default is `["*"]`.
+- `cors.allowCredentials`: Set to `true` to indicate that the client can send cookies and HTTP authentication
+  credentials with the cross-origin request. Note that `allowOrigins` cannot be `["*"]` when `allowCredentials` is
+  `true`. Default is `false`.
 
 ## Agent Management
-To manage agents within Agent Stack, you must configure how the platform accesses existing images, how it registers them for use, and how it builds new agents from source code.
+
+To manage agents within Kagenti ADK, you must configure how the platform accesses existing images, how it registers them
+for use, and how it builds new agents from source code.
 
 ### Configuring Private Access
-If your agent images or source code are hosted in private environments, you must provide authentication credentials to allow the cluster to retrieve them.
+
+If your agent images or source code are hosted in private environments, you must provide authentication credentials to
+allow the cluster to retrieve them.
 
 #### Private Image Registries
 
-When using agents stored in private Docker registries, you must specify the name of a Kubernetes `custom-registry-secret`. This allows the cluster to pull the images during deployment.
+When using agents stored in private Docker registries, you must specify the name of a Kubernetes
+`custom-registry-secret`. This allows the cluster to pull the images during deployment.
 
 ```yaml
 imagePullSecrets:
@@ -431,16 +473,20 @@ imagePullSecrets:
 
 #### Private GitHub Repositories
 
-For building agents from private or Enterprise GitHub repositories, Agent Stack supports both [Personal Access Token (PAT)](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) and [GitHub Apps](https://docs.github.com/en/apps/creating-github-apps/about-creating-github-apps/about-creating-github-apps). This configuration enables the build engine to clone your source code.
+For building agents from private or Enterprise GitHub repositories, Kagenti ADK supports both
+[Personal Access Token (PAT)](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)
+and
+[GitHub Apps](https://docs.github.com/en/apps/creating-github-apps/about-creating-github-apps/about-creating-github-apps).
+This configuration enables the build engine to clone your source code.
 
 ```yaml
 github:
   auths:
     github.com:
-      type: "pat"
-      token: "ghp_xxxxxxxxxxxxxxxxxxxx"
+      type: 'pat'
+      token: 'ghp_xxxxxxxxxxxxxxxxxxxx'
     github.enterprise.com:
-      type: "app"
+      type: 'app'
       app_id: 123456
       installation_id: 789012
       private_key: |
@@ -451,11 +497,13 @@ github:
 
 ### Agent Registration
 
-Once access is configured, you must define which agents are available to the platform. You can do this by listing specific images or by syncing with a remote catalog.
+Once access is configured, you must define which agents are available to the platform. You can do this by listing
+specific images or by syncing with a remote catalog.
 
 #### Static Agent Registration
 
 Use this method to manually define specific agent images and their unique environment variables.
+
 ```yaml
 providers:
   # Official agents
@@ -468,26 +516,28 @@ providers:
     auto_stop_timeout_sec: 0 # disable agent downscaling
     # Variables should be strings (or they will be converted)
     variables:
-      MY_API_KEY: "sk-..."
-      MY_CONFIG_VAR: "42"
+      MY_API_KEY: 'sk-...'
+      MY_CONFIG_VAR: '42'
 ```
 
 To upgrade an agent, change its version tag and redeploy using `helm upgrade`.
 
 #### External Agent Registry
 
-Instead of manual listing, you can point to a remote registry file. This is ideal for teams managing a large, dynamic catalog of agents.
+Instead of manual listing, you can point to a remote registry file. This is ideal for teams managing a large, dynamic
+catalog of agents.
+
 ```yaml
 externalRegistries:
-  public_github: "https://github.com/kagenti/adk@v0.4.3#path=agent-registry.yaml"
+  public_github: 'https://github.com/kagenti/adk@v0.4.3#path=agent-registry.yaml'
 ```
 
 To upgrade an agent, change its version in the registry and wait for automatic synchronization (up to 10 minutes).
 
 ### Agent Builds
 
-Agents can be built from a GitHub repository directly in the cluster. To enable this feature, you will need to
-setup a few things:
+Agents can be built from a GitHub repository directly in the cluster. To enable this feature, you will need to setup a
+few things:
 
 - Docker image registry credentials with write permissions, see [Private image registries](#private-image-registries)
 - GitHub credentials to access private or enterprise GitHub repositories (optional)
@@ -496,19 +546,19 @@ setup a few things:
 ```yaml
 providerBuilds:
   enabled: true
-  buildBackend: "kaniko" # valid options: [kaniko, buildkit]
+  buildBackend: 'kaniko' # valid options: [kaniko, buildkit]
   buildRegistry:
-    registryPrefix: "ghcr.io/github-org-name"
-    imageFormat: "{registry_prefix}/{org}/{repo}/{path}:{commit_hash}"
+    registryPrefix: 'ghcr.io/github-org-name'
+    imageFormat: '{registry_prefix}/{org}/{repo}/{path}:{commit_hash}'
     # Registry credentials with write access (see section about Private image registries below)
-    secretName: "custom-registry-secret"
+    secretName: 'custom-registry-secret'
     insecure: false
   kaniko:
     useSecurityContextCapabilities: true
   externalClusterExecutor:
-    serviceAccountName: ""
-    namespace: "" # Kubernetes namespace for provider builds (defaults to current namespace if empty)
-    kubeconfig: "" # Kubeconfig YAML content for external cluster (optional)
+    serviceAccountName: ''
+    namespace: '' # Kubernetes namespace for provider builds (defaults to current namespace if empty)
+    kubeconfig: '' # Kubeconfig YAML content for external cluster (optional)
     # Example:
     # kubeconfig: |
     #   apiVersion: v1
@@ -518,33 +568,41 @@ providerBuilds:
     #       server: https://kubernetes.example.com
     #   ...
 ```
+
 <Warning>
-  **OpenShift Users**: In-cluster builds require a service account with the appropriate [Security Context Constraints (SCC)](https://www.redhat.com/en/blog/managing-sccs-in-openshift) to allow the elevated permissions necessary for container image construction.
+  **OpenShift Users**: In-cluster builds require a service account with the appropriate [Security Context Constraints
+  (SCC)](https://www.redhat.com/en/blog/managing-sccs-in-openshift) to allow the elevated permissions necessary for
+  container image construction.
 </Warning>
 
 ## Advanced Configuration
 
-The guide above covers the primary configuration paths for production environments. For a comprehensive list of every available parameter, including low-level resource limits, node selectors, and detailed sub-chart settings, refer to the source configuration file.
+The guide above covers the primary configuration paths for production environments. For a comprehensive list of every
+available parameter, including low-level resource limits, node selectors, and detailed sub-chart settings, refer to the
+source configuration file.
 
-All configuration options, including their default values and technical descriptions, are documented in the [values.yaml file](https://github.com/kagenti/adk/blob/v0.4.3/helm/values.yaml) within the official repository.
+All configuration options, including their default values and technical descriptions, are documented in the
+[values.yaml file](https://github.com/kagenti/adk/blob/v0.4.3/helm/values.yaml) within the official repository.
 
-If your infrastructure has specific requirements (such as custom sidecars, unique volume mounts, or specific network policies) that are not currently exposed via the Helm chart, please open a GitHub issue to request a new configuration toggle.
+If your infrastructure has specific requirements (such as custom sidecars, unique volume mounts, or specific network
+policies) that are not currently exposed via the Helm chart, please open a GitHub issue to request a new configuration
+toggle.
 
 ## Operations & Maintenance
 
 ### Management Commands
 
 ### Upgrading
-Once Agent Stack is running, use these Helm and `kubectl` commands to manage the lifecycle of your deployment.
 
-| Task | Command |
-|------|---------|
-| Upgrade Platform | `helm upgrade --install agentstack -f config.yaml oci://ghcr.io/kagenti/adk/chart/adk:<version>` |
-| View Active Config | `helm get values agentstack` |
-| Deployment Status | `helm status agentstack` |
-| Resource Health | `kubectl get pods` , `kubectl logs deployment/adk-server` |
-| Uninstall | `helm uninstall agentstack` |
+Once Kagenti ADK is running, use these Helm and `kubectl` commands to manage the lifecycle of your deployment.
 
+| Task               | Command                                                                                          |
+| ------------------ | ------------------------------------------------------------------------------------------------ |
+| Upgrade Platform   | `helm upgrade --install adk -f config.yaml oci://ghcr.io/kagenti/adk/chart/adk:<version>` |
+| View Active Config | `helm get values adk`                                                                     |
+| Deployment Status  | `helm status adk`                                                                         |
+| Resource Health    | `kubectl get pods` , `kubectl logs deployment/adk-server`                                        |
+| Uninstall          | `helm uninstall adk`                                                                      |
 
 ## Troubleshooting
 
@@ -569,7 +627,10 @@ kubectl get events --sort-by=.lastTimestamp
 
 **Authentication issues:**
 
-- **Redirect URIs:** Your Identity Provider must whitelist `https://<your-url>/api/auth/callback`. For CLI usage, you must also whitelist `http://localhost:9001/callback`.
+- **Redirect URIs:** Your Identity Provider must whitelist `https://<your-url>/api/auth/callback`. For CLI usage, you
+  must also whitelist `http://localhost:9001/callback`.
 - **CLI Application:** Consider creating a separate public OIDC application for the CLI
-- **Audience Claim**: The `audience` claim in your JWT must match the public URL of your application exactly, with no trailing slash (e.g., `https://example.com`).
-- **Proxy Headers:** If you are behind a load balancer or ingress, `trustProxyHeaders`: true must be enabled in your config to correctly forward request URLs.
+- **Audience Claim**: The `audience` claim in your JWT must match the public URL of your application exactly, with no
+  trailing slash (e.g., `https://example.com`).
+- **Proxy Headers:** If you are behind a load balancer or ingress, `trustProxyHeaders`: true must be enabled in your
+  config to correctly forward request URLs.

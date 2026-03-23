@@ -1,0 +1,114 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import { Button } from '@carbon/react';
+import type {
+  CheckboxField,
+  CheckboxGroupField,
+  DateField,
+  FileField,
+  FormField,
+  MultiSelectField,
+  SingleSelectField,
+  TextField,
+} from '@kagenti/adk';
+import { useMemo } from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
+import { match } from 'ts-pattern';
+
+import { FormFields } from '#modules/form/components/FormFields.tsx';
+import { useMessageForm } from '#modules/form/contexts/index.ts';
+import type { RunFormValues, ValueOfField } from '#modules/form/types.ts';
+import { isNotNull } from '#utils/helpers.ts';
+
+import type { UIMessageForm } from '../types';
+import classes from './MessageFormResponse.module.scss';
+
+interface Props {
+  form: UIMessageForm;
+}
+
+export function MessageFormResponse({ form }: Props) {
+  const { showSubmission, setShowSubmission } = useMessageForm();
+  const formReturn = useForm<RunFormValues>({ values: form.response });
+
+  const data: FieldWithValue[] | null = useMemo(() => {
+    if (!form.response) {
+      return null;
+    }
+    return form.request.fields
+      .map((field) => {
+        const value = form.response[field.id];
+        return value && value.type === field.type ? ({ ...field, value: value.value } as FieldWithValue) : null;
+      })
+      .filter(isNotNull);
+  }, [form.request.fields, form.response]);
+
+  // TODO: Temporary solution for cancelled form request
+  if (!data) {
+    return <p className={classes.empty}>Message has no content</p>;
+  }
+
+  const { fields, columns } = form.request;
+
+  return (
+    <div className={classes.root}>
+      <div>
+        {data.map((field) => {
+          const { id, label, value } = field;
+
+          return value ? (
+            <p key={id}>
+              {label}: <FormValueRenderer field={field} />
+            </p>
+          ) : null;
+        })}
+      </div>
+
+      {showSubmission && (
+        <FormProvider {...formReturn}>
+          <fieldset className={classes.submission} disabled>
+            <FormFields fields={fields} columns={columns} values={form.response} />
+          </fieldset>
+        </FormProvider>
+      )}
+
+      <Button kind="ghost" className={classes.toggleButton} onClick={() => setShowSubmission((state) => !state)}>
+        {showSubmission ? 'Hide' : 'Show'} my submission
+      </Button>
+    </div>
+  );
+}
+
+function FormValueRenderer({ field }: { field: FieldWithValue }) {
+  return (
+    <>
+      {match(field)
+        .with({ type: 'text' }, { type: 'date' }, ({ value }) => value)
+        .with({ type: 'checkbox' }, ({ value }) => (value ? 'yes' : 'no'))
+        .with({ type: 'checkbox_group' }, ({ value }) =>
+          value
+            ? Object.entries(value)
+                .map(([id, value]) => `${id} - ${value ? 'yes' : 'no'}`)
+                .join(', ')
+            : null,
+        )
+        .with({ type: 'singleselect' }, ({ value }) => value)
+        .with({ type: 'multiselect' }, ({ value }) => value?.join(', '))
+        .with({ type: 'file' }, ({ value }) => value?.map(({ name }) => name).join(', '))
+        .otherwise(() => null)}
+    </>
+  );
+}
+
+type FieldWithValueMapper<F extends FormField> = F & { value: ValueOfField<F>['value'] };
+type FieldWithValue =
+  | FieldWithValueMapper<TextField>
+  | FieldWithValueMapper<DateField>
+  | FieldWithValueMapper<CheckboxField>
+  | FieldWithValueMapper<CheckboxGroupField>
+  | FieldWithValueMapper<SingleSelectField>
+  | FieldWithValueMapper<MultiSelectField>
+  | FieldWithValueMapper<FileField>;

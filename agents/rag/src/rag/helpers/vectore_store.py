@@ -1,4 +1,4 @@
-# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
 from __future__ import annotations
 
@@ -53,7 +53,7 @@ async def extract_file(file: File) -> None:
             if final_status == "failed":
                 raise RuntimeError(
                     f"Extraction for file {file.filename} has failed. \n"
-                    f"Make sure you have docling enabled (`agentstack start --set docling.enabled=true`)"
+                    f"Make sure you have docling enabled (`kagenti-adk start --set docling.enabled=true`)"
                 )
             if final_status != "completed":
                 raise TimeoutError("Text extraction is not finished yet")

@@ -1,4 +1,4 @@
-# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
 
 from __future__ import annotations
@@ -112,9 +112,9 @@ async def authenticate_oauth_user(
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Verified email not found") from e
 
     calculated_role = UserRole.USER
-    if "agentstack-admin" in realm_roles:
+    if "adk-admin" in realm_roles:
         calculated_role = UserRole.ADMIN
-    elif "agentstack-developer" in realm_roles:
+    elif "adk-developer" in realm_roles:
         calculated_role = UserRole.DEVELOPER
 
     try:

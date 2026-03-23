@@ -1,4 +1,4 @@
-# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
 from __future__ import annotations
 
@@ -71,7 +71,7 @@ async def test_text_extraction_pdf_workflow(subtests, test_configuration, test_p
 
     # Create a simple PDF-like content for testing
     pdf = test_pdf(
-        "Test of sirens\n" * 100 + "\nAgent Stack is the future of AI\n\nThere is no better platform than Agent Stack."
+        "Test of sirens\n" * 100 + "\nKagenti ADK is the future of AI\n\nThere is no better platform than Kagenti ADK."
     )
 
     with subtests.test("upload PDF file"):
@@ -128,7 +128,7 @@ async def test_text_extraction_pdf_workflow(subtests, test_configuration, test_p
         async with file.load_text_content() as text_content:
             # Check that we get some text content back
             assert len(text_content.text) > 0, "No text content was extracted"
-            assert "Agent Stack is the future of AI" in text_content.text
+            assert "Kagenti ADK is the future of AI" in text_content.text
 
     with subtests.test("delete extraction"):
         await file.delete_extraction()

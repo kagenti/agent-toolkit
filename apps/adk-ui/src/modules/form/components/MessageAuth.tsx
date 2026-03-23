@@ -1,0 +1,37 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import { Button } from '@carbon/react';
+
+import type { UIAgentMessage } from '#modules/messages/types.ts';
+import { getMessageOAuth } from '#modules/messages/utils.ts';
+import { useAgentRun } from '#modules/runs/contexts/agent-run/index.ts';
+
+interface Props {
+  message: UIAgentMessage;
+}
+
+export function MessageAuth({ message }: Props) {
+  const authPart = getMessageOAuth(message);
+  const { startAuth } = useAgentRun();
+
+  const onHandleAuth = () => {
+    if (!authPart) {
+      return;
+    }
+
+    startAuth(authPart.url, authPart.taskId);
+  };
+
+  if (!authPart) {
+    return null;
+  }
+
+  return (
+    <Button onClick={onHandleAuth} size="md">
+      Authorize
+    </Button>
+  );
+}

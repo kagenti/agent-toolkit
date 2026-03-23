@@ -92,7 +92,7 @@ depends = ["common:check:*"]
 
 ["common:check:license"]
 dir = "{{config_root}}"
-run = "addlicense -check -l apache -s=only -c '© BeeAI a Series of LF Projects, LLC' $(fd '\\.(py|[jt]sx?|html|s?css)$')"
+run = "addlicense -check -l apache -s=only -c '© IBM Corp.' $(fd '\\.(py|[jt]sx?|html|s?css)$')"
 
 ["common:check:version"]
 dir = "{{config_root}}"
@@ -107,7 +107,7 @@ version=$(
     yq -r .project.version      apps/adk-py/pyproject.toml
     yq -r .version              apps/adk-ts/package.json
     yq -r .project.version      apps/adk-server/pyproject.toml
-    yq -r .version              apps/agentstack-ui/package.json
+    yq -r .version              apps/adk-ui/package.json
     yq -r '.providers[].location | split(":")[-1]' agent-registry.yaml
   } | sort -u
 )
@@ -123,7 +123,7 @@ depends = ["common:fix:*"]
 
 ["common:fix:license"]
 dir = "{{config_root}}"
-run = "addlicense -l apache -s=only -c '© BeeAI a Series of LF Projects, LLC' $(fd '\\.(py|[jt]sx?|html|s?css)$')"
+run = "addlicense -l apache -s=only -c '© IBM Corp.' $(fd '\\.(py|[jt]sx?|html|s?css)$')"
 
 ## test
 
@@ -132,7 +132,7 @@ run = "true" # Empty tests in case there are no tests
 
 # platform tasks
 
-["agentstack:start"]
+["adk:start"]
 depends = [
   "adk-server:build",
   "microshift-vm:build:qemu",
@@ -144,8 +144,8 @@ run = """
 set -euxo pipefail
 
 if [[ ! "$*" =~ 'ui.enabled=false' ]]; then
-    {{ mise_bin }} run agentstack-ui:build
-    UI_TAG="--set agentstack:ui.image.tag=local"
+    {{ mise_bin }} run adk-ui:build
+    UI_TAG="--set kagenti-adk:ui.image.tag=local"
 fi
 
 if [[ -n "${KAGENTI_ADK_RUNNING_INSIDE_VM-}" ]]; then
@@ -166,18 +166,18 @@ fi
 {{ mise_bin }} run adk-cli:run -- platform start -v \
     ${LIMA_IMAGE_FLAG-} \
     --image-pull-mode="$PULL_MODE" \
-    --set agentstack:auth.nextauthDevUrl="http://localhost:3000" \
-    --set agentstack:server.image.tag=local \
+    --set kagenti-adk:auth.nextauthDevUrl="http://localhost:3000" \
+    --set kagenti-adk:server.image.tag=local \
     ${UI_TAG-} "$@"
 """
 
-["agentstack:delete"]
+["adk:delete"]
 run = "{{ mise_bin }} run adk-cli:run -- platform delete"
 
-["agentstack:stop"]
+["adk:stop"]
 run = "{{ mise_bin }} run adk-cli:run -- platform stop"
 
-["agentstack:stop-all"]
+["adk:stop-all"]
 usage = 'flag "--except <except>" default=""'
 run = """
 #!/bin/bash
@@ -194,10 +194,10 @@ echo "$TO_STOP" | xargs -rn 1 -I"{}" mise run adk-cli:run -- platform stop --vm-
 {% endraw %}
 """
 
-["agentstack:shell"]
+["adk:shell"]
 raw = true
 dir = "{{cwd}}"
-usage = 'flag "--vm-name <vm_name>" default="agentstack"'
+usage = 'flag "--vm-name <vm_name>" default="adk"'
 run = """
 cat <<EOF
 deactivate () {

@@ -225,3 +225,6 @@ mise.local.toml
 # Claude
 .claude/tasks
 .claude/worktrees
+
+# pnpm store gets created in-tree in VMs
+.pnpm-store

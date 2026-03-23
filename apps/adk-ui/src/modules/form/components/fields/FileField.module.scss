@@ -1,0 +1,27 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+.button {
+  &:global(.cds--btn) {
+    &:hover {
+      background-color: $layer-hover-02;
+    }
+    &:disabled {
+      &,
+      &:hover {
+        color: $text-disabled;
+        background-color: $field;
+        border-color: $border-subtle-00;
+      }
+    }
+  }
+}
+
+.files {
+  column-gap: var(--field-gap);
+  > li {
+    max-inline-size: var(--file-field-max-width);
+  }
+}

@@ -53,12 +53,13 @@ overrides:
   "@mintlify/previewing>tar": "6.2.1"
 
 packages:
-  - apps/agentstack-ui
+  - apps/adk-ui
   - apps/lint-config
   - apps/adk-ts
   # TODO: Uncomment, when published to npm
   # - apps/adk-ts/examples/chat-ui
   - apps/keycloak-theme
+  - apps/docs-site
   - docs
 
 catalog:

@@ -1,4 +1,4 @@
-# Default values for agentstack.
+# Default values for adk.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
@@ -14,7 +14,7 @@ useHelmHooks: true
 localStorage: false
 
 # Gateway API HTTPRoute configuration for local development
-# When enabled, creates HTTPRoutes for agentstack UI and API through a shared gateway
+# When enabled, creates HTTPRoutes for ADK UI and API through a shared gateway
 # Hostnames are derived from auth.nextauthUrl and auth.apiUrl
 gateway:
   enabled: false
@@ -98,7 +98,6 @@ contextTokenPermissions:
     vector_stores: ["*"]
     context_data: ["*"]
 
-
 defaultLLMModel: ""
 defaultEmbeddingModel: ""
 modelProviders: []
@@ -132,26 +131,26 @@ auth:
   nextauthSecret: "" # If empty, a random string will be generated
 
   # These are important for audience validation, make sure to change them to your public URLs
-  nextauthUrl: "http://agentstack.localtest.me:8080"
+  nextauthUrl: "http://adk.localtest.me:8080"
   nextauthDevUrl: ""
-  apiUrl: "http://agentstack-api.localtest.me:8080"
+  apiUrl: "http://adk-api.localtest.me:8080"
 
   ## Keycloak provisioning job configuration
   ## Keycloak itself is deployed externally (e.g. via kagenti-deps).
-  ## This job sets up the agentstack realm, clients, and seed users.
+  ## This job sets up the adk realm, clients, and seed users.
   keycloakProvisionJob:
     enabled: true
     adminUser: admin
     # a random password will be generated if empty, you can get it using
     # kubectl get secret keycloak-secret -o jsonpath="{.data.admin-password}" | base64 -d
     adminPassword: ""
-    seedAgentstackUsers:
+    seedUsers:
       # - username: admin
       #   password: admin
       #   firstName: Admin
       #   lastName: User
       #   email: admin@beeai.dev
-      #   roles: ["agentstack-admin"]
+      #   roles: ["adk-admin"]
       #   enabled: true
     image:
       repository: quay.io/keycloak/keycloak
@@ -177,7 +176,7 @@ auth:
     name: "Keycloak"
     id: "keycloak"
     rolesPath: "realm_access.roles" # JSON path to roles in JWT claims (can be an array or a semicolon separated string)
-    uiClientId: "agentstack-ui"
+    uiClientId: "adk-ui"
     uiClientSecret: ""
     uiClientSecretKey: "uiClientSecret"
     serverClientId: "adk-server"
@@ -186,14 +185,14 @@ auth:
     existingSecret: ""
 
 # In adk-server this is used to determine the request origin and dynamically create agent card.
-# For example https://agentstack.example.com/api/v1/providers/{provider_id} will return an agent cart with URL for
-# https://agentstack.example.com, without respecting the headers, the URL would be "http://agentstack.example.com",
+# For example https://adk.example.com/api/v1/providers/{provider_id} will return an agent cart with URL for
+# https://adk.example.com, without respecting the headers, the URL would be "http://adk.example.com",
 # See https://www.uvicorn.org/settings/#application-interface
 trustProxyHeaders: false
 
 # --- EXTERNAL REGISTRIES ---
 # GitHub configuration for accessing private repositories
-# This creates a .githubconfigjson file in the agentstack-secret
+# This creates a .githubconfigjson file in the adk-secret
 github:
   auths: {}
   # Example configurations:
@@ -212,7 +211,6 @@ github:
 
 # This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
-
 
 # -------- SERVER ----------
 server:
@@ -359,7 +357,7 @@ connector:
 ui:
   replicaCount: 1
   enabled: true
-  appName: "Agent Stack"
+  appName: "Kagenti ADK"
   image:
     repository: ghcr.io/kagenti/adk/adk-ui
     pullPolicy: IfNotPresent
@@ -383,8 +381,6 @@ ui:
 
 # ----- INFRASTRUCTURE ------
 
-
-
 ## PostgreSQL chart configuration
 ## ref: https://github.com/CloudPirates-io/helm-charts/tree/main/charts/postgres
 ## @param postgresql.enabled Switch to enable or disable the PostgreSQL helm chart
@@ -403,25 +399,25 @@ postgresql:
     repository: pgvector/pgvector
     tag: pg17
   auth:
-    username: agentstack-user
+    username: adk-user
     password: "password"
-    database: agentstack
+    database: adk
   persistence:
     size: 4Gi
 ## External PostgreSQL configuration
 ## All of these values are only used when postgresql.enabled is set to false
 ## @param externalDatabase.host Database host (ignored if externalDatabase.sqlConnection is set)
 ## @param externalDatabase.port Database port number (ignored if externalDatabase.sqlConnection is set)
-## @param externalDatabase.user Non-root username for Agent Stack (ignored if externalDatabase.sqlConnection is set)
-## @param externalDatabase.password Password for the non-root username for Agent Stack (ignored if externalDatabase.sqlConnection or externalDatabase.existingSecret are set)
-## @param externalDatabase.database Agent Stack database name (ignored if externalDatabase.sqlConnection is set)
+## @param externalDatabase.user Non-root username for ADK (ignored if externalDatabase.sqlConnection is set)
+## @param externalDatabase.password Password for the non-root username for ADK (ignored if externalDatabase.sqlConnection or externalDatabase.existingSecret are set)
+## @param externalDatabase.database ADK database name (ignored if externalDatabase.sqlConnection is set)
 ## @param externalDatabase.existingSecret Name of an existing secret resource containing the database credentials
 ##
 externalDatabase:
   host: ""
   port: 5432
-  user: agentstack-user
-  database: agentstack
+  user: adk-user
+  database: adk
   password: ""
   # Required when initContainers.createVectorDbExtension is enabled
   adminUser: ""
@@ -446,11 +442,11 @@ seaweedfs:
   image:
     registry: mirror.gcr.io
     repository: chrislusf
-  bucket: "agentstack-files"
+  bucket: "adk-files"
   auth:
     admin:
-      accessKeyID: "agentstack-admin-user"
-      accessKeySecret: "agentstack-admin-password"
+      accessKeyID: "adk-admin-user"
+      accessKeySecret: "adk-admin-password"
     existingSecret: ""
   affinity: ""
   master:
@@ -468,7 +464,7 @@ seaweedfs:
   s3:
     port: 9009
     enableAuth: true
-    existingConfigSecret: agentstack-seaweedfs-default-config-secret
+    existingConfigSecret: adk-seaweedfs-default-config-secret
 
   allInOne:
     nodeSelector: ""
@@ -499,7 +495,7 @@ externalS3:
   accessKeySecret: ""
   existingSecret: ""
   protocol: "https"
-  bucket: "agentstack-files"
+  bucket: "adk-files"
   region: "us-east-1"
 
 ## Redis chart configuration

@@ -1,0 +1,19 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+'use client';
+import { FooterNav } from '#components/Navbar/FooterNav.tsx';
+
+import classes from './CommonFooter.module.scss';
+
+export function CommonFooter() {
+  return (
+    <div className={classes.root}>
+      <div className={classes.nav}>
+        <FooterNav />
+      </div>
+    </div>
+  );
+}

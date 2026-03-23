@@ -1,4 +1,4 @@
-# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
 
 from __future__ import annotations
@@ -94,7 +94,7 @@ class KagentiConfiguration(BaseModel):
     # OAuth2 client credentials for authenticating to kagenti API.
     # Defaults to reusing the adk-server OIDC client (same realm).
     # The adk-server service account needs kagenti-viewer role assigned in Keycloak.
-    auth_token_url: str = "http://keycloak-service.keycloak:8080/realms/agentstack/protocol/openid-connect/token"
+    auth_token_url: str = "http://keycloak-service.keycloak:8080/realms/adk/protocol/openid-connect/token"
     client_id: str = "adk-server"
     client_secret: Secret[str] = Secret("adk-server-secret")
 
@@ -116,10 +116,10 @@ class OidcConfiguration(BaseModel):
     # enabled: bool = False  <-- Removed
 
     # Flattened configuration allows setting a single provider via environment variables
-    # e.g., AGENTSTACK__AUTH__OIDC__NAME="Keycloak"
+    # e.g., ADK__AUTH__OIDC__NAME="Keycloak"
     name: str = "Keycloak"
-    issuer: AnyUrl = HttpUrl("http://keycloak-service.keycloak:8080/realms/agentstack")
-    external_issuer: AnyUrl = HttpUrl("http://keycloak.localtest.me:8080/realms/agentstack")
+    issuer: AnyUrl = HttpUrl("http://keycloak-service.keycloak:8080/realms/adk")
+    external_issuer: AnyUrl = HttpUrl("http://keycloak.localtest.me:8080/realms/adk")
     client_id: str = "adk-server"
     client_secret: Secret[str] = Secret("adk-server-secret")
     insecure_transport: bool = False
@@ -184,9 +184,9 @@ class AuthConfiguration(BaseModel):
 
 class ObjectStorageConfiguration(BaseModel):
     endpoint_url: AnyUrl = AnyUrl("http://seaweedfs-all-in-one:9009")
-    access_key_id: Secret[str] = Secret("agentstack-admin-user")
-    access_key_secret: Secret[str] = Secret("agentstack-admin-password")
-    bucket_name: str = "agentstack-files"
+    access_key_id: Secret[str] = Secret("adk-admin-user")
+    access_key_secret: Secret[str] = Secret("adk-admin-password")
+    bucket_name: str = "adk-files"
     region: str = "us-east-1"
     use_ssl: bool = False
     storage_limit_per_user_bytes: int = 1 * (1024 * 1024 * 1024)  # 1GiB
@@ -220,7 +220,7 @@ class RedisConfiguration(BaseModel):
 class PersistenceConfiguration(BaseModel):
     db_use_ssl: bool = False
     db_ssl_cert: Path | None = None
-    db_url: Secret[AnyUrl] = Secret(AnyUrl("postgresql+asyncpg://agentstack-user:password@postgresql:5432/agentstack"))
+    db_url: Secret[AnyUrl] = Secret(AnyUrl("postgresql+asyncpg://adk-user:password@postgresql:5432/adk"))
     encryption_key: Secret[str] | None = None
     finished_requests_remove_after_sec: int = int(timedelta(minutes=30).total_seconds())
     stale_requests_remove_after_sec: int = int(timedelta(hours=1).total_seconds())

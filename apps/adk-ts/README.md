@@ -210,6 +210,6 @@ Contributions are welcome! Please see the
 
 ---
 
-Developed by contributors to the BeeAI project, this initiative is part of the
+Developed by contributors to the Kagenti project, this initiative is part of the
 [Linux Foundation AI & Data program](https://lfaidata.foundation/projects/). Its development follows open,
 collaborative, and community-driven practices.

@@ -1,0 +1,35 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+@use 'sass:map';
+@use '@carbon/styles/scss/utilities/convert' as *;
+
+$breakpoints: (
+  sm: (
+    columns: 4,
+    margin: rem(16px),
+    width: rem(320px),
+  ),
+  md: (
+    columns: 8,
+    margin: rem(16px),
+    width: rem(672px),
+  ),
+  lg: (
+    columns: 16,
+    margin: rem(24px),
+    width: rem(1056px),
+  ),
+  xlg: (
+    columns: 16,
+    margin: rem(32px),
+    width: rem(1312px),
+  ),
+  max: (
+    columns: 16,
+    margin: rem(32px),
+    width: rem(1584px),
+  ),
+);

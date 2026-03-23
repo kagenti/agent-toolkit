@@ -1,0 +1,132 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+'use client';
+
+import type { Placement } from '@floating-ui/react';
+import {
+  arrow,
+  autoUpdate,
+  flip,
+  FloatingArrow,
+  FloatingPortal,
+  offset,
+  safePolygon,
+  shift,
+  useDismiss,
+  useFloating,
+  useFocus,
+  useHover,
+  useInteractions,
+  useRole,
+} from '@floating-ui/react';
+import { Slot } from '@radix-ui/react-slot';
+import clsx from 'clsx';
+import type { PropsWithChildren, ReactNode } from 'react';
+import { useRef, useState } from 'react';
+
+import classes from './Tooltip.module.scss';
+
+interface Props {
+  content: ReactNode;
+  placement?: Placement;
+  size?: 'sm' | 'md' | 'lg';
+  asChild?: boolean;
+  isEnabled?: boolean;
+  isOpen?: boolean;
+}
+
+export function Tooltip({
+  content,
+  placement = 'bottom',
+  size = 'md',
+  asChild,
+  isEnabled = true,
+  isOpen: isOpenControlled,
+  children,
+}: PropsWithChildren<Props>) {
+  const arrowRef = useRef(null);
+
+  const SIZE = {
+    sm: {
+      ArrowWidth: 8,
+      ArrowHeight: 4,
+      Offset: 3,
+    },
+    md: {
+      ArrowWidth: 12,
+      ArrowHeight: 6,
+      Offset: 8,
+    },
+    lg: {
+      ArrowWidth: 12,
+      ArrowHeight: 6,
+      Offset: 8,
+    },
+  }[size];
+
+  const [isOpen, setIsOpen] = useState(false);
+
+  const isControlled = isOpenControlled !== undefined;
+
+  const { refs, floatingStyles, context } = useFloating({
+    placement,
+    open: isControlled ? isOpenControlled : isOpen,
+    onOpenChange: isControlled ? undefined : setIsOpen,
+    whileElementsMounted: autoUpdate,
+    middleware: [
+      offset(SIZE.ArrowHeight + SIZE.Offset),
+      flip({
+        fallbackAxisSideDirection: 'start',
+      }),
+      shift(),
+      arrow({
+        element: arrowRef,
+      }),
+    ],
+  });
+
+  const hover = useHover(context, {
+    move: false,
+    handleClose: safePolygon(),
+    enabled: !isControlled,
+  });
+  const focus = useFocus(context, { enabled: !isControlled });
+  const dismiss = useDismiss(context);
+  const role = useRole(context, { role: 'tooltip' });
+
+  const { getReferenceProps, getFloatingProps } = useInteractions([hover, focus, dismiss, role]);
+
+  const Comp = asChild ? Slot : 'button';
+
+  return (
+    <>
+      <Comp ref={refs.setReference} {...getReferenceProps()}>
+        {children}
+      </Comp>
+
+      {(isControlled ? isOpenControlled : isOpen) && isEnabled && (
+        <FloatingPortal>
+          <div
+            ref={refs.setFloating}
+            style={floatingStyles}
+            className={clsx(classes.root, { [classes[size]]: size })}
+            {...getFloatingProps()}
+          >
+            <div className={classes.content}>{content}</div>
+
+            <FloatingArrow
+              ref={arrowRef}
+              context={context}
+              width={SIZE.ArrowWidth}
+              height={SIZE.ArrowHeight}
+              className={classes.arrow}
+            />
+          </div>
+        </FloatingPortal>
+      )}
+    </>
+  );
+}

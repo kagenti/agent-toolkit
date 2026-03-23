@@ -5,7 +5,7 @@ description: "Allow users to configure agent behavior with interactive UI compon
 
 Sometimes you need to give users control over how your agent behaves during a conversation. For example, users might want to enable or disable thinking mode, choose between different response styles, or configure other agent-specific parameters.
 
-The Agent Stack platform provides a settings as a part of Form extension that creates an interactive UI component where users can configure these options before or during their interaction with your agent.
+The Kagenti ADK platform provides a settings as a part of Form extension that creates an interactive UI component where users can configure these options before or during their interaction with your agent.
 
 <Tip>
 Settings extensions are a type of form [Service Extension](../agent-integration/overview#dependency-injection-service-extensions) that allows you to easily "inject dependencies" into your agent. This follows the inversion of control principle where your agent defines what it needs, and the platform provides those dependencies.
@@ -42,7 +42,7 @@ Here's how to add simple user defined settings to your agent:
 
 {/* <!-- embedme examples/agent-integration/agent-settings/basic-settings/src/basic_settings/agent.py --> */}
 ```python
-# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
 
 import os
@@ -205,7 +205,7 @@ Settings are presented to users in a clean, organized interface that makes it ea
 
 ## Settings Field Types
 
-Agent Stack supports various field types for collecting different kinds of configuration data:
+Kagenti ADK supports various field types for collecting different kinds of configuration data:
 
 ### CheckboxGroupField
 Groups multiple checkboxes together for related boolean options. A single checkbox must still be wrapped inside the `CheckboxGroupField`.

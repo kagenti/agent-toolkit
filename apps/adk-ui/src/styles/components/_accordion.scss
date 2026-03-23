@@ -1,0 +1,14 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+@use 'styles/common' as *;
+
+.cds--accordion__heading {
+  flex-direction: row;
+  padding-inline-end: 0;
+}
+.cds--accordion__title {
+  padding-inline-start: $spacing-03;
+}

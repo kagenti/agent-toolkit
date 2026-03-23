@@ -1,16 +1,16 @@
 ---
 title: "MCP integration"
-description: "Learn how Agent Stack helps with authentication when using MCP."
+description: "Learn how Kagenti ADK helps with authentication when using MCP."
 ---
 
 ## What are Connectors?
 
-A connector is an MCP endpoint exposed by the Agent Stack that forwards MCP requests to a remote MCP server, acting as a proxy and handling authentication.
+A connector is an MCP endpoint exposed by the Kagenti ADK that forwards MCP requests to a remote MCP server, acting as a proxy and handling authentication.
 
 
 It allows users to set up a connection to a third-party service (like GitHub, Box etc.) and then exposes a local MCP server that can be consumed by agents. This architecture eliminates the need for user authentication in your agent code. The connector handles authentication with the third-party service on behalf of the authenticated user, and the MCP interface is properly scoped to that user's permissions and data.
 
-Users can work with connectors in two ways via the Agent Stack UI:
+Users can work with connectors in two ways via the Kagenti ADK UI:
 
 - **Connect an existing connector**: Go through an OAuth flow to obtain an authentication token for a pre-registered connector.
 - **Register a custom connector**: Provide OAuth client ID, client secret, and URL to register their own service as a connector, then connect it.
@@ -21,7 +21,7 @@ When a connector is registered and connected, it becomes available for the agent
 
 The MCP Service Extension provides a standardized way for your agents to access MCP servers (connectors) without managing connection details, authentication, or URLs manually. The extension automatically matches your agent's MCP requirements with available connectors and provides you with a ready-to-use MCP client session, eliminating the need for manual configuration.
 
-One of the key features of Agent Stack's MCP integration is automatic connector matching. When you specify a suggested connector name in your agent, the platform automatically:
+One of the key features of Kagenti ADK's MCP integration is automatic connector matching. When you specify a suggested connector name in your agent, the platform automatically:
 
 1. Searches for connected connectors with matching names (case-insensitive)
 2. Creates an MCP client connection to the matched connector
@@ -30,7 +30,7 @@ One of the key features of Agent Stack's MCP integration is automatic connector 
 This means you don't need to manually configure URLs or manage connector connections. The platform handles it all for you.
 
 <Tip>
-Service Extensions are a type of [A2A Extension](https://a2a-protocol.org/latest/topics/extensions/) that allows you to easily "inject dependencies" into your agent. This follows the inversion of control principle where your agent defines what it needs, and the Client (in this case, Agent Stack UI) is responsible for providing those dependencies.
+Service Extensions are a type of [A2A Extension](https://a2a-protocol.org/latest/topics/extensions/) that allows you to easily "inject dependencies" into your agent. This follows the inversion of control principle where your agent defines what it needs, and the Client (in this case, Kagenti ADK UI) is responsible for providing those dependencies.
 </Tip>
 
 <Warning>
@@ -64,7 +64,7 @@ Here's an example agent that uses the GitHub MCP Connector and returns your prof
 
 {/* <!-- embedme examples/agent-integration/mcp/github-mcp-agent/src/github_mcp_agent/agent.py--> */}
 ```python
-# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
 
 import json
@@ -138,7 +138,7 @@ Use an MCP client session to call tools, list resources, or interact with prompt
 
 If you prefer not to use the MCP Service Extension (which automatically matches connectors), you can still create a standard MCP client and use the OAuth extension for user authentication. 
 
-Unlike the connector-based approach, this method does not require users to set up a connection ahead of the conversation. The OAuth extension handles the authentication flow through the Agent Stack UI, allowing users to authorize your agent to access third-party services during the conversation itself. This makes it ideal for scenarios where you want users to authenticate on-demand without pre-configuration.
+Unlike the connector-based approach, this method does not require users to set up a connection ahead of the conversation. The OAuth extension handles the authentication flow through the Kagenti ADK UI, allowing users to authorize your agent to access third-party services during the conversation itself. This makes it ideal for scenarios where you want users to authenticate on-demand without pre-configuration.
 
 ### Example: Direct MCP Client with OAuth
 
@@ -146,7 +146,7 @@ Here's how to build an agent that creates a custom MCP client and uses OAuth for
 
 {/* <!-- embedme examples/agent-integration/mcp/custom-mcp-client-with-oauth/src/custom_mcp_client_with_oauth/agent.py--> */}
 ```python
-# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
 
 import os

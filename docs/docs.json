@@ -1,7 +1,7 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "maple",
-  "name": "Agent Stack",
+  "name": "Kagenti ADK",
   "colors": {
     "primary": "#000000",
     "light": "#c5c5c5",
@@ -68,7 +68,7 @@
             ]
           },
           {
-            "group": "Deploy Agent Stack",
+            "group": "Deploy Kagenti ADK",
             "pages": [
               "stable/deploy-agent-stack/deployment-guide",
               "stable/deploy-agent-stack/authenticate-cli-to-server"
@@ -154,7 +154,7 @@
             ]
           },
           {
-            "group": "Deploy Agent Stack",
+            "group": "Deploy Kagenti ADK",
             "pages": [
               "development/deploy-agent-stack/deployment-guide",
               "development/deploy-agent-stack/authenticate-cli-to-server"
@@ -194,7 +194,7 @@
     "primary": {
       "type": "button",
       "label": "GitHub",
-      "href": "https://github.com/i-am-bee/agentstack"
+      "href": "https://github.com/kagenti/adk"
     },
     "links": [
       {
@@ -205,7 +205,7 @@
   },
   "footer": {
     "socials": {
-      "github": "https://github.com/i-am-bee/agentstack",
+      "github": "https://github.com/kagenti/adk",
       "discord": "https://discord.gg/AZFrp3UF5k",
       "bluesky": "https://bsky.app/profile/beeaiagents.bsky.social"
     }
@@ -217,7 +217,7 @@
     },
     {
       "source": "/install.sh",
-      "destination": "https://raw.githubusercontent.com/i-am-bee/agentstack/install/install.sh"
+      "destination": "https://raw.githubusercontent.com/kagenti/adk/main/install.sh"
     }
   ]
 }

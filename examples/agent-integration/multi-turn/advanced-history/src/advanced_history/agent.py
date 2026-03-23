@@ -1,4 +1,4 @@
-# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
 
 import os
@@ -23,7 +23,7 @@ FrameworkMessage = UserMessage | AssistantMessage
 
 
 def to_framework_message(message: Message) -> FrameworkMessage:
-    """Convert A2A Message to BeeAI Framework Message format"""
+    """Convert A2A Message to Kagenti ADK Message format"""
     message_text = "".join(part.root.text for part in message.parts if part.root.kind == "text")
 
     if message.role == Role.agent:
@@ -46,7 +46,7 @@ async def advanced_history_example(
     # Load conversation history
     history = [message async for message in context.load_history() if isinstance(message, Message) and message.parts]
 
-    # Initialize BeeAI Framework LLM client
+    # Initialize Kagenti ADK LLM client
     llm_client = AgentStackChatModel(tool_choice_support={"none", "auto"})
     llm_client.set_context(llm)
 

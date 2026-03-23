@@ -1,4 +1,4 @@
-# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
 
 from __future__ import annotations
@@ -74,7 +74,7 @@ class Configuration(pydantic_settings.BaseSettings):
             auth_token = await self.auth_manager.load_auth_token()
         except Exception as e:
             # Auto-recover for local dev by re-authenticating with admin:admin
-            if self.auth_manager.active_server and "agentstack-api.localtest.me" in self.auth_manager.active_server:
+            if self.auth_manager.active_server and "adk-api.localtest.me" in self.auth_manager.active_server:
                 with contextlib.suppress(Exception):
                     auth_token = await self.auth_manager.login_with_password(
                         self.auth_manager.active_server, username="admin", password="admin"
@@ -95,7 +95,7 @@ class Configuration(pydantic_settings.BaseSettings):
 
     @pydantic.model_validator(mode="after")
     def _check_old_home(self) -> typing.Self:
-        for old_path in [pathlib.Path.home() / ".beeai", pathlib.Path.home() / ".agentstack"]:
+        for old_path in [pathlib.Path.home() / ".kagenti", pathlib.Path.home() / ".adk"]:
             if old_path.exists() and not self.home.exists():
                 self.home.parent.mkdir(parents=True, exist_ok=True)
                 old_path.rename(self.home)

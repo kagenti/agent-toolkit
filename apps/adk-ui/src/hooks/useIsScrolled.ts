@@ -1,0 +1,33 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import { useRef } from 'react';
+import { useIntersectionObserver } from 'usehooks-ts';
+
+export function useIsScrolled() {
+  const scrollElementRef = useRef<HTMLDivElement>(null);
+
+  const { isIntersecting, ref: observeElementRef } = useIntersectionObserver();
+  const isScrolled = !isIntersecting;
+
+  const scrollToBottom = () => {
+    const scrollElement = scrollElementRef.current;
+
+    if (!scrollElement) {
+      return;
+    }
+
+    scrollElement.scrollTo({
+      top: scrollElement.scrollHeight,
+    });
+  };
+
+  return {
+    scrollElementRef,
+    observeElementRef,
+    isScrolled,
+    scrollToBottom,
+  };
+}

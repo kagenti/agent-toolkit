@@ -8,7 +8,7 @@ If avaialble use Github MCP.
 
 ## Workflow
 
-When filing issues to i-am-bee/agentstack:
+When filing issues to kagenti/adk:
 
 1. Read appropriate template from `.github/ISSUE_TEMPLATE/` first:
    - `bug_report.md` for bugs

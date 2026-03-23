@@ -1,0 +1,18 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+@use 'styles/common' as *;
+
+.cds--inline-loading__checkmark-container {
+  fill: $background-inverse;
+}
+
+.cds--inline-loading {
+  min-block-size: 0;
+}
+
+.cds--inline-loading__animation {
+  overflow: hidden;
+}

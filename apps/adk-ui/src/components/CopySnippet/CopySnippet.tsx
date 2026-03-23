@@ -1,0 +1,44 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+'use client';
+
+import clsx from 'clsx';
+import { type ReactElement, useRef } from 'react';
+
+import { CopyButton } from '#components/CopyButton/CopyButton.tsx';
+
+import classes from './CopySnippet.module.scss';
+
+interface Props {
+  children: string | ReactElement;
+  className?: string;
+  variant?: 'blog';
+}
+
+export function CopySnippet({ children: snippet, className, variant }: Props) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  return (
+    <div
+      className={clsx(
+        classes.root,
+        {
+          [classes.block]: typeof snippet !== 'string',
+          [classes.blog]: variant === 'blog',
+        },
+        className,
+      )}
+    >
+      <div ref={ref} className={classes.content}>
+        {typeof snippet === 'string' ? <code>{snippet}</code> : snippet}
+      </div>
+
+      <div className={classes.button}>
+        <CopyButton contentRef={ref} />
+      </div>
+    </div>
+  );
+}

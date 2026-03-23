@@ -1,6 +1,6 @@
 ---
 title: ACP to A2A Migration Guide
-description: "Migrate from ACP (Agent Communication Protocol) to A2A (Agent2Agent) Protocol for Agent Stack v0.3.x+."
+description: 'Migrate from ACP (Agent Communication Protocol) to A2A (Agent2Agent) Protocol for Kagenti ADK v0.3.x+.'
 ---
 
 ## Quick Migration Checklist
@@ -45,8 +45,8 @@ from a2a.types import AgentSkill, Message
 from kagenti_adk.server import Server
 from kagenti_adk.server.context import RunContext
 from kagenti_adk.a2a.extensions import (
-    AgentDetail, AgentDetailTool, 
-    CitationExtensionServer, CitationExtensionSpec, 
+    AgentDetail, AgentDetailTool,
+    CitationExtensionServer, CitationExtensionSpec,
     TrajectoryExtensionServer, TrajectoryExtensionSpec,
     LLMServiceExtensionServer, LLMServiceExtensionSpec
 )
@@ -65,7 +65,7 @@ from kagenti_adk.util.file import load_file
     description="This is a general-purpose chat assistant prototype built with the BeeAI Framework and powered by Granite.",
     metadata=Metadata(
         annotations=Annotations(
-            beeai_ui=PlatformUIAnnotation(
+            kagenti_ui=PlatformUIAnnotation(
                 ui_type=PlatformUIType.CHAT,
                 user_greeting="Hi! I'm your Granite-powered AI assistant—here to help with questions, research, and more. What can I do for you today?",
                 display_name="Jenna's Granite Chat",
@@ -96,15 +96,15 @@ async def agent_function(input: list[Message], context: Context) -> AsyncGenerat
         version="0.0.10",
         tools=[
             AgentDetailTool(
-                name="Think", 
+                name="Think",
                 description="Advanced reasoning and analysis to provide thoughtful, well-structured responses to complex questions and topics."
             ),
             AgentDetailTool(
-                name="DuckDuckGo", 
+                name="DuckDuckGo",
                 description="Search the web for current information, news, and real-time updates on any topic."
             ),
             AgentDetailTool(
-                name="File Processing", 
+                name="File Processing",
                 description="Read and analyze uploaded files including PDFs, text files, CSV data, and JSON documents."
             )
         ],
@@ -183,7 +183,7 @@ for part in message.parts:
 # Simple file processing (if needed)
 if uploaded_files:
     from kagenti_adk.util.file import load_file
-    
+
     for file_part in uploaded_files:
         async with load_file(file_part) as loaded_content:
             # Process file content as needed
@@ -240,7 +240,7 @@ async def agent_function(
     if llm_ext:
         # Get platform-managed LLM configuration
         llm_config = llm_ext.data.llm_fulfillments.get("default")
-        
+
         llm = OpenAIChatModel(
             model_id=llm_config.api_model,
             api_key=llm_config.api_key,
@@ -256,17 +256,17 @@ async def agent_function(
 
 ```py
 yield MessagePart(metadata=TrajectoryMetadata(
-    kind="trajectory", 
+    kind="trajectory",
     key=str(uuid.uuid4()),
     message="Processing..."
 ))
 
 citations.append(CitationMetadata(
-    kind="citation", 
+    kind="citation",
     url=url,
     title=title,
     description=description,
-    start_index=start, 
+    start_index=start,
     end_index=end
 ))
 for citation in citations:
@@ -309,5 +309,5 @@ yield response_text
 
 ## Complete Examples
 
-1. https://github.com/i-am-bee/agentstack/blob/main/agents/chat/src/chat/agent.py
-2. https://github.com/jenna-winkler/agentstack-showcase/blob/main/src/agentstack_agents/agent.py
+1. https://github.com/kagenti/adk/blob/main/agents/chat/src/chat/agent.py
+2. https://github.com/jenna-winkler/adk-showcase/blob/main/src/adk_agents/agent.py

@@ -1,0 +1,25 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+@use 'styles/common' as *;
+
+.cds--popover-container {
+  position: relative;
+}
+
+.cds--popover--tab-tip > .cds--popover > .cds--popover-content {
+  border-radius: $border-radius;
+  padding: 1rem;
+}
+
+.cds--popover--drop-shadow .cds--popover > .cds--popover-content {
+  filter: none;
+  box-shadow: $box-shadow;
+}
+
+.cds--popover-content {
+  border-radius: $border-radius;
+  padding: $spacing-03 $spacing-04;
+}

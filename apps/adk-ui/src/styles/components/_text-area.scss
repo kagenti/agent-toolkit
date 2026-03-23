@@ -1,0 +1,13 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+@use 'styles/common' as *;
+
+.cds--text-area {
+  &:focus,
+  &:active {
+    outline: 2px solid $background-inverse;
+  }
+}

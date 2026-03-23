@@ -1,0 +1,17 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+.container {
+  @include type-style(label-01);
+
+  --cds-layer: #{$layer-02};
+
+  min-block-size: rem(48px);
+
+  &.blog {
+    font-size: rem(16px);
+    line-height: math.div(24, 16);
+  }
+}

@@ -1,4 +1,4 @@
-# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
 
 from __future__ import annotations
@@ -38,7 +38,7 @@ FrameworkMessage = UserMessage | AssistantMessage
 
 
 def to_framework_message(message: Message) -> FrameworkMessage:
-    """Convert A2A Message to Agent Stack Framework Message format"""
+    """Convert A2A Message to Kagenti ADK Framework Message format"""
     message_text = "".join(part.root.text for part in message.parts if part.root.kind == "text")
 
     if message.role == Role.agent:

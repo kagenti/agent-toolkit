@@ -3,13 +3,13 @@ title: Monitoring & Observability
 description: Monitor traces, logs, and metrics from your agents and platform
 ---
 
-Agent Stack provides built-in observability through [OpenTelemetry (OTLP)](https://opentelemetry.io/). This allows you to monitor agent health, performance metrics, and execution traces in real-time. By default, the stack integrates with [Arize Phoenix](https://docs.arize.com/phoenix) for local visualization, but it can be routed to any OTLP-compliant backend.
+Kagenti ADK provides built-in observability through [OpenTelemetry (OTLP)](https://opentelemetry.io/). This allows you to monitor agent health, performance metrics, and execution traces in real-time. By default, the stack integrates with [Arize Phoenix](https://docs.arize.com/phoenix) for local visualization, but it can be routed to any OTLP-compliant backend.
 
 
 ```mermaid
 graph LR
     %% Sources
-    AgentStack[Agent Stack Server] 
+    Kagenti ADK[Kagenti ADK Server] 
     Agent[Agent Providers]
     
     %% Collector
@@ -21,7 +21,7 @@ graph LR
     Custom[Custom<br/>Backend<br/>⚙ Config Required]
     
     %% Data flows
-    AgentStack -->|traces/metrics| OTLP
+    Kagenti ADK -->|traces/metrics| OTLP
     Agent -->|traces/metrics| OTLP
     
     OTLP --> Phoenix
@@ -50,7 +50,7 @@ For telemetry to flow successfully, it must be enabled at three levels:
   The server must be configured to export that data by setting `configure_telemetry=True`.
    </Step>
 
-   <Step title="The Agent Stack Platform">
+   <Step title="The Kagenti ADK Platform">
   The infrastructure must be running a collector and a backend (like Arize Phoenix) to receive and display the data.
    </Step>
 
@@ -88,7 +88,7 @@ server.run(configure_telemetry=True)
 The quickest way to see what your agent is doing is by streaming its logs directly to your terminal. This is ideal for debugging container lifecycle events and immediate request errors.
 
 ```bash
-agentstack logs
+adk logs
 ```
 
 What you'll see:
@@ -98,12 +98,12 @@ What you'll see:
 - Container lifecycle events
 
 <Note>
-  Logs are only available for managed (containerized) agents that are currently running on Agent Stack.
+  Logs are only available for managed (containerized) agents that are currently running on Kagenti ADK.
 </Note>
 
 ## Advanced Observability: Traces & Metrics
 
-By default, Agent Stack integrates with [Arize Phoenix](https://phoenix.arize.com/) for local visualization of agent traces. For cloud-based observability and production monitoring, you can easily integrate [Langfuse](https://langfuse.com/).
+By default, Kagenti ADK integrates with [Arize Phoenix](https://phoenix.arize.com/) for local visualization of agent traces. For cloud-based observability and production monitoring, you can easily integrate [Langfuse](https://langfuse.com/).
 
 Telemetry details include:
 - Platform version and runtime details
@@ -112,7 +112,7 @@ Telemetry details include:
 ### Enable Phoenix Observability
 
 <Warning>
-  **License Notice**: Phoenix is [licensed under the Elastic License v2 (ELv2)](https://github.com/Arize-ai/phoenix/blob/main/LICENSE). It is disabled by default in Agent Stack. By enabling it, you acknowledge responsibility for ensuring compliance with these terms in your specific use case.
+  **License Notice**: Phoenix is [licensed under the Elastic License v2 (ELv2)](https://github.com/Arize-ai/phoenix/blob/main/LICENSE). It is disabled by default in Kagenti ADK. By enabling it, you acknowledge responsibility for ensuring compliance with these terms in your specific use case.
   </Warning>
 
 <Steps>
@@ -120,12 +120,12 @@ Telemetry details include:
 
 Phoenix is included by default as part of the kagenti observability stack (OTel collector + Phoenix). Simply start the platform:
 ```sh
-agentstack platform start
+kagenti-adk platform start
 ```
 
 To disable Phoenix and the OTel collector, pass:
 ```sh
-agentstack platform start --set kagenti-deps:components.otel.enabled=false
+kagenti-adk platform start --set kagenti-deps:components.otel.enabled=false
 ```
 
   </Step>
@@ -139,7 +139,7 @@ Spinning up the Phoenix container can take a moment, even after the CLI reports 
 
 Execute an agent to generate data:
 ```sh
-agentstack run chat "Hello"
+kagenti-adk run chat "Hello"
 ```
 
    </Step>
@@ -180,7 +180,7 @@ collector:
 
 <Step title="Start the platform with the configuration">
 ```bash
-agentstack platform start -f config.yaml
+kagenti-adk platform start -f config.yaml
 ```
 </Step>
 
@@ -188,7 +188,7 @@ agentstack platform start -f config.yaml
 
 Execute an agent to generate data:
 ```sh
-agentstack run chat "Hello"
+kagenti-adk run chat "Hello"
 ```
 Check your Langfuse project dashboard for incoming traces and metrics.
 </Step>

@@ -1,0 +1,55 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+.root {
+  display: block;
+  p {
+    font-size: inherit;
+    line-height: inherit;
+    letter-spacing: inherit;
+  }
+}
+
+.clamped {
+  @include line-clamp(0);
+
+  .root:not(.useBlockElement) & {
+    > * {
+      display: inline-block;
+    }
+  }
+}
+
+.sentinel {
+  display: inline-block;
+  inline-size: 1px;
+  block-size: 1px;
+  margin-inline-start: -1px;
+
+  .useBlockElement & {
+    display: block;
+    margin-inline-start: 0;
+  }
+}
+
+.button {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  :global(.cds--tooltip-trigger__wrapper) {
+    display: flex;
+  }
+  :global(.cds--btn--icon-only) {
+    inline-size: rem(16px);
+    block-size: rem(16px);
+    min-block-size: 0;
+    border-radius: rem(4px);
+    background-color: $layer-03;
+    &:hover:not(:focus) {
+      background-color: $layer-hover-03;
+      border-color: $layer-hover-03;
+    }
+  }
+}

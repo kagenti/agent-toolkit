@@ -1,0 +1,22 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+@use 'breakpoints' as *;
+@forward '@carbon/styles/scss/config' with (
+  $font-display: swap,
+  $grid-breakpoints: $breakpoints
+);
+@forward 'theme';
+@forward 'functions';
+@forward 'mixins';
+@forward '@carbon/styles/scss/spacing';
+@forward '@carbon/styles/scss/colors';
+@forward '@carbon/styles/scss/motion';
+@forward '@carbon/styles/scss/type';
+@forward '@carbon/styles/scss/breakpoint';
+@forward '@carbon/styles/scss/utilities/convert';
+@forward '@carbon/styles/scss/utilities/focus-outline';
+@forward '@carbon/styles/scss/utilities/visually-hidden';
+@forward '@carbon/styles/scss/utilities/z-index';

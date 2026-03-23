@@ -1,0 +1,16 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+@use 'styles/common' as *;
+
+.cds--progress-bar__bar {
+  background-color: $background-inverse;
+}
+
+.cds--progress-bar--small {
+  .cds--progress-bar__track {
+    block-size: rem(2px);
+  }
+}

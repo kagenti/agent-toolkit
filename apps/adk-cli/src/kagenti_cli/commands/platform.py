@@ -1,4 +1,4 @@
-# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
 
 from __future__ import annotations
@@ -79,8 +79,8 @@ def detect_driver() -> typing.Literal["lima", "wsl"]:
 @functools.cache
 def detect_export_import_paths() -> tuple[str, str]:
     if detect_driver() == "lima":
-        pathlib.Path("/tmp/agentstack").mkdir(exist_ok=True, parents=True)
-        path = f"/tmp/agentstack/{uuid.uuid4()}.tar"
+        pathlib.Path("/tmp/kagenti-adk").mkdir(exist_ok=True, parents=True)
+        path = f"/tmp/kagenti-adk/{uuid.uuid4()}.tar"
         return (path, path)
     fd, tmp_path = tempfile.mkstemp(suffix=".tar")
     os.close(fd)
@@ -205,19 +205,19 @@ class ImagePullMode(StrEnum):
     skip = "skip"
 
 
-CHART_PREFIXES = ("kagenti-deps:", "kagenti:", "agentstack:")
+CHART_PREFIXES = ("kagenti-deps:", "kagenti:", "kagenti-adk:")
 
 
 def parse_scoped_set_values(set_values_list: list[str]) -> dict[str, list[str]]:
-    """Split --set values by chart prefix. Unprefixed defaults to 'agentstack'."""
-    result: dict[str, list[str]] = {"agentstack": [], "kagenti": [], "kagenti-deps": []}
+    """Split --set values by chart prefix. Unprefixed defaults to 'kagenti-adk'."""
+    result: dict[str, list[str]] = {"kagenti-adk": [], "kagenti": [], "kagenti-deps": []}
     for value in set_values_list:
         for prefix in CHART_PREFIXES:
             if value.startswith(prefix):
                 result[prefix.rstrip(":")].append(value[len(prefix) :])
                 break
         else:
-            result["agentstack"].append(value)
+            result["kagenti-adk"].append(value)
     return result
 
 
@@ -227,7 +227,7 @@ async def start_cmd(
         list[str],
         typer.Option(
             "--set",
-            help="Set Helm chart values. Prefix with chart name: --set kagenti:key=val, --set kagenti-deps:key=val. Unprefixed applies to agentstack.",
+            help="Set Helm chart values. Prefix with chart name: --set kagenti:key=val, --set kagenti-deps:key=val. Unprefixed applies to kagenti-adk.",
             default_factory=list,
         ),
     ],
@@ -247,7 +247,7 @@ async def start_cmd(
         pathlib.Path | None,
         typer.Option(
             "-f",
-            help="YAML values file with chart-scoped sections: agentstack:, kagenti:, kagenti-deps:",
+            help="YAML values file with chart-scoped sections: kagenti-adk:, kagenti:, kagenti-deps:",
         ),
     ] = None,
     lima_image: typing.Annotated[
@@ -256,7 +256,7 @@ async def start_cmd(
     wsl_image: typing.Annotated[
         str | None, typer.Option("--wsl-image", help="Local path or URL to WSL distro image (.wsl)")
     ] = None,
-    vm_name: typing.Annotated[str, typer.Option(hidden=True)] = "agentstack",
+    vm_name: typing.Annotated[str, typer.Option(hidden=True)] = "kagenti-adk",
     verbose: typing.Annotated[bool, typer.Option("-v", "--verbose", help="Show verbose output")] = False,
     skip_login: typing.Annotated[bool, typer.Option(hidden=True)] = False,
     no_wait_for_platform: typing.Annotated[bool, typer.Option(hidden=True)] = False,
@@ -285,7 +285,7 @@ async def start_cmd(
                     lima_env = {"LIMA_HOME": str(Configuration().lima_home)}
                     match await detect_vm_status(vm_name):
                         case "missing":
-                            for name, label in [(vm_name, "previous"), ("beeai-platform", "legacy")]:
+                            for name, label in [(vm_name, "previous"), ("kagenti-platform", "legacy")]:
                                 await run_command([detect_limactl(), "--tty=false", "delete", "--force", name], f"Cleaning up remains of {label} instance", env=lima_env, check=False, cwd="/")
                             import psutil
 
@@ -296,7 +296,7 @@ async def start_cmd(
                             if total_memory_gib < 8:
                                 console.warning("Less than 8 GB of RAM detected. Performance may be degraded.")
 
-                            current_lima_image = lima_image or f"https://github.com/i-am-bee/agentstack/releases/download/v{version}/microshift-vm-{arch}.qcow2"
+                            current_lima_image = lima_image or f"https://github.com/kagenti/adk/releases/download/v{version}/microshift-vm-{arch}.qcow2"
                             if current_lima_image.startswith(("/", "./")):
                                 current_lima_image = str(await anyio.Path(current_lima_image).absolute())
 
@@ -321,8 +321,8 @@ async def start_cmd(
                                             ],
                                             "mounts": [
                                                 {
-                                                    "location": "/tmp/agentstack",
-                                                    "mountPoint": "/tmp/agentstack",
+                                                    "location": "/tmp/kagenti-adk",
+                                                    "mountPoint": "/tmp/kagenti-adk",
                                                     "writable": True,
                                                 }
                                             ],
@@ -350,7 +350,7 @@ async def start_cmd(
                 case "wsl":
                     if (await run_command(["wsl.exe", "--status"], "Checking for WSL2", check=False)).returncode != 0:
                         console.error(
-                            "WSL is not installed. Please follow the Kagenti ADK installation instructions: https://agentstack.beeai.dev/stable/introduction/quickstart#windows"
+                            "WSL is not installed. Please follow the Kagenti ADK installation instructions: https://kagenti.github.io/adk/stable/introduction/quickstart#windows"
                         )
                         console.hint(
                             "Run [green]wsl.exe --install[/green] as administrator. If you just did this, restart your PC and run the same command again. Full installation may require up to two restarts. WSL is properly set up once you reach a working Linux terminal. You can verify this by running [green]wsl.exe[/green] without arguments."
@@ -395,12 +395,12 @@ async def start_cmd(
                             ["wsl.exe", "--unregister", vm_name], "Cleaning up remains of previous instance", check=False
                         )
                         await run_command(
-                            ["wsl.exe", "--unregister", "beeai-platform"],
+                            ["wsl.exe", "--unregister", "kagenti-platform"],
                             "Cleaning up remains of legacy instance",
                             check=False,
                         )
 
-                        current_wsl_image = wsl_image or f"https://github.com/i-am-bee/agentstack/releases/download/v{version}/microshift-vm-{arch}.wsl"
+                        current_wsl_image = wsl_image or f"https://github.com/kagenti/adk/releases/download/v{version}/microshift-vm-{arch}.wsl"
                         install_dir = Configuration().home / "wsl" / vm_name
                         install_dir.mkdir(parents=True, exist_ok=True)
                         if current_wsl_image.startswith(("http://", "https://")):
@@ -446,16 +446,16 @@ async def start_cmd(
             ["bash", "-c", 'command -v helm && exit 0; case $(uname -m) in x86_64) ARCH="amd64" ;; aarch64) ARCH="arm64" ;; esac; curl -fsSL "https://get.helm.sh/helm-v4.1.1-linux-${ARCH}.tar.gz" | tar -xzf - --strip-components=1 -C /usr/local/bin "linux-${ARCH}/helm"; chmod +x /usr/local/bin/helm'],
             "Installing Helm",
         )
-        # --- Prepare agentstack chart and import images before any deployments ---
+        # --- Prepare kagenti-adk chart and import images before any deployments ---
         await run_in_vm(
             vm_name,
-            ["bash", "-c", "cat >/tmp/agentstack-chart.tgz"],
+            ["bash", "-c", "cat >/tmp/kagenti-adk-chart.tgz"],
             "Preparing Helm chart",
             input=(importlib.resources.files("kagenti_cli") / "data" / "helm-chart.tgz").read_bytes(),
         )
         await run_in_vm(
             vm_name,
-            ["bash", "-c", "cat >/tmp/agentstack-values.yaml"],
+            ["bash", "-c", "cat >/tmp/kagenti-adk-values.yaml"],
             "Preparing Helm values",
             input=yaml.dump(
                 merge(
@@ -470,29 +470,29 @@ async def start_cmd(
                                 "enabled": True,
                                 "adminUser": "admin",
                                 "adminPassword": "admin",
-                                "seedAgentstackUsers": [
+                                "seedUsers": [
                                     {
                                         "username": "admin",
                                         "password": "admin",
                                         "firstName": "Admin",
                                         "lastName": "User",
                                         "email": "admin@beeai.dev",
-                                        "roles": ["agentstack-admin", "kagenti-admin"],
+                                        "roles": ["adk-admin", "kagenti-admin"],
                                         "enabled": True,
                                     }
                                 ],
                             },
                             "validateAudience": False,
-                            "nextauthUrl": "http://agentstack.localtest.me:8080",
-                            "apiUrl": "http://agentstack-api.localtest.me:8080",
+                            "nextauthUrl": "http://adk.localtest.me:8080",
+                            "apiUrl": "http://adk-api.localtest.me:8080",
                             "oidcProvider": {
-                                "issuerUrl": "http://keycloak-service.keycloak:8080/realms/agentstack",
-                                "publicIssuerUrl": "http://keycloak.localtest.me:8080/realms/agentstack",
+                                "issuerUrl": "http://keycloak-service.keycloak:8080/realms/adk",
+                                "publicIssuerUrl": "http://keycloak.localtest.me:8080/realms/adk",
                                 "name": "Keycloak",
                                 "id": "keycloak",
                                 "rolesPath": "realm_access.roles",
-                                "uiClientId": "agentstack-ui",
-                                "uiClientSecret": "agentstack-ui-secret",
+                                "uiClientId": "adk-ui",
+                                "uiClientSecret": "adk-ui-secret",
                                 "serverClientId": "adk-server",
                                 "serverClientSecret": "adk-server-secret",
                             },
@@ -508,7 +508,7 @@ async def start_cmd(
                             },
                         },
                     },
-                    user_values.get("agentstack", {}),
+                    user_values.get("kagenti-adk", {}),
                 )
             ).encode("utf-8"),
         )
@@ -571,7 +571,7 @@ async def start_cmd(
                         "namespace": "keycloak",
                         "url": "http://keycloak-service.keycloak:8080",
                         "publicUrl": "http://keycloak.localtest.me:8080",
-                        "realm": "agentstack",
+                        "realm": "adk",
                         "autoBootstrapRealm": False,
                         "adminSecretName": "keycloak-initial-admin",
                         "adminUsernameKey": "username",
@@ -593,14 +593,14 @@ async def start_cmd(
         )
         for name, content in [("kagenti-deps", kagenti_deps_values), ("kagenti", kagenti_values)]:
             await run_in_vm(vm_name, ["bash", "-c", f"cat >/tmp/{name}-values.yaml"], f"Preparing {name} values", input=content.encode("utf-8"))
-        # List images from all charts (agentstack + kagenti + kagenti-deps)
+        # List images from all charts (kagenti-adk + kagenti + kagenti-deps)
         helm_template_cmds = "; ".join(
             f"helm template {name} {src}"
             + (f" --version={kagenti_chart_version}" if ver else "")
             + f" --values=/tmp/{name}-values.yaml"
             + (" " + " ".join(shlex.quote(f"--set={v}") for v in scoped_sets[name]) if scoped_sets[name] else "")
             for name, src, ver in [
-                ("agentstack", "/tmp/agentstack-chart.tgz", False),
+                ("kagenti-adk", "/tmp/kagenti-adk-chart.tgz", False),
                 ("kagenti-deps", "oci://ghcr.io/kagenti/kagenti/kagenti-deps", True),
                 ("kagenti", "oci://ghcr.io/kagenti/kagenti/kagenti", True),
             ]
@@ -724,8 +724,8 @@ async def start_cmd(
         await run_in_vm(
             vm_name,
             ["bash", "-c",
-             "kubectl create namespace agentstack --dry-run=client -o yaml | kubectl apply -f - && "
-             "for ns in agentstack keycloak kagenti-system istio-system; do kubectl label namespace $ns shared-gateway-access=true --overwrite; done && "
+             "kubectl create namespace kagenti-adk --dry-run=client -o yaml | kubectl apply -f - && "
+             "for ns in kagenti-adk keycloak kagenti-system istio-system; do kubectl label namespace $ns shared-gateway-access=true --overwrite; done && "
              "kubectl apply -f - <<'EOF'\n"
              "apiVersion: gateway.networking.k8s.io/v1\n"
              "kind: HTTPRoute\n"
@@ -746,7 +746,7 @@ async def start_cmd(
             "Configuring gateway routes",
         )
 
-        # --- Agentstack helm install ---
+        # --- Kagenti ADK helm install ---
         await run_in_vm(
             vm_name,
             ["bash", "-c",
@@ -760,14 +760,14 @@ async def start_cmd(
                 "helm",
                 "upgrade",
                 "--install",
-                "agentstack",
-                "/tmp/agentstack-chart.tgz",
-                "--namespace=agentstack",
+                "kagenti-adk",
+                "/tmp/kagenti-adk-chart.tgz",
+                "--namespace=kagenti-adk",
                 "--create-namespace",
-                "--values=/tmp/agentstack-values.yaml",
+                "--values=/tmp/kagenti-adk-values.yaml",
                 "--timeout=20m",
                 "--wait",
-                *(f"--set={v}" for v in scoped_sets["agentstack"]),
+                *(f"--set={v}" for v in scoped_sets["kagenti-adk"]),
             ],
             "Deploying Kagenti ADK platform with Helm",
         )
@@ -818,7 +818,7 @@ async def start_cmd(
                             reraise=True,
                         ):
                             with attempt:
-                                (await client.get("http://agentstack-api.localtest.me:8080/healthcheck")).raise_for_status()
+                                (await client.get("http://adk-api.localtest.me:8080/healthcheck")).raise_for_status()
                     except Exception as ex:
                         raise ConnectionError(
                             "Server did not start in 20 minutes. Please check your internet connection."
@@ -826,7 +826,7 @@ async def start_cmd(
 
         await run_in_vm(
             vm_name,
-            ["bash", "-c", "kubectl wait --for=condition=Complete job/keycloak-provision -n agentstack --timeout=300s"],
+            ["bash", "-c", "kubectl wait --for=condition=Complete job/keycloak-provision -n kagenti-adk --timeout=300s"],
             "Waiting for Keycloak provisioning to complete",
         )
         console.success("Kagenti ADK platform started successfully!")
@@ -840,13 +840,13 @@ async def start_cmd(
             )
 
         if not skip_login:
-            await kagenti_cli.commands.server.server_login("http://agentstack-api.localtest.me:8080")
+            await kagenti_cli.commands.server.server_login("http://adk-api.localtest.me:8080")
 
 
 
 @app.command("stop", help="Stop Kagenti ADK platform. [Local only]")
 async def stop_cmd(
-    vm_name: typing.Annotated[str, typer.Option(hidden=True)] = "agentstack",
+    vm_name: typing.Annotated[str, typer.Option(hidden=True)] = "kagenti-adk",
     verbose: typing.Annotated[bool, typer.Option("-v", "--verbose", help="Show verbose output")] = False,
 ):
     with verbosity(verbose):
@@ -880,7 +880,7 @@ async def stop_cmd(
 
 @app.command("delete", help="Delete Kagenti ADK platform. [Local only]")
 async def delete_cmd(
-    vm_name: typing.Annotated[str, typer.Option(hidden=True)] = "agentstack",
+    vm_name: typing.Annotated[str, typer.Option(hidden=True)] = "kagenti-adk",
     verbose: typing.Annotated[bool, typer.Option("-v", "--verbose", help="Show verbose output")] = False,
 ):
     with verbosity(verbose):
@@ -918,7 +918,7 @@ async def delete_cmd(
 @app.command("import", help="Import a local docker image into the Kagenti ADK platform. [Local only]")
 async def import_cmd(
     tag: typing.Annotated[str, typer.Argument(help="Docker image tag to import")],
-    vm_name: typing.Annotated[str, typer.Option(hidden=True)] = "agentstack",
+    vm_name: typing.Annotated[str, typer.Option(hidden=True)] = "kagenti-adk",
     verbose: typing.Annotated[bool, typer.Option("-v", "--verbose", help="Show verbose output")] = False,
 ):
     with verbosity(verbose):
@@ -944,7 +944,7 @@ async def import_cmd(
 @app.command("exec", help="For debugging -- execute a command inside the Kagenti ADK platform VM. [Local only]")
 async def exec_cmd(
     command: typing.Annotated[list[str] | None, typer.Argument()] = None,
-    vm_name: typing.Annotated[str, typer.Option(hidden=True)] = "agentstack",
+    vm_name: typing.Annotated[str, typer.Option(hidden=True)] = "kagenti-adk",
     verbose: typing.Annotated[bool, typer.Option("-v", "--verbose", help="Show verbose output")] = False,
 ):
     with verbosity(verbose, show_success_status=False):

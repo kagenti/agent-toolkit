@@ -1,0 +1,35 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import 'server-only';
+
+import { notFound } from 'next/navigation';
+
+import { handleApiError } from '#app/(auth)/rsc.tsx';
+import type { Agent } from '#modules/agents/api/types.ts';
+import { buildAgent } from '#modules/agents/utils.ts';
+import { readProvider } from '#modules/providers/api/index.ts';
+
+export async function fetchAgent(providerId: string) {
+  let agent: Agent | undefined;
+
+  try {
+    const provider = await readProvider({ id: providerId });
+
+    if (provider) {
+      agent = buildAgent(provider);
+    }
+  } catch (error) {
+    await handleApiError(error);
+
+    throw error;
+  }
+
+  if (!agent) {
+    notFound();
+  }
+
+  return agent;
+}

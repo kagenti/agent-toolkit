@@ -1,4 +1,4 @@
-# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
 from __future__ import annotations
 
@@ -83,7 +83,7 @@ def keycloak_admin(test_configuration) -> KeycloakAdmin:
         server_url=test_configuration.keycloak_url,
         username="admin",
         password="admin",
-        realm_name="agentstack",
+        realm_name="adk",
         user_realm_name="master",
         verify=True,
     )
@@ -117,7 +117,7 @@ def _create_test_user(keycloak_admin: KeycloakAdmin, username: str, role: str | 
 @pytest.fixture(scope="session")
 def test_admin(keycloak_admin, test_configuration) -> Iterator[tuple[str, str]]:
     username = "testadmin"
-    _create_test_user(keycloak_admin, username, "agentstack-admin")
+    _create_test_user(keycloak_admin, username, "adk-admin")
     try:
         yield username, f"{username}-password"
     finally:

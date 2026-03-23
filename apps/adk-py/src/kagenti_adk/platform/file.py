@@ -1,4 +1,4 @@
-# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
 
 
@@ -53,7 +53,7 @@ class File(pydantic.BaseModel):
 
     @property
     def url(self) -> PlatformFileUrl:
-        return PlatformFileUrl(f"agentstack://{self.id}")
+        return PlatformFileUrl(f"adk://{self.id}")
 
     @staticmethod
     async def create(
@@ -258,7 +258,7 @@ class File(pydantic.BaseModel):
             ).raise_for_status()
 
     def to_part(self: File) -> Part:
-        return Part(filename=self.filename, url=f"agentstack://{self.id}")
+        return Part(filename=self.filename, url=f"adk://{self.id}")
 
     @staticmethod
     async def list(

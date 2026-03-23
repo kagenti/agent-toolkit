@@ -1,6 +1,6 @@
-# Agent Stack Server SDK
+# Kagenti ADK Server SDK
 
-Python SDK for packaging agents for deployment to Agent Stack infrastructure.
+Python SDK for packaging agents for deployment to Kagenti ADK infrastructure.
 
 [![PyPI version](https://img.shields.io/pypi/v/kagenti-adk.svg?style=plastic)](https://pypi.org/project/kagenti-adk/)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg?style=plastic)](https://opensource.org/licenses/Apache-2.0)
@@ -8,13 +8,13 @@ Python SDK for packaging agents for deployment to Agent Stack infrastructure.
 
 ## Overview
 
-The `kagenti-adk` provides Python utilities for wrapping agents built with any framework (LangChain, CrewAI, BeeAI Framework, etc.) for deployment on Agent Stack. It handles the A2A (Agent-to-Agent) protocol implementation, platform service integration, and runtime requirements so you can focus on agent logic.
+The `kagenti-adk` provides Python utilities for wrapping agents built with any framework (LangChain, CrewAI, BeeAI Framework, etc.) for deployment on Kagenti ADK. It handles the A2A (Agent-to-Agent) protocol implementation, platform service integration, and runtime requirements so you can focus on agent logic.
 
 ## Key Features
 
-- **Framework-Agnostic Deployment** - Wrap agents from any framework for Agent Stack deployment
+- **Framework-Agnostic Deployment** - Wrap agents from any framework for Kagenti ADK deployment
 - **A2A Protocol Support** - Automatic handling of Agent-to-Agent communication
-- **Platform Service Integration** - Connect to Agent Stack's managed LLM, embedding, file storage, and vector store services
+- **Platform Service Integration** - Connect to Kagenti ADK's managed LLM, embedding, file storage, and vector store services
 - **Context Storage** - Manage data associated with conversation contexts
 
 ## Installation
@@ -70,13 +70,13 @@ The SDK includes extension support for:
 - **Settings** - User-configurable agent parameters (`SettingsExtensionServer`, `SettingsExtensionSpec`)
 - **LLM Services** - Platform-managed language models (`LLMServiceExtensionServer`, `LLMServiceExtensionSpec`)
 - **Agent Details** - Metadata and UI enhancements (`AgentDetail`)
-- **And more** - See [Documentation](https://agentstack.beeai.dev/stable/agent-development/overview)
+- **And more** - See [Documentation](https://github.com/kagenti/adk/blob/main/docs/stable/agent-development/overview)
 
-Each extension provides both server-side handlers and A2A protocol specifications for seamless integration with Agent Stack's UI and infrastructure.
+Each extension provides both server-side handlers and A2A protocol specifications for seamless integration with Kagenti ADK's UI and infrastructure.
 
 ## Resources
 
-- [Agent Stack Documentation](https://agentstack.beeai.dev)
+- [Kagenti ADK Documentation](https://github.com/kagenti/adk)
 - [GitHub Repository](https://github.com/kagenti/adk)
 - [PyPI Package](https://pypi.org/project/kagenti-adk/)
 
@@ -91,4 +91,4 @@ Contributions are welcome! Please see the [Contributing Guide](https://github.co
 
 ---
 
-Developed by contributors to the BeeAI project, this initiative is part of the [Linux Foundation AI & Data program](https://lfaidata.foundation/projects/). Its development follows open, collaborative, and community-driven practices.
+Developed by contributors to the Kagenti project, this initiative is part of the [Linux Foundation AI & Data program](https://lfaidata.foundation/projects/). Its development follows open, collaborative, and community-driven practices.

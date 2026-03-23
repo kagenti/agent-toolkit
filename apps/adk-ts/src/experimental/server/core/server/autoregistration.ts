@@ -1,5 +1,5 @@
 /**
- * Copyright 2025 © BeeAI a Series of LF Projects, LLC
+ * Copyright 2026 © IBM Corp.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -11,7 +11,7 @@ import type { AutoregistrationOptions } from './types';
 
 const VARIABLE_RELOAD_INTERVAL_MS = 5000;
 
-export function createAutoregisterToAgentstack(options: AutoregistrationOptions): () => void {
+export function createAutoregisterToAdk(options: AutoregistrationOptions): () => void {
   const { selfRegistrationId, agentCard, host, port, api } = options;
 
   let providerId: string | null = null;

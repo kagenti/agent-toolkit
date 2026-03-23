@@ -1,5 +1,5 @@
 /**
- * Copyright 2025 © BeeAI a Series of LF Projects, LLC
+ * Copyright 2026 © IBM Corp.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -51,7 +51,7 @@ export function App() {
 
   return (
     <main className="app">
-      <h1 className="heading">Agent Stack Chat Example</h1>
+      <h1 className="heading">Kagenti ADK Chat Example</h1>
 
       <div className="meta">
         <p>

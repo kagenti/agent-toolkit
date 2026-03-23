@@ -1,4 +1,4 @@
-# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
 
 from __future__ import annotations
@@ -72,7 +72,7 @@ async def _wait_for_auth_code(port: int = 9001) -> str:
 
 
 def get_unique_app_name() -> str:
-    return f"Agent Stack CLI {uuid.uuid4()}"
+    return f"Kagenti ADK CLI {uuid.uuid4()}"
 
 
 @app.command("login | change | select | default | switch")
@@ -118,7 +118,7 @@ async def server_login(
     server = server.rstrip("/")
 
     # Local dev shortcut: use resource owner password grant with admin:admin
-    if "agentstack-api.localtest.me" in server:
+    if "adk-api.localtest.me" in server:
         try:
             await config.auth_manager.login_with_password(server, username="admin", password="admin")
             console.success(f"Logged in to [cyan]{server}[/cyan] (local dev).")

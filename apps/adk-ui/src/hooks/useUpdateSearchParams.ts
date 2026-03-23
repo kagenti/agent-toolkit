@@ -1,0 +1,26 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+
+export function useUpdateSearchParams() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const updateSearchParams = (params: Record<string, string | number | boolean>) => {
+    const newSearchParams = new URLSearchParams(searchParams ?? undefined);
+    Object.entries(params).forEach(([key, value]) => {
+      if (value) {
+        newSearchParams.set(key, String(value));
+      } else {
+        newSearchParams.delete(key);
+      }
+    });
+    router.push(`${pathname}?${newSearchParams.toString()}`);
+  };
+
+  return { updateSearchParams };
+}

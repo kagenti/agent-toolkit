@@ -5,7 +5,7 @@ kind: PersistentVolume
 metadata:
   name: {{ .Release.Name }}-postgresql-pv
   labels:
-    app.kubernetes.io/name: {{ include "agentstack.name" . }}
+    app.kubernetes.io/name: {{ include "kagenti-adk.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/component: postgresql-storage
 spec:
@@ -28,7 +28,7 @@ kind: PersistentVolume
 metadata:
   name: {{ .Release.Name }}-seaweedfs-pv
   labels:
-    app.kubernetes.io/name: {{ include "agentstack.name" . }}
+    app.kubernetes.io/name: {{ include "kagenti-adk.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/component: seaweedfs-storage
 spec:
@@ -51,7 +51,7 @@ kind: PersistentVolume
 metadata:
   name: {{ .Release.Name }}-redis-pv
   labels:
-    app.kubernetes.io/name: {{ include "agentstack.name" . }}
+    app.kubernetes.io/name: {{ include "kagenti-adk.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/component: redis-storage
 spec:
@@ -74,7 +74,7 @@ kind: PersistentVolume
 metadata:
   name: {{ .Release.Name }}-kagenti-keycloak-postgres-pv
   labels:
-    app.kubernetes.io/name: {{ include "agentstack.name" . }}
+    app.kubernetes.io/name: {{ include "kagenti-adk.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/component: kagenti-keycloak-postgres-storage
 spec:
@@ -97,7 +97,7 @@ kind: PersistentVolume
 metadata:
   name: {{ .Release.Name }}-phoenix-data-pv
   labels:
-    app.kubernetes.io/name: {{ include "agentstack.name" . }}
+    app.kubernetes.io/name: {{ include "kagenti-adk.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/component: phoenix-data-storage
 spec:

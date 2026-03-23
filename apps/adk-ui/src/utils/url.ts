@@ -1,0 +1,19 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+// https://stackoverflow.com/a/19709846
+const ABSOLUTE_URL_REGEX = new RegExp('^(?:[a-z+]+:)?//', 'i');
+
+export const isAbsoluteUrl = (url: string) => ABSOLUTE_URL_REGEX.test(url);
+
+export const isValidUrl = (value: string): boolean => {
+  try {
+    const { protocol } = new URL(value);
+
+    return protocol === 'http:' || protocol === 'https:';
+  } catch {
+    return false;
+  }
+};

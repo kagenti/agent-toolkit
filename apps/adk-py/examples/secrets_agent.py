@@ -1,4 +1,4 @@
-# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
 
 from __future__ import annotations
@@ -25,7 +25,7 @@ server = Server()
     name="Agent with secrets",
     detail=AgentDetail(
         interaction_mode="multi-turn",
-        author=AgentDetailContributor(name="BeeAI contributors"),
+        author=AgentDetailContributor(name="Kagenti contributors"),
         contributors=[AgentDetailContributor(name="John"), AgentDetailContributor(name="Kate")],
         license="Apache 2.0",
     ),

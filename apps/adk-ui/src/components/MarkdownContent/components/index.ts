@@ -1,0 +1,27 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import type { JSX } from 'react';
+import type { Components } from 'react-markdown';
+
+import { Code } from './Code';
+import { ExternalLink, type ExternalLinkProps } from './ExternalLink';
+import { Img } from './Img';
+import type { MermaidDiagramProps } from './MermaidDiagram';
+import { MermaidDiagram } from './MermaidDiagram';
+import { Table } from './Table';
+
+export interface ExtendedComponents extends Components {
+  externalLink?: (props: ExternalLinkProps) => JSX.Element;
+  mermaidDiagram?: (props: MermaidDiagramProps) => JSX.Element;
+}
+
+export const components = {
+  code: Code,
+  table: Table,
+  img: Img,
+  externalLink: ExternalLink,
+  mermaidDiagram: MermaidDiagram,
+} satisfies ExtendedComponents;

@@ -1,0 +1,9 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+// TODO: The API does not yet support tools, so this is just to suppress TypeScript errors.
+export type Tool = {
+  name: 'search' | 'wikipedia' | 'weather';
+};

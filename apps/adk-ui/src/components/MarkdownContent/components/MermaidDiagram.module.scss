@@ -1,0 +1,31 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  row-gap: $spacing-04;
+}
+
+.diagram {
+  text-align: center;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-block-size: rem(120px);
+
+  :global(.cds--inline-loading) {
+    justify-content: center;
+  }
+}
+
+.error {
+  :global(.cds--inline-notification__subtitle) {
+    @include line-clamp(2);
+  }
+}

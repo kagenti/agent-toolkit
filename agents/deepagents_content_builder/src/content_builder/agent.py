@@ -1,4 +1,4 @@
-# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
 
 
@@ -34,7 +34,7 @@ from kagenti_adk.server.context import RunContext
 from langchain_core.messages import HumanMessage, AIMessageChunk, ToolMessage
 from deepagents import create_deep_agent, SubAgent
 
-from content_builder.backend import AgentStackBackend
+from content_builder.backend import ADKBackend
 from content_builder.tools import generate_cover, generate_social_image
 from content_builder.utils import load_subagents, create_chat_model, to_langchain_messages
 from content_builder.tools import web_search
@@ -57,7 +57,7 @@ CURRENT_DIRECTORY = Path(__file__).parent
 
 @server.agent(
     name="Content Creator Agent (Deepagents)",
-    documentation_url=f"https://github.com/i-am-bee/agentstack/blob/{os.getenv('RELEASE_VERSION', 'main')}/agents/deepagents_content_builder",
+    documentation_url=f"https://github.com/kagenti/adk/blob/{os.getenv('RELEASE_VERSION', 'main')}/agents/deepagents_content_builder",
     default_input_modes=["text/plain"],
     default_output_modes=["text/plain", "image/jpeg", "image/png", "text/markdown"],
     description="A content writer for a technology company that creates engaging, informative content that educates readers about AI, software development, and emerging technologies.",
@@ -99,7 +99,7 @@ async def content_builder_agent(
         sub_agent = sub_agent.to_deepagent_subagent(model=create_chat_model(llm_config))
         subagents.append(sub_agent)
 
-    agent_stack_backend = AgentStackBackend()
+    agent_stack_backend = ADKBackend()
     print([f.filename for f in await agent_stack_backend.alist()])
     fs_backend = FilesystemBackend(virtual_mode=True, root_dir=CURRENT_DIRECTORY)
 

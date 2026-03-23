@@ -1,0 +1,25 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+.ref {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.dialogHolder {
+  z-index: z('modal') - 1;
+}
+
+.dialog {
+  inline-size: rem(288px);
+}
+
+.isVoted {
+  &:global(.cds--btn) {
+    background-color: $text-dark;
+    color: $text-inverse;
+  }
+}

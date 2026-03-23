@@ -1,0 +1,28 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import type { Root } from 'hast';
+import type { Code } from 'mdast';
+import { visit } from 'unist-util-visit';
+
+export function remarkMermaid() {
+  return (tree: Root) => {
+    let mermaidIndex = 0;
+
+    visit(tree, 'code', (node: Code) => {
+      if (node.lang === 'mermaid') {
+        node.data = {
+          ...node.data,
+          hName: 'mermaidDiagram',
+          hProperties: {
+            mermaidIndex,
+          },
+        };
+
+        mermaidIndex++;
+      }
+    });
+  };
+}

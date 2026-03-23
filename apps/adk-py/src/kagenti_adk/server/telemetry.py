@@ -1,4 +1,4 @@
-# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
 
 from __future__ import annotations
@@ -36,7 +36,7 @@ _DEFAULT_OTEL_ENDPOINT = "http://otel-collector.localtest.me:8080"
 def configure_telemetry(app: FastAPI) -> None:
     """Utility that configures opentelemetry with OTLP exporter and FastAPI instrumentation"""
 
-    # Set a sensible default OTLP endpoint for local agentstack deployments
+    # Set a sensible default OTLP endpoint for local kagenti-adk deployments
     if not os.environ.get("OTEL_EXPORTER_OTLP_ENDPOINT"):
         os.environ["OTEL_EXPORTER_OTLP_ENDPOINT"] = _DEFAULT_OTEL_ENDPOINT
 

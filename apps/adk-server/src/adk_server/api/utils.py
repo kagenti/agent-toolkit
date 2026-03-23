@@ -1,4 +1,4 @@
-# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
 
 from __future__ import annotations
@@ -8,7 +8,7 @@ from collections.abc import Iterable
 
 import openai.types.chat
 
-from adk_server.api.constants import AGENTSTACK_PROXY_VERSION
+from adk_server.api.constants import ADK_PROXY_VERSION
 from adk_server.api.schema.openai import ChatCompletionRequest
 from adk_server.types import JsonValue
 from adk_server.utils.utils import filter_json_recursively
@@ -26,7 +26,7 @@ def format_openai_error(error: Exception) -> JsonValue:
     error_type = camel_case_to_snake_case(type(error).__name__.removesuffix("Error").removesuffix("Exception"))
     return {
         "error": {"message": str(error), "type": error_type},
-        "agentstack_proxy_version": AGENTSTACK_PROXY_VERSION,
+        "adk_proxy_version": ADK_PROXY_VERSION,
     }
 
 

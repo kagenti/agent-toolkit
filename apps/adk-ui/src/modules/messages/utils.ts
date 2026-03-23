@@ -1,0 +1,249 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import { match } from 'ts-pattern';
+
+import { getArtifactPartUpdates } from '#modules/canvas/utils.ts';
+import { getFileTransformPart } from '#modules/files/utils.ts';
+import { getSourceTransformPart } from '#modules/sources/utils.ts';
+
+import { Role } from './api/types';
+import type { UIAgentMessage, UIMessage, UIMessagePart, UISourcePart, UITransformPart, UIUserMessage } from './types';
+import { UIMessagePartKind, UIMessageStatus, UITransformType } from './types';
+
+export function isUserMessage(message: UIMessage): message is UIUserMessage {
+  return message.role === Role.User;
+}
+
+export function isAgentMessage(message: UIMessage): message is UIAgentMessage {
+  return message.role === Role.Agent;
+}
+
+export function getMessagePartsRawContent(parts: UIMessage['parts']) {
+  const rawContent = parts.reduce((content, part) => {
+    match(part)
+      .with({ kind: UIMessagePartKind.Text }, (part) => {
+        content += part.text;
+      })
+      .with({ kind: UIMessagePartKind.Artifact }, (part) => {
+        content += part.parts
+          .map((artifactPart) => (artifactPart.kind === UIMessagePartKind.Text ? artifactPart.text : ''))
+          .join('');
+      });
+
+    return content;
+  }, '');
+
+  return rawContent;
+}
+
+export function getMessageRawContent(message: UIMessage) {
+  return getMessagePartsRawContent(message.parts);
+}
+
+export function applyTransforms(parts: UIMessagePart[], rawContent: string) {
+  let offset = 0;
+
+  return parts.reduce((content, part) => {
+    if (part.kind === UIMessagePartKind.Transform) {
+      const newContent = part.apply(content, offset);
+      offset += newContent.length - content.length;
+
+      return newContent;
+    }
+
+    return content;
+  }, rawContent);
+}
+
+export function getMessageContent(message: UIMessage) {
+  const rawContent = getMessageRawContent(message);
+
+  return applyTransforms(message.parts, rawContent);
+}
+
+export function getMessageFiles(message: UIMessage) {
+  const files = message.parts.filter((part) => part.kind === UIMessagePartKind.File);
+
+  return files;
+}
+
+export function getMessageSources(message: UIMessage, includeArtifactSources = false) {
+  const sources = message.parts.filter((part) => part.kind === UIMessagePartKind.Source);
+
+  if (includeArtifactSources) {
+    const artifactSources = message.parts
+      .filter((part) => part.kind === UIMessagePartKind.Artifact)
+      .flatMap(({ parts }) => parts.filter((part) => part.kind === UIMessagePartKind.Source));
+
+    return [...sources, ...artifactSources];
+  }
+
+  return sources;
+}
+
+export function getMessageTrajectories(message: UIMessage) {
+  const trajectories = message.parts.filter((part) => part.kind === UIMessagePartKind.Trajectory);
+
+  return trajectories;
+}
+
+export function getMessageForm(message: UIMessage) {
+  const form = message.parts.findLast((part) => part.kind === UIMessagePartKind.Form);
+
+  return form;
+}
+
+export function getMessageOAuth(message: UIMessage) {
+  const oauth = message.parts.findLast((part) => part.kind === UIMessagePartKind.OAuth);
+
+  return oauth;
+}
+
+export function getMessageSecret(message: UIMessage) {
+  const secret = message.parts.findLast((part) => part.kind === UIMessagePartKind.SecretRequired);
+
+  return secret;
+}
+
+export function getMessageApproval(message: UIMessage) {
+  const approval = message.parts.findLast((part) => part.kind === UIMessagePartKind.ApprovalRequired);
+
+  return approval;
+}
+
+function hasMessageApprovalResponse(message: UIMessage) {
+  return message.parts.some((part) => part.kind === UIMessagePartKind.ApprovalResponse);
+}
+
+export function hasMessageApproval(message: UIMessage) {
+  return (
+    (isAgentMessage(message) && Boolean(getMessageApproval(message))) ||
+    (isUserMessage(message) && hasMessageApprovalResponse(message))
+  );
+}
+
+export function checkMessageStatus(message: UIAgentMessage) {
+  const { status, error } = message;
+
+  const isInProgress = status === UIMessageStatus.InProgress;
+  const isCompleted = status === UIMessageStatus.Completed;
+  const isAborted = status === UIMessageStatus.Aborted;
+  const isFailed = status === UIMessageStatus.Failed;
+  const isError = isFailed || isAborted;
+
+  return { isInProgress, isCompleted, isAborted, isFailed, isError, error };
+}
+
+export function checkMessageContent(message: UIMessage) {
+  const hasContent = Boolean(
+    message.parts.some(({ kind }) => kind === UIMessagePartKind.Text || kind === UIMessagePartKind.Transform) ||
+    checkMessageForm(message),
+  );
+
+  return hasContent;
+}
+
+export function checkMessageForm(message: UIMessage) {
+  return message.role === Role.User && message.form;
+}
+
+export function sortMessageParts<T extends UIMessagePart>(parts: T[]): T[] {
+  const [sourceParts, otherParts, transformParts] = parts.reduce<[UISourcePart[], T[], UITransformPart[]]>(
+    ([sources, others, transforms], part) => {
+      switch (part.kind) {
+        case UIMessagePartKind.Source:
+          return [[...sources, part], others, transforms];
+
+        case UIMessagePartKind.Transform:
+          return [sources, others, [...transforms, part]];
+
+        default:
+          return [sources, [...others, part], transforms];
+      }
+    },
+    [[], [], []],
+  );
+
+  const sourceMap = new Map<string, number>();
+  let numberCounter = 1;
+
+  // Sort sources by startIndex in ascending order and place items with undefined startIndex at the end
+  const sortedSourceParts = sourceParts
+    .sort((a, b) => (a.startIndex ?? Infinity) - (b.startIndex ?? Infinity))
+    .map((source) => {
+      const { url, title } = source;
+      const key = `${url}${title ?? ''}`;
+
+      if (!sourceMap.has(key)) {
+        sourceMap.set(key, numberCounter++);
+      }
+
+      return {
+        ...source,
+        number: sourceMap.get(key) ?? null,
+      };
+    });
+
+  // Sort transforms by startIndex in ascending order and group items with the same startIndex into one
+  const sortedTransformParts = transformParts
+    .reduce<UITransformPart[]>((parts, part) => {
+      const { type, startIndex } = part;
+
+      if (type === UITransformType.Source) {
+        const existingPart = parts
+          .filter((part) => part.type === UITransformType.Source)
+          .find((part) => part.startIndex === startIndex);
+
+        if (existingPart) {
+          existingPart.sources.push(...part.sources);
+
+          return parts;
+        }
+      }
+
+      return [...parts, part];
+    }, [])
+    .sort((a, b) => a.startIndex - b.startIndex);
+
+  // Transforms must be at the end
+  return [...otherParts, ...sortedSourceParts, ...sortedTransformParts] as T[];
+}
+
+export function addMessagePart(part: UIMessagePart, message: UIAgentMessage) {
+  const newParts = [...message.parts];
+
+  match(part)
+    .with({ kind: UIMessagePartKind.File }, (part) => {
+      const transformPart = getFileTransformPart(part, message);
+
+      if (transformPart) {
+        newParts.push(transformPart);
+      } else {
+        newParts.push(part);
+      }
+    })
+    .with({ kind: UIMessagePartKind.Source }, (part) => {
+      const transformPart = getSourceTransformPart(part);
+
+      newParts.push(part, transformPart);
+    })
+    .with({ kind: UIMessagePartKind.Artifact }, (part) => {
+      const { add: addParts, update: updateParts } = getArtifactPartUpdates(part, newParts, message);
+
+      updateParts?.forEach(({ index, part }) => {
+        newParts[index] = part;
+      });
+
+      if (addParts) {
+        newParts.push(...addParts);
+      }
+    })
+    .otherwise((part) => {
+      newParts.push(part);
+    });
+
+  return sortMessageParts(newParts);
+}

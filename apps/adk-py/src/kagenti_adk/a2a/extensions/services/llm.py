@@ -1,9 +1,10 @@
-# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
 
 
 from __future__ import annotations
 
+import os
 import re
 from types import NoneType
 from typing import TYPE_CHECKING, Any, Self
@@ -110,15 +111,18 @@ class LLMServiceExtensionMetadata(pydantic.BaseModel):
 class LLMServiceExtensionServer(BaseExtensionServer[LLMServiceExtensionSpec, LLMServiceExtensionMetadata]):
     @override
     def handle_incoming_message(self, message: A2AMessage, run_context: RunContext, request_context: RequestContext):
-        from kagenti_adk.platform import get_platform_client
-
         super().handle_incoming_message(message, run_context, request_context)
-        if not self.data:
-            return
 
-        for fullfilment in self.data.llm_fulfillments.values():
-            platform_url = str(get_platform_client().base_url).rstrip("/")
-            fullfilment.api_base = re.sub("{platform_url}", platform_url, fullfilment.api_base)
+        if self.data and self.data.llm_fulfillments:
+            from kagenti_adk.platform import get_platform_client
+
+            for fulfillment in self.data.llm_fulfillments.values():
+                platform_url = str(get_platform_client().base_url).rstrip("/")
+                fulfillment.api_base = re.sub("{platform_url}", platform_url, fulfillment.api_base)
+        elif not self.data or not self.data.llm_fulfillments:
+            fulfillment = _llm_fulfillment_from_env()
+            if fulfillment:
+                self._metadata_from_client = LLMServiceExtensionMetadata(llm_fulfillments={"default": fulfillment})
 
 
 class LLMServiceExtensionClient(BaseExtensionClient[LLMServiceExtensionSpec, NoneType]):
@@ -128,3 +132,19 @@ class LLMServiceExtensionClient(BaseExtensionClient[LLMServiceExtensionSpec, Non
                 mode="json", context={REVEAL_SECRETS: True}
             )
         }
+
+
+def _llm_fulfillment_from_env() -> LLMFulfillment | None:
+    """Build a default LLM fulfillment from environment variables.
+
+    Resolution order: LLM_API_BASE > OPENAI_API_BASE, LLM_API_KEY > OPENAI_API_KEY, LLM_MODEL > OPENAI_MODEL.
+    Returns None if the required variables (api_base and api_model) are not set.
+    """
+    api_base = os.environ.get("LLM_API_BASE") or os.environ.get("OPENAI_API_BASE")
+    api_key = os.environ.get("LLM_API_KEY") or os.environ.get("OPENAI_API_KEY") or ""
+    api_model = os.environ.get("LLM_MODEL") or os.environ.get("OPENAI_MODEL")
+
+    if not api_base or not api_model:
+        return None
+
+    return LLMFulfillment(api_base=api_base, api_key=api_key, api_model=api_model)

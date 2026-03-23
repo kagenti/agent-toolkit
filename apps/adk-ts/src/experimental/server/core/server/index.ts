@@ -1,5 +1,5 @@
 /**
- * Copyright 2025 © BeeAI a Series of LF Projects, LLC
+ * Copyright 2026 © IBM Corp.
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -13,7 +13,7 @@ import { AgentDetailExtensionSpec } from '../../a2a/extensions/agent-detail';
 import { PlatformSelfRegistrationExtensionSpec } from '../../a2a/extensions/platform-self-registration';
 import { loadConfig } from '../config';
 import type { ExtensionConfig, ExtensionServer } from '../extensions/types';
-import { createAutoregisterToAgentstack } from './autoregistration';
+import { createAutoregisterToAdk } from './autoregistration';
 import { AgentExecutorImpl } from './executor';
 import { createAgentCardUrl } from './helpers';
 import type { AgentOptions, ServerHandle, ServerOptions } from './types';
@@ -96,7 +96,7 @@ export class Server {
     let stopAutoregistration: (() => void) | undefined;
 
     if (selfRegistrationId && !productionMode) {
-      stopAutoregistration = createAutoregisterToAgentstack({
+      stopAutoregistration = createAutoregisterToAdk({
         selfRegistrationId,
         agentCard: this.agentCard,
         host,

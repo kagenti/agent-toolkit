@@ -1,0 +1,16 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+.name {
+  @include line-clamp();
+  font-size: rem(16px);
+  line-height: math.div(18, 16);
+  font-weight: 600;
+  color: $text-dark;
+}
+
+.link {
+  text-decoration: none;
+}

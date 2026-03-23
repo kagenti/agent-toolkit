@@ -1,0 +1,22 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import clsx from 'clsx';
+
+import { SessionsNav } from '#modules/history/components/SessionsNav.tsx';
+
+import classes from './NavbarMainContent.module.scss';
+
+interface Props {
+  className?: string;
+}
+
+export function NavbarMainContent({ className }: Props) {
+  return (
+    <div className={clsx(classes.root, className)}>
+      <SessionsNav className={classes.sessions} />
+    </div>
+  );
+}

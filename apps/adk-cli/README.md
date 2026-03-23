@@ -1,1 +1,1 @@
-# Agent Stack CLI
+# Kagenti ADK CLI

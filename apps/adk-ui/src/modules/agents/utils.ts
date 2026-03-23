@@ -1,0 +1,105 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import type { Provider } from '@kagenti/adk';
+import { agentDetailExtension, extractUiExtensionData, InteractionMode } from '@kagenti/adk';
+import uniq from 'lodash/uniq';
+import uniqWith from 'lodash/uniqWith';
+
+import { SupportedUis } from '#modules/runs/constants.ts';
+import { compareStrings, isNotNull } from '#utils/helpers.ts';
+
+import type { Agent, AgentExtension, ListAgentsOrderBy } from './api/types';
+
+const extractAgentDetail = extractUiExtensionData(agentDetailExtension);
+
+export const getAgentsProgrammingLanguages = (agents: Agent[] | undefined) => {
+  return uniq(
+    agents
+      ?.map(({ ui }) => ui.programming_language)
+      .filter(isNotNull)
+      .flat(),
+  );
+};
+
+export function sortAgentsByName(a: Agent, b: Agent) {
+  return compareStrings(a.name, b.name);
+}
+
+export function sortProvidersBy(
+  a: Provider,
+  b: Provider,
+  orderBy: ListAgentsOrderBy.CreatedAt | ListAgentsOrderBy.LastActiveAt,
+) {
+  const aDate = a[orderBy] ? Date.parse(a[orderBy]) : 0;
+  const bDate = b[orderBy] ? Date.parse(b[orderBy]) : 0;
+
+  return bDate - aDate;
+}
+
+export function isAgentUiSupported(agent: Agent) {
+  const interaction_mode = agent.ui?.interaction_mode;
+
+  return interaction_mode && SupportedUis.includes(interaction_mode);
+}
+
+function getAgentDetail(extensions: AgentExtension[]) {
+  const uri = agentDetailExtension.getUri();
+  const metadata = extensions.find((extension) => extension.uri === uri)?.params;
+
+  if (!metadata) {
+    return {};
+  }
+
+  return extractAgentDetail({ [uri]: metadata }) ?? {};
+}
+
+export function buildAgent(provider: Provider): Agent {
+  const { agent_card, ...providerData } = provider;
+
+  const extensions = agent_card.capabilities.extensions ?? [];
+  const ui = getAgentDetail(extensions);
+
+  const uiWithFallbacks = { ...ui };
+
+  if (uiWithFallbacks.interaction_mode === undefined || uiWithFallbacks.interaction_mode === null) {
+    uiWithFallbacks.interaction_mode = InteractionMode.MultiTurn;
+  }
+
+  if ((uiWithFallbacks.tools === undefined || uiWithFallbacks.tools === null) && agent_card.skills) {
+    uiWithFallbacks.tools = agent_card.skills.map((skill) => ({
+      name: skill.name,
+      description: skill.description ?? '',
+    }));
+  }
+
+  if (uiWithFallbacks.user_greeting === undefined || uiWithFallbacks.user_greeting === null) {
+    uiWithFallbacks.user_greeting = agent_card.description ?? undefined;
+  }
+
+  if (uiWithFallbacks.input_placeholder === undefined || uiWithFallbacks.input_placeholder === null) {
+    uiWithFallbacks.input_placeholder = 'What is your task?';
+  }
+
+  return {
+    ...agent_card,
+    provider: { ...providerData, metadata: agent_card.provider },
+    ui: uiWithFallbacks,
+  };
+}
+
+export function getAgentTags(agent: Agent) {
+  return uniqWith(
+    (agent.skills ?? []).flatMap(({ tags }) => tags),
+    (a, b) => a.toLocaleLowerCase() === b.toLocaleLowerCase(),
+  );
+}
+
+export function getAgentPromptExamples(agent: Agent) {
+  return uniqWith(
+    (agent.skills ?? []).flatMap(({ examples }) => examples).filter(isNotNull),
+    (a, b) => a.toLocaleLowerCase() === b.toLocaleLowerCase(),
+  );
+}

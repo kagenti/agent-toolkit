@@ -1,4 +1,4 @@
-# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
 
 from __future__ import annotations
@@ -23,14 +23,14 @@ from adk_server.infrastructure.persistence.repositories.db_metadata import metad
 
 class Configuration(BaseSettings):
     model_config = SettingsConfigDict(extra="ignore")
-    kubeconfig: Path = Path.home() / ".agentstack/lima/agentstack-local-dev/copied-from-guest/kubeconfig.yaml"
+    kubeconfig: Path = Path.home() / ".adk/lima/adk-local-dev/copied-from-guest/kubeconfig.yaml"
     llm_api_base: Secret[str] = Secret("http://localhost:11434/v1")
     llm_model: str = "ollama:gpt-oss:20b"
     embedding_model: str = "ollama:nomic-embed-text:latest"
     llm_api_key: Secret[str] = Secret("dummy")
     test_agent_image: str = "registry.cr-system.svc.cluster.local:5000/chat-test:latest"
-    server_url: str = "http://agentstack-api.localtest.me:8080"
-    db_url: str = "postgresql+asyncpg://agentstack-user:password@postgresql:5432/agentstack"
+    server_url: str = "http://adk-api.localtest.me:8080"
+    db_url: str = "postgresql+asyncpg://adk-user:password@postgresql:5432/adk"
     keycloak_url: str = "http://keycloak.localtest.me:8080"
 
     @computed_field

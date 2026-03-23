@@ -1,0 +1,31 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+@use 'styles/common' as *;
+
+.root {
+  overflow-inline: auto;
+}
+
+.table {
+  @include type-style(body-01);
+  table-layout: fixed;
+  inline-size: 100%;
+  &,
+  th,
+  td {
+    border: 1px solid $border-subtle-00;
+  }
+  th,
+  td {
+    padding: $spacing-03 $spacing-04;
+  }
+  th {
+    font-weight: bold;
+  }
+  thead th {
+    vertical-align: middle;
+  }
+}

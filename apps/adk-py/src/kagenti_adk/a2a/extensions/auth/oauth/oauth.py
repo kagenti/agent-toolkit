@@ -1,4 +1,4 @@
-# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
 
 
@@ -139,7 +139,7 @@ class OAuthExtensionServer(BaseExtensionServer[OAuthExtensionSpec, OAuthExtensio
         oauth_auth = OAuthClientProvider(
             server_url=str(resource_url),
             client_metadata=OAuthClientMetadata(
-                client_name="AgentStack Agent",
+                client_name="Kagenti ADK Agent",
                 redirect_uris=[fulfillment.redirect_uri],
             ),
             storage=await self.token_storage_factory.create_storage(),

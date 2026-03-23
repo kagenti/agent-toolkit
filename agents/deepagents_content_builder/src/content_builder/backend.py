@@ -1,4 +1,4 @@
-# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
 
 from __future__ import annotations
@@ -22,7 +22,7 @@ from deepagents.backends.utils import FileInfo, GrepMatch, format_content_with_l
 from kagenti_adk.platform import File
 
 
-class AgentStackBackend(BackendProtocol):
+class ADKBackend(BackendProtocol):
     def __init__(self, prefix: str = ""):
         self.prefix = prefix.rstrip("/")
 

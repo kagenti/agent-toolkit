@@ -1,0 +1,40 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+.root {
+  display: flex;
+  align-items: center;
+  column-gap: $spacing-05;
+  min-block-size: rem(32px);
+}
+
+.agentName {
+  @include line-clamp();
+  @include type-style(body-02);
+  line-height: math.div(18, 16);
+  color: $text-dark;
+  min-inline-size: 0;
+  font-weight: 600;
+  margin: 0;
+
+  :global(.cds--skeleton__text) {
+    min-inline-size: 8rem;
+  }
+}
+
+.backLink {
+  color: $text-primary;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  column-gap: $spacing-02;
+}
+
+.buttons {
+  margin-inline-start: auto;
+  display: flex;
+  justify-content: flex-end;
+  column-gap: $spacing-02;
+}

@@ -1,0 +1,25 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+'use client';
+
+import type { PropsWithChildren } from 'react';
+
+import { useFileUpload } from '../contexts';
+import classes from './FileUpload.module.scss';
+import { FileUploadDropzone } from './FileUploadDropzone';
+
+export function FileUpload({ children }: PropsWithChildren) {
+  const { dropzone } = useFileUpload();
+
+  const dropzoneProps = dropzone ? dropzone.getRootProps() : {};
+
+  return (
+    <div className={classes.root} {...dropzoneProps}>
+      {children}
+
+      {dropzone?.isDragActive && <FileUploadDropzone />}
+    </div>
+  );
+}

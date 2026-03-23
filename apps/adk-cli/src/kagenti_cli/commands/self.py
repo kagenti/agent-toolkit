@@ -143,7 +143,8 @@ async def install(
         if already_started and (
             yes
             or await inquirer.confirm(
-                message="Do you want to configure your LLM provider now? Will run: kagenti-adk model setup", default=True
+                message="Do you want to configure your LLM provider now? Will run: kagenti-adk model setup",
+                default=True,
             ).execute_async()
         ):
             try:
@@ -160,7 +161,7 @@ async def install(
         ):
             import webbrowser
 
-            webbrowser.open("http://agentstack.localtest.me:8080")
+            webbrowser.open("http://adk.localtest.me:8080")
 
         console.print()
         console.success("Installation complete!")

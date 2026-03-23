@@ -1,0 +1,16 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import { BASE_PATH } from '#utils/constants.ts';
+
+export function createProxyUrl(url: string) {
+  try {
+    const { origin } = new URL(url);
+
+    return BASE_PATH + url.replace(origin, '');
+  } catch {
+    return url;
+  }
+}

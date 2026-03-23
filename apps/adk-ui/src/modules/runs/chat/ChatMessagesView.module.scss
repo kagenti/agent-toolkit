@@ -1,0 +1,117 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+$messages-row-gap: $spacing-07;
+$holder-row-gap: $spacing-06;
+
+$zindex-messages: 1;
+$zindex-buttons: 2;
+
+.root {
+  display: grid;
+  grid-template-columns: 100% 0%;
+  inline-size: 100%;
+  overflow: hidden;
+  justify-content: stretch;
+  transition: grid-template-columns $duration-slow-01 motion(entrance, productive);
+
+  &.canvasView {
+    grid-template-columns: 31.25% 68.75%;
+  }
+}
+
+.holder {
+  min-inline-size: rem(320px);
+  inline-size: 100%;
+  block-size: 100%;
+  display: grid;
+  grid-template-rows: 1fr max-content;
+  row-gap: $holder-row-gap;
+  padding-block: $spacing-07;
+  overflow: hidden;
+
+  .canvasView & {
+    min-inline-size: rem(120px);
+  }
+}
+
+.scrollable {
+  @include scrollbar();
+  display: flex;
+  flex-direction: column-reverse;
+  position: relative;
+}
+
+.header {
+  position: sticky;
+  inset-block-start: $spacing-03;
+  text-align: end;
+  padding-block-end: $spacing-06;
+  z-index: $zindex-buttons;
+}
+
+.container {
+  position: relative;
+  flex-grow: 1;
+}
+
+.messages {
+  display: flex;
+  flex-direction: column-reverse;
+  row-gap: $messages-row-gap;
+}
+
+.bottom {
+  position: relative;
+}
+
+.bottomHolder {
+  overflow-block: auto;
+  scrollbar-gutter: stable;
+  padding-block-end: $spacing-07;
+  margin-block-end: -$spacing-07;
+}
+
+.bottomContainer {
+  min-block-size: rem(88px);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.toBottomButton {
+  filter: drop-shadow($drop-shadow);
+  &:global(.cds--tooltip) {
+    position: absolute;
+    inset-block-end: 100%;
+    inset-inline-start: 50%;
+    transform: translate(-50%, -$spacing-05);
+    z-index: $zindex-messages;
+  }
+}
+
+.loading {
+  :global(.cds--inline-loading) {
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+
+.canvas {
+  block-size: 100%;
+  display: flex;
+  overflow: hidden;
+}
+
+@include breakpoint-up(lg) {
+  .header {
+    .root:not(.canvasView) & {
+      margin: 0 #{-$spacing-09} #{-$spacing-07} auto;
+      max-inline-size: max-content;
+      transform: translateX(100%);
+      padding-block-end: 0;
+    }
+  }
+}

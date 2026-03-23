@@ -1,4 +1,4 @@
-# Write Documentation for Agent Stack
+# Write Documentation for Kagenti ADK
 
 There's a common pattern in how documentation is written specifically in docs/agent-development folder. The folder serves to demonstrate all capabilities for agent builders.
 
@@ -11,6 +11,6 @@ There's a certain pattern how the documentation is written.
 3. Analyse code base to see all the connections for what is being documented
 4. Propose the documentation page
 
-
 ### Documentation Rules
+
 - Don't use em dashes

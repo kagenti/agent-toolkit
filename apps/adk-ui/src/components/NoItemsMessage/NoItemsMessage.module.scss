@@ -1,0 +1,12 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+.empty {
+  @include type-style(heading-02);
+  font-weight: 400;
+  line-height: math.div(18, 16);
+  letter-spacing: $letter-spacing;
+  color: $text-placeholder;
+}

@@ -1,0 +1,70 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+.root {
+  display: flex;
+  align-items: center;
+  :global(.#{$prefix}--btn) {
+    &:hover,
+    &:active,
+    &[aria-expanded='true'] {
+      background-color: $layer-hover-01;
+    }
+    &:not([disabled]) svg {
+      fill: currentColor;
+    }
+  }
+  [aria-owns] :global(.#{$prefix}--popover) {
+    display: none;
+  }
+}
+
+.modal {
+  position: relative;
+  inline-size: 100%;
+  z-index: z('modal') - 1;
+}
+
+.content {
+  @include scrollbar(false);
+  background-color: $background;
+  border-radius: $border-radius;
+  box-shadow: $box-shadow;
+  padding-inline: $spacing-03;
+  padding-block: $spacing-05;
+  inline-size: 100%;
+  max-block-size: rem(294px);
+}
+
+.button {
+  padding-inline: $spacing-03;
+  display: flex;
+  gap: $spacing-03;
+  align-items: center;
+  block-size: rem(28px);
+}
+
+.statusIcon {
+  transition: transform $duration-fast-01 ease-in-out;
+
+  .isOpen & {
+    transform: rotate(180deg);
+  }
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  block-size: rem(32px);
+  inline-size: rem(32px);
+
+  :global(.cds--inline-loading) {
+    inline-size: auto;
+  }
+  :global(.cds--inline-loading__animation) {
+    margin: 0;
+  }
+}

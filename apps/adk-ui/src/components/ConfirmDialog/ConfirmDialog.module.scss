@@ -1,0 +1,16 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+.root {
+  :global(.cds--modal-footer) {
+    :global(.cds--btn--danger) {
+      column-gap: $spacing-05;
+      padding-inline-end: $spacing-05;
+      svg {
+        flex-shrink: 0;
+      }
+    }
+  }
+}

@@ -1,51 +1,60 @@
-# Kagenti Agent Development Kit
+# Kagenti ADK
+
+**The developer toolkit for getting agents into production.**
 
 [![GitHub Release](https://img.shields.io/github/v/release/kagenti/adk)](https://github.com/kagenti/adk/releases/latest)
 [![License](https://img.shields.io/github/license/kagenti/adk)](LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-Join%20us-5865F2?logo=discord&logoColor=white)](https://discord.gg/aJ92dNDzqB)
 
-> 🚧 This project is under active development and not yet ready for use.
+[Documentation](https://kagenti.github.io/adk) · [Discord](https://discord.gg/aJ92dNDzqB) · [Contributing](./CONTRIBUTING.md)
 
 ---
 
-## What is Kagenti ADK?
+Kagenti ADK (Agent Development Kit) takes agents built with any framework or custom code and turns them into A2A-compliant services.
 
-Kagenti ADK (Agent Development Kit) takes agents built with any framework or custom code and turns them into [A2A](https://a2a-protocol.org/)-compliant services.
+> [!WARNING]
+> This project is under active development and not yet ready for production use.
 
-It provides:
+## What's in the kit
 
-- A **Python SDK** to expose your agent over A2A and connect it to the runtime services below
-- A **TypeScript client SDK** to build applications that talk to your agents
-- A **CLI** to scaffold projects, run agents, and deploy
-- A **server** with built-in runtime services your agents use:
-  - **LLM proxy** — single API for 15+ providers (OpenAI, Anthropic, watsonx.ai, Bedrock, Ollama, and more)
-  - **MCP connectors** — connect agents to external tools and APIs via the [Model Context Protocol](https://modelcontextprotocol.io/)
-  - **Database (PostgreSQL)** — agent state, conversation history, and configuration
-  - **Vector search (pgvector)** — embeddings and similarity search for RAG workflows
-  - **File storage (SeaweedFS)** — S3-compatible upload, download, and storage
-  - **Document extraction (Docling)** — text extraction from PDFs, CSVs, and other formats
-  - **Authentication (Keycloak)** — identity and access management
-  - **Observability (Phoenix)** — LLM tracing and agent debugging
-  - **End user web UI** — chat interface for interacting with your agents
+| Component | Description |
+|---|---|
+| **CLI** | Scaffold projects, run agents locally, and deploy |
+| **Python SDK** | Wrap your agent with A2A, inject runtime services via dependency injection |
+| **TypeScript Client SDK** | Build applications that talk to your agents |
+| **Server** | Self-hostable runtime with everything below built in |
 
-## Status
+### Runtime services
 
-This project is under active development. Documentation, packages, and an initial release are coming soon.
+| Service | What it does |
+|---|---|
+| **LLM proxy** | Single API for 15+ providers — OpenAI, Anthropic, watsonx.ai, Bedrock, Ollama |
+| **MCP connectors** | Connect agents to external tools via [Model Context Protocol](https://modelcontextprotocol.io/) |
+| **PostgreSQL** | Agent state, conversation history, and configuration |
+| **Vector search** | pgvector for embeddings and similarity search |
+| **File storage** | S3-compatible upload/download via SeaweedFS |
+| **Document extraction** | Text extraction from PDFs, CSVs, and more via Docling |
+| **Authentication** | Identity and access management via Keycloak |
+| **Observability** | LLM tracing and agent debugging via Phoenix |
+| **Web UI** | Built-in chat interface for testing your agents |
 
-## Contributing
+## Quick start
 
-We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
+```bash
+sh -c "$(curl -LsSf https://raw.githubusercontent.com/kagenti/adk/main/install.sh)"
+```
 
-## Contact
+## Get involved
 
-To reach the maintainer team, email **kagenti-maintainers@googlegroups.com** or join us on [Discord](https://discord.gg/aJ92dNDzqB).
+We'd love to hear from you — whether you have questions, feedback, or want to contribute.
+
+| | |
+|---|---|
+| **Discord** | [Join the community](https://discord.gg/aJ92dNDzqB) |
+| **Email** | kagenti-maintainers@googlegroups.com |
+| **Contributing** | [Read the guide](./CONTRIBUTING.md) |
+| **Issues** | [Report a bug or request a feature](https://github.com/kagenti/adk/issues) |
 
 ## License
 
 [Apache 2.0](./LICENSE)
-
-## QR Code for Kagenti.io
-
-This QR Code links to <http://kagenti.io>
-
-![Kagenti.io QR Code](./docs/stable/images/Kagenti.QRcode.png)

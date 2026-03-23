@@ -1,4 +1,4 @@
-# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
 from __future__ import annotations
 
@@ -52,7 +52,7 @@ class PlatformClient(httpx.AsyncClient):
         default_encoding: str | typing.Callable[[bytes], str] = "utf-8",
     ) -> None:
         if not base_url:
-            base_url = os.environ.get("PLATFORM_URL", "http://agentstack-api.localtest.me:8080")
+            base_url = os.environ.get("PLATFORM_URL", "http://adk-api.localtest.me:8080")
         super().__init__(
             auth=auth,
             params=params,

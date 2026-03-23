@@ -19,21 +19,21 @@ brew install qemu # if not using Brew: install QEMU through some other package m
 
 After setup, you can use:
 
-* `mise run` to list tasks and select one interactively to run
+- `mise run` to list tasks and select one interactively to run
 
-* `mise <task-name>` to run a task
+- `mise <task-name>` to run a task
 
-* `mise x -- <command>` to run a project tool -- for example `mise x -- uv add <package>`
+- `mise x -- <command>` to run a project tool -- for example `mise x -- uv add <package>`
 
 If you want to run tools directly without the `mise x --` prefix, you need to activate a shell hook:
 
-* Bash: `eval "$(mise activate bash)"` (add to `~/.bashrc` to make permanent)
+- Bash: `eval "$(mise activate bash)"` (add to `~/.bashrc` to make permanent)
 
-* Zsh: `eval "$(mise activate zsh)"` (add to `~/.zshrc` to make permanent)
+- Zsh: `eval "$(mise activate zsh)"` (add to `~/.zshrc` to make permanent)
 
-* Fish: `mise activate fish | source` (add to `~/.config/fish/config.fish` to make permanent)
+- Fish: `mise activate fish | source` (add to `~/.config/fish/config.fish` to make permanent)
 
-* Other shells: [documentation](https://mise.jdx.dev/installing-mise.html#shells)
+- Other shells: [documentation](https://mise.jdx.dev/installing-mise.html#shells)
 
 ### Configuration
 
@@ -49,28 +49,28 @@ will use
 Instead, use:
 
 ```shell
-mise agentstack:start
+mise adk:start
 ```
 
-This will build the images (`adk-server` and `agentstack-ui`) and import them to the cluster. You can add other
+This will build the images (`adk-server` and `adk-ui`) and import them to the cluster. You can add other
 CLI arguments as you normally would when using `kagenti-adk` CLI, for example:
 
 ```shell
-mise agentstack:start --set docling.enabled=true --set oidc.enabled=true 
+mise adk:start --set docling.enabled=true --set oidc.enabled=true
 ```
 
 To stop or delete the platform use
 
 ```shell
-mise agentstack:stop
-mise agentstack:delete
+mise adk:stop
+mise adk:delete
 ```
 
 For debugging and direct access to kubernetes, setup `KUBECONFIG` and other environment variables using:
 
 ```shell
 # Activate environment
-eval "$(mise run agentstack:shell)"
+eval "$(mise run adk:shell)"
 
 # Deactivate environment
 deactivate
@@ -83,7 +83,7 @@ By default, authentication and authorization are disabled.
 Starting the platform with OIDC enabled:
 
 ```bash
-mise agentstack:start --set auth.enabled=true
+mise adk:start --set auth.enabled=true
 ```
 
 This will setup keycloak (with no platform users out of the box).
@@ -91,7 +91,7 @@ This will setup keycloak (with no platform users out of the box).
 You can add users at <http://localhost:8336>, by loggin in with the admin user (admin:admin in dev)
 and going to "Manage realms" -> "Users".
 
-You can promote users by assigning `agentstack-admin` or `agentstack-developer` roles to them. Make sure to add a
+You can promote users by assigning `adk-admin` or `adk-developer` roles to them. Make sure to add a
 password in the "Credentials" tab and set their email to verified.
 
 You can also automate this by creating a file `config.yaml`:
@@ -101,30 +101,30 @@ auth:
   enabled: true
 keycloak:
   auth:
-    seedAgentstackUsers:
+    seedAdkUsers:
       - username: admin
         password: admin
         firstName: Admin
         lastName: User
         email: admin@beeai.dev
-        roles: ["agentstack-admin"]
+        roles: ["adk-admin"]
         enabled: true
 ```
 
-Then run `mise run agentstack:start -f config.yaml`
+Then run `mise run adk:start -f config.yaml`
 
 **Available endpoints:**
 
 | Service              | HTTP                                |
-|----------------------|-------------------------------------|
+| -------------------- | ----------------------------------- |
 | Keycloak             | `http://localhost:8336`             |
-| Agent Stack UI       | `http://localhost:8334`             |
-| Agent Stack API Docs | `http://localhost:8333/api/v1/docs` |
+| Kagenti ADK UI       | `http://localhost:8334`             |
+| Kagenti ADK API Docs | `http://localhost:8333/api/v1/docs` |
 
 **OIDC configuration:**
 
-* UI: follow `template.env` in `apps/agentstack-ui` directory (copy to `apps/agentstack-ui/.env`).
-* Server: follow `template.env` in `apps/adk-server` directory (copy to `apps/adk-server/.env`).
+- UI: follow `template.env` in `apps/adk-ui` directory (copy to `apps/adk-ui/.env`).
+- Server: follow `template.env` in `apps/adk-server` directory (copy to `apps/adk-server/.env`).
 
 ### Running and debugging individual components
 
@@ -139,22 +139,23 @@ mise run adk-server:dev:start
 This will do the following:
 
 1. Create .env file if it doesn't exist yet (you can add your configuration here)
-2. Stop default platform VM ("agentstack") if it exists
-3. Start a new VM named "agentstack-local-dev" separate from the "agentstack" VM used by default
+2. Stop default platform VM ("adk") if it exists
+3. Start a new VM named "adk-local-dev" separate from the "adk" VM used by default
 4. Install telepresence into the cluster
    > Note that this will require **root access** on your machine, due to setting up a networking stack.
-5. Replace agentstack in the cluster and forward any incoming traffic to localhost
+5. Replace kagenti-adk in the cluster and forward any incoming traffic to localhost
 
 After the command succeeds, you can:
 
-* send requests as if your machine was running inside the cluster. For example:
+- send requests as if your machine was running inside the cluster. For example:
   `curl http://<service-name>:<service-port>`.
-* connect to postgresql using the default credentials `postgresql://agentstack-user:password@postgresql:5432/agentstack`
+
+* connect to postgresql using the default credentials `postgresql://adk-user:password@postgresql:5432/adk`
 * now you can start your server from your IDE or using `mise run adk-server:run` on port **18333**
 * run kagenti-adk using `mise adk-cli:run -- <command>` or HTTP requests to localhost:8333 or localhost:18333
-  * localhost:8333 is port-forwarded from the cluster, so any requests will pass through the cluster networking to the
-      agentstack pod, which is replaced by telepresence and forwarded back to your local machine to port 18333
-  * localhost:18333 is where your local platform should be running
+  - localhost:8333 is port-forwarded from the cluster, so any requests will pass through the cluster networking to the
+    kagenti-adk pod, which is replaced by telepresence and forwarded back to your local machine to port 18333
+  - localhost:18333 is where your local platform should be running
 
 To inspect cluster using `kubectl` or `k9s` and lima using `limactl`, activate the dev environment using:
 
@@ -188,8 +189,8 @@ To run and develop adk-server tests locally use `mise run adk-server:dev:start -
 
 > Note:
 >
-> * Some tests require additional settings (e.g. enabling authentication), see section for tests in `template.env` for more details.
-> * Tests will drop your database - you may need to add agents again or reconfigure model
+> - Some tests require additional settings (e.g. enabling authentication), see section for tests in `template.env` for more details.
+> - Tests will drop your database - you may need to add agents again or reconfigure model
 
 Locally, the default model for tests is configured in `apps/adk-server/tests/conftest.py` (`llama3.1:8b` from ollama).
 Make sure to have this model running locally.
@@ -202,7 +203,7 @@ Make sure to have this model running locally.
 eval "$(mise run adk-server:dev:shell)"
 
 # Start platform
-mise adk-cli:run -- platform start --vm-name=agentstack-local-dev # optional --tag [tag] --import-images
+mise adk-cli:run -- platform start --vm-name=adk-local-dev # optional --tag [tag] --import-images
 mise x -- telepresence helm install
 mise x -- telepresence connect
 
@@ -257,10 +258,10 @@ This scaffolds the example agent and its e2e test. After scaffolding:
 
 **Running e2e example tests:**
 
-| Command | What it runs |
-|---|---|
-| `mise run adk-server:test:e2e` | Core e2e tests only (excludes examples) |
-| `mise run adk-server:test:e2e-examples` | Example e2e tests only |
+| Command                                 | What it runs                            |
+| --------------------------------------- | --------------------------------------- |
+| `mise run adk-server:test:e2e`          | Core e2e tests only (excludes examples) |
+| `mise run adk-server:test:e2e-examples` | Example e2e tests only                  |
 
 E2e example tests are **not** part of the core e2e suite and don't run on every commit. They run automatically when merged to `main`, or on PRs when you add the `e2e-examples` label.
 
@@ -268,9 +269,9 @@ E2e example tests are **not** part of the core e2e suite and don't run on every 
 
 The following commands can be used to create or run migrations in the dev environment above:
 
-* Run migrations: `mise run adk-server:migrations:run`
-* Generate migrations: `mise run adk-server:migrations:generate`
-* Use Alembic command directly: `mise run adk-server:migrations:alembic`
+- Run migrations: `mise run adk-server:migrations:run`
+- Generate migrations: `mise run adk-server:migrations:generate`
+- Use Alembic command directly: `mise run adk-server:migrations:alembic`
 
 > NOTE: The dev setup will run the locally built image including its migrations before replacing it with your local
 > instance. If new migrations you just implemented are not working, the dev setup will not start properly and you need
@@ -279,7 +280,7 @@ The following commands can be used to create or run migrations in the dev enviro
 
 ### Running individual components
 
-To run Agent Stack components in development mode (ensuring proper rebuilding), use the following commands.
+To run Kagenti ADK components in development mode (ensuring proper rebuilding), use the following commands.
 
 #### Server
 
@@ -298,7 +299,7 @@ mise adk-cli:run -- agent run website_summarizer "summarize beeai.dev"
 
 ```sh
 # run the UI development server:
-mise agentstack-ui:run
+mise adk-ui:run
 
 # UI is also available from adk-server (in static mode):
 mise adk-server:run
@@ -306,7 +307,7 @@ mise adk-server:run
 
 ## Releasing
 
-Agent Stack is using `main` branch for next version development (integration branch) and `release-v*` branches for stable releases.
+Kagenti ADK is using `main` branch for next version development (integration branch) and `release-v*` branches for stable releases.
 
 The release process consists of three steps:
 
@@ -351,7 +352,7 @@ Special care needs to be taken with the `docs/development/reference/cli-referenc
 Try to follow this structure:
 
 - **Elevator pitch:** What value this feature brings to the user.
-- **Pre-requisites:** Extra dependencies required on top of Agent Stack -- non-default agents, Docker runtime, 3rd party libraries, environment variables like API keys, etc. (Note that `uv` is part of the Agent Stack install.)
+- **Pre-requisites:** Extra dependencies required on top of Kagenti ADK -- non-default agents, Docker runtime, 3rd party libraries, environment variables like API keys, etc. (Note that `uv` is part of the Kagenti ADK install.)
 - **Step-by-step instructions**
 - **Troubleshooting:** Common errors and solutions.
 

@@ -1,0 +1,17 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import clsx from 'clsx';
+
+import classes from './NoItemsMessage.module.scss';
+
+interface Props {
+  message: string;
+  className?: string;
+}
+
+export function NoItemsMessage({ message, className }: Props) {
+  return <p className={clsx(classes.empty, className)}>{message}</p>;
+}

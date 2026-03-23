@@ -1,0 +1,23 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import { notFound, permanentRedirect } from 'next/navigation';
+
+import { routes } from '#utils/router.ts';
+
+interface Props {
+  params: Promise<{ providerId: string; contextId: string }>;
+}
+
+export default async function AgentRunPage({ params }: Props) {
+  const { providerId, contextId } = await params;
+
+  // Redirect to new URL structure
+  if (providerId) {
+    permanentRedirect(routes.agentRun({ providerId, contextId }));
+  }
+
+  notFound();
+}

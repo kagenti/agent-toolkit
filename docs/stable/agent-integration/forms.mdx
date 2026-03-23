@@ -3,9 +3,9 @@ title: "Collect Input with Forms"
 description: "Collect structured input from users"
 ---
 
-One of the most powerful features of the Agent Stack is the ability to request structured data from users through interactive forms. Instead of relying on free-form text input, your agent can present users with specific fields, dropdowns, and other form elements to gather precise information.
+One of the most powerful features of the Kagenti ADK is the ability to request structured data from users through interactive forms. Instead of relying on free-form text input, your agent can present users with specific fields, dropdowns, and other form elements to gather precise information.
 
-The Agent Stack provides a Form extensions that allows you to collect structured data from users in two ways:
+The Kagenti ADK provides a Form extensions that allows you to collect structured data from users in two ways:
 
 1. **Initial form rendering** - Present a form as the first interaction before users start a conversation with your agent
 2. **Dynamic form requests** - Request forms at any point during a multi-turn conversation when your agent needs specific structured input
@@ -16,7 +16,7 @@ For initial form rendering, you specify the form structure when injecting the ex
 
 {/* <!-- embedme examples/agent-integration/forms/initial-form-rendering/src/initial_form_rendering/agent.py --> */}
 ```python
-# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
 
 import os
@@ -226,7 +226,7 @@ If you don't use a model, the methods return `FormResponse` which has a `values`
 
 ## Form Field Types
 
-The Agent Stack supports various field types for collecting different kinds of structured data:
+The Kagenti ADK supports various field types for collecting different kinds of structured data:
 
 ### TextField
 Basic text input fields for collecting strings, names, descriptions, etc.

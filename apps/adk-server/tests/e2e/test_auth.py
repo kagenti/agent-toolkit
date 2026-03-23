@@ -1,4 +1,4 @@
-# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
 
 from __future__ import annotations
@@ -42,7 +42,7 @@ async def test_oidc_bearer_auth(api_base_url, test_user, test_configuration, sub
     with subtests.test("valid credentials"):
         async with httpx.AsyncClient() as client:
             resp = await client.post(
-                f"{test_configuration.keycloak_url}/realms/agentstack/protocol/openid-connect/token",
+                f"{test_configuration.keycloak_url}/realms/adk/protocol/openid-connect/token",
                 data={
                     "grant_type": "password",
                     "username": test_user[0],

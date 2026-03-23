@@ -35,7 +35,7 @@ telemetry = [
 ]
 
 [[package]]
-name = "agentstack-sdk"
+name = "kagenti-adk"
 version = "0.6.3"
 source = { editable = "../../../../apps/adk-py" }
 dependencies = [
@@ -1900,7 +1900,7 @@ name = "streaming-agent-history"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
-    { name = "agentstack-sdk" },
+    { name = "kagenti-adk" },
     { name = "beeai-framework", extra = ["a2a", "duckduckgo", "wikipedia"] },
     { name = "fastuuid" },
     { name = "pyyaml" },
@@ -1915,7 +1915,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "agentstack-sdk", editable = "../../../../apps/adk-py" },
+    { name = "kagenti-adk", editable = "../../../../apps/adk-py" },
     { name = "beeai-framework", extras = ["duckduckgo", "wikipedia", "a2a"], specifier = "==0.1.78" },
     { name = "fastuuid", specifier = ">=0.14.0" },
     { name = "pyyaml", specifier = ">=6.0.2" },

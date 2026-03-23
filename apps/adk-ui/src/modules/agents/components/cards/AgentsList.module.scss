@@ -1,0 +1,17 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  row-gap: $spacing-06;
+}
+
+.noItems {
+  @include type-style(heading-03);
+  color: $text-secondary;
+  padding-block-end: $spacing-07;
+  border-block-end: 1px solid $border-subtle;
+}

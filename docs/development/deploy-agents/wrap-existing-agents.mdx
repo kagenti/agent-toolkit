@@ -1,24 +1,24 @@
 ---
 title: "Wrap Your Existing Agents"
-description: "Deploy your existing agent to Agent Stack by wrapping it with the Agent Stack server"
+description: "Deploy your existing agent to Kagenti ADK by wrapping it with the Kagenti ADK server"
 ---
 
-If you already have an agent built with any framework (LangGraph, CrewAI, or your own custom implementation), you can deploy it to Agent Stack by wrapping it with the Agent Stack server.
+If you already have an agent built with any framework (LangGraph, CrewAI, or your own custom implementation), you can deploy it to Kagenti ADK by wrapping it with the Kagenti ADK server.
 
-This gives you instant access to the Agent Stack UI, observability features, and deployment infrastructure without rewriting your agent logic.
+This gives you instant access to the Kagenti ADK UI, observability features, and deployment infrastructure without rewriting your agent logic.
 
 ## Prerequisites
 
-- Agent Stack installed ([Quickstart](../introduction/quickstart))
+- Kagenti ADK installed ([Quickstart](../introduction/quickstart))
 - An existing agent implementation
 - Python 3.12+ environment
 
 ## How It Works
 
-The Agent Stack server wraps your existing agent code and exposes it through the A2A protocol. Your agent logic stays exactly the same - you just add a thin server wrapper that handles:
+The Kagenti ADK server wraps your existing agent code and exposes it through the A2A protocol. Your agent logic stays exactly the same - you just add a thin server wrapper that handles:
 
 - Protocol translation (A2A)
-- Auto-registration with Agent Stack
+- Auto-registration with Kagenti ADK
 - Session management
 - Extension support
 
@@ -61,7 +61,7 @@ async def my_wrapped_agent(input: Message, context: RunContext):
     # This can be synchronous or asynchronous
     result = await run_my_agent(user_message)
     
-    # Yield the response back to Agent Stack
+    # Yield the response back to Kagenti ADK
     yield AgentMessage(text=result)
 
 def run():
@@ -80,12 +80,12 @@ if __name__ == "__main__":
 uv run server.py
 ```
 
-Your agent will automatically register with Agent Stack!
+Your agent will automatically register with Kagenti ADK!
 
 <Tip>
 **Enable auto-reload during development:** Add `watchfiles` to automatically restart your server when code changes:
 ```bash
-uv run watchfiles agentstack_agents.agent.run
+uv run watchfiles adk_agents.agent.run
 ```
 </Tip>
 

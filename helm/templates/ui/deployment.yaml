@@ -2,16 +2,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: agentstack-ui
+  name: adk-ui
   labels:
-    app: agentstack-ui
-    {{- include "agentstack.labels" . | nindent 4 }}
+    app: adk-ui
+    {{- include "kagenti-adk.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.ui.replicaCount }}
   selector:
     matchLabels:
-      app: agentstack-ui
-      {{- include "agentstack.selectorLabels" . | nindent 6 }}
+      app: adk-ui
+      {{- include "kagenti-adk.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       annotations:
@@ -19,19 +19,19 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        app: agentstack-ui
-        {{- include "agentstack.labels" . | nindent 8 }}
+        app: adk-ui
+        {{- include "kagenti-adk.labels" . | nindent 8 }}
         {{- with .Values.ui.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
-      {{- include "agentstack.imagePullSecrets" . | nindent 6 }}
+      {{- include "kagenti-adk.imagePullSecrets" . | nindent 6 }}
       {{- with .Values.ui.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
-        - name: agentstack-ui
+        - name: adk-ui
           {{- with .Values.ui.securityContext }}
           securityContext:
             {{- toYaml . | nindent 12 }}
@@ -78,24 +78,24 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: authSecret
-                  name: agentstack-ui-secret
+                  name: adk-ui-secret
             - name: OIDC_ENABLED
               value: "true"
             - name: OIDC_PROVIDER_NAME
-              value: {{ include "agentstack.oidc.providerName" . | quote }}
+              value: {{ include "kagenti-adk.oidc.providerName" . | quote }}
             - name: OIDC_PROVIDER_ID
-              value: {{ include "agentstack.oidc.providerId" . | quote }}
+              value: {{ include "kagenti-adk.oidc.providerId" . | quote }}
             - name: OIDC_PROVIDER_CLIENT_ID
-              value: {{ include "agentstack.oidc.uiClientId" . | quote }}
+              value: {{ include "kagenti-adk.oidc.uiClientId" . | quote }}
             - name: OIDC_PROVIDER_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  key: {{ include "agentstack.oidc.uiClientSecretKey" . }}
-                  name: {{ include "agentstack.oidc.uiClientSecretName" . }}
+                  key: {{ include "kagenti-adk.oidc.uiClientSecretKey" . }}
+                  name: {{ include "kagenti-adk.oidc.uiClientSecretName" . }}
             - name: OIDC_PROVIDER_ISSUER
-              value: {{ include "agentstack.oidc.internalIssuerUrl" . | quote }}
+              value: {{ include "kagenti-adk.oidc.internalIssuerUrl" . | quote }}
             - name: OIDC_PROVIDER_EXTERNAL_ISSUER
-              value: {{ include "agentstack.oidc.publicIssuerUrl" . | quote }}
+              value: {{ include "kagenti-adk.oidc.publicIssuerUrl" . | quote }}
             - name: OIDC_KEYCLOAK_LOGOUT
               value: "true"
           {{- else}}

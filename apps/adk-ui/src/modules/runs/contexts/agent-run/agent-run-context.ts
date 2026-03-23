@@ -1,0 +1,47 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+'use client';
+import type { ApprovalDecision, FormRender } from '@kagenti/adk';
+import { createContext } from 'react';
+
+import type { AgentA2AClient } from '#api/a2a/types.ts';
+import type { Agent } from '#modules/agents/api/types.ts';
+import type { UICanvasEditRequestParams } from '#modules/canvas/types.ts';
+import type { UIMessageForm } from '#modules/messages/types.ts';
+import type { RunStats } from '#modules/runs/types.ts';
+import type { TaskId } from '#modules/tasks/api/types.ts';
+
+import type { FulfillmentsContext } from '../agent-demands/agent-demands-context';
+
+export const AgentRunContext = createContext<AgentRunContextValue | undefined>(undefined);
+
+interface AgentRunContextValue {
+  agent: Agent;
+  agentClient?: AgentA2AClient;
+  status: AgentRunStatus;
+  isPending: boolean;
+  isInitializing: boolean;
+  isReady: boolean;
+  input?: string;
+  stats?: RunStats;
+  hasMessages: boolean;
+  initialFormRender: FormRender | undefined;
+  chat: (input: string, fulfillmentsContext?: FulfillmentsContext) => Promise<void>;
+  submitForm: (form: UIMessageForm) => Promise<void>;
+  submitRuntimeForm: (form: UIMessageForm, taskId: TaskId) => Promise<void>;
+  startAuth: (url: string, taskId: TaskId) => void;
+  submitSecrets: (secrets: Record<string, string>, taskId: TaskId) => Promise<void>;
+  submitApproval: (decision: ApprovalDecision, taskId: TaskId) => Promise<void>;
+  submitTextInput: (text: string, taskId: TaskId) => Promise<void>;
+  submitCanvasEditRequest: (canvasEditRequest: UICanvasEditRequestParams) => Promise<void>;
+  cancel: () => void;
+  clear: () => void;
+}
+
+export enum AgentRunStatus {
+  Initializing = 'initializing',
+  Ready = 'ready',
+  Pending = 'pending',
+}

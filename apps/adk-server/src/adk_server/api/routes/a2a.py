@@ -1,4 +1,4 @@
-# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
 
 from __future__ import annotations
@@ -37,7 +37,7 @@ def create_proxy_agent_card(
             http_auth_security_scheme=HTTPAuthSecurityScheme(
                 scheme="bearer",
                 bearer_format="JWT",
-                description="Platform context token, issued by the AgentStack server using POST /api/v1/context/{context_id}/token.",
+                description="Platform context token, issued by the Kagenti ADK server using POST /api/v1/context/{context_id}/token.",
             )
         )
     }

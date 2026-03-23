@@ -1,0 +1,240 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+@use 'sass:map';
+@use '@carbon/styles/scss/themes';
+@use '@carbon/styles/scss/theme' as *;
+@use '@carbon/styles/scss/colors' as *;
+@use '@carbon/styles/scss/spacing' as *;
+
+$light: map.merge(
+  themes.$white,
+  (
+    background-inverse: $cool-gray-80,
+    background-hover: $cool-gray-10,
+    background-hover-50: rgba($cool-gray-10, 0.5),
+    background-transparent: rgba($white, 0),
+    layer-01: $white,
+    layer-02: $cool-gray-10,
+    layer-03: $cool-gray-20,
+
+    layer-hover-01: $cool-gray-10,
+    layer-hover-02: $cool-gray-20,
+    layer-hover-03: $cool-gray-30,
+
+    layer-selected-hover-01: $cool-gray-20,
+    layer-selected-hover-02: $cool-gray-30,
+    layer-selected-hover-03: $cool-gray-40,
+
+    layer-accent-01: $cool-gray-10,
+    layer-accent-02: $cool-gray-20,
+    layer-accent-03: $cool-gray-30,
+
+    layer-inverse: $black,
+    layer-inverse-00: $cool-gray-100,
+    layer-inverse-01: $cool-gray-90,
+    layer-inverse-02: $cool-gray-80,
+    layer-inverse-03: $cool-gray-70,
+
+    border-subtle-00: $cool-gray-20,
+    border-subtle-inverse: $cool-gray-80,
+    border-interactive: $black,
+
+    button-primary-color: $white,
+    button-disabled: $cool-gray-30,
+    button-disabled-color: $white,
+
+    support-error-30: rgba($red-60, 0.3),
+    text-dark: $black,
+    text-muted: $cool-gray-70,
+    text-muted-inverse: $cool-gray-40,
+    text-placeholder: $cool-gray-40,
+    text-helper: $cool-gray-60,
+    box-shadow-color: rgba(193, 199, 205, 0.45),
+    modal-background: rgba($cool-gray-60, 0.5),
+    hero-background: $gray-10,
+    expand-button-color: $cool-gray-70,
+    file-upload-dropzone-background: rgba($white, 0.95),
+    source-number-active-background: $green-10,
+  )
+);
+
+$dark: map.merge(
+  themes.$g100,
+  (
+    background-inverse: $cool-gray-10,
+    background-hover: $cool-gray-90,
+    background-hover-50: rgba($cool-gray-80, 0.5),
+    background-transparent: rgba($cool-gray-100, 0),
+    layer-01: $gray-100,
+    layer-02: $cool-gray-90,
+    layer-03: $cool-gray-80,
+
+    layer-hover-01: $cool-gray-90,
+    layer-hover-02: $cool-gray-80,
+    layer-hover-03: $cool-gray-70,
+
+    layer-selected-hover-01: $cool-gray-80,
+    layer-selected-hover-02: $cool-gray-70,
+    layer-selected-hover-03: $cool-gray-60,
+
+    layer-accent-01: $cool-gray-90,
+    layer-accent-02: $cool-gray-80,
+    layer-accent-03: $cool-gray-70,
+
+    layer-inverse: $white,
+    layer-inverse-00: $cool-gray-10,
+    layer-inverse-01: $cool-gray-10,
+    layer-inverse-02: $cool-gray-20,
+    layer-inverse-03: $cool-gray-30,
+
+    border-subtle-00: $cool-gray-80,
+    border-subtle-inverse: $cool-gray-20,
+    border-interactive: $white,
+
+    button-primary-color: $black,
+    button-disabled: $cool-gray-70,
+    button-disabled-color: $cool-gray-60,
+
+    support-error-30: rgba($red-50, 0.3),
+    text-dark: $white,
+    text-muted: $cool-gray-40,
+    text-muted-inverse: $cool-gray-70,
+    text-placeholder: $cool-gray-60,
+    text-helper: $cool-gray-50,
+    box-shadow-color: rgba($cool-gray-30, 0.3),
+    modal-background: rgba($cool-gray-100, 0.75),
+    hero-background: $layer-01,
+    expand-button-color: $cool-gray-30,
+    file-upload-dropzone-background: rgba($black, 0.95),
+    source-number-active-background: $green-70,
+  )
+);
+
+@use '@carbon/styles/scss/components/button/tokens' as button-tokens with (
+  $button-primary: (
+    fallback: $black,
+    values: (
+      (theme: $light, value: $black),
+      (theme: $dark, value: $white),
+    ),
+  ),
+  $button-primary-hover: (
+    fallback: $background-inverse,
+    values: (
+      (theme: $light, value: $background-inverse),
+      (theme: $dark, value: $background-inverse),
+    ),
+  ),
+  $button-primary-active: (
+    fallback: $background-inverse,
+    values: (
+      (theme: $light, value: $background-inverse),
+      (theme: $dark, value: $background-inverse),
+    ),
+  ),
+  $button-tertiary: (
+    fallback: $black,
+    values: (
+      (theme: $light, value: $black),
+      (theme: $dark, value: $white),
+    ),
+  ),
+  $button-tertiary-hover: (
+    fallback: $background-hover,
+    values: (
+      (theme: $light, value: $background-hover),
+      (theme: $dark, value: $background-hover),
+    ),
+  ),
+  $button-tertiary-active: (
+    fallback: $background-active,
+    values: (
+      (theme: $light, value: $background-active),
+      (theme: $dark, value: $background-active),
+    ),
+  )
+);
+@use '@carbon/styles/scss/components/tag/tokens' as tag-tokens with (
+  $tag-color-cool-gray: (
+    fallback: $black,
+    values: (
+      (theme: $light, value: $black),
+      (theme: $dark, value: $white),
+    ),
+  ),
+  $tag-background-cool-gray: (
+    fallback: $cool-gray-10,
+    values: (
+      (theme: $light, value: $cool-gray-10),
+      (theme: $dark, value: $cool-gray-80),
+    ),
+  ),
+  $tag-color-green: (
+    fallback: $green-60,
+    values: (
+      (theme: $light, value: $green-60),
+      (theme: $dark, value: $green-20),
+    ),
+  ),
+  $tag-background-green: (
+    fallback: $green-10,
+    values: (
+      (theme: $light, value: $green-10),
+      (theme: $dark, value: $green-70),
+    ),
+  )
+);
+@use '@carbon/styles/scss/components/notification/tokens' as notification-tokens with (
+  $notification-background-error: (
+    fallback: $red-10,
+    values: (
+      (theme: $light, value: $red-10),
+      (theme: $dark, value: $cool-gray-90),
+    ),
+  )
+);
+
+$grid-margin: var(--cds-grid-margin);
+$gap: $grid-margin;
+
+$background-hover-50: var(--cds-background-hover-50);
+$background-transparent: var(--cds-background-transparent);
+$layer-inverse: var(--cds-layer-inverse);
+$layer-inverse-00: var(--cds-layer-inverse-00);
+$layer-inverse-01: var(--cds-layer-inverse-01);
+$layer-inverse-02: var(--cds-layer-inverse-02);
+$layer-inverse-03: var(--cds-layer-inverse-03);
+
+$text-dark: var(--cds-text-dark);
+$text-muted: var(--cds-text-muted);
+$text-muted-inverse: var(--cds-text-muted-inverse);
+
+$border-subtle-inverse: var(--cds-border-subtle-inverse);
+$border-radius: $spacing-03;
+$border-radius-lg: $spacing-04;
+$box-shadow-color: var(--cds-box-shadow-color);
+$box-shadow: 0px 2px 8px 0px $box-shadow-color;
+$drop-shadow: 0px 2px 8px $box-shadow-color;
+
+$button-primary: var(--cds-button-primary);
+$button-primary-color: var(--cds-button-primary-color);
+$button-tertiary: var(--cds-button-tertiary);
+$button-tertiary-hover: var(--cds-button-tertiary-hover);
+$button-disabled: var(--cds-button-disabled);
+$button-disabled-color: var(--cds-button-disabled-color);
+
+$support-error-30: var(--cds-support-error-30);
+
+$modal-background: var(--cds-modal-background);
+$hero-background: var(--cds-hero-background);
+$expand-button-color: var(--cds-expand-button-color);
+$file-upload-dropzone-background: var(--cds-file-upload-dropzone-background);
+$source-number-active-background: var(--cds-source-number-active-background);
+
+$letter-spacing: 0.16px;
+$letter-spacing-lg: 0.32px;
+
+@forward '@carbon/styles/scss/theme';

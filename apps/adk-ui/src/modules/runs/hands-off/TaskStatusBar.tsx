@@ -1,0 +1,34 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+'use client';
+
+import { RunElapsedTime } from '../components/RunElapsedTime';
+import { RunStatusBar } from '../components/RunStatusBar';
+import { AGENT_STARTING_MESSAGE } from '../constants';
+import { useAgentRun } from '../contexts/agent-run';
+import { useAgentStatus } from '../contexts/agent-status';
+
+interface Props {
+  onStopClick?: () => void;
+}
+
+export function TaskStatusBar({ onStopClick }: Props) {
+  const { stats, isPending } = useAgentRun();
+  const {
+    status: { isNotInstalled, isStarting },
+  } = useAgentStatus();
+
+  return stats?.startTime ? (
+    <RunStatusBar isPending={isPending} onStopClick={onStopClick}>
+      {isNotInstalled || isStarting ? (
+        AGENT_STARTING_MESSAGE
+      ) : (
+        <>
+          Task {isPending ? 'running for' : 'completed in'} <RunElapsedTime stats={stats} />
+        </>
+      )}
+    </RunStatusBar>
+  ) : null;
+}

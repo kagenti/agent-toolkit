@@ -1,7 +1,7 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Agentstack server",
+    "title": "ADK server",
     "version": "0.7.1"
   },
   "paths": {
@@ -217,236 +217,12 @@
       }
     },
     "/api/v1/a2a/{provider_id}/http/{path}": {
-      "patch": {
-        "tags": [
-          "a2a"
-        ],
-        "summary": "A2A Proxy Http Transport",
-        "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http__path__patch",
-        "security": [
-          {
-            "HTTPBasic": []
-          },
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "provider_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Provider Id"
-            }
-          },
-          {
-            "name": "path",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Path"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "a2a"
-        ],
-        "summary": "A2A Proxy Http Transport",
-        "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http__path__patch",
-        "security": [
-          {
-            "HTTPBasic": []
-          },
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "provider_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Provider Id"
-            }
-          },
-          {
-            "name": "path",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Path"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      },
-      "head": {
-        "tags": [
-          "a2a"
-        ],
-        "summary": "A2A Proxy Http Transport",
-        "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http__path__patch",
-        "security": [
-          {
-            "HTTPBasic": []
-          },
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "provider_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Provider Id"
-            }
-          },
-          {
-            "name": "path",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Path"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      },
-      "options": {
-        "tags": [
-          "a2a"
-        ],
-        "summary": "A2A Proxy Http Transport",
-        "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http__path__patch",
-        "security": [
-          {
-            "HTTPBasic": []
-          },
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "provider_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Provider Id"
-            }
-          },
-          {
-            "name": "path",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Path"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      },
       "get": {
         "tags": [
           "a2a"
         ],
         "summary": "A2A Proxy Http Transport",
-        "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http__path__patch",
+        "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http__path__get",
         "security": [
           {
             "HTTPBasic": []
@@ -502,7 +278,63 @@
           "a2a"
         ],
         "summary": "A2A Proxy Http Transport",
-        "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http__path__patch",
+        "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http__path__get",
+        "security": [
+          {
+            "HTTPBasic": []
+          },
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "provider_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Provider Id"
+            }
+          },
+          {
+            "name": "path",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Path"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "a2a"
+        ],
+        "summary": "A2A Proxy Http Transport",
+        "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http__path__get",
         "security": [
           {
             "HTTPBasic": []
@@ -558,7 +390,175 @@
           "a2a"
         ],
         "summary": "A2A Proxy Http Transport",
-        "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http__path__patch",
+        "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http__path__get",
+        "security": [
+          {
+            "HTTPBasic": []
+          },
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "provider_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Provider Id"
+            }
+          },
+          {
+            "name": "path",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Path"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "a2a"
+        ],
+        "summary": "A2A Proxy Http Transport",
+        "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http__path__get",
+        "security": [
+          {
+            "HTTPBasic": []
+          },
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "provider_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Provider Id"
+            }
+          },
+          {
+            "name": "path",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Path"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "a2a"
+        ],
+        "summary": "A2A Proxy Http Transport",
+        "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http__path__get",
+        "security": [
+          {
+            "HTTPBasic": []
+          },
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "provider_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Provider Id"
+            }
+          },
+          {
+            "name": "path",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Path"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "tags": [
+          "a2a"
+        ],
+        "summary": "A2A Proxy Http Transport",
+        "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http__path__get",
         "security": [
           {
             "HTTPBasic": []
@@ -611,240 +611,12 @@
       }
     },
     "/api/v1/a2a/{provider_id}/http": {
-      "patch": {
-        "tags": [
-          "a2a"
-        ],
-        "summary": "A2A Proxy Http Transport",
-        "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http_patch",
-        "security": [
-          {
-            "HTTPBasic": []
-          },
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "provider_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Provider Id"
-            }
-          },
-          {
-            "name": "path",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "default": "",
-              "title": "Path"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "a2a"
-        ],
-        "summary": "A2A Proxy Http Transport",
-        "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http_patch",
-        "security": [
-          {
-            "HTTPBasic": []
-          },
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "provider_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Provider Id"
-            }
-          },
-          {
-            "name": "path",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "default": "",
-              "title": "Path"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      },
-      "head": {
-        "tags": [
-          "a2a"
-        ],
-        "summary": "A2A Proxy Http Transport",
-        "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http_patch",
-        "security": [
-          {
-            "HTTPBasic": []
-          },
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "provider_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Provider Id"
-            }
-          },
-          {
-            "name": "path",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "default": "",
-              "title": "Path"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      },
-      "options": {
-        "tags": [
-          "a2a"
-        ],
-        "summary": "A2A Proxy Http Transport",
-        "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http_patch",
-        "security": [
-          {
-            "HTTPBasic": []
-          },
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "provider_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Provider Id"
-            }
-          },
-          {
-            "name": "path",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "default": "",
-              "title": "Path"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      },
       "get": {
         "tags": [
           "a2a"
         ],
         "summary": "A2A Proxy Http Transport",
-        "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http_patch",
+        "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http_get",
         "security": [
           {
             "HTTPBasic": []
@@ -901,7 +673,64 @@
           "a2a"
         ],
         "summary": "A2A Proxy Http Transport",
-        "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http_patch",
+        "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http_get",
+        "security": [
+          {
+            "HTTPBasic": []
+          },
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "provider_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Provider Id"
+            }
+          },
+          {
+            "name": "path",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "",
+              "title": "Path"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "a2a"
+        ],
+        "summary": "A2A Proxy Http Transport",
+        "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http_get",
         "security": [
           {
             "HTTPBasic": []
@@ -958,7 +787,178 @@
           "a2a"
         ],
         "summary": "A2A Proxy Http Transport",
-        "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http_patch",
+        "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http_get",
+        "security": [
+          {
+            "HTTPBasic": []
+          },
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "provider_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Provider Id"
+            }
+          },
+          {
+            "name": "path",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "",
+              "title": "Path"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "a2a"
+        ],
+        "summary": "A2A Proxy Http Transport",
+        "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http_get",
+        "security": [
+          {
+            "HTTPBasic": []
+          },
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "provider_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Provider Id"
+            }
+          },
+          {
+            "name": "path",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "",
+              "title": "Path"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "a2a"
+        ],
+        "summary": "A2A Proxy Http Transport",
+        "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http_get",
+        "security": [
+          {
+            "HTTPBasic": []
+          },
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "provider_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Provider Id"
+            }
+          },
+          {
+            "name": "path",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "",
+              "title": "Path"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "tags": [
+          "a2a"
+        ],
+        "summary": "A2A Proxy Http Transport",
+        "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http_get",
         "security": [
           {
             "HTTPBasic": []
@@ -1042,7 +1042,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProviderWithState"
+                  "$ref": "#/components/schemas/Provider"
                 }
               }
             }
@@ -1131,42 +1131,22 @@
         }
       }
     },
-    "/api/v1/providers/{id}": {
-      "patch": {
+    "/api/v1/providers/preview": {
+      "post": {
         "tags": [
           "providers"
         ],
-        "summary": "Patch Provider",
-        "operationId": "patch_provider_api_v1_providers__id__patch",
-        "security": [
-          {
-            "HTTPBasic": []
-          },
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Id"
-            }
-          }
-        ],
+        "summary": "Preview Provider",
+        "operationId": "preview_provider_api_v1_providers_preview_post",
         "requestBody": {
-          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/PatchProviderRequest"
+                "$ref": "#/components/schemas/CreateProviderRequest"
               }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "200": {
@@ -1174,7 +1154,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProviderWithState"
+                  "$ref": "#/components/schemas/Provider"
                 }
               }
             }
@@ -1189,8 +1169,18 @@
               }
             }
           }
-        }
-      },
+        },
+        "security": [
+          {
+            "HTTPBasic": []
+          },
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/providers/{id}": {
       "get": {
         "tags": [
           "providers"
@@ -1223,7 +1213,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__2"
+                  "$ref": "#/components/schemas/adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__2"
                 }
               }
             }
@@ -1283,55 +1273,6 @@
         }
       }
     },
-    "/api/v1/providers/preview": {
-      "post": {
-        "tags": [
-          "providers"
-        ],
-        "summary": "Preview Provider",
-        "operationId": "preview_provider_api_v1_providers_preview_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateProviderRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProviderWithState"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "HTTPBasic": []
-          },
-          {
-            "HTTPBearer": []
-          }
-        ]
-      }
-    },
     "/api/v1/providers/by-location/{location}": {
       "get": {
         "tags": [
@@ -1364,624 +1305,8 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__3"
+                  "$ref": "#/components/schemas/adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__3"
                 }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/providers/{id}/logs": {
-      "get": {
-        "tags": [
-          "providers"
-        ],
-        "summary": "Stream Logs",
-        "operationId": "stream_logs_api_v1_providers__id__logs_get",
-        "security": [
-          {
-            "HTTPBasic": []
-          },
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/providers/{id}/variables": {
-      "put": {
-        "tags": [
-          "providers"
-        ],
-        "summary": "Update Provider Variables",
-        "operationId": "update_provider_variables_api_v1_providers__id__variables_put",
-        "security": [
-          {
-            "HTTPBasic": []
-          },
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Id"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateVariablesRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      },
-      "get": {
-        "tags": [
-          "providers"
-        ],
-        "summary": "List Provider Variables",
-        "operationId": "list_provider_variables_api_v1_providers__id__variables_get",
-        "security": [
-          {
-            "HTTPBasic": []
-          },
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ListVariablesSchema"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/providers/discovery": {
-      "post": {
-        "tags": [
-          "provider_discovery"
-        ],
-        "summary": "Create Provider Discovery",
-        "operationId": "create_provider_discovery_api_v1_providers_discovery_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateDiscoveryRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProviderDiscovery"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "HTTPBasic": []
-          },
-          {
-            "HTTPBearer": []
-          }
-        ]
-      }
-    },
-    "/api/v1/providers/discovery/{id}": {
-      "get": {
-        "tags": [
-          "provider_discovery"
-        ],
-        "summary": "Get Provider Discovery",
-        "operationId": "get_provider_discovery_api_v1_providers_discovery__id__get",
-        "security": [
-          {
-            "HTTPBasic": []
-          },
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProviderDiscovery"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/provider_builds": {
-      "post": {
-        "tags": [
-          "provider_builds"
-        ],
-        "summary": "Create Provider Build",
-        "operationId": "create_provider_build_api_v1_provider_builds_post",
-        "security": [
-          {
-            "HTTPBasic": []
-          },
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateProviderBuildRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProviderBuild"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      },
-      "get": {
-        "tags": [
-          "provider_builds"
-        ],
-        "summary": "List Provider Builds",
-        "operationId": "list_provider_builds_api_v1_provider_builds_get",
-        "security": [
-          {
-            "HTTPBasic": []
-          },
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "maximum": 100,
-              "minimum": 1,
-              "title": "Limit"
-            }
-          },
-          {
-            "name": "page_token",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "format": "uuid"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Page Token"
-            }
-          },
-          {
-            "name": "order",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "pattern": "^(asc|desc)$",
-              "title": "Order"
-            }
-          },
-          {
-            "name": "order_by",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "pattern": "^created_at|updated_at$",
-              "title": "Order By"
-            }
-          },
-          {
-            "name": "status",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "$ref": "#/components/schemas/BuildState"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Status"
-            }
-          },
-          {
-            "name": "user_owned",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "boolean"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "User Owned"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PaginatedResult_ProviderBuild_"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/provider_builds/preview": {
-      "post": {
-        "tags": [
-          "provider_builds"
-        ],
-        "summary": "Preview Provider Build",
-        "operationId": "preview_provider_build_api_v1_provider_builds_preview_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateProviderBuildRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProviderBuild"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "HTTPBasic": []
-          },
-          {
-            "HTTPBearer": []
-          }
-        ]
-      }
-    },
-    "/api/v1/provider_builds/{id}": {
-      "get": {
-        "tags": [
-          "provider_builds"
-        ],
-        "summary": "Get Provider Build",
-        "operationId": "get_provider_build_api_v1_provider_builds__id__get",
-        "security": [
-          {
-            "HTTPBasic": []
-          },
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProviderBuild"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "provider_builds"
-        ],
-        "summary": "Delete",
-        "operationId": "delete_api_v1_provider_builds__id__delete",
-        "security": [
-          {
-            "HTTPBasic": []
-          },
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Id"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Successful Response"
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/provider_builds/{id}/logs": {
-      "get": {
-        "tags": [
-          "provider_builds"
-        ],
-        "summary": "Stream Logs",
-        "operationId": "stream_logs_api_v1_provider_builds__id__logs_get",
-        "security": [
-          {
-            "HTTPBasic": []
-          },
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
               }
             }
           },
@@ -2048,7 +1373,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__4"
+                  "$ref": "#/components/schemas/adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__4"
                 }
               }
             }
@@ -2107,7 +1432,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__5"
+                  "$ref": "#/components/schemas/adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__5"
                 }
               }
             }
@@ -2229,7 +1554,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__6"
+                  "$ref": "#/components/schemas/adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__6"
                 }
               }
             }
@@ -2266,7 +1591,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__7"
+                  "$ref": "#/components/schemas/adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__7"
                 }
               }
             }
@@ -2342,7 +1667,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__8"
+                  "$ref": "#/components/schemas/adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__8"
                 }
               }
             }
@@ -2474,7 +1799,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__9"
+                  "$ref": "#/components/schemas/adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__9"
                 }
               }
             }
@@ -2751,7 +2076,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__10"
+                  "$ref": "#/components/schemas/adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__10"
                 }
               }
             }
@@ -2817,7 +2142,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__11"
+                  "$ref": "#/components/schemas/adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__11"
                 }
               }
             }
@@ -2999,7 +2324,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__12"
+                  "$ref": "#/components/schemas/adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__12"
                 }
               }
             }
@@ -3164,7 +2489,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__13"
+                  "$ref": "#/components/schemas/adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__13"
                 }
               }
             }
@@ -3265,7 +2590,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__14"
+                  "$ref": "#/components/schemas/adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__14"
                 }
               }
             }
@@ -3326,7 +2651,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__15"
+                  "$ref": "#/components/schemas/adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__15"
                 }
               }
             }
@@ -3787,7 +3112,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__16"
+                  "$ref": "#/components/schemas/adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__16"
                 }
               }
             }
@@ -3856,7 +3181,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__17"
+                  "$ref": "#/components/schemas/adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__17"
                 }
               }
             }
@@ -4903,47 +4228,6 @@
   },
   "components": {
     "schemas": {
-      "AddProvider": {
-        "properties": {
-          "type": {
-            "type": "string",
-            "const": "add_provider",
-            "title": "Type",
-            "default": "add_provider"
-          },
-          "auto_stop_timeout_sec": {
-            "anyOf": [
-              {
-                "type": "integer",
-                "maximum": 600.0,
-                "exclusiveMinimum": 0.0
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Auto Stop Timeout Sec",
-            "description": "Timeout after which the agent provider will be automatically downscaled if unused.Contact administrator if you need to increase this value."
-          },
-          "variables": {
-            "anyOf": [
-              {
-                "additionalProperties": {
-                  "type": "string"
-                },
-                "type": "object"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Variables"
-          }
-        },
-        "type": "object",
-        "title": "AddProvider",
-        "description": "Will add a new provider or update an existing one with the same base docker image ID\n(docker registry + repository, excluding tag)"
-      },
       "Audio": {
         "properties": {
           "id": {
@@ -4992,36 +4276,6 @@
           "file"
         ],
         "title": "Body_upload_file_api_v1_files_post"
-      },
-      "BuildConfiguration": {
-        "properties": {
-          "dockerfile_path": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "path"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Dockerfile Path",
-            "description": "Path to Dockerfile relative to the repository path (provider_build.source.path or repository root if not defined)"
-          }
-        },
-        "type": "object",
-        "title": "BuildConfiguration"
-      },
-      "BuildState": {
-        "type": "string",
-        "enum": [
-          "missing",
-          "in_progress",
-          "build_completed",
-          "completed",
-          "failed"
-        ],
-        "title": "BuildState"
       },
       "ChatCompletionAllowedToolChoiceParam": {
         "properties": {
@@ -5190,6 +4444,9 @@
                   "marin",
                   "cedar"
                 ]
+              },
+              {
+                "$ref": "#/components/schemas/VoiceID"
               }
             ],
             "title": "Voice"
@@ -5530,6 +4787,8 @@
               {
                 "type": "string",
                 "enum": [
+                  "gpt-5.4",
+                  "gpt-5.3-chat-latest",
                   "gpt-5.2",
                   "gpt-5.2-2025-12-11",
                   "gpt-5.2-chat-latest",
@@ -6621,19 +5880,6 @@
         "title": "ContextUpdateRequest",
         "description": "Request schema for context update."
       },
-      "CreateDiscoveryRequest": {
-        "properties": {
-          "docker_image": {
-            "type": "string",
-            "title": "Docker Image"
-          }
-        },
-        "type": "object",
-        "required": [
-          "docker_image"
-        ],
-        "title": "CreateDiscoveryRequest"
-      },
       "CreateModelProviderRequest": {
         "properties": {
           "name": {
@@ -6703,43 +5949,10 @@
         ],
         "title": "CreateModelProviderRequest"
       },
-      "CreateProviderBuildRequest": {
-        "properties": {
-          "location": {
-            "$ref": "#/components/schemas/GithubUrl"
-          },
-          "on_complete": {
-            "$ref": "#/components/schemas/OnCompleteAction"
-          },
-          "build_configuration": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/BuildConfiguration"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          }
-        },
-        "type": "object",
-        "required": [
-          "location"
-        ],
-        "title": "CreateProviderBuildRequest"
-      },
       "CreateProviderRequest": {
         "properties": {
           "location": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/DockerImageProviderLocation"
-              },
-              {
-                "$ref": "#/components/schemas/NetworkProviderLocation"
-              }
-            ],
-            "title": "Location"
+            "$ref": "#/components/schemas/NetworkProviderLocation"
           },
           "agent_card": {
             "anyOf": [
@@ -6753,20 +5966,6 @@
             ],
             "title": "Agent Card"
           },
-          "variables": {
-            "anyOf": [
-              {
-                "additionalProperties": {
-                  "type": "string"
-                },
-                "type": "object"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Variables"
-          },
           "origin": {
             "anyOf": [
               {
@@ -6777,21 +5976,7 @@
               }
             ],
             "title": "Origin",
-            "description": "A unique origin of the provider: most often a docker or github repository url (without tag). This is used to determine multiple versions of the same agent."
-          },
-          "auto_stop_timeout_sec": {
-            "anyOf": [
-              {
-                "type": "integer",
-                "maximum": 1800.0,
-                "exclusiveMinimum": 0.0
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Auto Stop Timeout Sec",
-            "description": "Timeout after which the agent provider will be automatically downscaled if unused.Contact administrator if you need to increase this value."
+            "description": "A unique origin of the provider: most often a url. This is used to determine multiple versions of the same agent."
           }
         },
         "type": "object",
@@ -6825,24 +6010,6 @@
         ],
         "title": "CreateVectorStoreRequest",
         "description": "Request to create a new vector store."
-      },
-      "DiscoveryState": {
-        "type": "string",
-        "enum": [
-          "pending",
-          "in_progress",
-          "completed",
-          "failed"
-        ],
-        "title": "DiscoveryState"
-      },
-      "DockerImageID": {
-        "type": "string",
-        "title": "DockerImageID"
-      },
-      "DockerImageProviderLocation": {
-        "$ref": "#/components/schemas/DockerImageID",
-        "title": "DockerImageProviderLocation"
       },
       "DocumentType": {
         "type": "string",
@@ -6895,36 +6062,6 @@
         ],
         "title": "EmbeddingsRequest",
         "description": "Corresponds to the arguments for OpenAI `client.embeddings.create(...)`."
-      },
-      "EnvVar": {
-        "properties": {
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Description"
-          },
-          "required": {
-            "type": "boolean",
-            "title": "Required",
-            "default": false
-          }
-        },
-        "additionalProperties": true,
-        "type": "object",
-        "required": [
-          "name"
-        ],
-        "title": "EnvVar"
       },
       "ExtractedFileInfo": {
         "properties": {
@@ -7173,12 +6310,6 @@
         "format": "uri",
         "title": "FileSystemModelProviderRegistryLocation"
       },
-      "FileSystemRegistryLocation": {
-        "type": "string",
-        "minLength": 1,
-        "format": "uri",
-        "title": "FileSystemRegistryLocation"
-      },
       "FileType": {
         "type": "string",
         "enum": [
@@ -7238,22 +6369,6 @@
           "name"
         ],
         "title": "FunctionDefinition"
-      },
-      "GithubRegistryLocation": {
-        "$ref": "#/components/schemas/GithubUrl",
-        "title": "GithubRegistryLocation"
-      },
-      "GithubUrl": {
-        "type": "string",
-        "title": "GithubUrl"
-      },
-      "GithubVersionType": {
-        "type": "string",
-        "enum": [
-          "head",
-          "tag"
-        ],
-        "title": "GithubVersionType"
       },
       "GlobalPermissionGrant": {
         "properties": {
@@ -7362,18 +6477,6 @@
             },
             "type": "array",
             "title": "Providers"
-          },
-          "provider_variables": {
-            "items": {
-              "type": "string",
-              "enum": [
-                "read",
-                "write",
-                "*"
-              ]
-            },
-            "type": "array",
-            "title": "Provider Variables"
           },
           "contexts": {
             "items": {
@@ -7828,38 +6931,6 @@
         "format": "uri",
         "title": "NetworkProviderLocation"
       },
-      "NetworkRegistryLocation": {
-        "type": "string",
-        "maxLength": 2083,
-        "minLength": 1,
-        "format": "uri",
-        "title": "NetworkRegistryLocation"
-      },
-      "NoAction": {
-        "properties": {
-          "type": {
-            "type": "string",
-            "const": "no_action",
-            "title": "Type",
-            "default": "no_action"
-          }
-        },
-        "type": "object",
-        "title": "NoAction"
-      },
-      "OnCompleteAction": {
-        "anyOf": [
-          {
-            "$ref": "#/components/schemas/AddProvider"
-          },
-          {
-            "$ref": "#/components/schemas/UpdateProvider"
-          },
-          {
-            "$ref": "#/components/schemas/NoAction"
-          }
-        ]
-      },
       "OpenAIPage_Model_": {
         "properties": {
           "data": {
@@ -8086,7 +7157,7 @@
         "properties": {
           "items": {
             "items": {
-              "$ref": "#/components/schemas/agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__1"
+              "$ref": "#/components/schemas/adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__1"
             },
             "type": "array",
             "title": "Items"
@@ -8201,46 +7272,6 @@
           "next_page_token"
         ],
         "title": "PaginatedResult[ModelWithScore]"
-      },
-      "PaginatedResult_ProviderBuild_": {
-        "properties": {
-          "items": {
-            "items": {
-              "$ref": "#/components/schemas/ProviderBuild"
-            },
-            "type": "array",
-            "title": "Items"
-          },
-          "total_count": {
-            "type": "integer",
-            "title": "Total Count"
-          },
-          "has_more": {
-            "type": "boolean",
-            "title": "Has More",
-            "default": false
-          },
-          "next_page_token": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Next Page Token",
-            "readOnly": true
-          }
-        },
-        "type": "object",
-        "required": [
-          "items",
-          "total_count",
-          "next_page_token"
-        ],
-        "title": "PaginatedResult[ProviderBuild]"
       },
       "PaginatedResult_UserFeedbackResponse_": {
         "properties": {
@@ -8362,295 +7393,23 @@
         ],
         "title": "PaginatedResult[VectorStoreSearchResult]"
       },
-      "PatchProviderRequest": {
-        "properties": {
-          "location": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/DockerImageProviderLocation"
-              },
-              {
-                "$ref": "#/components/schemas/NetworkProviderLocation"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Location"
-          },
-          "agent_card": {
-            "anyOf": [
-              {
-                "additionalProperties": true,
-                "type": "object"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Agent Card"
-          },
-          "variables": {
-            "anyOf": [
-              {
-                "additionalProperties": {
-                  "type": "string"
-                },
-                "type": "object"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Variables"
-          },
-          "origin": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Origin",
-            "description": "A unique origin of the provider: most often a docker or github repository url (without tag). This is used to determine multiple versions of the same agent. None means that origin will be recomputed from location. To preserve original value, set it explicitly."
-          },
-          "auto_stop_timeout_sec": {
-            "anyOf": [
-              {
-                "type": "integer",
-                "maximum": 1800.0,
-                "exclusiveMinimum": 0.0
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Auto Stop Timeout Sec",
-            "description": "Timeout after which the agent provider will be automatically downscaled if unused.Contact administrator if you need to increase this value."
-          }
-        },
-        "type": "object",
-        "title": "PatchProviderRequest"
-      },
-      "ProviderBuild": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Id"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Created At"
-          },
-          "status": {
-            "$ref": "#/components/schemas/BuildState"
-          },
-          "source": {
-            "$ref": "#/components/schemas/ResolvedGithubUrl"
-          },
-          "destination": {
-            "$ref": "#/components/schemas/DockerImageID"
-          },
-          "build_configuration": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/BuildConfiguration"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "provider_id": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Provider Id",
-            "description": "ID of the provider added or modified by this build"
-          },
-          "created_by": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Created By"
-          },
-          "on_complete": {
-            "$ref": "#/components/schemas/OnCompleteAction",
-            "default": {
-              "type": "no_action"
-            }
-          },
-          "error_message": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Error Message"
-          },
-          "provider_origin": {
-            "type": "string",
-            "title": "Provider Origin",
-            "readOnly": true
-          }
-        },
-        "type": "object",
-        "required": [
-          "status",
-          "source",
-          "destination",
-          "created_by",
-          "provider_origin"
-        ],
-        "title": "ProviderBuild"
-      },
-      "ProviderDeploymentState": {
-        "type": "string",
-        "enum": [
-          "missing",
-          "starting",
-          "ready",
-          "running",
-          "error"
-        ],
-        "title": "ProviderDeploymentState"
-      },
-      "ProviderDiscovery": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Id"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Created At"
-          },
-          "status": {
-            "$ref": "#/components/schemas/DiscoveryState"
-          },
-          "docker_image": {
-            "type": "string",
-            "title": "Docker Image"
-          },
-          "created_by": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Created By"
-          },
-          "agent_card": {
-            "anyOf": [
-              {
-                "additionalProperties": true,
-                "type": "object"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Agent Card"
-          },
-          "error_message": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Error Message"
-          }
-        },
-        "type": "object",
-        "required": [
-          "status",
-          "docker_image",
-          "created_by"
-        ],
-        "title": "ProviderDiscovery"
-      },
-      "ProviderErrorMessage": {
-        "properties": {
-          "message": {
-            "type": "string",
-            "title": "Message"
-          }
-        },
-        "type": "object",
-        "required": [
-          "message"
-        ],
-        "title": "ProviderErrorMessage"
-      },
-      "ProviderType": {
-        "type": "string",
-        "enum": [
-          "managed",
-          "unmanaged"
-        ],
-        "title": "ProviderType"
-      },
-      "ProviderWithState": {
+      "Provider": {
         "properties": {
           "source": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/DockerImageProviderLocation"
-              },
-              {
-                "$ref": "#/components/schemas/NetworkProviderLocation"
-              }
-            ],
-            "title": "Source"
+            "$ref": "#/components/schemas/NetworkProviderLocation"
           },
           "id": {
             "type": "string",
             "format": "uuid",
             "title": "Id"
           },
-          "auto_stop_timeout": {
-            "type": "string",
-            "format": "duration",
-            "title": "Auto Stop Timeout",
-            "default": "PT20M"
+          "source_type": {
+            "$ref": "#/components/schemas/SourceType",
+            "default": "api"
           },
           "origin": {
             "type": "string",
             "title": "Origin"
-          },
-          "version_info": {
-            "$ref": "#/components/schemas/VersionInfo"
-          },
-          "registry": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/GithubRegistryLocation"
-              },
-              {
-                "$ref": "#/components/schemas/NetworkRegistryLocation"
-              },
-              {
-                "$ref": "#/components/schemas/FileSystemRegistryLocation"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Registry"
           },
           "created_at": {
             "type": "string",
@@ -8678,145 +7437,26 @@
             "title": "Agent Card"
           },
           "state": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/ProviderDeploymentState"
-              },
-              {
-                "$ref": "#/components/schemas/UnmanagedState"
-              }
-            ],
-            "title": "State"
-          },
-          "last_error": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/ProviderErrorMessage"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "missing_configuration": {
-            "items": {
-              "$ref": "#/components/schemas/EnvVar"
-            },
-            "type": "array",
-            "title": "Missing Configuration"
-          },
-          "type": {
-            "$ref": "#/components/schemas/ProviderType",
-            "readOnly": true
-          },
-          "managed": {
-            "type": "boolean",
-            "title": "Managed",
-            "readOnly": true
-          },
-          "env": {
-            "items": {
-              "$ref": "#/components/schemas/EnvVar"
-            },
-            "type": "array",
-            "title": "Env",
-            "readOnly": true
+            "$ref": "#/components/schemas/ProviderState",
+            "default": "online"
           }
         },
-        "additionalProperties": true,
         "type": "object",
         "required": [
           "source",
           "origin",
           "created_by",
-          "agent_card",
-          "state",
-          "type",
-          "managed",
-          "env"
+          "agent_card"
         ],
-        "title": "ProviderWithState"
+        "title": "Provider"
       },
-      "ResolvedDockerImageID": {
-        "properties": {
-          "registry": {
-            "type": "string",
-            "title": "Registry"
-          },
-          "repository": {
-            "type": "string",
-            "title": "Repository"
-          },
-          "tag": {
-            "type": "string",
-            "title": "Tag"
-          },
-          "digest": {
-            "type": "string",
-            "title": "Digest"
-          },
-          "image_id": {
-            "$ref": "#/components/schemas/DockerImageID",
-            "readOnly": true
-          }
-        },
-        "type": "object",
-        "required": [
-          "registry",
-          "repository",
-          "tag",
-          "digest",
-          "image_id"
+      "ProviderState": {
+        "type": "string",
+        "enum": [
+          "online",
+          "offline"
         ],
-        "title": "ResolvedDockerImageID"
-      },
-      "ResolvedGithubUrl": {
-        "properties": {
-          "host": {
-            "type": "string",
-            "title": "Host",
-            "default": "github.com"
-          },
-          "org": {
-            "type": "string",
-            "title": "Org"
-          },
-          "repo": {
-            "type": "string",
-            "title": "Repo"
-          },
-          "version": {
-            "type": "string",
-            "title": "Version"
-          },
-          "version_type": {
-            "$ref": "#/components/schemas/GithubVersionType"
-          },
-          "commit_hash": {
-            "type": "string",
-            "title": "Commit Hash"
-          },
-          "path": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Path"
-          }
-        },
-        "type": "object",
-        "required": [
-          "org",
-          "repo",
-          "version",
-          "version_type",
-          "commit_hash"
-        ],
-        "title": "ResolvedGithubUrl"
+        "title": "ProviderState"
       },
       "ResponseFormatJSONObject": {
         "properties": {
@@ -8892,6 +7532,14 @@
         "title": "SearchRequest",
         "description": "Request to search a vector store."
       },
+      "SourceType": {
+        "type": "string",
+        "enum": [
+          "kagenti",
+          "api"
+        ],
+        "title": "SourceType"
+      },
       "TextExtractionRequest": {
         "properties": {
           "settings": {
@@ -8923,14 +7571,6 @@
         "type": "object",
         "title": "TextExtractionSettings"
       },
-      "UnmanagedState": {
-        "type": "string",
-        "enum": [
-          "online",
-          "offline"
-        ],
-        "title": "UnmanagedState"
-      },
       "UpdateConfigurationRequest": {
         "properties": {
           "default_llm_model": {
@@ -8958,27 +7598,6 @@
         },
         "type": "object",
         "title": "UpdateConfigurationRequest"
-      },
-      "UpdateProvider": {
-        "properties": {
-          "type": {
-            "type": "string",
-            "const": "update_provider",
-            "title": "Type",
-            "default": "update_provider"
-          },
-          "provider_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Provider Id"
-          }
-        },
-        "type": "object",
-        "required": [
-          "provider_id"
-        ],
-        "title": "UpdateProvider",
-        "description": "Will update provider specified by ID"
       },
       "UpdateVariablesRequest": {
         "properties": {
@@ -9336,31 +7955,19 @@
         ],
         "title": "VectorStoreStats"
       },
-      "VersionInfo": {
+      "VoiceID": {
         "properties": {
-          "docker": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/ResolvedDockerImageID"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "github": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/ResolvedGithubUrl"
-              },
-              {
-                "type": "null"
-              }
-            ]
+          "id": {
+            "type": "string",
+            "title": "Id"
           }
         },
         "type": "object",
-        "title": "VersionInfo"
+        "required": [
+          "id"
+        ],
+        "title": "VoiceID",
+        "description": "Custom voice reference."
       },
       "WebSearchOptions": {
         "properties": {
@@ -9430,53 +8037,23 @@
         "title": "WebSearchOptionsUserLocationApproximate",
         "description": "Approximate location parameters for the search."
       },
-      "agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__1": {
+      "adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__1": {
         "properties": {
           "source": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/DockerImageProviderLocation"
-              },
-              {
-                "$ref": "#/components/schemas/NetworkProviderLocation"
-              }
-            ],
-            "title": "Source"
+            "$ref": "#/components/schemas/NetworkProviderLocation"
           },
           "id": {
             "type": "string",
             "format": "uuid",
             "title": "Id"
           },
-          "auto_stop_timeout": {
-            "type": "string",
-            "format": "duration",
-            "title": "Auto Stop Timeout",
-            "default": "PT20M"
+          "source_type": {
+            "$ref": "#/components/schemas/SourceType",
+            "default": "api"
           },
           "origin": {
             "type": "string",
             "title": "Origin"
-          },
-          "version_info": {
-            "$ref": "#/components/schemas/VersionInfo"
-          },
-          "registry": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/GithubRegistryLocation"
-              },
-              {
-                "$ref": "#/components/schemas/NetworkRegistryLocation"
-              },
-              {
-                "$ref": "#/components/schemas/FileSystemRegistryLocation"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Registry"
           },
           "created_at": {
             "type": "string",
@@ -9504,67 +8081,21 @@
             "title": "Agent Card"
           },
           "state": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/ProviderDeploymentState"
-              },
-              {
-                "$ref": "#/components/schemas/UnmanagedState"
-              }
-            ],
-            "title": "State"
-          },
-          "last_error": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/ProviderErrorMessage"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "missing_configuration": {
-            "items": {
-              "$ref": "#/components/schemas/EnvVar"
-            },
-            "type": "array",
-            "title": "Missing Configuration"
-          },
-          "type": {
-            "$ref": "#/components/schemas/ProviderType",
-            "readOnly": true
-          },
-          "managed": {
-            "type": "boolean",
-            "title": "Managed",
-            "readOnly": true
-          },
-          "env": {
-            "items": {
-              "$ref": "#/components/schemas/EnvVar"
-            },
-            "type": "array",
-            "title": "Env",
-            "readOnly": true
+            "$ref": "#/components/schemas/ProviderState",
+            "default": "online"
           }
         },
-        "additionalProperties": true,
         "type": "object",
         "required": [
           "source",
           "id",
           "origin",
           "created_by",
-          "agent_card",
-          "state",
-          "type",
-          "managed",
-          "env"
+          "agent_card"
         ],
-        "title": "ProviderWithStateResponse"
+        "title": "ProviderResponse"
       },
-      "agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__10": {
+      "adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__10": {
         "properties": {
           "id": {
             "type": "string",
@@ -9656,7 +8187,7 @@
         ],
         "title": "TextExtractionResponse"
       },
-      "agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__11": {
+      "adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__11": {
         "properties": {
           "id": {
             "type": "string",
@@ -9748,7 +8279,7 @@
         ],
         "title": "TextExtractionResponse"
       },
-      "agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__12": {
+      "adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__12": {
         "properties": {
           "id": {
             "type": "string",
@@ -9810,7 +8341,7 @@
         ],
         "title": "ContextResponse"
       },
-      "agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__13": {
+      "adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__13": {
         "properties": {
           "id": {
             "type": "string",
@@ -9872,7 +8403,7 @@
         ],
         "title": "ContextResponse"
       },
-      "agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__14": {
+      "adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__14": {
         "properties": {
           "id": {
             "type": "string",
@@ -9934,7 +8465,7 @@
         ],
         "title": "ContextResponse"
       },
-      "agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__15": {
+      "adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__15": {
         "properties": {
           "id": {
             "type": "string",
@@ -9996,7 +8527,7 @@
         ],
         "title": "ContextResponse"
       },
-      "agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__16": {
+      "adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__16": {
         "properties": {
           "id": {
             "type": "string",
@@ -10071,7 +8602,7 @@
         ],
         "title": "VectorStoreResponse"
       },
-      "agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__17": {
+      "adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__17": {
         "properties": {
           "id": {
             "type": "string",
@@ -10146,53 +8677,23 @@
         ],
         "title": "VectorStoreResponse"
       },
-      "agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__2": {
+      "adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__2": {
         "properties": {
           "source": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/DockerImageProviderLocation"
-              },
-              {
-                "$ref": "#/components/schemas/NetworkProviderLocation"
-              }
-            ],
-            "title": "Source"
+            "$ref": "#/components/schemas/NetworkProviderLocation"
           },
           "id": {
             "type": "string",
             "format": "uuid",
             "title": "Id"
           },
-          "auto_stop_timeout": {
-            "type": "string",
-            "format": "duration",
-            "title": "Auto Stop Timeout",
-            "default": "PT20M"
+          "source_type": {
+            "$ref": "#/components/schemas/SourceType",
+            "default": "api"
           },
           "origin": {
             "type": "string",
             "title": "Origin"
-          },
-          "version_info": {
-            "$ref": "#/components/schemas/VersionInfo"
-          },
-          "registry": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/GithubRegistryLocation"
-              },
-              {
-                "$ref": "#/components/schemas/NetworkRegistryLocation"
-              },
-              {
-                "$ref": "#/components/schemas/FileSystemRegistryLocation"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Registry"
           },
           "created_at": {
             "type": "string",
@@ -10220,113 +8721,37 @@
             "title": "Agent Card"
           },
           "state": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/ProviderDeploymentState"
-              },
-              {
-                "$ref": "#/components/schemas/UnmanagedState"
-              }
-            ],
-            "title": "State"
-          },
-          "last_error": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/ProviderErrorMessage"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "missing_configuration": {
-            "items": {
-              "$ref": "#/components/schemas/EnvVar"
-            },
-            "type": "array",
-            "title": "Missing Configuration"
-          },
-          "type": {
-            "$ref": "#/components/schemas/ProviderType",
-            "readOnly": true
-          },
-          "managed": {
-            "type": "boolean",
-            "title": "Managed",
-            "readOnly": true
-          },
-          "env": {
-            "items": {
-              "$ref": "#/components/schemas/EnvVar"
-            },
-            "type": "array",
-            "title": "Env",
-            "readOnly": true
+            "$ref": "#/components/schemas/ProviderState",
+            "default": "online"
           }
         },
-        "additionalProperties": true,
         "type": "object",
         "required": [
           "source",
           "id",
           "origin",
           "created_by",
-          "agent_card",
-          "state",
-          "type",
-          "managed",
-          "env"
+          "agent_card"
         ],
-        "title": "ProviderWithStateResponse"
+        "title": "ProviderResponse"
       },
-      "agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__3": {
+      "adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__3": {
         "properties": {
           "source": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/DockerImageProviderLocation"
-              },
-              {
-                "$ref": "#/components/schemas/NetworkProviderLocation"
-              }
-            ],
-            "title": "Source"
+            "$ref": "#/components/schemas/NetworkProviderLocation"
           },
           "id": {
             "type": "string",
             "format": "uuid",
             "title": "Id"
           },
-          "auto_stop_timeout": {
-            "type": "string",
-            "format": "duration",
-            "title": "Auto Stop Timeout",
-            "default": "PT20M"
+          "source_type": {
+            "$ref": "#/components/schemas/SourceType",
+            "default": "api"
           },
           "origin": {
             "type": "string",
             "title": "Origin"
-          },
-          "version_info": {
-            "$ref": "#/components/schemas/VersionInfo"
-          },
-          "registry": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/GithubRegistryLocation"
-              },
-              {
-                "$ref": "#/components/schemas/NetworkRegistryLocation"
-              },
-              {
-                "$ref": "#/components/schemas/FileSystemRegistryLocation"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Registry"
           },
           "created_at": {
             "type": "string",
@@ -10354,67 +8779,21 @@
             "title": "Agent Card"
           },
           "state": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/ProviderDeploymentState"
-              },
-              {
-                "$ref": "#/components/schemas/UnmanagedState"
-              }
-            ],
-            "title": "State"
-          },
-          "last_error": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/ProviderErrorMessage"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "missing_configuration": {
-            "items": {
-              "$ref": "#/components/schemas/EnvVar"
-            },
-            "type": "array",
-            "title": "Missing Configuration"
-          },
-          "type": {
-            "$ref": "#/components/schemas/ProviderType",
-            "readOnly": true
-          },
-          "managed": {
-            "type": "boolean",
-            "title": "Managed",
-            "readOnly": true
-          },
-          "env": {
-            "items": {
-              "$ref": "#/components/schemas/EnvVar"
-            },
-            "type": "array",
-            "title": "Env",
-            "readOnly": true
+            "$ref": "#/components/schemas/ProviderState",
+            "default": "online"
           }
         },
-        "additionalProperties": true,
         "type": "object",
         "required": [
           "source",
           "id",
           "origin",
           "created_by",
-          "agent_card",
-          "state",
-          "type",
-          "managed",
-          "env"
+          "agent_card"
         ],
-        "title": "ProviderWithStateResponse"
+        "title": "ProviderResponse"
       },
-      "agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__4": {
+      "adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__4": {
         "properties": {
           "id": {
             "type": "string",
@@ -10495,7 +8874,7 @@
         ],
         "title": "ModelProviderResponse"
       },
-      "agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__5": {
+      "adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__5": {
         "properties": {
           "id": {
             "type": "string",
@@ -10576,7 +8955,7 @@
         ],
         "title": "ModelProviderResponse"
       },
-      "agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__6": {
+      "adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__6": {
         "properties": {
           "id": {
             "type": "string",
@@ -10625,7 +9004,7 @@
         ],
         "title": "SystemConfigurationResponse"
       },
-      "agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__7": {
+      "adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__7": {
         "properties": {
           "id": {
             "type": "string",
@@ -10674,7 +9053,7 @@
         ],
         "title": "SystemConfigurationResponse"
       },
-      "agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__8": {
+      "adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__8": {
         "properties": {
           "id": {
             "type": "string",
@@ -10749,7 +9128,7 @@
         ],
         "title": "FileResponse"
       },
-      "agentstack_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__9": {
+      "adk_server__api__schema__common__EntityModel____class_getitem_____locals___ModelOutput__9": {
         "properties": {
           "id": {
             "type": "string",

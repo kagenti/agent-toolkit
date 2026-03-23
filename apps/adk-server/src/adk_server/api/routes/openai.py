@@ -1,4 +1,4 @@
-# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ import fastapi
 import openai.types.chat
 from fastapi import Depends
 
-from adk_server.api.constants import AGENTSTACK_PROXY_VERSION
+from adk_server.api.constants import ADK_PROXY_VERSION
 from adk_server.api.dependencies import (
     ModelProviderServiceDependency,
     RequiresPermissions,
@@ -52,7 +52,7 @@ async def create_chat_completion(
                 estimated_cost = estimate_llm_cost(chunk)
                 total_estimated_cost += estimated_cost
                 await user_rate_limiter.hit(RateLimit.OPENAI_CHAT_COMPLETION_TOKENS, cost=estimated_cost)
-                yield json.dumps(chunk.model_dump(mode="json") | {"agentstack_proxy_version": AGENTSTACK_PROXY_VERSION})
+                yield json.dumps(chunk.model_dump(mode="json") | {"adk_proxy_version": ADK_PROXY_VERSION})
 
             if chunk and chunk.usage and (total_cost := chunk.usage.total_tokens) and total_estimated_cost < total_cost:
                 await user_rate_limiter.hit(
@@ -67,7 +67,7 @@ async def create_chat_completion(
     response = await model_provider_service.create_chat_completion(request=request)
     cost = max(response.usage.total_tokens - request_cost, 0) if response.usage else estimate_llm_cost(response)
     await user_rate_limiter.hit(RateLimit.OPENAI_CHAT_COMPLETION_TOKENS, cost=cost)
-    return response.model_dump(mode="json") | {"agentstack_proxy_version": AGENTSTACK_PROXY_VERSION}
+    return response.model_dump(mode="json") | {"adk_proxy_version": ADK_PROXY_VERSION}
 
 
 @router.post("/embeddings")
@@ -80,7 +80,7 @@ async def create_embedding(
     cost = len(request.input) if isinstance(request.input, list) else 1
     await user_rate_limiter.hit(RateLimit.OPENAI_EMBEDDING_ITEMS, cost=cost)
     result = await model_provider_service.create_embedding(request=request)
-    return result.model_dump(mode="json") | {"agentstack_proxy_version": AGENTSTACK_PROXY_VERSION}
+    return result.model_dump(mode="json") | {"adk_proxy_version": ADK_PROXY_VERSION}
 
 
 @router.get("/models")

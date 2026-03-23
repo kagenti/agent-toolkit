@@ -1,4 +1,4 @@
-# Copyright 2025 © BeeAI a Series of LF Projects, LLC
+# Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
 
 from __future__ import annotations
@@ -27,7 +27,7 @@ async def build_agent(
     context: typing.Annotated[str, typer.Argument(help="Docker build context (path or URL)")] = ".",
     dockerfile: typing.Annotated[str | None, typer.Option("-f", "--dockerfile", help="Dockerfile path")] = None,
     tag: typing.Annotated[str | None, typer.Option("-t", "--tag", help="Image tag (default: auto-generated)")] = None,
-    vm_name: typing.Annotated[str, typer.Option(hidden=True)] = "agentstack",
+    vm_name: typing.Annotated[str, typer.Option(hidden=True)] = "adk",
     verbose: typing.Annotated[bool, typer.Option("-v", "--verbose", help="Show verbose output")] = False,
 ) -> None:
     """Build an agent image locally and push it to the platform registry. [Local only]"""
@@ -50,7 +50,7 @@ async def build_agent(
         # Full image ref for cluster-internal use (pod specs)
         cluster_ref = f"{REGISTRY_INTERNAL}/{image_name}"
         # Local docker build tag
-        build_tag = f"localhost/agentstack/{image_name}"
+        build_tag = f"localhost/adk/{image_name}"
 
         # Build the image
         await run_command(

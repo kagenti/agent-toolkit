@@ -2,9 +2,9 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "agentstack.fullname" . }}
+  name: {{ include "kagenti-adk.fullname" . }}
   labels:
-    {{- include "agentstack.labels" . | nindent 4 }}
+    {{- include "kagenti-adk.labels" . | nindent 4 }}
   {{- with .Values.server.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -35,7 +35,7 @@ spec:
             {{- end }}
             backend:
               service:
-                name: agentstack-ui-svc
+                name: adk-ui-svc
                 port:
                   number: {{ $.Values.ui.service.port }}
           {{- end }}

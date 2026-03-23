@@ -1,0 +1,18 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import type { PropsWithChildren } from 'react';
+
+import classes from './SignInLayout.module.scss';
+
+export function SignInLayout({ children }: PropsWithChildren) {
+  return (
+    <div className={classes.root}>
+      <main className={classes.main} data-route-transition>
+        {children}
+      </main>
+    </div>
+  );
+}

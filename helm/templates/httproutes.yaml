@@ -8,7 +8,7 @@ metadata:
   name: {{ .Release.Name }}-ui
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "agentstack.labels" . | nindent 4 }}
+    {{- include "kagenti-adk.labels" . | nindent 4 }}
 spec:
   parentRefs:
     - name: {{ .Values.gateway.parentRef.name }}
@@ -17,7 +17,7 @@ spec:
     - {{ $uiHost | quote }}
   rules:
     - backendRefs:
-        - name: agentstack-ui-svc
+        - name: adk-ui-svc
           port: {{ .Values.ui.service.port }}
 
 ---
@@ -27,7 +27,7 @@ metadata:
   name: {{ .Release.Name }}-api
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "agentstack.labels" . | nindent 4 }}
+    {{- include "kagenti-adk.labels" . | nindent 4 }}
 spec:
   parentRefs:
     - name: {{ .Values.gateway.parentRef.name }}

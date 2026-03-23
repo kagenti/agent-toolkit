@@ -1,0 +1,44 @@
+/**
+ * Copyright 2026 © IBM Corp.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import type { FormRender } from '@kagenti/adk';
+
+import { Container } from '#components/layouts/Container.tsx';
+import { FormRenderer } from '#modules/form/components/FormRenderer.tsx';
+import type { RunFormValues } from '#modules/form/types.ts';
+
+import { useAgentRun } from '../contexts/agent-run';
+import classes from './FormRenderView.module.scss';
+
+interface Props {
+  formRender: FormRender;
+  onMessageSent?: () => void;
+}
+
+export function FormRenderView({ formRender, onMessageSent }: Props) {
+  const { agent, submitForm } = useAgentRun();
+
+  if (!formRender) {
+    return false;
+  }
+
+  return (
+    <Container size="sm" className={classes.root}>
+      <FormRenderer
+        definition={formRender}
+        showRunSettings
+        onSubmit={(values: RunFormValues) => {
+          onMessageSent?.();
+
+          submitForm({
+            request: formRender,
+            response: values,
+          });
+        }}
+        defaultHeading={agent.ui.user_greeting}
+      />
+    </Container>
+  );
+}
