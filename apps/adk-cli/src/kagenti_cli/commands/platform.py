@@ -275,7 +275,7 @@ async def start_cmd(
     with verbosity(verbose):
         version = importlib.metadata.version("kagenti-cli").replace("rc", "-rc")
         arch = "x86_64" if platform_module.machine().lower() in ["x86_64", "amd64"] else "aarch64"
-        Configuration().home.mkdir(exist_ok=True)
+        Configuration().home.mkdir(parents=True, exist_ok=True)
         if Configuration().running_inside_vm:
             console.info("Running inside VM, skipping VM management.")
             await run_command(["sudo", "systemctl", "start", "microshift"], "Starting MicroShift service")
@@ -389,7 +389,7 @@ async def start_cmd(
                                 )
                                 sys.exit(1)
                             await run_command(["wsl.exe", "--shutdown"], "Updating WSL2 networking")
-                    Configuration().home.mkdir(exist_ok=True)
+                    Configuration().home.mkdir(parents=True, exist_ok=True)
                     if await detect_vm_status(vm_name) == "missing":
                         await run_command(
                             ["wsl.exe", "--unregister", vm_name], "Cleaning up remains of previous instance", check=False
