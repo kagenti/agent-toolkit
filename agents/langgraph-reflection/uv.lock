@@ -700,7 +700,7 @@ wheels = [
 
 [[package]]
 name = "kagenti-adk"
-version = "0.8.0rc3"
+version = "0.8.0rc4"
 source = { editable = "../../apps/adk-py" }
 dependencies = [
     { name = "a2a-sdk", extra = ["sqlite"] },
@@ -841,7 +841,7 @@ wheels = [
 
 [[package]]
 name = "langgraph-reflection"
-version = "0.8.0rc3"
+version = "0.8.0rc4"
 source = { editable = "." }
 dependencies = [
     { name = "kagenti-adk" },
