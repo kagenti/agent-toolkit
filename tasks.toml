@@ -133,10 +133,7 @@ run = "true" # Empty tests in case there are no tests
 # platform tasks
 
 ["adk:start"]
-depends = [
-  "adk-server:build",
-  "microshift-vm:build:qemu",
-]
+depends = ["adk-server:build", "microshift-vm:build:qemu"]
 raw = true
 dir = "{{config_root}}"
 run = """
@@ -197,7 +194,7 @@ echo "$TO_STOP" | xargs -rn 1 -I"{}" mise run adk-cli:run -- platform stop --vm-
 ["adk:shell"]
 raw = true
 dir = "{{cwd}}"
-usage = 'flag "--vm-name <vm_name>" default="adk"'
+usage = 'flag "--vm-name <vm_name>" default="kagenti-adk"'
 run = """
 cat <<EOF
 deactivate () {
