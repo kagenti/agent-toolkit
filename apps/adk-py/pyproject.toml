@@ -1,6 +1,6 @@
 [project]
 name = "kagenti-adk"
-version = "0.7.1"
+version = "0.8.0"
 description = "Kagenti ADK"
 readme = "README.md"
 authors = [{ name = "IBM Corp." }]

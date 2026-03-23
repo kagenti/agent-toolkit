@@ -4,8 +4,8 @@ requires-python = "==3.14.*"
 
 [[package]]
 name = "a2a-sdk"
-version = "1.0.0a0.post4.dev0+24f5f1e"
-source = { git = "https://github.com/a2aproject/a2a-python.git?rev=1.0-dev#24f5f1e5c4184a36bb99cff6e7c44db4176b72be" }
+version = "1.0.0a0"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "google-api-core" },
     { name = "googleapis-common-protos" },
@@ -14,6 +14,10 @@ dependencies = [
     { name = "json-rpc" },
     { name = "protobuf" },
     { name = "pydantic" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/77/e3/e0d0b93877dc7d7ad45d59f82a254664e8d78f35fe20c8cd8584eb9bcba0/a2a_sdk-1.0.0a0.tar.gz", hash = "sha256:83ee525015b8577091750ea823af1afe41ccf350789539e421b0ab06d3622eb2", size = 343086, upload-time = "2026-03-17T14:11:04.071Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/97/f7/673b61a8272c9d36baf9df7169a784e6eda214a830569e9f0c3e442d75bb/a2a_sdk-1.0.0a0-py3-none-any.whl", hash = "sha256:a062e00a00d0fffcdd4325c36392dff27bf0e9ef99a6a6d35344c08676ca45c4", size = 225939, upload-time = "2026-03-17T14:11:02.672Z" },
 ]
 
 [package.optional-dependencies]
@@ -439,7 +443,7 @@ wheels = [
 
 [[package]]
 name = "form"
-version = "0.7.1"
+version = "0.8.0"
 source = { editable = "." }
 dependencies = [
     { name = "kagenti-adk" },
@@ -805,7 +809,7 @@ wheels = [
 
 [[package]]
 name = "kagenti-adk"
-version = "0.7.1"
+version = "0.8.0"
 source = { editable = "../../apps/adk-py" }
 dependencies = [
     { name = "a2a-sdk", extra = ["sqlite"] },
@@ -834,7 +838,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "a2a-sdk", extras = ["sqlite"], git = "https://github.com/a2aproject/a2a-python.git?rev=1.0-dev" },
+    { name = "a2a-sdk", extras = ["sqlite"], specifier = "==1.0.0a0" },
     { name = "anyio", specifier = ">=4.9.0" },
     { name = "async-lru", specifier = ">=2.0.4" },
     { name = "asyncclick", specifier = ">=8.1.8" },

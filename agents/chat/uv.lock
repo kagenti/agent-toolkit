@@ -302,7 +302,7 @@ wheels = [
 
 [[package]]
 name = "chat"
-version = "0.7.1"
+version = "0.8.0"
 source = { editable = "." }
 dependencies = [
     { name = "beeai-framework", extra = ["a2a", "duckduckgo", "wikipedia"] },
@@ -848,7 +848,7 @@ wheels = [
 
 [[package]]
 name = "kagenti-adk"
-version = "0.7.1"
+version = "0.8.0"
 source = { editable = "../../apps/adk-py" }
 dependencies = [
     { name = "a2a-sdk" },
