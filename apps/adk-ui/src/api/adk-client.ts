@@ -19,7 +19,7 @@ function buildAuthenticatedAdkClient() {
     const request = new Request(url, init);
 
     if (isAuthEnabled) {
-      const token = await ensureToken(request);
+      const token = await ensureToken();
 
       if (token?.accessToken) {
         request.headers.set('Authorization', `Bearer ${token.accessToken}`);

@@ -58,7 +58,6 @@ packages:
   - apps/adk-ts
   # TODO: Uncomment, when published to npm
   # - apps/adk-ts/examples/chat-ui
-  - apps/keycloak-theme
   - docs
 
 catalog:

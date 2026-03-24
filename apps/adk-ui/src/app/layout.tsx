@@ -11,7 +11,7 @@ import { connection } from 'next/server';
 import { AppProvider } from '#contexts/App/AppProvider.tsx';
 import { runtimeConfig } from '#contexts/App/runtime-config.ts';
 import Providers from '#providers.tsx';
-import { APP_FAVICON_SVG, APP_FAVICON_SVG_DARK, BASE_PATH, THEME_STORAGE_KEY } from '#utils/constants.ts';
+import { THEME_STORAGE_KEY } from '#utils/constants.ts';
 
 const darkModeScript = `
 (() => {
@@ -32,14 +32,8 @@ const darkModeScript = `
 })();
 `;
 
-const icon = `${BASE_PATH}${APP_FAVICON_SVG}`;
-const darkIcon = `${BASE_PATH}${APP_FAVICON_SVG_DARK}`;
-
 export const metadata: Metadata = {
   title: runtimeConfig.appName,
-  icons: {
-    icon: [{ url: icon }, { url: darkIcon, media: '(prefers-color-scheme: dark)' }],
-  },
 };
 
 export default async function RootLayout({

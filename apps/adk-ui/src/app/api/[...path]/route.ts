@@ -39,7 +39,7 @@ async function handler(request: NextRequest, context: RouteContext) {
       return;
     }
 
-    const token = await ensureToken(request);
+    const token = await ensureToken();
 
     if (!token?.accessToken) {
       return new NextResponse('Unauthorized', { status: 401 });

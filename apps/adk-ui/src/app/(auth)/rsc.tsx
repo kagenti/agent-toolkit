@@ -16,7 +16,7 @@ import { routes } from '#utils/router.ts';
 
 import { auth, AUTH_COOKIE_NAME, AUTH_SECRET } from './auth';
 
-export async function ensureToken(request: Request) {
+export async function ensureToken() {
   const { isAuthEnabled } = runtimeConfig;
 
   if (!isAuthEnabled) {
@@ -28,13 +28,12 @@ export async function ensureToken(request: Request) {
     return null;
   }
 
-  // Ensure we have auth cookie, because it's not included in RSC requests
-  if (!request.headers.get('cookie')?.includes(`${AUTH_COOKIE_NAME}=`)) {
-    const cookieStore = await cookies();
-    request.headers.set('cookie', cookieStore.toString());
-  }
+  const cookieStore = await cookies();
+  const cookieHeader = cookieStore.toString();
+  // Synthetic request with cookies from next/headers — getToken only reads cookies, not the URL
+  const req = new Request('https://n', { headers: { cookie: cookieHeader } });
 
-  const token = await getToken({ req: request, cookieName: AUTH_COOKIE_NAME, secret: AUTH_SECRET });
+  const token = await getToken({ req, cookieName: AUTH_COOKIE_NAME, secret: AUTH_SECRET });
 
   return token;
 }

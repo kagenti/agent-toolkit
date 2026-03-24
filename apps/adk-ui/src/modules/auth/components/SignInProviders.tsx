@@ -3,25 +3,29 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { redirect } from 'next/navigation';
-import { AuthError } from 'next-auth';
-
 import { auth, getProvider, signIn } from '#app/(auth)/auth.ts';
 import type { ThemePreference } from '#contexts/Theme/theme-context.ts';
 import { routes } from '#utils/router.ts';
 
 import { AuthErrorPage } from './AuthErrorPage';
 import { AutoSignIn } from './AutoSignIn';
+import { SignInError } from './SignInError';
 
 interface Props {
   callbackUrl?: string;
+  error?: string;
 }
 
 const authProvider = getProvider();
 
-export async function SignInProviders({ callbackUrl = routes.home() }: Props) {
+export async function SignInProviders({ callbackUrl = routes.home(), error }: Props) {
   if (!authProvider) {
     return null;
+  }
+
+  if (error) {
+    const message = AUTH_ERROR_MESSAGES[error] ?? 'An unexpected authentication error occurred. Please try again.';
+    return <SignInError message={message} callbackUrl={callbackUrl} />;
   }
 
   const session = await auth();
@@ -44,11 +48,16 @@ async function handleSignIn(
     await signIn(providerId, { redirectTo }, { kc_theme: theme });
   } catch (error) {
     // Sign-in can fail for a number of reasons, such as the user not existing, or the user not having the correct role.
-    // In some cases, you may want to redirect to a custom error.
-    if (error instanceof AuthError) {
-      return redirect(routes.error({ error }));
-    }
-
+    // NextAuth redirects to the error page for auth errors (e.g. Configuration when the provider is unreachable).
+    // Re-throw to let Next.js handle the redirect.
     throw error;
   }
 }
+
+
+const AUTH_ERROR_MESSAGES: Record<string, string> = {
+  Configuration:
+    'Unable to connect to the identity provider. Please verify that the authentication service is running and correctly configured.',
+  IdentityProviderUnavailable:
+    'Unable to connect to the identity provider. Please verify that the authentication service is running and try again.',
+};
