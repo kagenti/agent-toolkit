@@ -12,11 +12,10 @@ case "${KAGENTI_ADK_VERSION:-latest}" in "latest") KAGENTI_ADK_VERSION=$LATEST_S
 
 # This gets updated by Renovate:
 # renovate: datasource=python-version depName=python
-PYTHON_VERSION=3.13
-case "$KAGENTI_ADK_VERSION" in 0.7.*) PYTHON_VERSION=3.14 ;; esac
+PYTHON_VERSION=3.14
 
 error() {
-    printf "\n💥 \033[31mERROR:\033[0m: Kagenti ADK installation has failed. Please report the above error: https://github.com/kagenti/adk/issues\n" >&2
+    printf "\n💥 \033[31mERROR:\033[0m: Kagenti ADK CLI installation has failed. Please report the above error: https://github.com/kagenti/adk/issues\n" >&2
     exit 1
 }
 
@@ -24,7 +23,7 @@ echo "Starting the Kagenti ADK installer..."
 
 # Check if running as root (not supported)
 if [ "$(id -u)" = "0" ]; then
-    printf "\n💥 \033[31mERROR:\033[0m: Kagenti ADK should not be installed as root. Please run as a regular user.\n" >&2
+    printf "\n💥 \033[31mERROR:\033[0m: Kagenti ADK CLI should not be installed as root. Please run as a regular user.\n" >&2
     exit 1
 fi
 
@@ -49,17 +48,13 @@ uv python install --quiet --python-preference=only-managed --no-bin $PYTHON_VERS
 # Separately uninstall potential old versions to remove envs created with wrong Python versions
 # Also remove obsolete version from Homebrew and any local executables potentially left behind by Homebrew or old uv versions
 echo "Removing old versions..."
-uv tool uninstall --quiet kagenti-adk >/dev/null 2>&1 || true
-uv tool uninstall --quiet agentstack-cli >/dev/null 2>&1 || true
-uv tool uninstall --quiet beeai-cli >/dev/null 2>&1 || true
-brew uninstall beeai >/dev/null 2>&1 || true
-while command -v beeai >/dev/null && rm $(command -v beeai); do true; done
+uv tool uninstall --quiet kagenti-cli >/dev/null 2>&1 || true
 
 # Install kagenti-adk using a uv-managed Python version
 # We set the version to error out on platforms incompatible with the latest version
 # It also avoids accidentally installing prereleases of dependencies by only allowing explicitly set ones
 echo "Installing Kagenti ADK CLI..."
-uv tool install --quiet --python-preference=only-managed --python=$PYTHON_VERSION --refresh --prerelease if-necessary-or-explicit --with "kagenti-adk==$KAGENTI_ADK_VERSION" "kagenti-cli==$KAGENTI_ADK_VERSION" --force || error
+uv tool install --quiet --python-preference=only-managed --python=$PYTHON_VERSION --refresh --prerelease allow --with "kagenti-adk==$KAGENTI_ADK_VERSION" "kagenti-cli==$KAGENTI_ADK_VERSION" --force || error
 
 # Finish set up using CLI (install QEMU on Linux, start platform, set up API keys, run UI, ...)
 kagenti-adk self install
