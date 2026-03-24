@@ -9,8 +9,7 @@ import importlib.metadata
 import pathlib
 import re
 import sys
-import typing
-from collections.abc import AsyncIterator
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
 import pydantic
@@ -61,7 +60,7 @@ class Configuration(pydantic_settings.BaseSettings):
         return AuthManager(self.auth_file)
 
     @asynccontextmanager
-    async def use_platform_client(self) -> AsyncIterator[PlatformClient]:
+    async def use_platform_client(self) -> AsyncGenerator[PlatformClient]:
         if self.auth_manager.active_server is None:
             console.error("No server selected.")
             console.hint(
@@ -92,11 +91,3 @@ class Configuration(pydantic_settings.BaseSettings):
             base_url=(self.auth_manager.active_server or "") + "/",
         ) as client:
             yield client
-
-    @pydantic.model_validator(mode="after")
-    def _check_old_home(self) -> typing.Self:
-        for old_path in [pathlib.Path.home() / ".kagenti", pathlib.Path.home() / ".adk"]:
-            if old_path.exists() and not self.home.exists():
-                self.home.parent.mkdir(parents=True, exist_ok=True)
-                old_path.rename(self.home)
-        return self
