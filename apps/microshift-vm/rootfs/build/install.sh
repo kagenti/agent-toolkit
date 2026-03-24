@@ -47,7 +47,6 @@ systemctl stop crio
 if [ -z "${CI:-}" ]; then
     printf '#!/bin/sh\nexec sudo podman "$@"\n' > /usr/local/bin/docker
     chmod +x /usr/local/bin/docker
-    echo 'export KAGENTI_ADK_RUNNING_INSIDE_VM=true' > /etc/profile.d/adk-vm.sh
     echo "deb [trusted=yes] https://mise.jdx.dev/deb stable main" | sudo tee /etc/apt/sources.list.d/mise.list
     apt-get update -y -q
     apt-get install -y -q --no-install-recommends \
@@ -93,3 +92,58 @@ if [ -n "${CI:-}" ]; then
     find /usr/share/locale -mindepth 1 -maxdepth 1 ! -name 'en*' -exec rm -rf {} +
     find /var/log -type f -exec truncate -s 0 {} +
 fi
+
+ARTIFACTS=/build/artifacts
+STAGING=/build/staging
+mkdir -p "$ARTIFACTS" "$STAGING/rootfs"
+trap 'rm -rf "$STAGING"' EXIT
+tar -cf - \
+    --exclude=./boot \
+    --exclude=./build \
+    --exclude=./dev \
+    --exclude=./etc/cloud \
+    --exclude=./etc/ssh/ssh_host_* \
+    --exclude=./home \
+    --exclude=./lib/firmware \
+    --exclude=./lib/modules \
+    --exclude=./lost+found \
+    --exclude=./media \
+    --exclude=./mnt \
+    --exclude=./proc \
+    --exclude=./run \
+    --exclude=./sys \
+    --exclude=./tmp \
+    --exclude=./var/lib/cloud \
+    --numeric-owner \
+    -C / . | tar -xf - -C "$STAGING/rootfs"
+truncate -s 0 "$STAGING/rootfs/etc/fstab"
+for svc in systemd-tmpfiles-setup.service systemd-tmpfiles-clean.service tmp.mount systemd-tmpfiles-setup-dev-early.service systemd-tmpfiles-setup-dev.service; do
+  ln -sf /dev/null "$STAGING/rootfs/etc/systemd/system/$svc"
+done
+
+cat > "$STAGING/rootfs/etc/systemd/network/eth0.network" <<NET
+[Match]
+Name=eth0
+
+[Network]
+DHCP=true
+NET
+
+cat > "$STAGING/metadata.yaml" <<YAML
+architecture: $(uname -m | sed -e 's/aarch64/arm64/;s/x86_64/amd64/')
+creation_date: $(date +%s)
+properties:
+  description: MicroShift Kubernetes VM (Debian 13) for Incus
+  os: debian
+  release: trixie
+  variant: microshift
+YAML
+tar -cf - --numeric-owner -C "$STAGING" metadata.yaml rootfs | gzip > "$ARTIFACTS/incus.tar.gz"
+ 
+rm -f "$STAGING/rootfs/etc/resolv.conf" "$STAGING/rootfs/etc/systemd/network/eth0.network"
+for svc in systemd-resolved.service systemd-networkd.service NetworkManager.service; do
+  ln -sf /dev/null "$STAGING/rootfs/etc/systemd/system/$svc"
+done
+cp /build/wsl.conf "$STAGING/rootfs/etc/wsl.conf"
+cp /build/wsl-distribution.conf "$STAGING/rootfs/etc/wsl-distribution.conf"
+tar -cf - --numeric-owner -C "$STAGING/rootfs" . | gzip > "$ARTIFACTS/rootfs.wsl"

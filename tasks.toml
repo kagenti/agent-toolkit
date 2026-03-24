@@ -133,7 +133,10 @@ run = "true" # Empty tests in case there are no tests
 # platform tasks
 
 ["adk:start"]
-depends = ["adk-server:build", "microshift-vm:build:qemu"]
+depends = [
+  "adk-server:build",
+  "microshift-vm:build",
+]
 raw = true
 dir = "{{config_root}}"
 run = """
@@ -145,7 +148,7 @@ if [[ ! "$*" =~ 'ui.enabled=false' ]]; then
     UI_TAG="--set kagenti-adk:ui.image.tag=local"
 fi
 
-if [[ -n "${KAGENTI_ADK_RUNNING_INSIDE_VM-}" ]]; then
+if [[ -f /etc/adk ]]; then
   PULL_MODE="skip"
 elif [[ -n "${CI-}" ]]; then
   PULL_MODE="hybrid"
@@ -155,7 +158,7 @@ else
   PULL_MODE="host"
 fi
 
-if [[ -z "${KAGENTI_ADK_RUNNING_INSIDE_VM-}" ]]; then
+if [[ ! -f /etc/adk ]]; then
   ARCH=$(uname -m | sed -e 's/arm64/aarch64/' -e 's/amd64/x86_64/')
   LIMA_IMAGE_FLAG="--lima-image={{config_root}}/apps/microshift-vm/dist/$ARCH/microshift-vm-$ARCH.qcow2"
 fi
@@ -552,7 +555,7 @@ brew upgrade mise || mise self-update || true
 
 ["yolobox"]
 dir = "{{ config_root }}"
-depends = ["microshift-vm:build:qemu"]
+depends = ["microshift-vm:build"]
 usage = 'arg "[name]"'
 run = '''
 #!/usr/bin/env bash

@@ -62,8 +62,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: mise run test
 
-  microshift-vm-build-qemu:
-    name: mise microshift-vm:build:qemu
+  microshift-vm-build:
+    name: mise microshift-vm:build
     needs: setup
     timeout-minutes: 10
     runs-on: ubuntu-latest
@@ -83,14 +83,14 @@ jobs:
           install_vm_deps: "build"
           save_cache: "true"
       - if: steps.cache-check.outputs.cache-hit != 'true'
-        run: mise run microshift-vm:build:qemu
+        run: mise run microshift-vm:build
 
   adk-server-test-integration:
     name: mise adk-server:test:integration
-    needs: [setup, microshift-vm-build-qemu]
+    needs: [setup, microshift-vm-build]
     if: >-
       always() &&
-      needs.microshift-vm-build-qemu.result != 'failure' &&
+      needs.microshift-vm-build.result != 'failure' &&
       (needs.setup.outputs.adk-server == 'true' ||
       needs.setup.outputs.adk-cli == 'true')
     timeout-minutes: 45
@@ -125,10 +125,10 @@ jobs:
 
   adk-server-test-e2e:
     name: mise adk-server:test:e2e
-    needs: [setup, microshift-vm-build-qemu]
+    needs: [setup, microshift-vm-build]
     if: >-
       always() &&
-      needs.microshift-vm-build-qemu.result != 'failure' &&
+      needs.microshift-vm-build.result != 'failure' &&
       (needs.setup.outputs.adk-server == 'true' ||
       needs.setup.outputs.adk-cli == 'true' ||
       needs.setup.outputs.adk-py == 'true' ||
@@ -156,10 +156,10 @@ jobs:
 
   adk-server-test-e2e-examples:
     name: mise adk-server:test:e2e-examples
-    needs: [setup, microshift-vm-build-qemu]
+    needs: [setup, microshift-vm-build]
     if: >-
       always() &&
-      needs.microshift-vm-build-qemu.result != 'failure' &&
+      needs.microshift-vm-build.result != 'failure' &&
       (needs.setup.outputs.adk-server == 'true' ||
       needs.setup.outputs.adk-py == 'true' ||
       needs.setup.outputs.examples == 'true' ||
