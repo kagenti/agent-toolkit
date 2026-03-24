@@ -22,7 +22,6 @@ from adk_server.configuration import (
     AuthConfiguration,
     Configuration,
     RateLimitConfiguration,
-    RedisConfiguration,
     RoleBasedRateLimitConfiguration,
     RoleRateLimits,
 )
@@ -38,7 +37,7 @@ pytestmark = pytest.mark.integration
 
 @pytest.fixture
 def redis_config():
-    return RedisConfiguration(enabled=True)
+    return Configuration().redis.model_copy(update={"enabled": True})
 
 
 @pytest.fixture

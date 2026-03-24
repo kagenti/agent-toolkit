@@ -468,8 +468,21 @@ VM_NAME=integration-test-run
 
 eval "$( {{ mise_bin }} run adk:shell --vm-name="$VM_NAME" )"
 
-{{ mise_bin }} run adk-server:dev:disconnect --vm-name="$VM_NAME"
-{{ mise_bin }} run adk-server:dev:connect --vm-name="$VM_NAME"
+NAMESPACE=kagenti-adk
+
+echo "Waiting for adk-server deployment to be ready (runs DB migrations on startup)..."
+kubectl wait -n "$NAMESPACE" --for=condition=available --timeout=300s deployment/adk-server
+
+kubectl port-forward -n "$NAMESPACE" svc/postgresql 5432:5432 2>/dev/null 1>&2 &
+kubectl port-forward -n "$NAMESPACE" svc/redis 6379:6379 2>/dev/null 1>&2 &
+
+export DB_URL="postgresql+asyncpg://adk-user:password@localhost:5432/adk"
+export PERSISTENCE__DB_URL="postgresql+asyncpg://adk-user:password@localhost:5432/adk"
+export REDIS__HOST="localhost"
 
 uv run pytest -m integration
+result=$?
+
+kill %1 %2 2>/dev/null || true
+exit $result
 """
