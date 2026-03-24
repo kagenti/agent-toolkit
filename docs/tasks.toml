@@ -47,7 +47,6 @@ source "$TMPDIR/venv/bin/activate"
 uv pip install --quiet \
   apps/adk-py/dist/kagenti_adk-*.whl \
   langchain_text_splitters \
-  beeai-framework \
   openai \
   pyrefly
 
