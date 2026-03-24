@@ -32,7 +32,10 @@ dev = ["pyrefly>=0.52.0", "pytest>=9.0.2", "ruff>=0.14.14", "wheel>=0.46.3"]
 kagenti-adk = { path = "../adk-py", editable = true }
 
 [project.scripts]
+kagenti-cli = "kagenti_cli:app"
 kagenti-adk = "kagenti_cli:app"
+kagenti = "kagenti_cli:app"
+adk = "kagenti_cli:app"
 
 [build-system]
 requires = ["uv_build>=0.10.0,<0.11.0"]
