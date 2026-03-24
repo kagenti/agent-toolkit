@@ -10,10 +10,6 @@ uv = "latest"
 nodejs = "24"
 pnpm = "10"
 
-# Java
-java = "21"
-maven = "latest"
-
 # Kubernetes
 helm = "latest"
 kubeconform = "latest"
