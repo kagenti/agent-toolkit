@@ -190,7 +190,7 @@ async def upgrade(
 
     with verbosity(verbose=verbose):
         await run_command(
-            ["uv", "tool", "install", "--force", "kagenti-cli"],
+            ["uv", "tool", "install", "--force", "kagenti-cli@latest"],
             "Upgrading kagenti-cli",
             env={"PATH": _path()},
         )
