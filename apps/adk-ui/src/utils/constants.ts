@@ -7,10 +7,6 @@ export const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
 
 export const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000';
 
-export const APP_FAVICON_SVG = process.env.NEXT_PUBLIC_APP_FAVICON_SVG ?? '/favicon.svg';
-
-export const APP_FAVICON_SVG_DARK = process.env.NEXT_PUBLIC_APP_FAVICON_SVG_DARK ?? '/favicon-dark.svg';
-
 export const API_URL = process.env.API_URL ?? 'http://adk-api.localtest.me:8080';
 
 export const PROD_MODE = process.env.NODE_ENV === 'production';
