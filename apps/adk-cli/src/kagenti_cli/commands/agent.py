@@ -22,6 +22,7 @@ from a2a.types import (
     Message,
     Part,
     Role,
+    SendMessageRequest,
     TaskState,
 )
 from google.protobuf.json_format import MessageToDict
@@ -39,8 +40,17 @@ from kagenti_adk.a2a.extensions import (
     LLMServiceExtensionSpec,
     PlatformApiExtensionClient,
     PlatformApiExtensionSpec,
-    TrajectoryExtensionClient,
+    Trajectory,
     TrajectoryExtensionSpec,
+)
+from kagenti_adk.a2a.extensions.streaming import (
+    ArtifactDelta,
+    MetadataDelta,
+    PartDelta,
+    StateChange,
+    StreamingExtensionClient,
+    StreamingExtensionSpec,
+    TextDelta,
 )
 from kagenti_adk.a2a.extensions.common.form import (
     CheckboxField,
@@ -92,7 +102,7 @@ import typer
 from rich.markdown import Markdown
 from rich.table import Column
 
-from kagenti_cli.api import a2a_client
+from kagenti_cli.api import a2a_client, make_extension_context
 from kagenti_cli.async_typer import AsyncTyper, console, create_table, err_console
 from kagenti_cli.server_utils import announce_server_action, confirm_server_action
 from kagenti_cli.utils import (
@@ -694,9 +704,9 @@ async def _run_agent(
     console_status_stopped = False
 
     log_type = None
+    pending_form_metadata = None
 
-    trajectory_spec = TrajectoryExtensionSpec.from_agent_card(agent_card)
-    trajectory_extension = TrajectoryExtensionClient(trajectory_spec) if trajectory_spec else None
+    has_trajectory = TrajectoryExtensionSpec.from_agent_card(agent_card) is not None
     llm_spec = LLMServiceExtensionSpec.from_agent_card(agent_card)
     embedding_spec = EmbeddingServiceExtensionSpec.from_agent_card(agent_card)
     platform_extension_spec = PlatformApiExtensionSpec.from_agent_card(agent_card)
@@ -787,30 +797,39 @@ async def _run_agent(
         metadata=metadata,
     )
 
-    stream = client.send_message(msg)  # pyrefly: ignore [bad-argument-type]
+    streaming_spec = StreamingExtensionSpec.from_agent_card(agent_card)
+    streaming = StreamingExtensionClient(streaming_spec or StreamingExtensionSpec())
+    extension_context = make_extension_context([ext.uri for ext in agent_card.capabilities.extensions or []])
+    stream = client.send_message(SendMessageRequest(message=msg), context=extension_context)
 
     while True:
-        async for response, task in stream:
+        async for delta, task_obj in streaming.stream(stream):
             if not console_status_stopped:
                 console_status_stopped = True
                 console_status.stop()
 
-            task_id = task.id if task else task_id
+            task_id = task_obj.id if task_obj else task_id
 
-            if response.HasField("status_update"):
-                update = response.status_update
-                status = update.status
-                state = status.state
-                message = status.message if status.HasField("message") else None
+            match delta:
+                case TextDelta(delta=text):
+                    if log_type:
+                        err_console.print()
+                        log_type = None
+                    console.print(text, end="")
 
-                if state == TaskState.TASK_STATE_COMPLETED:
-                    console.print()  # Add newline after completion
-                    return
+                case PartDelta(part=part):
+                    if log_type:
+                        err_console.print()
+                        log_type = None
+                    if "text" in part:
+                        console.print(part["text"], end="")
 
-                elif state in (TaskState.TASK_STATE_WORKING, TaskState.TASK_STATE_SUBMITTED):
-                    # Handle streaming content during working state
-                    if message:
-                        if trajectory_extension and (trajectory := trajectory_extension.parse_server_metadata(message)):
+                case MetadataDelta(metadata=meta):
+                    if FormRequestExtensionSpec.URI in meta:
+                        pending_form_metadata = meta[FormRequestExtensionSpec.URI]
+                    if has_trajectory and TrajectoryExtensionSpec.URI in meta:
+                        for entry in meta[TrajectoryExtensionSpec.URI]:
+                            trajectory = Trajectory.model_validate(entry)
                             if update_kind := trajectory.title:
                                 if update_kind != log_type:
                                     if log_type is not None:
@@ -818,109 +837,110 @@ async def _run_agent(
                                     err_console.print(f"{update_kind}: ", style="dim", end="")
                                     log_type = update_kind
                                 err_console.print(trajectory.content or "", style="dim", end="")
-                        else:
-                            # This is regular message content
-                            if log_type:
-                                console.print()
-                                log_type = None
-                        for part in message.parts:
-                            if part.HasField("text"):
-                                console.print(part.text, end="")
 
-                elif state == TaskState.TASK_STATE_INPUT_REQUIRED:
-                    if handle_input is None:
-                        raise ValueError("Agent requires input but no input handler provided")
+                case ArtifactDelta(event=artifact_event):
+                    artifact = artifact_event.artifact
+                    if dump_files_path is None:
+                        continue
+                    dump_files_path.mkdir(parents=True, exist_ok=True)
+                    full_path = dump_files_path / (artifact.name or "unnamed").lstrip("/")
+                    full_path.resolve().relative_to(dump_files_path.resolve())
+                    full_path.parent.mkdir(parents=True, exist_ok=True)
+                    try:
+                        for part in artifact.parts[:1]:
+                            if part.HasField("raw"):
+                                full_path.write_bytes(part.raw)
+                                console.print(f"📁 Saved {full_path}")
+                            elif part.HasField("url"):
+                                uri = part.url
+                                if uri.startswith("agentstack://"):
+                                    async with File.load_content(uri.removeprefix("agentstack://")) as file:
+                                        full_path.write_bytes(file.content)
+                                else:
+                                    async with httpx.AsyncClient() as httpx_client:
+                                        full_path.write_bytes((await httpx_client.get(uri)).content)
+                                console.print(f"📁 Saved {full_path}")
+                            elif part.HasField("text"):
+                                full_path.write_text(part.text)
+                            else:
+                                console.print(f"⚠️ Artifact part {type(part).__name__} is not supported")
+                        if len(artifact.parts) > 1:
+                            console.print("⚠️ Artifact with more than 1 part are not supported.")
+                    except ValueError:
+                        console.print(f"⚠️ Skipping artifact {artifact.name} - outside dump directory")
 
-                    if form_metadata := (
-                        MessageToDict(message.metadata).get(FormRequestExtensionSpec.URI)
-                        if message and message.metadata
-                        else None
-                    ):
-                        stream = client.send_message(
-                            Message(  # pyrefly: ignore [bad-argument-type]
-                                message_id=str(uuid4()),
-                                parts=[],
-                                role=Role.ROLE_USER,
-                                task_id=task_id,
-                                context_id=context_token.context_id,
-                                metadata={
-                                    FormRequestExtensionSpec.URI: (
-                                        await _ask_form_questions(FormRender.model_validate(form_metadata))
-                                    ).model_dump(mode="json")
-                                },
+                case StateChange(state=state):
+                    if log_type:
+                        err_console.print()
+                        log_type = None
+                    if state == TaskState.TASK_STATE_COMPLETED:
+                        console.print()  # Add newline after completion
+                        return
+
+                    elif state in (TaskState.TASK_STATE_WORKING, TaskState.TASK_STATE_SUBMITTED):
+                        pass
+
+                    elif state == TaskState.TASK_STATE_INPUT_REQUIRED:
+                        if handle_input is None:
+                            raise ValueError("Agent requires input but no input handler provided")
+
+                        if pending_form_metadata:
+                            stream = client.send_message(
+                                SendMessageRequest(
+                                    message=Message(
+                                        message_id=str(uuid4()),
+                                        parts=[],
+                                        role=Role.ROLE_USER,
+                                        task_id=task_id,
+                                        context_id=context_token.context_id,
+                                        metadata={
+                                            FormRequestExtensionSpec.URI: (
+                                                await _ask_form_questions(
+                                                    FormRender.model_validate(pending_form_metadata)
+                                                )
+                                            ).model_dump(mode="json")
+                                        },
+                                    )
+                                ),
+                                context=extension_context,
                             )
+                            pending_form_metadata = None
+                            break
+
+                        console.print("\n[bold]Agent requires your input[/bold]\n")
+                        user_input = handle_input()
+                        stream = client.send_message(
+                            SendMessageRequest(
+                                message=Message(
+                                    message_id=str(uuid4()),
+                                    parts=[Part(text=user_input)],
+                                    role=Role.ROLE_USER,
+                                    task_id=task_id,
+                                    context_id=context_token.context_id,
+                                )
+                            ),
+                            context=extension_context,
                         )
                         break
 
-                    text = ""
-                    for part in message.parts if message else []:
-                        if part.HasField("text"):
-                            text = part.text
-                    console.print(f"\n[bold]Agent requires your input[/bold]: {text}\n")
-                    user_input = handle_input()
-                    stream = client.send_message(
-                        Message(  # pyrefly: ignore [bad-argument-type]
-                            message_id=str(uuid4()),
-                            parts=[Part(text=user_input)],
-                            role=Role.ROLE_USER,
-                            task_id=task_id,
-                            context_id=context_token.context_id,
-                        )
-                    )
-                    break
+                    elif state in (
+                        TaskState.TASK_STATE_CANCELED,
+                        TaskState.TASK_STATE_FAILED,
+                        TaskState.TASK_STATE_REJECTED,
+                    ):
+                        console.print(f"\n:boom: [red][bold]Task {TaskState.Name(state)}[/bold][/red]")
+                        return
 
-                elif state in (
-                    TaskState.TASK_STATE_CANCELED,
-                    TaskState.TASK_STATE_FAILED,
-                    TaskState.TASK_STATE_REJECTED,
-                ):
-                    error = ""
-                    if message and message.parts and message.parts[0].HasField("text"):
-                        error = message.parts[0].text
-                    console.print(f"\n:boom: [red][bold]Task {TaskState.Name(state)}[/bold][/red]")
-                    console.print(Markdown(error))
-                    return
+                    elif state == TaskState.TASK_STATE_AUTH_REQUIRED:
+                        console.print("[yellow]Authentication required[/yellow]")
+                        return
 
-                elif state == TaskState.TASK_STATE_AUTH_REQUIRED:
-                    console.print("[yellow]Authentication required[/yellow]")
-                    return
+                    elif state == TaskState.TASK_STATE_AUTH_REQUIRED:
+                        console.print("[yellow]Authentication required[/yellow]")
+                        return
 
-                else:
-                    console.print(f"[yellow]Unknown task status: {state}[/yellow]")
-
-            elif response.HasField("artifact_update"):
-                artifact = response.artifact_update.artifact
-                if dump_files_path is None:
-                    continue
-                dump_files_path.mkdir(parents=True, exist_ok=True)  # noqa: ASYNC240
-                full_path = dump_files_path / (artifact.name or "unnamed").lstrip("/")
-                full_path.resolve().relative_to(dump_files_path.resolve())  # noqa: ASYNC240
-                full_path.parent.mkdir(parents=True, exist_ok=True)
-                try:
-                    for part in artifact.parts[:1]:
-                        if part.HasField("raw"):
-                            full_path.write_bytes(part.raw)
-                            console.print(f"📁 Saved {full_path}")
-                        elif part.HasField("url"):
-                            uri = part.url
-                            if uri.startswith("adk://"):
-                                async with File.load_content(uri.removeprefix("adk://")) as file:
-                                    full_path.write_bytes(file.content)
-                            else:
-                                async with httpx.AsyncClient() as httpx_client:
-                                    full_path.write_bytes((await httpx_client.get(uri)).content)
-                            console.print(f"📁 Saved {full_path}")
-                        elif part.HasField("text"):
-                            full_path.write_text(part.text)
-                        else:
-                            console.print(f"⚠️ Artifact part {type(part).__name__} is not supported")
-                    if len(artifact.parts) > 1:
-                        console.print("⚠️ Artifact with more than 1 part are not supported.")
-                except ValueError:
-                    console.print(f"⚠️ Skipping artifact {artifact.name} - outside dump directory")
-
-            else:
-                print(response)
+                    else:
+                        console.print(f"[yellow]Unknown task status: {state}[/yellow]")
         else:
             break  # Stream ended normally
 
@@ -1216,6 +1236,7 @@ async def run_agent(
                         settings=settings_input,
                         dump_files_path=dump_files,
                         handle_input=handle_input,
+
                     )
                     console.print()
                     turn_input = handle_input()

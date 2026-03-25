@@ -42,7 +42,7 @@ class Trajectory(pydantic.BaseModel):
     group_id: str | None = None
 
 
-class TrajectoryExtensionSpec(NoParamsBaseExtensionSpec):
+class TrajectoryExtensionSpec(NoParamsBaseExtensionSpec[NoneType]):
     URI: str = "https://a2a-extensions.adk.kagenti.dev/ui/trajectory/v1"
 
 
@@ -51,7 +51,11 @@ class TrajectoryExtensionServer(BaseExtensionServer[TrajectoryExtensionSpec, Non
         self, *, title: str | None = None, content: str | None = None, group_id: str | None = None
     ) -> Metadata:
         return Metadata(
-            {self.spec.URI: Trajectory(title=title, content=content, group_id=group_id).model_dump(mode="json")}
+            {
+                self.spec.URI: [
+                    Trajectory(title=title, content=content, group_id=group_id).model_dump(mode="json"),
+                ]
+            }
         )
 
     def message(

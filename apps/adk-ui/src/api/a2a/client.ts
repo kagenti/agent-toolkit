@@ -17,6 +17,7 @@ import { getAgentClient } from './agent-card';
 import { AGENT_ERROR_MESSAGE } from './constants';
 import type { A2AClient } from './jsonrpc-client';
 import { processArtifactMetadata, processMessageMetadata, processParts } from './part-processors';
+import { applyPatches, extractStreamingPatches } from './streaming';
 import type { ChatResult, TaskStatusUpdateResultWithTaskId } from './types';
 import { type ChatParams, type ChatRun, RunResultType } from './types';
 import { createUserMessage, extractErrorExtension } from './utils';
@@ -124,6 +125,7 @@ export const buildA2AClient = async <UIGenericPart = never>({
     const messageSubject = new Subject<ChatResult<UIGenericPart>>();
 
     let taskId: undefined | TaskId = initialTaskId;
+    const streamingDraft: Record<string, unknown> = {};
 
     const iterateOverStream = async () => {
       const agentCardMetadata = await resolveAgentCardMetadata(fulfillments);
@@ -153,6 +155,28 @@ export const buildA2AClient = async <UIGenericPart = never>({
             .with({ statusUpdate: P.nonNullable }, ({ statusUpdate }) => {
               taskId = statusUpdate.taskId;
 
+              // Check for streaming patches in metadata
+              const patches = extractStreamingPatches(
+                statusUpdate.metadata as Record<string, unknown> | undefined,
+              );
+
+              if (patches && taskId) {
+                // Apply patches to draft and emit as a replace update
+                applyPatches(streamingDraft, patches);
+                const draftParts = (streamingDraft.parts as Array<Record<string, unknown>>) ?? [];
+                const uiParts: UIMessagePart[] = draftParts
+                  .map((part): UIMessagePart | null => {
+                    if (typeof part.text === 'string') {
+                      return { kind: UIMessagePartKind.Text, id: 'streaming-text', text: part.text } as UITextPart;
+                    }
+                    return null;
+                  })
+                  .filter((p): p is UIMessagePart => p !== null);
+
+                messageSubject.next({ type: RunResultType.Parts, parts: uiParts, taskId, replace: true });
+                return;
+              }
+
               handleTaskStatusUpdate(statusUpdate).forEach((result) => {
                 if (!taskId) {
                   throw new Error(`Illegal State - taskId missing on status-update event`);
@@ -166,10 +190,17 @@ export const buildA2AClient = async <UIGenericPart = never>({
 
               const parts: (UIMessagePart | UIGenericPart)[] = handleStatusUpdate(statusUpdate, onStatusUpdate);
 
+              // On final message, clear the streaming draft and replace the
+              // streamed text so it is not duplicated by the complete message.
+              const wasStreaming = Object.keys(streamingDraft).length > 0;
+              if (wasStreaming) {
+                Object.keys(streamingDraft).forEach((key) => delete streamingDraft[key]);
+              }
+
               if (!taskId) {
                 throw new Error(`Illegal State - taskId missing on status-update event`);
               }
-              messageSubject.next({ type: RunResultType.Parts, parts, taskId });
+              messageSubject.next({ type: RunResultType.Parts, parts, taskId, replace: wasStreaming });
             })
             .with({ artifactUpdate: P.nonNullable }, ({ artifactUpdate }) => {
               taskId = artifactUpdate.taskId;

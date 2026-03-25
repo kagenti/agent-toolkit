@@ -236,11 +236,13 @@ async def test_sync_function_with_context_agent(sync_function_with_context_agent
 
     assert final_task is not None
     assert final_task.status.state == TaskState.TASK_STATE_COMPLETED
-    # Should have intermediate yield and final result
+    # Consecutive string yields are accumulated into a single message
     # pyrefly: ignore [missing-attribute, not-iterable]
-    messages = [msg.parts[0].text for msg in final_task.history if msg.role == Role.ROLE_AGENT]
-    assert "first sync yield" in messages
-    assert "sync_function_with_context_agent: hello" in messages
+    agent_messages = [msg for msg in final_task.history if msg.role == Role.ROLE_AGENT]
+    assert len(agent_messages) == 1
+    text = agent_messages[0].parts[0].text
+    assert "first sync yield" in text
+    assert "sync_function_with_context_agent: hello" in text
 
 
 async def test_sync_generator_agent(sync_generator_agent):
@@ -252,10 +254,13 @@ async def test_sync_generator_agent(sync_generator_agent):
 
     assert final_task is not None
     assert final_task.status.state == TaskState.TASK_STATE_COMPLETED
+    # Consecutive string yields are accumulated into a single message
     # pyrefly: ignore [missing-attribute, not-iterable]
-    messages = [msg.parts[0].text for msg in final_task.history if msg.role == Role.ROLE_AGENT]
-    assert "sync_generator yield 1" in messages
-    assert "sync_generator yield 2" in messages
+    agent_messages = [msg for msg in final_task.history if msg.role == Role.ROLE_AGENT]
+    assert len(agent_messages) == 1
+    text = agent_messages[0].parts[0].text
+    assert "sync_generator yield 1" in text
+    assert "sync_generator yield 2" in text
 
 
 async def test_sync_generator_with_context_agent(sync_generator_with_context_agent):
@@ -267,12 +272,15 @@ async def test_sync_generator_with_context_agent(sync_generator_with_context_age
 
     assert final_task is not None
     assert final_task.status.state == TaskState.TASK_STATE_COMPLETED
+    # Consecutive string yields are accumulated into a single message
     # pyrefly: ignore [missing-attribute, not-iterable]
-    messages = [msg.parts[0].text for msg in final_task.history if msg.role == Role.ROLE_AGENT]
-    assert "sync_generator_with_context yield 1" in messages
-    assert "sync_generator_with_context context yield" in messages
-    assert "sync_generator_with_context yield 2" in messages
-    assert "sync_generator_with_context_agent: hello" in messages
+    agent_messages = [msg for msg in final_task.history if msg.role == Role.ROLE_AGENT]
+    assert len(agent_messages) == 1
+    text = agent_messages[0].parts[0].text
+    assert "sync_generator_with_context yield 1" in text
+    assert "sync_generator_with_context context yield" in text
+    assert "sync_generator_with_context yield 2" in text
+    assert "sync_generator_with_context_agent: hello" in text
 
 
 async def test_async_function_agent(async_function_agent):
@@ -297,10 +305,13 @@ async def test_async_function_with_context_agent(async_function_with_context_age
 
     assert final_task is not None
     assert final_task.status.state == TaskState.TASK_STATE_COMPLETED
+    # Consecutive string yields are accumulated into a single message
     # pyrefly: ignore [missing-attribute, not-iterable]
-    messages = [msg.parts[0].text for msg in final_task.history if msg.role == Role.ROLE_AGENT]
-    assert "first async yield" in messages
-    assert "async_function_with_context_agent: hello" in messages
+    agent_messages = [msg for msg in final_task.history if msg.role == Role.ROLE_AGENT]
+    assert len(agent_messages) == 1
+    text = agent_messages[0].parts[0].text
+    assert "first async yield" in text
+    assert "async_function_with_context_agent: hello" in text
 
 
 async def test_async_generator_agent(async_generator_agent):
@@ -312,11 +323,14 @@ async def test_async_generator_agent(async_generator_agent):
 
     assert final_task is not None
     assert final_task.status.state == TaskState.TASK_STATE_COMPLETED
+    # Consecutive string yields are accumulated into a single message
     # pyrefly: ignore [missing-attribute, not-iterable]
-    messages = [msg.parts[0].text for msg in final_task.history if msg.role == Role.ROLE_AGENT]
-    assert "async_generator yield 1" in messages
-    assert "async_generator yield 2" in messages
-    assert "async_generator_agent: hello" in messages
+    agent_messages = [msg for msg in final_task.history if msg.role == Role.ROLE_AGENT]
+    assert len(agent_messages) == 1
+    text = agent_messages[0].parts[0].text
+    assert "async_generator yield 1" in text
+    assert "async_generator yield 2" in text
+    assert "async_generator_agent: hello" in text
 
 
 async def test_async_generator_with_context_agent(async_generator_with_context_agent):
@@ -328,12 +342,15 @@ async def test_async_generator_with_context_agent(async_generator_with_context_a
 
     assert final_task is not None
     assert final_task.status.state == TaskState.TASK_STATE_COMPLETED
+    # Consecutive string yields are accumulated into a single message
     # pyrefly: ignore [missing-attribute, not-iterable]
-    messages = [msg.parts[0].text for msg in final_task.history if msg.role == Role.ROLE_AGENT]
-    assert "async_generator_with_context yield 1" in messages
-    assert "async_generator_with_context context yield" in messages
-    assert "async_generator_with_context yield 2" in messages
-    assert "async_generator_with_context_agent: hello" in messages
+    agent_messages = [msg for msg in final_task.history if msg.role == Role.ROLE_AGENT]
+    assert len(agent_messages) == 1
+    text = agent_messages[0].parts[0].text
+    assert "async_generator_with_context yield 1" in text
+    assert "async_generator_with_context context yield" in text
+    assert "async_generator_with_context yield 2" in text
+    assert "async_generator_with_context_agent: hello" in text
 
 
 async def test_sync_function_resume_agent(sync_function_resume_agent):
@@ -369,9 +386,10 @@ async def test_sync_generator_resume_agent(sync_generator_resume_agent):
 
     assert initial_task is not None
     assert initial_task.status.state == TaskState.TASK_STATE_INPUT_REQUIRED
+    # The "starting" string is flushed as a message before the InputRequired status
     # pyrefly: ignore [missing-attribute, not-iterable]
-    messages = [msg.parts[0].text for msg in initial_task.history if msg.role == Role.ROLE_AGENT]
-    assert "sync_generator_resume_agent: starting" in messages
+    agent_messages = [msg for msg in initial_task.history if msg.role == Role.ROLE_AGENT]
+    assert any("sync_generator_resume_agent: starting" in msg.parts[0].text for msg in agent_messages)
 
     # Resume with additional data
     resume_message = create_text_message_object(content="resume data")
@@ -383,8 +401,8 @@ async def test_sync_generator_resume_agent(sync_generator_resume_agent):
     assert final_task is not None
     assert final_task.status.state == TaskState.TASK_STATE_COMPLETED
     # pyrefly: ignore [missing-attribute, not-iterable]
-    messages = [msg.parts[0].text for msg in final_task.history if msg.role == Role.ROLE_AGENT]
-    assert "sync_generator_resume_agent: received resume data" in messages
+    agent_messages = [msg for msg in final_task.history if msg.role == Role.ROLE_AGENT]
+    assert any("sync_generator_resume_agent: received resume data" in msg.parts[0].text for msg in agent_messages)
 
 
 async def test_async_function_resume_agent(async_function_resume_agent):
@@ -421,9 +439,10 @@ async def test_async_generator_resume_agent(async_generator_resume_agent):
 
     assert initial_task is not None
     assert initial_task.status.state == TaskState.TASK_STATE_INPUT_REQUIRED
+    # The "starting" string is flushed as a message before the InputRequired status
     # pyrefly: ignore [missing-attribute, not-iterable]
-    messages = [msg.parts[0].text for msg in initial_task.history if msg.role == Role.ROLE_AGENT]
-    assert "async_generator_resume_agent: starting" in messages
+    agent_messages = [msg for msg in initial_task.history if msg.role == Role.ROLE_AGENT]
+    assert any("async_generator_resume_agent: starting" in msg.parts[0].text for msg in agent_messages)
 
     # Resume with additional data
     resume_message = create_text_message_object(content="resume data")
@@ -435,8 +454,8 @@ async def test_async_generator_resume_agent(async_generator_resume_agent):
     assert final_task is not None
     assert final_task.status.state == TaskState.TASK_STATE_COMPLETED
     # pyrefly: ignore [missing-attribute, not-iterable]
-    messages = [msg.parts[0].text for msg in final_task.history if msg.role == Role.ROLE_AGENT]
-    assert "async_generator_resume_agent: received resume data" in messages
+    agent_messages = [msg for msg in final_task.history if msg.role == Role.ROLE_AGENT]
+    assert any("async_generator_resume_agent: received resume data" in msg.parts[0].text for msg in agent_messages)
 
 
 async def test_sync_function_streaming(sync_function_agent):
@@ -457,7 +476,7 @@ async def test_sync_function_streaming(sync_function_agent):
 
 
 async def test_sync_generator_streaming(sync_generator_agent):
-    """Test synchronous generator agent with streaming to see intermediate yields."""
+    """Test synchronous generator agent with streaming events."""
     _, client = sync_generator_agent
     events = []
     async for event in client.send_message(SendMessageRequest(message=create_text_message_object(content="hello"))):
@@ -472,13 +491,14 @@ async def test_sync_generator_streaming(sync_generator_agent):
     assert len(status_events) > 0
     assert status_events[-1].status.state == TaskState.TASK_STATE_COMPLETED
 
-    # Should see multiple working state messages for each yield
-    working_events = [e for e in status_events if e.status.state == TaskState.TASK_STATE_WORKING]
-    assert len(working_events) >= 3  # At least 3 yields from the generator
+    # Without the streaming extension activated by the client, partial updates are not sent.
+    # The final completed message contains the accumulated result.
+    completed = status_events[-1]
+    assert completed.status.message.parts[0].text
 
 
 async def test_async_generator_streaming(async_generator_agent):
-    """Test asynchronous generator agent with streaming to see intermediate yields."""
+    """Test asynchronous generator agent with streaming events."""
     _, client = async_generator_agent
     events = []
     async for event in client.send_message(SendMessageRequest(message=create_text_message_object(content="hello"))):
@@ -492,13 +512,15 @@ async def test_async_generator_streaming(async_generator_agent):
     assert len(status_events) > 0
     assert status_events[-1].status.state == TaskState.TASK_STATE_COMPLETED
 
-    # Should see multiple working state messages for each yield
-    working_events = [e for e in status_events if e.status.state == TaskState.TASK_STATE_WORKING]
-    assert len(working_events) >= 2  # At least 2 yields from the generator
+    # Without the streaming extension activated by the client, partial updates are not sent.
+    # The final completed message contains the accumulated result.
+    completed = status_events[-1]
+    assert completed.status.message.parts[0].text
 
 
 async def test_yield_dict_vs_metadata(create_server_with_agent):
     async def yielder_of_meta_data() -> AsyncIterator[RunYield]:
+        # dict → Part(data=...), Metadata, and AgentMessage are accumulated into one message
         yield {"data": "this should be datapart"}
         yield Metadata({"metadata": "this should be metadata"})
         yield AgentMessage(
@@ -513,26 +535,24 @@ async def test_yield_dict_vs_metadata(create_server_with_agent):
 
         assert final_task is not None
         assert final_task.status.state == TaskState.TASK_STATE_COMPLETED
+        # dict+Metadata are accumulated, then flushed as draft when AgentMessage arrives
+        # The final message merges the draft (data part + metadata) with the AgentMessage (metadata)
+        # pyrefly: ignore [missing-attribute, not-iterable]
+        agent_messages = [msg for msg in final_task.history if msg.role == Role.ROLE_AGENT]
+        assert len(agent_messages) == 1
+        merged = agent_messages[0]
         # pyrefly: ignore [missing-attribute, unsupported-operation]
-        assert MessageToDict(final_task.history[0].parts[0].data) == {"data": "this should be datapart"}
+        assert MessageToDict(merged.parts[0].data) == {"data": "this should be datapart"}
+        # Metadata from both Metadata yield and AgentMessage are merged
         # pyrefly: ignore [unsupported-operation]
-        assert MessageToDict(final_task.history[1].metadata) == {"metadata": "this should be metadata"}
-        # pyrefly: ignore [unsupported-operation]
-        assert MessageToDict(final_task.history[2].metadata) == {
-            "metadata": "this class still behaves as dict",
-            "metadata2": "and can be used in union",
-        }
-        # pyrefly: ignore [unsupported-operation]
-        assert not final_task.history[0].metadata
-        # pyrefly: ignore [unsupported-operation]
-        assert not final_task.history[1].parts
-        # pyrefly: ignore [unsupported-operation]
-        assert not final_task.history[2].parts
+        merged_meta = MessageToDict(merged.metadata)
+        assert merged_meta["metadata"] == "this class still behaves as dict"
+        assert merged_meta["metadata2"] == "and can be used in union"
 
 
 async def test_yield_of_all_types(create_server_with_agent):
     async def yielder_of_all_types_agent(message: Message, context: RunContext) -> AsyncIterator[RunYield]:
-        """Synchronous function agent that returns a string directly."""
+        """Agent that yields all supported types."""
         text_part = Part(text="text")
         message = AgentMessage(parts=[text_part], role=Role.ROLE_AGENT, message_id=str(uuid.uuid4()))
         yield message
@@ -571,5 +591,10 @@ async def test_yield_of_all_types(create_server_with_agent):
                     _,
                 ) if artifact_id:
                     artifact_cnt += 1
-        assert message_cnt == 9
+        # With streaming accumulation:
+        # - Message yield → 1 message
+        # - text_part accumulated, then TaskStatus flushes → 1 merged message
+        # - Parts accumulated, then TaskStatusUpdateEvent flushes → 1 merged message
+        # - str/dict/Metadata accumulated, then completion flushes → 1 message
+        assert message_cnt == 4
         assert artifact_cnt == 2

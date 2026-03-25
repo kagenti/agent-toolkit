@@ -18,6 +18,8 @@ export interface PartsResult<UIGenericPart = never> {
   type: RunResultType.Parts;
   taskId: TaskId;
   parts: Array<UIMessagePart | UIGenericPart>;
+  /** When true, replace all current parts instead of appending (used for streaming updates). */
+  replace?: boolean;
 }
 
 export type TaskStatusUpdateResultWithTaskId = TaskStatusUpdateResult & {
@@ -37,7 +39,9 @@ export interface ChatParams {
 export interface ChatRun<UIGenericPart = never> {
   taskId?: TaskId;
   done: Promise<null | TaskStatusUpdateResultWithTaskId>;
-  subscribe: (fn: (data: { parts: (UIMessagePart | UIGenericPart)[]; taskId: TaskId }) => void) => () => void;
+  subscribe: (
+    fn: (data: { parts: (UIMessagePart | UIGenericPart)[]; taskId: TaskId; replace?: boolean }) => void,
+  ) => () => void;
   cancel: () => Promise<void>;
 }
 

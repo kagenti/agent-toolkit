@@ -212,20 +212,23 @@ function AgentRunProvider({ agent, children }: PropsWithChildren<Props>) {
         pendingRun.current = run;
 
         let isFirstIteration = true;
-        pendingSubscription.current = run.subscribe(({ parts, taskId: responseTaskId }) => {
+        pendingSubscription.current = run.subscribe(({ parts, taskId: responseTaskId, replace }) => {
           if (isFirstIteration) {
             queryClient.invalidateQueries({ queryKey: contextKeys.lists() });
           }
 
           updateCurrentAgentMessage((message) => {
             message.taskId = responseTaskId;
-          });
 
-          parts.forEach((part) => {
-            updateCurrentAgentMessage((message) => {
-              const updatedParts = addMessagePart(part, message);
-              message.parts = updatedParts;
-            });
+            if (replace) {
+              // Streaming update: replace text parts with latest draft
+              const nonTextParts = message.parts.filter((p) => p.kind !== UIMessagePartKind.Text);
+              message.parts = [...parts, ...nonTextParts];
+            } else {
+              for (const part of parts) {
+                message.parts = addMessagePart(part, message);
+              }
+            }
           });
 
           isFirstIteration = false;

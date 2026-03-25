@@ -100,7 +100,7 @@ async def get_agent_card(
     card_copy = create_proxy_agent_card(
         provider.agent_card, provider_id=provider.id, request=request, configuration=configuration
     )
-    return MessageToDict(card_copy, preserving_proto_field_name=True)
+    return MessageToDict(card_copy)
 
 
 @router.post("/{provider_id}")

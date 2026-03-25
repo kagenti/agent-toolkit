@@ -90,15 +90,13 @@ async def test_platform_api_extension(file_reader_writer_factory, permissions, s
         else:
             assert task.status.state == TaskState.TASK_STATE_COMPLETED, f"Fail: {task.status.message.parts[0].text}"
 
-            # check that first message is the content of the first_file
-            first_message_text = task.history[0].parts[0].text
-            assert first_message_text == "01234"
-
-            second_message_text = task.history[1].parts[0].text
-            assert second_message_text == "56789"
+            # accumulator combines consecutive string chunks into a single text part,
+            # so we get one message with text + file parts
+            msg = task.history[0]
+            assert msg.parts[0].text == "0123456789"
 
             # check that the agent uploaded a new file with correct context_id as content
-            async with load_file(task.history[2].parts[0]) as file:
+            async with load_file(msg.parts[1]) as file:
                 assert file.text == context.id
 
 

@@ -66,7 +66,7 @@ class PlatformApiExtensionParams(pydantic.BaseModel):
     auto_use: bool = True
 
 
-class PlatformApiExtensionSpec(BaseExtensionSpec[PlatformApiExtensionParams]):
+class PlatformApiExtensionSpec(BaseExtensionSpec[PlatformApiExtensionParams, PlatformApiExtensionMetadata]):
     URI: str = "https://a2a-extensions.adk.kagenti.dev/services/platform_api/v1"
 
     def __init__(self, params: PlatformApiExtensionParams | None = None) -> None:
@@ -152,7 +152,9 @@ class _PlatformSelfRegistrationExtensionParams(pydantic.BaseModel):
     self_registration_id: str
 
 
-class _PlatformSelfRegistrationExtensionSpec(BaseExtensionSpec[_PlatformSelfRegistrationExtensionParams]):
+class _PlatformSelfRegistrationExtensionSpec(
+    BaseExtensionSpec[_PlatformSelfRegistrationExtensionParams, _PlatformSelfRegistrationExtension]
+):
     URI: str = "https://a2a-extensions.adk.kagenti.dev/services/platform-self-registration/v1"
 
 

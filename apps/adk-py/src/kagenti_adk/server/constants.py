@@ -8,9 +8,11 @@ from a2a.types import AgentInterface, AgentSkill
 
 from kagenti_adk.a2a.extensions import BaseExtensionServer
 from kagenti_adk.a2a.extensions.services.platform import PlatformApiExtensionServer, PlatformApiExtensionSpec
+from kagenti_adk.a2a.extensions.streaming import StreamingExtensionServer, StreamingExtensionSpec
 from kagenti_adk.a2a.extensions.ui.error import ErrorExtensionParams, ErrorExtensionServer, ErrorExtensionSpec
 
 DEFAULT_IMPLICIT_EXTENSIONS: Final[dict[str, BaseExtensionServer]] = {
+    StreamingExtensionSpec.URI: StreamingExtensionServer(StreamingExtensionSpec()),
     ErrorExtensionSpec.URI: ErrorExtensionServer(ErrorExtensionSpec(ErrorExtensionParams())),
     PlatformApiExtensionSpec.URI: PlatformApiExtensionServer(PlatformApiExtensionSpec()),
 }

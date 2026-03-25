@@ -18,7 +18,7 @@ from pydantic import AnyUrl
 from typing_extensions import override
 
 from kagenti_adk.a2a.extensions.auth.oauth.oauth import OAuthExtensionServer
-from kagenti_adk.a2a.extensions.base import BaseExtensionClient, BaseExtensionServer, BaseExtensionSpec
+from kagenti_adk.a2a.extensions.base import DEFAULT_DEMAND_NAME, BaseExtensionClient, BaseExtensionServer, BaseExtensionSpec
 from kagenti_adk.a2a.extensions.services.platform import PlatformApiExtensionServer
 from kagenti_adk.platform.client import get_platform_client
 from kagenti_adk.util.logging import logger
@@ -55,7 +55,6 @@ __all__ = [
 
 _TRANSPORT_TYPES = Literal["streamable_http", "stdio"]
 
-_DEFAULT_DEMAND_NAME = "default"
 _DEFAULT_ALLOWED_TRANSPORTS: list[_TRANSPORT_TYPES] = ["streamable_http"]
 
 
@@ -115,16 +114,22 @@ class MCPServiceExtensionParams(pydantic.BaseModel):
     """Server requests that the agent requires to be provided by the client."""
 
 
-class MCPServiceExtensionSpec(BaseExtensionSpec[MCPServiceExtensionParams]):
+class MCPServiceExtensionMetadata(pydantic.BaseModel):
+    mcp_fulfillments: dict[str, MCPFulfillment] = {}
+    """Provided servers corresponding to the server requests."""
+
+
+class MCPServiceExtensionSpec(BaseExtensionSpec[MCPServiceExtensionParams, MCPServiceExtensionMetadata]):
     URI: str = "https://a2a-extensions.adk.kagenti.dev/services/mcp/v1"
 
     @classmethod
     def single_demand(
         cls,
-        name: str = _DEFAULT_DEMAND_NAME,
+        name: str = DEFAULT_DEMAND_NAME,
         description: str | None = None,
         suggested: tuple[str, ...] = (),
         allowed_transports: list[_TRANSPORT_TYPES] | None = None,
+        default: MCPFulfillment | None = None,
     ) -> Self:
         return cls(
             params=MCPServiceExtensionParams(
@@ -135,13 +140,9 @@ class MCPServiceExtensionSpec(BaseExtensionSpec[MCPServiceExtensionParams]):
                         allowed_transports=allowed_transports or _DEFAULT_ALLOWED_TRANSPORTS,
                     )
                 }
-            )
+            ),
+            default=MCPServiceExtensionMetadata(mcp_fulfillments={name: default}) if default else None,
         )
-
-
-class MCPServiceExtensionMetadata(pydantic.BaseModel):
-    mcp_fulfillments: dict[str, MCPFulfillment] = {}
-    """Provided servers corresponding to the server requests."""
 
 
 class MCPServiceExtensionServer(BaseExtensionServer[MCPServiceExtensionSpec, MCPServiceExtensionMetadata]):
@@ -173,7 +174,7 @@ class MCPServiceExtensionServer(BaseExtensionServer[MCPServiceExtensionSpec, MCP
         return metadata
 
     @asynccontextmanager
-    async def create_client(self, demand: str = _DEFAULT_DEMAND_NAME):
+    async def create_client(self, demand: str = DEFAULT_DEMAND_NAME):
         fulfillment = self.data.mcp_fulfillments.get(demand) if self.data else None
 
         if not fulfillment:

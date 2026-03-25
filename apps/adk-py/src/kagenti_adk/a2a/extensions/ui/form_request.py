@@ -37,7 +37,7 @@ __all__ = [
 T = TypeVar("T")
 
 
-class FormRequestExtensionSpec(NoParamsBaseExtensionSpec):
+class FormRequestExtensionSpec(NoParamsBaseExtensionSpec[FormResponse]):
     URI: str = "https://a2a-extensions.adk.kagenti.dev/ui/form_request/v1"
 
 

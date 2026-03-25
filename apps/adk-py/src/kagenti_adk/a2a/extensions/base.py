@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import abc
+import logging
 import typing
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
@@ -29,8 +30,10 @@ from kagenti_adk.util.telemetry import (
 )
 
 ParamsT = typing.TypeVar("ParamsT")
-MetadataFromClientT = typing.TypeVar("MetadataFromClientT")
-MetadataFromServerT = typing.TypeVar("MetadataFromServerT")
+MetadataFromClientT = typing.TypeVar("MetadataFromClientT", bound=BaseModel | NoneType)
+MetadataFromServerT = typing.TypeVar("MetadataFromServerT", bound=BaseModel | list | NoneType)
+
+logger = logging.getLogger(__name__)
 
 
 if typing.TYPE_CHECKING:
@@ -39,16 +42,18 @@ if typing.TYPE_CHECKING:
 
 A2A_EXTENSION_URI = "a2a_extension.uri"
 A2A_EXTENSION_METADATA_RECEIVED_EVENT = "a2a_extension.metadata.received"
+DEFAULT_DEMAND_NAME = "default"
 
 
 def _get_generic_args(cls: type, base_class: type) -> tuple[typing.Any, ...]:
-    for base in getattr(cls, "__orig_bases__", ()):
-        if typing.get_origin(base) is base_class and (args := typing.get_args(base)):
-            return args
+    for klass in cls.__mro__:
+        for base in getattr(klass, "__orig_bases__", ()):
+            if typing.get_origin(base) is base_class and (args := typing.get_args(base)):
+                return args
     raise TypeError(f"Missing Params type for {cls.__name__}")
 
 
-class BaseExtensionSpec(abc.ABC, typing.Generic[ParamsT]):
+class BaseExtensionSpec(abc.ABC, typing.Generic[ParamsT, MetadataFromClientT]):
     """
     Base class for an A2A extension handler.
 
@@ -76,12 +81,18 @@ class BaseExtensionSpec(abc.ABC, typing.Generic[ParamsT]):
     Params from the agent card.
     """
 
-    def __init__(self, params: ParamsT, required: bool = False) -> None:
+    default: MetadataFromClientT | None = None
+    """
+    Default metadata to use if the client does not provide any.
+    """
+
+    def __init__(self, params: ParamsT, required: bool = False, default: MetadataFromClientT | None = None) -> None:
         """
         Agent should construct an extension instance using the constructor.
         """
         self.params = params
         self.required = required
+        self.default = default
 
     @classmethod
     def from_agent_card(cls: type[typing.Self], agent: AgentCard) -> typing.Self | None:
@@ -111,9 +122,9 @@ class BaseExtensionSpec(abc.ABC, typing.Generic[ParamsT]):
         ]
 
 
-class NoParamsBaseExtensionSpec(BaseExtensionSpec[NoneType]):
-    def __init__(self, required: bool = False):
-        super().__init__(None, required)
+class NoParamsBaseExtensionSpec(typing.Generic[MetadataFromClientT], BaseExtensionSpec[NoneType, MetadataFromClientT]):
+    def __init__(self, required: bool = False, default: MetadataFromClientT | None = None):
+        super().__init__(None, required, default)
 
     @classmethod
     @override
@@ -123,13 +134,15 @@ class NoParamsBaseExtensionSpec(BaseExtensionSpec[NoneType]):
         return None
 
 
-ExtensionSpecT = typing.TypeVar("ExtensionSpecT", bound=BaseExtensionSpec[typing.Any])
+ExtensionSpecT = typing.TypeVar("ExtensionSpecT", bound=BaseExtensionSpec[typing.Any, typing.Any])
 
 
 class BaseExtensionServer(abc.ABC, typing.Generic[ExtensionSpecT, MetadataFromClientT]):
     """
     Type of the extension metadata, attached to messages.
     """
+
+    _is_active: bool = False
 
     def __init_subclass__(cls: type[Self], **kwargs):
         super().__init_subclass__(**kwargs)
@@ -150,11 +163,28 @@ class BaseExtensionServer(abc.ABC, typing.Generic[ExtensionSpecT, MetadataFromCl
         return cls._context_var.get()
 
     @property
-    def data(self) -> MetadataFromClientT | None:
-        return self._metadata_from_client
+    def data(self) -> MetadataFromClientT:
+        if self.MetadataFromClient is NoneType:
+            return None  # type: ignore
+
+        if self._metadata_from_client:
+            if not self._is_active:
+                logger.warning("Extension metadata received but extension is not active.")
+            return self._metadata_from_client
+
+        if self.spec.default is not None:
+            return self.spec.default
+
+        if not self._is_active:
+            raise AttributeError(f"Cannot access 'data' attribute: extension '{self.spec.URI}' is not active.")
+
+        raise AttributeError(
+            f"Extension '{self.spec.URI}' is active but no metadata provided and no default available."
+        )
 
     def __bool__(self):
-        return bool(self.data)
+        # fallback - if we receive metadata but not an extension activation header
+        return bool(self._is_active or self._metadata_from_client)
 
     def __init__(self, spec: ExtensionSpecT, *args, **kwargs) -> None:
         self.spec = spec
@@ -180,6 +210,10 @@ class BaseExtensionServer(abc.ABC, typing.Generic[ExtensionSpecT, MetadataFromCl
                     A2A_EXTENSION_METADATA_RECEIVED_EVENT,
                     attributes=flatten_dict(self._metadata_from_client.model_dump(context={REDACT_SECRETS: True})),
                 )
+
+        if not self._is_active and request_context.call_context:
+            self._is_active = self.spec.URI in request_context.call_context.requested_extensions
+            request_context.call_context.activated_extensions.add(self.spec.URI)
 
     def _fork(self) -> typing.Self:
         """Creates a clone of this instance with the same arguments as the original"""

@@ -19,7 +19,8 @@ export async function getAgentClient(providerId: string, token: string): Promise
 
   const agentCard = await fetchAgentCard(agentCardUrl, fetchImpl);
 
-  return createA2AClient({ endpointUrl, agentCard, fetchImpl });
+  const extensions = agentCard.capabilities?.extensions?.map((ext) => ext.uri).filter(Boolean) as string[];
+  return createA2AClient({ endpointUrl, agentCard, fetchImpl, extensions });
 }
 
 async function clientFetch(input: RequestInfo, init?: RequestInit) {

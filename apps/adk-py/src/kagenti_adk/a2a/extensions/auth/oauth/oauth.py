@@ -19,7 +19,7 @@ from mcp.shared.auth import OAuthClientMetadata
 from typing_extensions import override
 
 from kagenti_adk.a2a.extensions.auth.oauth.storage import MemoryTokenStorageFactory, TokenStorageFactory
-from kagenti_adk.a2a.extensions.base import BaseExtensionClient, BaseExtensionServer, BaseExtensionSpec
+from kagenti_adk.a2a.extensions.base import DEFAULT_DEMAND_NAME, BaseExtensionClient, BaseExtensionServer, BaseExtensionSpec
 from kagenti_adk.a2a.types import AgentMessage, AuthRequired, Metadata, RunYieldResume
 from kagenti_adk.util.pydantic import REVEAL_SECRETS, SecureBaseModel
 
@@ -50,7 +50,6 @@ __all__ = [
     "OAuthFulfillment",
 ]
 
-_DEFAULT_DEMAND_NAME = "default"
 
 
 class AuthRequest(SecureBaseModel):
@@ -74,17 +73,20 @@ class OAuthExtensionParams(pydantic.BaseModel):
     """Server requests that the agent requires to be provided by the client."""
 
 
-class OAuthExtensionSpec(BaseExtensionSpec[OAuthExtensionParams]):
-    URI: str = "https://a2a-extensions.adk.kagenti.dev/auth/oauth/v1"
-
-    @classmethod
-    def single_demand(cls, name: str = _DEFAULT_DEMAND_NAME) -> Self:
-        return cls(params=OAuthExtensionParams(oauth_demands={name: OAuthDemand()}))
-
-
 class OAuthExtensionMetadata(pydantic.BaseModel):
     oauth_fulfillments: dict[str, OAuthFulfillment] = {}
     """Provided servers corresponding to the server requests."""
+
+
+class OAuthExtensionSpec(BaseExtensionSpec[OAuthExtensionParams, OAuthExtensionMetadata]):
+    URI: str = "https://a2a-extensions.adk.kagenti.dev/auth/oauth/v1"
+
+    @classmethod
+    def single_demand(cls, name: str = DEFAULT_DEMAND_NAME, default: OAuthFulfillment | None = None) -> Self:
+        return cls(
+            params=OAuthExtensionParams(oauth_demands={name: OAuthDemand()}),
+            default=OAuthExtensionMetadata(oauth_fulfillments={name: default}) if default else None,
+        )
 
 
 class OAuthExtensionServer(BaseExtensionServer[OAuthExtensionSpec, OAuthExtensionMetadata]):
@@ -105,7 +107,7 @@ class OAuthExtensionServer(BaseExtensionServer[OAuthExtensionSpec, OAuthExtensio
             raise RuntimeError("No fulfillments found")
 
         fulfillment = self.data.oauth_fulfillments.get(str(resource_url)) or self.data.oauth_fulfillments.get(
-            _DEFAULT_DEMAND_NAME
+            DEFAULT_DEMAND_NAME
         )
         if fulfillment:
             return fulfillment

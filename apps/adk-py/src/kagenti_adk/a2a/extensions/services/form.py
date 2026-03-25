@@ -31,7 +31,7 @@ class FormServiceExtensionParams(BaseModel):
     form_demands: FormDemands
 
 
-class FormServiceExtensionSpec(BaseExtensionSpec[FormServiceExtensionParams]):
+class FormServiceExtensionSpec(BaseExtensionSpec[FormServiceExtensionParams, FormServiceExtensionMetadata]):
     URI: str = "https://a2a-extensions.adk.kagenti.dev/services/form/v1"
 
     @classmethod

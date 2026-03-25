@@ -81,12 +81,12 @@ class ToolCallExtensionParams(BaseModel):
     pass
 
 
-class ToolCallExtensionSpec(BaseExtensionSpec[ToolCallExtensionParams]):
-    URI: str = "https://a2a-extensions.adk.kagenti.dev/tools/call/v1"
-
-
 class ToolCallExtensionMetadata(BaseModel):
     pass
+
+
+class ToolCallExtensionSpec(BaseExtensionSpec[ToolCallExtensionParams, ToolCallExtensionMetadata]):
+    URI: str = "https://a2a-extensions.adk.kagenti.dev/tools/call/v1"
 
 
 class ToolCallExtensionServer(BaseExtensionServer[ToolCallExtensionSpec, ToolCallExtensionMetadata]):

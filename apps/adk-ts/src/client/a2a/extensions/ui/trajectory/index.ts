@@ -11,7 +11,7 @@ import type { TrajectoryMetadata } from './types';
 
 export const TRAJECTORY_EXTENSION_URI = 'https://a2a-extensions.adk.kagenti.dev/ui/trajectory/v1';
 
-export const trajectoryExtension: A2AUiExtension<typeof TRAJECTORY_EXTENSION_URI, TrajectoryMetadata> = {
+export const trajectoryExtension: A2AUiExtension<typeof TRAJECTORY_EXTENSION_URI, TrajectoryMetadata[]> = {
   getUri: () => TRAJECTORY_EXTENSION_URI,
-  getMessageMetadataSchema: () => z.object({ [TRAJECTORY_EXTENSION_URI]: trajectoryMetadataSchema }).partial(),
+  getMessageMetadataSchema: () => z.object({ [TRAJECTORY_EXTENSION_URI]: z.array(trajectoryMetadataSchema) }).partial(),
 };
