@@ -101,7 +101,7 @@ mise adk:start --set auth.enabled=true
 
 This will setup keycloak (with no platform users out of the box).
 
-You can add users at <http://localhost:8336>, by loggin in with the admin user (admin:admin in dev)
+You can add users at <http://keycloak.localtest.me:8080>, by logging in with the admin user (admin:admin in dev)
 and going to "Manage realms" -> "Users".
 
 You can promote users by assigning `adk-admin` or `adk-developer` roles to them. Make sure to add a
@@ -130,9 +130,9 @@ Then run `mise run adk:start -f config.yaml`
 
 | Service              | HTTP                                |
 | -------------------- | ----------------------------------- |
-| Keycloak             | `http://localhost:8336`             |
-| Kagenti ADK UI       | `http://localhost:8334`             |
-| Kagenti ADK API Docs | `http://localhost:8333/api/v1/docs` |
+| Keycloak             | `http://keycloak.localtest.me:8080`             |
+| Kagenti ADK UI       | `http://adk.localtest.me:8080`                  |
+| Kagenti ADK API Docs | `http://adk-api.localtest.me:8080/api/v1/docs`  |
 
 **OIDC configuration:**
 
@@ -165,10 +165,10 @@ After the command succeeds, you can:
 
 * connect to postgresql using the default credentials `postgresql://adk-user:password@postgresql:5432/adk`
 * now you can start your server from your IDE or using `mise run adk-server:run` on port **18333**
-* run kagenti-adk using `mise adk-cli:run -- <command>` or HTTP requests to localhost:8333 or localhost:18333
-  - localhost:8333 is port-forwarded from the cluster, so any requests will pass through the cluster networking to the
+* run kagenti-adk using `mise adk-cli:run -- <command>` or HTTP requests to `adk-api.localtest.me:8080` or `localhost:18333`
+  - `adk-api.localtest.me:8080` is routed through the cluster networking to the
     kagenti-adk pod, which is replaced by telepresence and forwarded back to your local machine to port 18333
-  - localhost:18333 is where your local platform should be running
+  - `localhost:18333` is where your local platform should be running
 
 To inspect cluster using `kubectl` or `k9s` and lima using `limactl`, activate the dev environment using:
 
@@ -205,7 +205,7 @@ To run and develop adk-server tests locally use `mise run adk-server:dev:start -
 > - Some tests require additional settings (e.g. enabling authentication), see section for tests in `template.env` for more details.
 > - Tests will drop your database - you may need to add agents again or reconfigure model
 
-Locally, the default model for tests is configured in `apps/adk-server/tests/conftest.py` (`llama3.1:8b` from ollama).
+Locally, the default model for tests is configured in `apps/adk-server/tests/conftest.py` (`gpt-oss:20b` from ollama).
 Make sure to have this model running locally.
 
 <details>
