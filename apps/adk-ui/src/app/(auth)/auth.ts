@@ -95,6 +95,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: provider ? [provider] : [],
   pages: {
     signIn: routes.signIn(),
+    error: routes.signIn(),
   },
   session: { strategy: 'jwt' },
   trustHost: true,

@@ -6,11 +6,11 @@
 import { SignInView } from '#modules/auth/components/SignInView.tsx';
 
 interface Props {
-  searchParams: Promise<{ callbackUrl?: string }>;
+  searchParams: Promise<{ callbackUrl?: string; error?: string }>;
 }
 
 export default async function SignInPage({ searchParams }: Props) {
-  const { callbackUrl } = await searchParams;
+  const { callbackUrl, error } = await searchParams;
 
-  return <SignInView callbackUrl={callbackUrl} />;
+  return <SignInView callbackUrl={callbackUrl} error={error} />;
 }

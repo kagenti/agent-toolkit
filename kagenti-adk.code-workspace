@@ -25,10 +25,6 @@
       "path": "apps/adk-ui",
     },
     {
-      "name": "keycloak-theme",
-      "path": "apps/keycloak-theme",
-    },
-    {
       "name": "agent-chat",
       "path": "agents/chat",
     },

@@ -11,15 +11,16 @@ import classes from './SignInView.module.scss';
 
 interface Props {
   callbackUrl?: string;
+  error?: string;
 }
 
-export function SignInView({ callbackUrl }: Props) {
+export function SignInView({ callbackUrl, error }: Props) {
   return (
     <div className={classes.root}>
       <Container size="full" className={classes.container}>
         <SignInHeading />
 
-        <SignInProviders callbackUrl={callbackUrl} />
+        <SignInProviders callbackUrl={callbackUrl} error={error} />
       </Container>
     </div>
   );
