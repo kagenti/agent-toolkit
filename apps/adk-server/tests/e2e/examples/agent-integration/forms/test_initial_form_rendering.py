@@ -41,6 +41,6 @@ async def test_initial_form_rendering_example(subtests, get_final_task_from_stre
 
             # Verify response
             assert task.status.state == TaskState.TASK_STATE_COMPLETED, (
-                f"Fail: {task.status.message.parts[0].root.text}"
+                f"Fail: {task.status.message.parts[0].text}"
             )
-            assert "Hello Alice Smith! Nice to meet you." in task.history[-1].parts[0].root.text
+            assert "Hello Alice Smith! Nice to meet you." in task.history[-1].parts[0].text

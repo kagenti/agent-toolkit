@@ -19,10 +19,10 @@ def _history_text(task) -> str:
     so all buffered partial outputs are present as a single joined entry in history.
     """
     return "".join(
-        part.root.text
+        part.text
         for message in task.history
         for part in message.parts
-        if getattr(part.root, "kind", None) == "text"
+        if part.text
     )
 
 
@@ -36,7 +36,7 @@ async def test_streaming_buffered_history_example(subtests, get_final_task_from_
             message.context_id = running_example.context.id
             task = await get_final_task_from_stream(running_example.client.send_message(SendMessageRequest(message=message)))
 
-            assert task.status.state == TaskState.completed, f"Fail: {task.status.message.parts[0].root.text}"
+            assert task.status.state == TaskState.completed, f"Fail: {task.status.message.parts[0].text}"
             text = _history_text(task)
             assert "total=1" in text and "user=1" in text
             assert "Error during execution" not in text
@@ -46,7 +46,7 @@ async def test_streaming_buffered_history_example(subtests, get_final_task_from_
             message.context_id = running_example.context.id
             task = await get_final_task_from_stream(running_example.client.send_message(SendMessageRequest(message=message)))
 
-            assert task.status.state == TaskState.completed, f"Fail: {task.status.message.parts[0].root.text}"
+            assert task.status.state == TaskState.completed, f"Fail: {task.status.message.parts[0].text}"
             text = _history_text(task)
             assert "total=3" in text and "user=2" in text
             assert "Error during execution" not in text
@@ -56,7 +56,7 @@ async def test_streaming_buffered_history_example(subtests, get_final_task_from_
             message.context_id = running_example.context.id
             task = await get_final_task_from_stream(running_example.client.send_message(SendMessageRequest(message=message)))
 
-            assert task.status.state == TaskState.completed, f"Fail: {task.status.message.parts[0].root.text}"
+            assert task.status.state == TaskState.completed, f"Fail: {task.status.message.parts[0].text}"
             text = _history_text(task)
             # The tool call completes successfully before the error occurs, so we expect to see the tool result part followed by the error message about history being too long.
             assert "Tool call completed with result:" in text

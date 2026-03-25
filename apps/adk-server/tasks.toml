@@ -413,7 +413,7 @@ kagenti-adk:
     enabled: true
 ' > "$CONFIG_FILE"
 
-{{ mise_bin }} run adk:start --vm-name=${VM_NAME} --skip-login -f "$CONFIG_FILE"
+{{ mise_bin }} run adk:start --vm-name=${VM_NAME} --skip-login -f "$CONFIG_FILE" --set ui.enabled=false
 
 
 eval "$( {{ mise_bin }} run adk:shell --vm-name="$VM_NAME" )"

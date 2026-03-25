@@ -31,9 +31,9 @@ async def test_basic_secrets_example(subtests, get_final_task_from_stream, a2a_c
             task = await get_final_task_from_stream(running_example.client.send_message(SendMessageRequest(message=message)))
 
             assert task.status.state == TaskState.TASK_STATE_COMPLETED, (
-                f"Fail: {task.status.message.parts[0].root.text}"
+                f"Fail: {task.status.message.parts[0].text}"
             )
-            assert "Slack API key: test-slack-api-key-12345" in task.history[-1].parts[0].root.text
+            assert "Slack API key: test-slack-api-key-12345" in task.history[-1].parts[0].text
 
         with subtests.test("agent handles missing secret"):
             # Send message without secret - agent will request it
@@ -54,6 +54,6 @@ async def test_basic_secrets_example(subtests, get_final_task_from_stream, a2a_c
             final_task = await get_final_task_from_stream(running_example.client.send_message(SendMessageRequest(message=response_message)))
 
             assert final_task.status.state == TaskState.TASK_STATE_COMPLETED, (
-                f"Fail: {final_task.status.message.parts[0].root.text}"
+                f"Fail: {final_task.status.message.parts[0].text}"
             )
-            assert "No Slack API key provided" in final_task.history[-1].parts[0].root.text
+            assert "No Slack API key provided" in final_task.history[-1].parts[0].text

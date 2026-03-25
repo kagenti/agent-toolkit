@@ -24,11 +24,11 @@ FrameworkMessage = UserMessage | AssistantMessage
 
 def to_framework_message(message: Message) -> FrameworkMessage:
     """Convert A2A Message to Kagenti ADK Message format"""
-    message_text = "".join(part.root.text for part in message.parts if part.root.kind == "text")
+    message_text = "".join(part.text for part in message.parts if part.text)
 
-    if message.role == Role.agent:
+    if message.role == Role.ROLE_AGENT:
         return AssistantMessage(message_text)
-    elif message.role == Role.user:
+    elif message.role == Role.ROLE_USER:
         return UserMessage(message_text)
     else:
         raise ValueError(f"Invalid message role: {message.role}")

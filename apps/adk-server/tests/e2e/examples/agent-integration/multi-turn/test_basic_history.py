@@ -23,9 +23,9 @@ async def test_basic_history_example(subtests, get_final_task_from_stream, a2a_c
             task = await get_final_task_from_stream(running_example.client.send_message(SendMessageRequest(message=message)))
             # Verify response
             assert task.status.state == TaskState.TASK_STATE_COMPLETED, (
-                f"Fail: {task.status.message.parts[0].root.text}"
+                f"Fail: {task.status.message.parts[0].text}"
             )
-            assert "I can see we have 1 messages in our conversation." in task.history[-1].parts[0].root.text
+            assert "I can see we have 1 messages in our conversation." in task.history[-1].parts[0].text
 
         with subtests.test("agent reports 3 messages after second exchange"):
             message = create_text_message_object(content="My 2nd message")
@@ -34,6 +34,6 @@ async def test_basic_history_example(subtests, get_final_task_from_stream, a2a_c
 
             # Verify response
             assert task.status.state == TaskState.TASK_STATE_COMPLETED, (
-                f"Fail: {task.status.message.parts[0].root.text}"
+                f"Fail: {task.status.message.parts[0].text}"
             )
-            assert "I can see we have 3 messages in our conversation." in task.history[-1].parts[0].root.text
+            assert "I can see we have 3 messages in our conversation." in task.history[-1].parts[0].text

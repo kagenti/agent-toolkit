@@ -199,5 +199,5 @@ async def test_custom_mcp_client_with_oauth_example(
                     task, _ = event
 
             assert task.status.state == TaskState.TASK_STATE_COMPLETED
-            result_text = task.history[-1].parts[0].root.text
+            result_text = task.history[-1].parts[0].text
             assert "acct_test123" in result_text

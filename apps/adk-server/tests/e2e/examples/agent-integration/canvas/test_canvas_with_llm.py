@@ -26,7 +26,7 @@ async def test_canvas_with_llm_example(subtests, get_final_task_from_stream, a2a
             task = await get_final_task_from_stream(running_example.client.send_message(SendMessageRequest(message=message)))
 
             assert task.status.state == TaskState.TASK_STATE_COMPLETED, (
-                f"Fail: {task.status.message.parts[0].root.text}"
+                f"Fail: {task.status.message.parts[0].text}"
             )
 
             # Verify artifact is returned (the agent uses a mocked LLM response)
@@ -35,7 +35,7 @@ async def test_canvas_with_llm_example(subtests, get_final_task_from_stream, a2a
             assert artifact.name == "Response"
 
             # Verify the artifact contains the expected mock response
-            artifact_text = "".join(part.root.text for part in artifact.parts if hasattr(part.root, "text"))
+            artifact_text = "".join(part.text for part in artifact.parts if part.text)
             assert "Hello from LLM!" in artifact_text
 
         with subtests.test("agent updates artifact via canvas edit"):
@@ -43,7 +43,7 @@ async def test_canvas_with_llm_example(subtests, get_final_task_from_stream, a2a
             artifact_id = artifact.artifact_id
 
             # Get the artifact text to determine indices
-            artifact_text = "".join(part.root.text for part in artifact.parts if hasattr(part.root, "text"))
+            artifact_text = "".join(part.text for part in artifact.parts if part.text)
 
             # Send edit request for a portion of the code
             message = create_text_message_object(content="Change print to use f-string")
@@ -59,7 +59,7 @@ async def test_canvas_with_llm_example(subtests, get_final_task_from_stream, a2a
             task = await get_final_task_from_stream(running_example.client.send_message(SendMessageRequest(message=message)))
 
             assert task.status.state == TaskState.TASK_STATE_COMPLETED, (
-                f"Fail: {task.status.message.parts[0].root.text}"
+                f"Fail: {task.status.message.parts[0].text}"
             )
 
             # Verify updated artifact is returned
@@ -67,5 +67,5 @@ async def test_canvas_with_llm_example(subtests, get_final_task_from_stream, a2a
             updated_artifact = task.artifacts[0]
 
             # Verify the response contains the edit prompt context
-            updated_text = "".join(part.root.text for part in updated_artifact.parts if hasattr(part.root, "text"))
+            updated_text = "".join(part.text for part in updated_artifact.parts if part.text)
             assert "editing existing code" in updated_text.lower() or "selected" in updated_text.lower()

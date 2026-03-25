@@ -24,6 +24,6 @@ async def test_implement_your_agent_logic_example(subtests, get_final_task_from_
 
             # Verify response
             assert task.status.state == TaskState.TASK_STATE_COMPLETED, (
-                f"Fail: {task.status.message.parts[0].root.text}"
+                f"Fail: {task.status.message.parts[0].text}"
             )
-            assert "Ciao Pedro!" in task.history[-1].parts[0].root.text
+            assert "Ciao Pedro!" in task.history[-1].parts[0].text

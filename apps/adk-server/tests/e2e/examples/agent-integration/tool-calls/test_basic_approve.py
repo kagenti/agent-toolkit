@@ -61,7 +61,7 @@ async def test_basic_approve_example(subtests, a2a_client_factory, test_configur
 
             assert task is not None
             assert task.status.state == TaskState.TASK_STATE_COMPLETED, (
-                f"Fail: {task.status.message.parts[0].root.text}"
+                f"Fail: {task.status.message.parts[0].text}"
             )
 
         with subtests.test("tool call is rejected"):

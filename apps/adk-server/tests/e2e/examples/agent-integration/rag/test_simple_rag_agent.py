@@ -95,10 +95,10 @@ async def test_simple_rag_agent_example(subtests, get_final_task_from_stream, a2
 
             # Verify response
             assert task.status.state == TaskState.TASK_STATE_COMPLETED, (
-                f"Fail: {task.status.message.parts[0].root.text}"
+                f"Fail: {task.status.message.parts[0].text}"
             )
 
             # Verify results contain the relevant chunk (Power Requirements)
-            result_text = task.history[-1].parts[0].root.text
+            result_text = task.history[-1].parts[0].text
             assert "Results" in result_text
             assert "42 gigawatts" in result_text

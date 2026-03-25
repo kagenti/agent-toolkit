@@ -62,8 +62,8 @@ async def test_dynamic_form_requests_example(subtests, get_final_task_from_strea
             final_task = await get_final_task_from_stream(running_example.client.send_message(SendMessageRequest(message=response_message)))
 
             assert final_task.status.state == TaskState.TASK_STATE_COMPLETED, (
-                f"Fail: {final_task.status.message.parts[0].root.text}"
+                f"Fail: {final_task.status.message.parts[0].text}"
             )
-            assert "test@example.com" in final_task.history[-1].parts[0].root.text
-            assert "555-1234" in final_task.history[-1].parts[0].root.text
-            assert "Acme Corp" in final_task.history[-1].parts[0].root.text
+            assert "test@example.com" in final_task.history[-1].parts[0].text
+            assert "555-1234" in final_task.history[-1].parts[0].text
+            assert "Acme Corp" in final_task.history[-1].parts[0].text

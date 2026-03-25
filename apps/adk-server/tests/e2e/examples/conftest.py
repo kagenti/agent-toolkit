@@ -15,6 +15,7 @@ import httpx
 import pytest
 from a2a.client import Client, ClientEvent
 from a2a.types import AgentCard, Task
+from httpx import HTTPStatusError
 from a2a.utils.constants import AGENT_CARD_WELL_KNOWN_PATH
 from kagenti_adk.platform import Provider
 from kagenti_adk.platform.context import Context, ContextPermissions, ContextToken, Permissions
@@ -103,7 +104,13 @@ async def run_example(
         agent_card = await _get_agent_card(example_url)
 
         # create provider for the agent
-        provider = await Provider.create(location=example_url, agent_card=agent_card)
+        try:
+            provider = await Provider.create(location=example_url, agent_card=agent_card)
+        except HTTPStatusError as e:
+            if e.response.status_code == 409:
+                provider = await Provider.get_by_location(location=example_url)
+            else:
+                raise
 
         # create context for the example
         context = await Context.create()

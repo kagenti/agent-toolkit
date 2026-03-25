@@ -26,7 +26,7 @@ async def test_advanced_error_reporting_example(subtests, get_final_task_from_st
             assert task.status.state == TaskState.TASK_STATE_FAILED
 
             # Verify error message content
-            error_text = task.status.message.parts[0].root.text
+            error_text = task.status.message.parts[0].text
             assert "ValueError" in error_text
             assert "Something went wrong!" in error_text
             assert "Stack Trace" in error_text
