@@ -20,44 +20,34 @@ jobs:
           fail-on-severity: moderate
           deny-licenses: GPL-3.0, AGPL-3.0
 
-  trivy-scan:
-    name: Trivy Filesystem Scan
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      security-events: write
-    steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6
+  # trivy-scan:
+  #   name: Trivy Filesystem Scan
+  #   # DISABLED: aquasecurity/trivy-action supply chain was temporarily compromised.
+  #   # See: https://github.com/aquasecurity/trivy-action/issues/510
+  #   # Re-enable once a verified safe release is available.
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     contents: read
+  #     security-events: write
+  #   steps:
+  #     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6
+  #
+  #     - uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1  # v0.35.0
+  #       with:
+  #         scan-type: fs
+  #         scan-ref: .
+  #         severity: CRITICAL,HIGH
+  #         exit-code: 1
+  #         format: sarif
+  #         output: trivy-results.sarif
+  #
+  #     - uses: github/codeql-action/upload-sarif@0d579ffd059c29b07949a3cce3983f0780820c98  # v4
+  #       if: always()
+  #       with:
+  #         sarif_file: trivy-results.sarif
 
-      - uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1  # v0.35.0
-        with:
-          scan-type: fs
-          scan-ref: .
-          severity: CRITICAL,HIGH
-          exit-code: 1
-          format: sarif
-          output: trivy-results.sarif
-
-      - uses: github/codeql-action/upload-sarif@0d579ffd059c29b07949a3cce3983f0780820c98  # v4
-        if: always()
-        with:
-          sarif_file: trivy-results.sarif
-
-  codeql:
-    name: CodeQL Analysis
-    runs-on: ubuntu-latest
-    permissions:
-      security-events: write
-      contents: read
-    steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6
-
-      - uses: github/codeql-action/init@0d579ffd059c29b07949a3cce3983f0780820c98  # v4
-        with:
-          languages: python
-          queries: security-extended
-
-      - uses: github/codeql-action/analyze@0d579ffd059c29b07949a3cce3983f0780820c98  # v4
+  # CodeQL Analysis is configured via GitHub repo settings (default setup)
+  # with the "extended" query suite covering python, javascript-typescript, and actions.
 
   action-pinning:
     name: Verify Action Pinning
@@ -75,7 +65,7 @@ jobs:
           echo "See: https://docs.github.com/en/actions/security-for-github-actions/security-guides/security-hardening-for-github-actions#using-third-party-actions"
           echo ""
 
-          UNPINNED=$(grep -rh "uses:" .github/workflows/ | grep -v "#" | grep -E "@v[0-9]|@main|@master" | sort -u || true)
+          UNPINNED=$(grep -rh "uses:" .github/workflows/ | grep -v "#" | grep -v "^\s*echo " | grep -E "@v[0-9]|@main|@master" | sort -u || true)
 
           if [ -n "$UNPINNED" ]; then
             echo "::warning::Found actions not pinned to SHA commits:"
