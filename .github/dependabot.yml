@@ -1,0 +1,26 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: uv
+    directory: /apps/adk-server
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: uv
+    directory: /apps/adk-cli
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: uv
+    directory: /apps/adk-py
+    schedule:
+      interval: weekly

@@ -1,6 +1,11 @@
-# Contributing
+# Contributing to Kagenti ADK
 
-## Development setup
+We are grateful for your interest in joining the Kagenti community and making
+a positive impact. Whether you're raising issues, enhancing documentation,
+fixing bugs, or developing new features, your contributions are essential to
+our success.
+
+## Development Setup
 
 ### Installation
 
@@ -11,10 +16,18 @@ don't need to install them yourself.
 Clone this project, then run these setup steps:
 
 ```sh
+git clone https://github.com/kagenti/adk.git
+cd adk
 brew install mise # more ways to install: https://mise.jdx.dev/installing-mise.html
 mise trust
 mise install
 brew install qemu # if not using Brew: install QEMU through some other package manager
+```
+
+Install git hooks:
+
+```bash
+mise run common:setup:git-hooks
 ```
 
 After setup, you can use:
@@ -99,9 +112,9 @@ You can also automate this by creating a file `config.yaml`:
 ```yaml
 auth:
   enabled: true
-keycloak:
-  auth:
-    seedAdkUsers:
+  keycloakProvisionJob:
+    enabled: true
+    seedUsers:
       - username: admin
         password: admin
         firstName: Admin
@@ -139,8 +152,8 @@ mise run adk-server:dev:start
 This will do the following:
 
 1. Create .env file if it doesn't exist yet (you can add your configuration here)
-2. Stop default platform VM ("adk") if it exists
-3. Start a new VM named "adk-local-dev" separate from the "adk" VM used by default
+2. Stop default platform VM ("kagenti-adk") if it exists
+3. Start a new VM named "adk-local-dev" separate from the "kagenti-adk" VM used by default
 4. Install telepresence into the cluster
    > Note that this will require **root access** on your machine, due to setting up a networking stack.
 5. Replace kagenti-adk in the cluster and forward any incoming traffic to localhost
@@ -305,6 +318,29 @@ mise adk-ui:run
 mise adk-server:run
 ```
 
+## Pull Request Process
+
+1. Fork the repository
+2. Create a feature branch from `main`
+3. Make your changes with tests
+4. Run checks: `mise run check`
+5. Submit a pull request
+
+Smaller pull requests are typically easier to review and merge. If your pull
+request is large, collaborate with the maintainers to find the best way to
+divide it.
+
+## Commit Messages
+
+Use conventional commit format:
+
+- `feat:` New features
+- `fix:` Bug fixes
+- `docs:` Documentation changes
+- `chore:` Maintenance tasks
+- `refactor:` Code refactoring
+- `test:` Adding or updating tests
+
 ## Releasing
 
 Kagenti ADK is using `main` branch for next version development (integration branch) and `release-v*` branches for stable releases.
@@ -359,3 +395,20 @@ Try to follow this structure:
 Make sure to preview docs locally using: `mise docs:run`. This runs a development server which refreshes as you make changes to the `.mdx` files.
 
 Some code samples in docs are embedded from the `examples/` directory using [embedme](https://github.com/zakhenry/embedme) tags. For these, edit the example agent (not the `.mdx` file directly) and run `mise run docs:fix` to sync. See [Examples](#examples) for the full workflow.
+
+## Certificate of Origin
+
+All commits **must** include a `Signed-off-by` trailer (Developer Certificate
+of Origin). Use the `-s` flag when committing:
+
+```bash
+git commit -s -m "feat: add new feature"
+```
+
+By contributing to this project you agree to the
+[Developer Certificate of Origin](https://developercertificate.org/) (DCO).
+
+## Licensing
+
+Kagenti ADK is [Apache 2.0 licensed](LICENSE) and we accept contributions
+via GitHub pull requests.
