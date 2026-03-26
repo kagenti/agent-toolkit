@@ -210,7 +210,9 @@ class AuthManager:
         metadata = await self.get_oidc_metadata(auth_server)
         token_endpoint = metadata["token_endpoint"]
 
-        async with await self._get_oauth_client(self._auth.active_server, auth_server) as client:
+        async with await self._get_oauth_client(  # pyrefly: ignore [bad-context-manager]
+            self._auth.active_server, auth_server
+        ) as client:
             new_token = await client.fetch_token(
                 url=token_endpoint,
                 grant_type="refresh_token",
@@ -282,7 +284,7 @@ class AuthManager:
             if not registration_endpoint:
                 raise RuntimeError("Registration endpoint not found in OIDC metadata")
 
-            async with AsyncOAuth2Client() as client:
+            async with AsyncOAuth2Client() as client:  # pyrefly: ignore [bad-context-manager]
                 headers = {"Authorization": f"Bearer {registration_token}"}
                 resp = await client.delete(f"{registration_endpoint}/{client_id}", headers=headers)
                 resp.raise_for_status()

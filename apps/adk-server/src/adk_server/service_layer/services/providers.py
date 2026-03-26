@@ -112,17 +112,14 @@ class ProviderService:
         elif agent_card and get_extension(agent_card, SELF_REGISTRATION_EXTENSION_URI):
             updated_provider.state = ProviderState.ONLINE
 
-        if location is not None and location != provider.source:
-            if not agent_card:
-                try:
-                    loaded_card = await location.load_agent_card()
-                    updated_provider.agent_card = self._inject_default_agent_detail_extension(loaded_card)
-                except ValueError as ex:
-                    raise ManifestLoadError(
-                        location=location, message=str(ex), status_code=HTTP_400_BAD_REQUEST
-                    ) from ex
-                except Exception as ex:
-                    raise ManifestLoadError(location=location, message=str(ex)) from ex
+        if location is not None and location != provider.source and not agent_card:
+            try:
+                loaded_card = await location.load_agent_card()
+                updated_provider.agent_card = self._inject_default_agent_detail_extension(loaded_card)
+            except ValueError as ex:
+                raise ManifestLoadError(location=location, message=str(ex), status_code=HTTP_400_BAD_REQUEST) from ex
+            except Exception as ex:
+                raise ManifestLoadError(location=location, message=str(ex)) from ex
 
         if provider == updated_provider:
             return provider
@@ -135,9 +132,7 @@ class ProviderService:
 
         return updated_provider
 
-    async def preview_provider(
-        self, location: ProviderLocation, agent_card: dict[str, Any] | None = None
-    ) -> Provider:
+    async def preview_provider(self, location: ProviderLocation, agent_card: dict[str, Any] | None = None) -> Provider:
         try:
             if not agent_card:
                 agent_card = await location.load_agent_card()
@@ -177,9 +172,7 @@ class ProviderService:
             ]
         return providers
 
-    async def get_provider(
-        self, provider_id: UUID | None = None, location: ProviderLocation | None = None
-    ) -> Provider:
+    async def get_provider(self, provider_id: UUID | None = None, location: ProviderLocation | None = None) -> Provider:
         if not (bool(provider_id) ^ bool(location)):
             raise ValueError("Either provider_id or location must be provided")
         providers = [
@@ -190,4 +183,3 @@ class ProviderService:
         if not providers:
             raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail=f"Provider with ID: {provider_id!s} not found")
         return providers[0]
-

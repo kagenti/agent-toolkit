@@ -1,7 +1,9 @@
 # setup
 
 ["adk-server:setup"]
-extends = "python:setup"
+run = "uv sync --all-extras --dev"
+sources = ["uv.lock", "pyproject.toml"]
+outputs = { auto = true }
 depends = ["adk-py:setup"]
 dir = "{{config_root}}/apps/adk-server"
 
@@ -13,27 +15,49 @@ depends = ["adk-server:test:unit"]
 depends = ["adk-server:check:*"]
 
 ["adk-server:check:pytest-marks"]
-extends = "python:check:pytest-marks"
+run = """
+#!/bin/bash
+unmarked_tests=$(uv run pytest --collect-only --no-header --no-summary -q -m "not (unit or integration or e2e)" tests/ 2>/dev/null)
+if echo "$unmarked_tests" | grep "tests collected" | grep -qv "no tests collected"; then
+    echo "ERROR: Found tests without required pytest marks:\n"
+    echo "$unmarked_tests" | grep 'tests collected'
+    echo ""
+    echo "All tests must be marked with @pytest.mark.unit, @pytest.mark.integration, or @pytest.mark.e2e"
+    exit 1
+else
+    echo "✓ All tests have pytest marks"
+fi
+"""
+sources = ["tests/**/*.py"]
+outputs = { auto = true }
 depends = ["adk-server:setup"]
 dir = "{{config_root}}/apps/adk-server"
 
 ["adk-server:check:ruff-check"]
-extends = "python:check:ruff"
+run = "uv run ruff check --quiet"
+sources = ["src/**/*.py"]
+outputs = { auto = true }
 depends = ["adk-server:setup"]
 dir = "{{config_root}}/apps/adk-server"
 
 ["adk-server:check:ruff-format"]
-extends = "python:check:ruff-format"
+run = "uv run ruff format --quiet --check"
+sources = ["src/**/*.py"]
+outputs = { auto = true }
 depends = ["adk-server:setup"]
 dir = "{{config_root}}/apps/adk-server"
 
 ["adk-server:check:pyrefly"]
-extends = "python:check:pyrefly"
+run = "uv run pyrefly check src"
+sources = ["src/**/*.py"]
+outputs = { auto = true }
 depends = ["adk-server:setup"]
 dir = "{{config_root}}/apps/adk-server"
 
 ["adk-server:check:hadolint"]
-extends = "docker:check:hadolint"
+run = "hadolint --ignore DL3018 Dockerfile"
+sources = ["Dockerfile"]
+outputs = { auto = true }
 dir = "{{config_root}}/apps/adk-server"
 
 # TODO: make the docs generation deterministic
@@ -73,32 +97,37 @@ dir = "{{config_root}}/apps/adk-server"
 depends = ["adk-server:fix:*"]
 
 ["adk-server:fix:ruff-check"]
-extends = "python:fix:ruff"
+run = "uv run ruff check --quiet --fix"
+sources = ["src/**/*.py"]
+outputs = { auto = true }
 depends = ["adk-server:setup"]
 dir = "{{config_root}}/apps/adk-server"
 
 ["adk-server:fix:ruff-format"]
-extends = "python:fix:ruff-format"
+run = "uv run ruff format --quiet"
+sources = ["src/**/*.py"]
+outputs = { auto = true }
 depends = ["adk-server:setup"]
 dir = "{{config_root}}/apps/adk-server"
 
-["adk-server:fix:docs"]
-description = "Regenerate docs/development/api-reference/openapi.json from server routes (no running server needed)"
-depends = ["adk-server:setup"]
-dir = "{{config_root}}/apps/adk-server"
-run = '''
-uv run python -c "
-import json, sys
-from fastapi import FastAPI
-from fastapi.openapi.utils import get_openapi
-from adk_server.application import mount_routes, get_version
-app = FastAPI(docs_url=None, openapi_url=None)
-mount_routes(app)
-spec = get_openapi(title='ADK server', version=get_version(), routes=app.routes)
-spec.pop('servers', None)
-print(json.dumps(spec, indent=2))
-" > ../../docs/development/api-reference/openapi.json
-'''
+# TODO: make the docs generation deterministic
+# ["adk-server:fix:docs"]
+# description = "Regenerate docs/development/api-reference/openapi.json from server routes (no running server needed)"
+# depends = ["adk-server:setup"]
+# dir = "{{config_root}}/apps/adk-server"
+# run = '''
+# uv run python -c "
+# import json, sys
+# from fastapi import FastAPI
+# from fastapi.openapi.utils import get_openapi
+# from adk_server.application import mount_routes, get_version
+# app = FastAPI(docs_url=None, openapi_url=None)
+# mount_routes(app)
+# spec = get_openapi(title='ADK server', version=get_version(), routes=app.routes)
+# spec.pop('servers', None)
+# print(json.dumps(spec, indent=2))
+# " > ../../docs/development/api-reference/openapi.json
+# '''
 
 # run
 
@@ -413,7 +442,7 @@ kagenti-adk:
     enabled: true
 ' > "$CONFIG_FILE"
 
-{{ mise_bin }} run adk:start --vm-name=${VM_NAME} --skip-login -f "$CONFIG_FILE"
+{{ mise_bin }} run adk:start --vm-name=${VM_NAME} --skip-login -f "$CONFIG_FILE" --set ui.enabled=false
 
 
 eval "$( {{ mise_bin }} run adk:shell --vm-name="$VM_NAME" )"

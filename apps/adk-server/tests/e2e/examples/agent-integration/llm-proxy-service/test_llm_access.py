@@ -37,9 +37,9 @@ async def test_llm_access_example(subtests, get_final_task_from_stream, a2a_clie
             message = create_text_message_object(content="Hello")
             message.metadata = metadata
             message.context_id = running_example.context.id
-            task = await get_final_task_from_stream(running_example.client.send_message(SendMessageRequest(message=message)))
-
-            assert task.status.state == TaskState.TASK_STATE_COMPLETED, (
-                f"Fail: {task.status.message.parts[0].root.text}"
+            task = await get_final_task_from_stream(
+                running_example.client.send_message(SendMessageRequest(message=message))
             )
-            assert "LLM access configured for model: ibm/granite-3-3-8b-instruct" in task.history[-1].parts[0].root.text
+
+            assert task.status.state == TaskState.TASK_STATE_COMPLETED, f"Fail: {task.status.message.parts[0].text}"
+            assert "LLM access configured for model: ibm/granite-3-3-8b-instruct" in task.history[-1].parts[0].text

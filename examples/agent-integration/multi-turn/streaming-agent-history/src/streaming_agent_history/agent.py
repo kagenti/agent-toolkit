@@ -3,7 +3,7 @@
 import asyncio
 import os
 
-from a2a.types import Message
+from a2a.types import Message, Role
 from a2a.utils.message import get_message_text
 from kagenti_adk.a2a.types import AgentMessage
 from kagenti_adk.server import Server
@@ -21,8 +21,8 @@ async def example_tool() -> str:
 async def history_counter(history: list[Message]) -> str:
     """Create a concise conversation-state summary."""
     await asyncio.sleep(.1)  # doing some agent work
-    user_count = sum(1 for item in history if item.role.value == "user")
-    agent_count = sum(1 for item in history if item.role.value == "agent")
+    user_count = sum(1 for item in history if item.role == Role.ROLE_USER)
+    agent_count = sum(1 for item in history if item.role == Role.ROLE_AGENT)
     history_count = len(history)
     return f"total={history_count}, user={user_count}, agent={agent_count}"
 

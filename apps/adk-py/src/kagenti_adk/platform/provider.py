@@ -49,7 +49,7 @@ class Provider(pydantic.BaseModel, arbitrary_types_allowed=True):
         agent_card: AgentCard | None = None,
         origin: str | None = None,
         client: PlatformClient | None = None,
-    ) -> "Provider":
+    ) -> Provider:
         async with client or get_platform_client() as client:
             return pydantic.TypeAdapter(Provider).validate_python(
                 (
@@ -69,13 +69,13 @@ class Provider(pydantic.BaseModel, arbitrary_types_allowed=True):
             )
 
     async def patch(
-        self: "Provider" | str,
+        self: Provider | str,
         *,
         location: str | None = None,
         agent_card: AgentCard | None = None,
         origin: str | None = None,
         client: PlatformClient | None = None,
-    ) -> "Provider":
+    ) -> Provider:
         # `self` has a weird type so that you can call both `instance.patch()` to update an instance, or `Provider.patch("123", ...)` to update a provider
 
         provider_id = self if isinstance(self, str) else self.id
@@ -105,7 +105,7 @@ class Provider(pydantic.BaseModel, arbitrary_types_allowed=True):
         location: str,
         agent_card: AgentCard | None = None,
         client: PlatformClient | None = None,
-    ) -> "Provider":
+    ) -> Provider:
         async with client or get_platform_client() as client:
             return pydantic.TypeAdapter(Provider).validate_python(
                 (
@@ -121,7 +121,7 @@ class Provider(pydantic.BaseModel, arbitrary_types_allowed=True):
                 .json()
             )
 
-    async def get(self: "Provider" | str, *, client: PlatformClient | None = None) -> "Provider":
+    async def get(self: Provider | str, *, client: PlatformClient | None = None) -> Provider:
         # `self` has a weird type so that you can call both `instance.get()` to update an instance, or `Provider.get("123")` to obtain a new instance
         provider_id = self if isinstance(self, str) else self.id
         async with client or get_platform_client() as client:
@@ -134,7 +134,7 @@ class Provider(pydantic.BaseModel, arbitrary_types_allowed=True):
         return result
 
     @staticmethod
-    async def get_by_location(*, location: str, client: PlatformClient | None = None) -> "Provider":
+    async def get_by_location(*, location: str, client: PlatformClient | None = None) -> Provider:
         async with client or get_platform_client() as client:
             return pydantic.TypeAdapter(Provider).validate_json(
                 (await client.get(url=f"/api/v1/providers/by-location/{urllib.parse.quote(location, safe='')}"))
@@ -142,7 +142,7 @@ class Provider(pydantic.BaseModel, arbitrary_types_allowed=True):
                 .content
             )
 
-    async def delete(self: "Provider" | str, *, client: PlatformClient | None = None) -> None:
+    async def delete(self: Provider | str, *, client: PlatformClient | None = None) -> None:
         # `self` has a weird type so that you can call both `instance.delete()` or `Provider.delete("123")`
         provider_id = self if isinstance(self, str) else self.id
         async with client or get_platform_client() as client:
@@ -151,7 +151,7 @@ class Provider(pydantic.BaseModel, arbitrary_types_allowed=True):
     @staticmethod
     async def list(
         *, origin: str | None = None, user_owned: bool | None = None, client: PlatformClient | None = None
-    ) -> builtins.list["Provider"]:
+    ) -> builtins.list[Provider]:
         async with client or get_platform_client() as client:
             params = filter_dict({"origin": origin, "user_owned": user_owned})
             return pydantic.TypeAdapter(builtins.list[Provider]).validate_python(

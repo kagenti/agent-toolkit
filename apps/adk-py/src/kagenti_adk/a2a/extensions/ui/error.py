@@ -7,7 +7,7 @@ from __future__ import annotations
 import json
 import logging
 import traceback
-from collections.abc import AsyncIterator
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from types import NoneType
 from typing import Any, Final
@@ -130,7 +130,7 @@ class ErrorExtensionServer(BaseExtensionServer[ErrorExtensionSpec, NoneType]):
         super().__init__(*args, **kwargs)
 
     @asynccontextmanager
-    async def lifespan(self) -> AsyncIterator[None]:
+    async def lifespan(self) -> AsyncGenerator[None]:
         """Set up request-scoped error context using ContextVar."""
         with use_error_extension_context(server=self, context={}):
             yield

@@ -20,6 +20,7 @@ from adk_server.api.dependencies import (
 from adk_server.api.routes.a2a import create_proxy_agent_card as create_proxy_agent_card_
 from adk_server.api.schema.common import EntityModel
 from adk_server.api.schema.provider import CreateProviderRequest
+from adk_server.configuration import Configuration
 from adk_server.domain.models.common import PaginatedResult
 from adk_server.domain.models.permissions import AuthorizedUser
 from adk_server.domain.models.provider import Provider, ProviderLocation
@@ -137,5 +138,3 @@ async def delete_provider(
 ) -> None:
     # admin can delete any provider, other users only their providers
     await provider_service.delete_provider(provider_id=id, user=user.user)
-
-

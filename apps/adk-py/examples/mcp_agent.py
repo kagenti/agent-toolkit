@@ -10,10 +10,10 @@ from a2a.types import Message
 from mcp import ClientSession
 
 from kagenti_adk.a2a.extensions import (
-    OAuthExtensionServer,
-    OAuthExtensionSpec,
     MCPServiceExtensionServer,
     MCPServiceExtensionSpec,
+    OAuthExtensionServer,
+    OAuthExtensionSpec,
     ToolCallExtensionParams,
     ToolCallExtensionServer,
     ToolCallExtensionSpec,

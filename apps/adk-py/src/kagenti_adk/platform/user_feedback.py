@@ -33,7 +33,7 @@ class UserFeedback(pydantic.BaseModel):
         limit: int = 50,
         after_cursor: str | None = None,
         client: PlatformClient | None = None,
-    ) -> "ListUserFeedbackResponse":
+    ) -> ListUserFeedbackResponse:
         async with client or get_platform_client() as client:
             params = filter_dict({"provider_id": provider_id, "limit": limit, "after_cursor": after_cursor})
             return pydantic.TypeAdapter(ListUserFeedbackResponse).validate_python(

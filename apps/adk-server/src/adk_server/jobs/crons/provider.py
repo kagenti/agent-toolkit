@@ -81,7 +81,7 @@ async def sync_kagenti_agents(
                 errors.append(ex)
 
     # Create new providers for new kagenti agents
-    for url, agent in desired.items():
+    for url, _agent in desired.items():
         if url not in existing_kagenti:
             try:
                 from adk_server.domain.models.provider import NetworkProviderLocation
@@ -98,7 +98,7 @@ async def sync_kagenti_agents(
                 errors.append(RuntimeError(f"Failed to add kagenti provider {url}: {ex}"))
 
     # Update existing providers (refresh agent card)
-    for url, agent in desired.items():
+    for url, _agent in desired.items():
         if url in existing_kagenti:
             provider = existing_kagenti[url]
             try:

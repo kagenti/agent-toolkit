@@ -3,12 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { type ListProvidersRequest, type ListProvidersResponse, ProviderState } from '@kagenti/adk';
 import { useQuery } from '@tanstack/react-query';
-import {
-  type ListProvidersRequest,
-  type ListProvidersResponse,
-  ProviderState,
-} from '@kagenti/adk';
 
 import { buildAgent, isAgentUiSupported, sortAgentsByName, sortProvidersBy } from '#modules/agents/utils.ts';
 import { listProviders } from '#modules/providers/api/index.ts';
@@ -35,9 +31,7 @@ export function useListAgents({ includeUnsupportedUi, includeOffline, orderBy, i
       }
 
       if (!includeOffline) {
-        items = items.filter(
-          ({ state }) => state !== ProviderState.Offline,
-        );
+        items = items.filter(({ state }) => state !== ProviderState.Offline);
       }
 
       let agents = items.map(buildAgent);

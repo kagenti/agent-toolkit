@@ -1,7 +1,9 @@
 # setup
 
 ["adk-py:setup"]
-extends = "python:setup"
+run = "uv sync --all-extras --dev"
+sources = ["uv.lock", "pyproject.toml"]
+outputs = { auto = true }
 dir = "{{config_root}}/apps/adk-py"
 
 # check
@@ -10,21 +12,41 @@ dir = "{{config_root}}/apps/adk-py"
 depends = ["adk-py:check:*"]
 
 ["adk-py:check:ruff-check"]
-extends = "python:check:ruff"
+run = "uv run ruff check --quiet"
+sources = ["src/**/*.py"]
+outputs = { auto = true }
 depends = ["adk-py:setup"]
 dir = "{{config_root}}/apps/adk-py"
 
 ["adk-py:check:ruff-format"]
-extends = "python:check:ruff-format"
+run = "uv run ruff format --quiet --check"
+sources = ["src/**/*.py"]
+outputs = { auto = true }
 depends = ["adk-py:setup"]
 dir = "{{config_root}}/apps/adk-py"
 
 ["adk-py:check:pyrefly"]
-extends = "python:check:pyrefly"
+run = "uv run pyrefly check src"
+sources = ["src/**/*.py"]
+outputs = { auto = true }
 dir = "{{config_root}}/apps/adk-py"
 
 ["adk-py:check:pytest-marks"]
-extends = "python:check:pytest-marks"
+run = """
+#!/bin/bash
+unmarked_tests=$(uv run pytest --collect-only --no-header --no-summary -q -m "not (unit or integration or e2e)" tests/ 2>/dev/null)
+if echo "$unmarked_tests" | grep "tests collected" | grep -qv "no tests collected"; then
+    echo "ERROR: Found tests without required pytest marks:\n"
+    echo "$unmarked_tests" | grep 'tests collected'
+    echo ""
+    echo "All tests must be marked with @pytest.mark.unit, @pytest.mark.integration, or @pytest.mark.e2e"
+    exit 1
+else
+    echo "✓ All tests have pytest marks"
+fi
+"""
+sources = ["tests/**/*.py"]
+outputs = { auto = true }
 depends = ["adk-py:setup"]
 dir = "{{config_root}}/apps/adk-py"
 
@@ -34,12 +56,16 @@ dir = "{{config_root}}/apps/adk-py"
 depends = ["adk-py:fix:*"]
 
 ["adk-py:fix:ruff-check"]
-extends = "python:fix:ruff"
+run = "uv run ruff check --quiet --fix"
+sources = ["src/**/*.py"]
+outputs = { auto = true }
 depends = ["adk-py:setup"]
 dir = "{{config_root}}/apps/adk-py"
 
 ["adk-py:fix:ruff-format"]
-extends = "python:fix:ruff-format"
+run = "uv run ruff format --quiet"
+sources = ["src/**/*.py"]
+outputs = { auto = true }
 depends = ["adk-py:setup"]
 dir = "{{config_root}}/apps/adk-py"
 

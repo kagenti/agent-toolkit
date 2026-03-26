@@ -8,7 +8,7 @@ from typing import Annotated
 from a2a.types import Message
 from mcp import ClientSession
 from mcp.client.streamable_http import (
-    streamablehttp_client  # pyrefly: ignore [deprecated] -- TODO: upgrade,
+    streamablehttp_client,  # pyrefly: ignore [deprecated] -- TODO: upgrade,
 )
 from mcp.types import TextContent
 

@@ -7,7 +7,7 @@ import functools
 import inspect
 import logging
 import uuid
-from collections.abc import AsyncGenerator, AsyncIterable, AsyncIterator, Awaitable, Callable, Coroutine, Iterator
+from collections.abc import AsyncGenerator, AsyncIterable, Awaitable, Callable, Coroutine, Iterator
 from contextlib import asynccontextmanager, contextmanager
 from datetime import timedelta
 from typing import Any, NamedTuple, cast, overload, override
@@ -171,7 +171,7 @@ class ProxyRequestHandler(RequestHandler):
         self._uow = uow
 
     @asynccontextmanager
-    async def _client_transport(self, context: ServerCallContext) -> AsyncIterator[ClientTransport]:
+    async def _client_transport(self, context: ServerCallContext) -> AsyncGenerator[ClientTransport]:
         from fastapi.security.utils import get_authorization_scheme_param
 
         if self._agent_card is None:
@@ -271,9 +271,7 @@ class ProxyRequestHandler(RequestHandler):
 
     @_handle_exception
     @override
-    async def on_message_send(
-        self, params: SendMessageRequest, context: ServerCallContext
-    ) -> Task | Message:
+    async def on_message_send(self, params: SendMessageRequest, context: ServerCallContext) -> Task | Message:
         # we set task_id and context_id if not configured
         with trace.get_tracer(INSTRUMENTATION_NAME).start_as_current_span("on_message_send") as span:
             trace_id = f"{span.get_span_context().trace_id:032x}"
@@ -429,9 +427,7 @@ class A2AProxyService:
                 await uow.commit()
 
             if provider.state is ProviderState.OFFLINE:
-                raise InvalidProviderCallError(
-                    f"Cannot send message to provider {provider_id}: provider is offline"
-                )
+                raise InvalidProviderCallError(f"Cannot send message to provider {provider_id}: provider is offline")
 
             assert isinstance(provider.source, NetworkProviderLocation)
             return provider.source.a2a_url

@@ -12,7 +12,7 @@ import subprocess
 import sys
 import time
 from collections import Counter
-from collections.abc import AsyncIterator, Iterable, Mapping, MutableMapping
+from collections.abc import AsyncGenerator, Iterable, Mapping, MutableMapping
 from contextlib import asynccontextmanager
 from contextvars import ContextVar
 from copy import deepcopy
@@ -187,7 +187,7 @@ def prompt_user(
 
 
 @asynccontextmanager
-async def capture_output(process: anyio.abc.Process, stream_contents: list | None = None) -> AsyncIterator[TaskGroup]:
+async def capture_output(process: anyio.abc.Process, stream_contents: list | None = None) -> AsyncGenerator[TaskGroup]:
     async def receive_logs(stream: ByteReceiveStream, index=0):
         buffer = BytesIO()
         async for chunk in stream:

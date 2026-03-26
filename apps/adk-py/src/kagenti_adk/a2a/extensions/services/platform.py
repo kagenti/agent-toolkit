@@ -5,7 +5,7 @@
 from __future__ import annotations
 
 import os
-from collections.abc import AsyncIterator
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from types import NoneType
 from typing import TYPE_CHECKING
@@ -78,7 +78,7 @@ class PlatformApiExtensionServer(BaseExtensionServer[PlatformApiExtensionSpec, P
 
     @asynccontextmanager
     @override
-    async def lifespan(self) -> AsyncIterator[None]:
+    async def lifespan(self) -> AsyncGenerator[None]:
         if self.data and self.data.auth_token and self.spec.params.auto_use:
             async with self.use_client():
                 yield
@@ -111,7 +111,7 @@ class PlatformApiExtensionServer(BaseExtensionServer[PlatformApiExtensionSpec, P
         data.auth_token = pydantic.SecretStr(auth_token.get_secret_value()) if auth_token else None
 
     @asynccontextmanager
-    async def use_client(self) -> AsyncIterator[PlatformClient]:
+    async def use_client(self) -> AsyncGenerator[PlatformClient]:
         if not self.data or not self.data.auth_token:
             raise ExtensionError(self.spec, "Platform extension metadata was not provided")
         async with use_platform_client(

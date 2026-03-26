@@ -7,7 +7,7 @@ from __future__ import annotations
 import inspect
 import typing
 from collections import Counter
-from collections.abc import AsyncIterator, Callable
+from collections.abc import AsyncGenerator, Callable
 from contextlib import AbstractAsyncContextManager, asynccontextmanager
 from inspect import isclass
 from typing import Annotated, Any, TypeAlias, Unpack, get_args, get_origin
@@ -48,7 +48,7 @@ class Depends:
         instance = self._dependency_callable(message, context, request_context)
 
         @asynccontextmanager
-        async def lifespan() -> AsyncIterator[Dependency]:
+        async def lifespan() -> AsyncGenerator[Dependency]:
             if self.extension or hasattr(instance, "lifespan"):
                 async with instance.lifespan():
                     yield instance

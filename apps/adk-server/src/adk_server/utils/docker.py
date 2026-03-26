@@ -25,7 +25,7 @@ class DockerImageID(RootModel):
     root: str
 
     @model_validator(mode="after")
-    def _parse(self) -> "DockerImageID":
+    def _parse(self) -> DockerImageID:
         m = _DOCKER_IMAGE_PATTERN.match(self.root)
         if not m:
             raise ValueError(f"Invalid docker image reference: {self.root}")

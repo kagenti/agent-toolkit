@@ -1,7 +1,9 @@
 # setup
 
 ["adk-cli:setup"]
-extends = "python:setup"
+run = "uv sync --all-extras --dev"
+sources = ["uv.lock", "pyproject.toml"]
+outputs = { auto = true }
 depends = ["adk-py:setup"]
 dir = "{{config_root}}/apps/adk-cli"
 
@@ -11,17 +13,23 @@ dir = "{{config_root}}/apps/adk-cli"
 depends = ["adk-cli:check:*"]
 
 ["adk-cli:check:ruff-check"]
-extends = "python:check:ruff"
+run = "uv run ruff check --quiet"
+sources = ["src/**/*.py"]
+outputs = { auto = true }
 depends = ["adk-cli:setup"]
 dir = "{{config_root}}/apps/adk-cli"
 
 ["adk-cli:check:ruff-format"]
-extends = "python:check:ruff-format"
+run = "uv run ruff format --quiet --check"
+sources = ["src/**/*.py"]
+outputs = { auto = true }
 depends = ["adk-cli:setup"]
 dir = "{{config_root}}/apps/adk-cli"
 
 ["adk-cli:check:pyrefly"]
-extends = "python:check:pyrefly"
+run = "uv run pyrefly check src"
+sources = ["src/**/*.py"]
+outputs = { auto = true }
 dir = "{{config_root}}/apps/adk-cli"
 
 # fix
@@ -30,12 +38,16 @@ dir = "{{config_root}}/apps/adk-cli"
 depends = ["adk-cli:fix:*"]
 
 ["adk-cli:fix:ruff-check"]
-extends = "python:fix:ruff"
+run = "uv run ruff check --quiet --fix"
+sources = ["src/**/*.py"]
+outputs = { auto = true }
 depends = ["adk-cli:setup"]
 dir = "{{config_root}}/apps/adk-cli"
 
 ["adk-cli:fix:ruff-format"]
-extends = "python:fix:ruff-format"
+run = "uv run ruff format --quiet"
+sources = ["src/**/*.py"]
+outputs = { auto = true }
 depends = ["adk-cli:setup"]
 dir = "{{config_root}}/apps/adk-cli"
 

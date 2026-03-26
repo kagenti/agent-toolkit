@@ -15,7 +15,7 @@ from uuid import uuid4
 import httpx
 import pytest
 import uvicorn
-from a2a.types import SendMessageRequest, Message, Part, Role, TaskState
+from a2a.types import Message, Part, Role, SendMessageRequest, TaskState
 from kagenti_adk.a2a.extensions import OAuthExtensionClient, OAuthFulfillment
 from kagenti_adk.a2a.extensions.auth.oauth import OAuthExtensionSpec
 from mcp.server.auth.provider import (
@@ -199,5 +199,5 @@ async def test_custom_mcp_client_with_oauth_example(
                     task, _ = event
 
             assert task.status.state == TaskState.TASK_STATE_COMPLETED
-            result_text = task.history[-1].parts[0].root.text
+            result_text = task.history[-1].parts[0].text
             assert "acct_test123" in result_text

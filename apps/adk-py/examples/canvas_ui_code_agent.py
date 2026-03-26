@@ -12,11 +12,11 @@ from typing import Annotated
 from a2a.types import Message, TextPart
 
 from kagenti_adk.a2a.extensions import (
+    CanvasExtensionServer,
+    CanvasExtensionSpec,
     ErrorExtensionParams,
     ErrorExtensionServer,
     ErrorExtensionSpec,
-    CanvasExtensionServer,
-    CanvasExtensionSpec,
 )
 from kagenti_adk.a2a.types import AgentArtifact, AgentMessage
 from kagenti_adk.server import Server

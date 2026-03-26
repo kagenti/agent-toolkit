@@ -7,7 +7,7 @@ import logging
 import re
 import urllib
 import urllib.parse
-from collections.abc import AsyncIterator
+from collections.abc import AsyncGenerator, AsyncIterator
 from contextlib import asynccontextmanager
 from datetime import timedelta
 from textwrap import indent
@@ -18,10 +18,10 @@ import openai
 import pydantic
 from a2a.client import A2AClientError, Client, ClientConfig, ClientFactory
 from a2a.types import AgentCard
-from kagenti_adk.platform.context import ContextToken
 from google.protobuf.json_format import MessageToDict
 from httpx import HTTPStatusError
 from httpx._types import RequestFiles
+from kagenti_adk.platform.context import ContextToken
 
 from kagenti_cli import configuration
 from kagenti_cli.configuration import Configuration
@@ -132,7 +132,7 @@ async def fetch_server_version() -> str | None:
 
 
 @asynccontextmanager
-async def a2a_client(agent_card: AgentCard, context_token: ContextToken) -> AsyncIterator[Client]:
+async def a2a_client(agent_card: AgentCard, context_token: ContextToken) -> AsyncGenerator[Client]:
     try:
         async with httpx.AsyncClient(
             headers={"Authorization": f"Bearer {context_token.token.get_secret_value()}"},
@@ -156,7 +156,7 @@ async def a2a_client(agent_card: AgentCard, context_token: ContextToken) -> Asyn
 
 
 @asynccontextmanager
-async def openai_client() -> AsyncIterator[openai.AsyncOpenAI]:
+async def openai_client() -> AsyncGenerator[openai.AsyncOpenAI]:
     async with Configuration().use_platform_client() as platform_client:
         headers = platform_client.headers.copy()
         headers.pop("Authorization", None)

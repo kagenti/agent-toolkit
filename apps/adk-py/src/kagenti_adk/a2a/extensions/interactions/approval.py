@@ -86,7 +86,7 @@ class ToolCallApprovalRequest(SecureBaseModel):
     @staticmethod
     def from_mcp_tool(
         tool: Tool, input: dict[str, Any] | None, server: Implementation | None = None
-    ) -> "ToolCallApprovalRequest":
+    ) -> ToolCallApprovalRequest:
         return ToolCallApprovalRequest(
             name=tool.name,
             title=tool.annotations.title if tool.annotations else None,

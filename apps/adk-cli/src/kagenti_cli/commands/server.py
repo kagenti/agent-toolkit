@@ -291,9 +291,11 @@ async def server_login(
             )
             if not client_id:
                 raise RuntimeError("Client ID is mandatory. Action cancelled.")
-            client_secret = client_secret or await inquirer.secret(
-                message="Enter Client Secret (optional):"
-            ).execute_async() or None
+            client_secret = (
+                client_secret
+                or await inquirer.secret(message="Enter Client Secret (optional):").execute_async()
+                or None
+            )
 
         code_verifier = generate_token(64)
 

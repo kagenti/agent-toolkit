@@ -45,7 +45,9 @@ configuration = Configuration()
 
 @functools.cache
 def detect_driver() -> typing.Literal["lima", "wsl"]:
-    has_lima = (importlib.resources.files("kagenti_cli") / "data" / "bin" / "limactl").is_file() or shutil.which("limactl")
+    has_lima = (importlib.resources.files("kagenti_cli") / "data" / "bin" / "limactl").is_file() or shutil.which(
+        "limactl"
+    )
     arch = "aarch64" if platform_module.machine().lower() == "arm64" else platform_module.machine().lower()
 
     if platform_module.system() == "Windows" or shutil.which("wsl.exe"):
@@ -115,7 +117,18 @@ async def detect_vm_status(vm_name: str) -> typing.Literal["running", "stopped",
     else:
         wsl_env = {"WSL_UTF8": "1", "WSLENV": os.getenv("WSLENV", "") + ":WSL_UTF8"}
         for status, cmd in [("running", ["--running"]), ("stopped", [])]:
-            if vm_name in (await run_command(["wsl.exe", "--list", "--quiet", *cmd], f"Looking for {status} Kagenti ADK platform", env=wsl_env)).stdout.decode().splitlines():
+            if (
+                vm_name
+                in (
+                    await run_command(
+                        ["wsl.exe", "--list", "--quiet", *cmd],
+                        f"Looking for {status} Kagenti ADK platform",
+                        env=wsl_env,
+                    )
+                )
+                .stdout.decode()
+                .splitlines()
+            ):
                 return typing.cast(typing.Literal["running", "stopped"], status)
     return "missing"
 
@@ -155,7 +168,6 @@ async def run_in_vm(
     )
 
 
-
 def canonify_image_tag(t: str) -> str:
     t = t.strip().strip("'").strip('"').replace(" @", "@")
     if "@" in t:
@@ -192,8 +204,7 @@ async def detect_image_shas(
         if (x := line.split())
         and len(x) >= 3
         and (x[1] != "<none>")
-        and (canon_tag := canonify_image_tag(f"{x[0]}:{x[1]}"))
-        in loaded_images
+        and (canon_tag := canonify_image_tag(f"{x[0]}:{x[1]}")) in loaded_images
         and (sha := x[2])
     }
 
@@ -286,7 +297,13 @@ async def start_cmd(
                     match await detect_vm_status(vm_name):
                         case "missing":
                             for name, label in [(vm_name, "previous"), ("kagenti-platform", "legacy")]:
-                                await run_command([detect_limactl(), "--tty=false", "delete", "--force", name], f"Cleaning up remains of {label} instance", env=lima_env, check=False, cwd="/")
+                                await run_command(
+                                    [detect_limactl(), "--tty=false", "delete", "--force", name],
+                                    f"Cleaning up remains of {label} instance",
+                                    env=lima_env,
+                                    check=False,
+                                    cwd="/",
+                                )
                             import psutil
 
                             total_memory_gib = psutil.virtual_memory().total // (1024**3)
@@ -296,7 +313,10 @@ async def start_cmd(
                             if total_memory_gib < 8:
                                 console.warning("Less than 8 GB of RAM detected. Performance may be degraded.")
 
-                            current_lima_image = lima_image or f"https://github.com/kagenti/adk/releases/download/v{version}/microshift-vm-{arch}.qcow2"
+                            current_lima_image = (
+                                lima_image
+                                or f"https://github.com/kagenti/adk/releases/download/v{version}/microshift-vm-{arch}.qcow2"
+                            )
                             if current_lima_image.startswith(("/", "./")):
                                 current_lima_image = str(await anyio.Path(current_lima_image).absolute())
 
@@ -343,7 +363,10 @@ async def start_cmd(
                                 )
                         case "stopped":
                             await run_command(
-                                [detect_limactl(), "--tty=false", "start", vm_name], "Starting up", env=lima_env, cwd="/"
+                                [detect_limactl(), "--tty=false", "start", vm_name],
+                                "Starting up",
+                                env=lima_env,
+                                cwd="/",
                             )
                         case "running":
                             console.info("Updating an existing instance.")
@@ -392,7 +415,9 @@ async def start_cmd(
                     Configuration().home.mkdir(parents=True, exist_ok=True)
                     if await detect_vm_status(vm_name) == "missing":
                         await run_command(
-                            ["wsl.exe", "--unregister", vm_name], "Cleaning up remains of previous instance", check=False
+                            ["wsl.exe", "--unregister", vm_name],
+                            "Cleaning up remains of previous instance",
+                            check=False,
                         )
                         await run_command(
                             ["wsl.exe", "--unregister", "kagenti-platform"],
@@ -400,7 +425,10 @@ async def start_cmd(
                             check=False,
                         )
 
-                        current_wsl_image = wsl_image or f"https://github.com/kagenti/adk/releases/download/v{version}/microshift-vm-{arch}.wsl"
+                        current_wsl_image = (
+                            wsl_image
+                            or f"https://github.com/kagenti/adk/releases/download/v{version}/microshift-vm-{arch}.wsl"
+                        )
                         install_dir = Configuration().home / "wsl" / vm_name
                         install_dir.mkdir(parents=True, exist_ok=True)
                         if current_wsl_image.startswith(("http://", "https://")):
@@ -422,7 +450,11 @@ async def start_cmd(
                                 "Importing WSL distribution",
                             )
                         await run_command(["wsl.exe", "--terminate", vm_name], "Restarting Kagenti ADK VM")
-                    await run_in_vm(vm_name, ["/usr/bin/setsid", "-f", "/usr/bin/sleep", "infinity"], "Ensuring persistence of Kagenti ADK VM")
+                    await run_in_vm(
+                        vm_name,
+                        ["/usr/bin/setsid", "-f", "/usr/bin/sleep", "infinity"],
+                        "Ensuring persistence of Kagenti ADK VM",
+                    )
                     await run_in_vm(
                         vm_name,
                         [
@@ -435,15 +467,31 @@ async def start_cmd(
 
         await run_in_vm(
             vm_name,
-            ["bash", "-c", "until test -f /var/lib/microshift/resources/kubeadmin/kubeconfig; do sleep 5; done && chmod o+x /var/lib/microshift /var/lib/microshift/resources /var/lib/microshift/resources/kubeadmin && chmod o+r /var/lib/microshift/resources/kubeadmin/kubeconfig"],
+            [
+                "bash",
+                "-c",
+                "until test -f /var/lib/microshift/resources/kubeadmin/kubeconfig; do sleep 5; done && chmod o+x /var/lib/microshift /var/lib/microshift/resources /var/lib/microshift/resources/kubeadmin && chmod o+r /var/lib/microshift/resources/kubeadmin/kubeconfig",
+            ],
             "Waiting for kubeconfig",
         )
         kubeconfig_local = anyio.Path(Configuration().lima_home / vm_name / "copied-from-guest" / "kubeconfig.yaml")
         await kubeconfig_local.parent.mkdir(parents=True, exist_ok=True)
-        await kubeconfig_local.write_text((await run_in_vm(vm_name, ["cat", "/var/lib/microshift/resources/kubeadmin/kubeconfig"], "Copying kubeconfig from Kagenti ADK platform")).stdout.decode())
+        await kubeconfig_local.write_text(
+            (
+                await run_in_vm(
+                    vm_name,
+                    ["cat", "/var/lib/microshift/resources/kubeadmin/kubeconfig"],
+                    "Copying kubeconfig from Kagenti ADK platform",
+                )
+            ).stdout.decode()
+        )
         await run_in_vm(
             vm_name,
-            ["bash", "-c", 'command -v helm && exit 0; case $(uname -m) in x86_64) ARCH="amd64" ;; aarch64) ARCH="arm64" ;; esac; curl -fsSL "https://get.helm.sh/helm-v4.1.1-linux-${ARCH}.tar.gz" | tar -xzf - --strip-components=1 -C /usr/local/bin "linux-${ARCH}/helm"; chmod +x /usr/local/bin/helm'],
+            [
+                "bash",
+                "-c",
+                'command -v helm && exit 0; case $(uname -m) in x86_64) ARCH="amd64" ;; aarch64) ARCH="arm64" ;; esac; curl -fsSL "https://get.helm.sh/helm-v4.1.1-linux-${ARCH}.tar.gz" | tar -xzf - --strip-components=1 -C /usr/local/bin "linux-${ARCH}/helm"; chmod +x /usr/local/bin/helm',
+            ],
             "Installing Helm",
         )
         # --- Prepare kagenti-adk chart and import images before any deployments ---
@@ -592,7 +640,12 @@ async def start_cmd(
             )
         )
         for name, content in [("kagenti-deps", kagenti_deps_values), ("kagenti", kagenti_values)]:
-            await run_in_vm(vm_name, ["bash", "-c", f"cat >/tmp/{name}-values.yaml"], f"Preparing {name} values", input=content.encode("utf-8"))
+            await run_in_vm(
+                vm_name,
+                ["bash", "-c", f"cat >/tmp/{name}-values.yaml"],
+                f"Preparing {name} values",
+                input=content.encode("utf-8"),
+            )
         # List images from all charts (kagenti-adk + kagenti + kagenti-deps)
         helm_template_cmds = "; ".join(
             f"helm template {name} {src}"
@@ -610,7 +663,11 @@ async def start_cmd(
             for line in (
                 await run_in_vm(
                     vm_name,
-                    ["/bin/bash", "-c", "{ " + helm_template_cmds + r"; } | sed -n '/^\s*image:/{ /{{/!{ s/.*image:\s*//p } }'"],
+                    [
+                        "/bin/bash",
+                        "-c",
+                        "{ " + helm_template_cmds + r"; } | sed -n '/^\s*image:/{ /{{/!{ s/.*image:\s*//p } }'",
+                    ],
                     "Listing necessary images",
                 )
             )
@@ -662,7 +719,11 @@ async def start_cmd(
                     [
                         "skopeo",
                         "copy",
-                        *(["--src-username", "x-access-token", "--src-password", github_token] if github_token and image.startswith("ghcr.io/") else []),
+                        *(
+                            ["--src-username", "x-access-token", "--src-password", github_token]
+                            if github_token and image.startswith("ghcr.io/")
+                            else []
+                        ),
                         f"docker://{image}",
                         f"containers-storage:{image}",
                     ],
@@ -673,18 +734,26 @@ async def start_cmd(
         # --- Kagenti platform installation ---
         await run_in_vm(
             vm_name,
-            ["kubectl", "apply", "-f", "https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/standard-install.yaml"],
+            [
+                "kubectl",
+                "apply",
+                "-f",
+                "https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/standard-install.yaml",
+            ],
             "Installing kagenti prerequisites (Gateway API CRDs)",
         )
         await run_in_vm(
             vm_name,
-            ["bash", "-c",
-             "V=1.28.0; "
-             "helm repo add istio https://istio-release.storage.googleapis.com/charts/ 2>/dev/null || true; helm repo update istio; "
-             "kubectl create namespace istio-system --dry-run=client -o yaml | kubectl apply -f -; "
-             "helm upgrade --install istio-base istio/base --version=$V --namespace=istio-system --wait --force-conflicts; "
-             "helm upgrade --install istiod istio/istiod --version=$V --namespace=istio-system --wait --force-conflicts "
-             "--set pilot.resources.requests.cpu=50m --set pilot.resources.requests.memory=256Mi"],
+            [
+                "bash",
+                "-c",
+                "V=1.28.0; "
+                "helm repo add istio https://istio-release.storage.googleapis.com/charts/ 2>/dev/null || true; helm repo update istio; "
+                "kubectl create namespace istio-system --dry-run=client -o yaml | kubectl apply -f -; "
+                "helm upgrade --install istio-base istio/base --version=$V --namespace=istio-system --wait --force-conflicts; "
+                "helm upgrade --install istiod istio/istiod --version=$V --namespace=istio-system --wait --force-conflicts "
+                "--set pilot.resources.requests.cpu=50m --set pilot.resources.requests.memory=256Mi",
+            ],
             "Installing Istio (Gateway API controller)",
         )
         phoenix_enabled = any("components.otel.enabled=true" in v.lower() for v in scoped_sets.get("kagenti-deps", []))
@@ -711,7 +780,8 @@ async def start_cmd(
         await run_in_vm(
             vm_name,
             [
-                "bash", "-c",
+                "bash",
+                "-c",
                 "UID_RANGE=$(kubectl get namespace keycloak -o jsonpath='{.metadata.annotations.openshift\\.io/sa\\.scc\\.uid-range}') && "
                 "BASE_UID=${UID_RANGE%%/*} && "
                 'chown -R "$BASE_UID:$BASE_UID" /kagenti-keycloak-postgres-data && '
@@ -723,35 +793,41 @@ async def start_cmd(
         # Label namespaces for shared gateway access and create otel-collector route
         await run_in_vm(
             vm_name,
-            ["bash", "-c",
-             "kubectl create namespace kagenti-adk --dry-run=client -o yaml | kubectl apply -f - && "
-             "for ns in kagenti-adk keycloak kagenti-system istio-system; do kubectl label namespace $ns shared-gateway-access=true --overwrite; done && "
-             "kubectl apply -f - <<'EOF'\n"
-             "apiVersion: gateway.networking.k8s.io/v1\n"
-             "kind: HTTPRoute\n"
-             "metadata:\n"
-             "  name: otel-collector\n"
-             "  namespace: kagenti-system\n"
-             "spec:\n"
-             "  parentRefs:\n"
-             "    - name: http\n"
-             "      namespace: kagenti-system\n"
-             "  hostnames:\n"
-             '    - "otel-collector.localtest.me"\n'
-             "  rules:\n"
-             "    - backendRefs:\n"
-             "        - name: otel-collector\n"
-             "          port: 8335\n"
-             "EOF"],
+            [
+                "bash",
+                "-c",
+                "kubectl create namespace kagenti-adk --dry-run=client -o yaml | kubectl apply -f - && "
+                "for ns in kagenti-adk keycloak kagenti-system istio-system; do kubectl label namespace $ns shared-gateway-access=true --overwrite; done && "
+                "kubectl apply -f - <<'EOF'\n"
+                "apiVersion: gateway.networking.k8s.io/v1\n"
+                "kind: HTTPRoute\n"
+                "metadata:\n"
+                "  name: otel-collector\n"
+                "  namespace: kagenti-system\n"
+                "spec:\n"
+                "  parentRefs:\n"
+                "    - name: http\n"
+                "      namespace: kagenti-system\n"
+                "  hostnames:\n"
+                '    - "otel-collector.localtest.me"\n'
+                "  rules:\n"
+                "    - backendRefs:\n"
+                "        - name: otel-collector\n"
+                "          port: 8335\n"
+                "EOF",
+            ],
             "Configuring gateway routes",
         )
 
         # --- Kagenti ADK helm install ---
         await run_in_vm(
             vm_name,
-            ["bash", "-c",
-             "timeout 5m bash -c 'until kubectl get nodes --no-headers -o custom-columns=NAME:.metadata.name 2>/dev/null | grep -q .; do sleep 5; done' && "
-             "kubectl get nodes --no-headers -o custom-columns=NAME:.metadata.name | xargs -I {} sh -c \"grep -q '{}' /etc/hosts || echo '127.0.0.1 {}' >> /etc/hosts\""],
+            [
+                "bash",
+                "-c",
+                "timeout 5m bash -c 'until kubectl get nodes --no-headers -o custom-columns=NAME:.metadata.name 2>/dev/null | grep -q .; do sleep 5; done' && "
+                "kubectl get nodes --no-headers -o custom-columns=NAME:.metadata.name | xargs -I {} sh -c \"grep -q '{}' /etc/hosts || echo '127.0.0.1 {}' >> /etc/hosts\"",
+            ],
             "Ensuring node name resolution",
         )
         await run_in_vm(
@@ -789,21 +865,46 @@ async def start_cmd(
             "Installing kagenti platform (operator + backend)",
         )
         if shas_guest_before:
-            replaced_digests = set(shas_guest_before.values()) - set((await detect_image_shas(vm_name, loaded_images, mode="guest")).values())
+            replaced_digests = set(shas_guest_before.values()) - set(
+                (await detect_image_shas(vm_name, loaded_images, mode="guest")).values()
+            )
             if replaced_digests:
-                pods = json.loads((await run_in_vm(vm_name, ["kubectl", "get", "pods", "-o", "json", "--all-namespaces"], "Getting pods")).stdout)
+                pods = json.loads(
+                    (
+                        await run_in_vm(
+                            vm_name, ["kubectl", "get", "pods", "-o", "json", "--all-namespaces"], "Getting pods"
+                        )
+                    ).stdout
+                )
                 for pod in pods.get("items", []):
-                    if any(cs.get("imageID", "") in replaced_digests for cs in pod.get("status", {}).get("containerStatuses", [])):
+                    if any(
+                        cs.get("imageID", "") in replaced_digests
+                        for cs in pod.get("status", {}).get("containerStatuses", [])
+                    ):
                         ns, name = pod["metadata"]["namespace"], pod["metadata"]["name"]
-                        await run_in_vm(vm_name, ["kubectl", "delete", "pod", name, "-n", ns], f"Removing pod with obsolete image {ns}/{name}")
+                        await run_in_vm(
+                            vm_name,
+                            ["kubectl", "delete", "pod", name, "-n", ns],
+                            f"Removing pod with obsolete image {ns}/{name}",
+                        )
         await run_in_vm(
             vm_name,
-            ["timeout", "5m", "bash", "-c", "until kubectl wait --for=condition=Ready pod -n openshift-dns -l dns.operator.openshift.io/daemonset-dns=default --timeout=2m; do sleep 5; done"],
+            [
+                "timeout",
+                "5m",
+                "bash",
+                "-c",
+                "until kubectl wait --for=condition=Ready pod -n openshift-dns -l dns.operator.openshift.io/daemonset-dns=default --timeout=2m; do sleep 5; done",
+            ],
             "Waiting for DNS to be ready",
         )
         await run_in_vm(
             vm_name,
-            ["bash", "-euxc", 'systemctl daemon-reload; systemctl start "kubectl-port-forward@kagenti-system:http-istio:8080:80" & systemctl start "kubectl-port-forward@kagenti-system:otel-collector:4318" &'],
+            [
+                "bash",
+                "-euxc",
+                'systemctl daemon-reload; systemctl start "kubectl-port-forward@kagenti-system:http-istio:8080:80" & systemctl start "kubectl-port-forward@kagenti-system:otel-collector:4318" &',
+            ],
             "Forwarding VM services to host",
         )
 
@@ -826,7 +927,11 @@ async def start_cmd(
 
         await run_in_vm(
             vm_name,
-            ["bash", "-c", "kubectl wait --for=condition=Complete job/keycloak-provision -n kagenti-adk --timeout=300s"],
+            [
+                "bash",
+                "-c",
+                "kubectl wait --for=condition=Complete job/keycloak-provision -n kagenti-adk --timeout=300s",
+            ],
             "Waiting for Keycloak provisioning to complete",
         )
         console.success("Kagenti ADK platform started successfully!")
@@ -841,7 +946,6 @@ async def start_cmd(
 
         if not skip_login:
             await kagenti_cli.commands.server.server_login("http://adk-api.localtest.me:8080")
-
 
 
 @app.command("stop", help="Stop Kagenti ADK platform. [Local only]")
@@ -875,7 +979,6 @@ async def stop_cmd(
         else:
             await run_command(["wsl.exe", "--terminate", vm_name], "Stopping Kagenti ADK VM")
         console.success("Kagenti ADK platform stopped successfully.")
-
 
 
 @app.command("delete", help="Delete Kagenti ADK platform. [Local only]")
@@ -914,7 +1017,6 @@ async def delete_cmd(
         console.success("Kagenti ADK platform deleted successfully.")
 
 
-
 @app.command("import", help="Import a local docker image into the Kagenti ADK platform. [Local only]")
 async def import_cmd(
     tag: typing.Annotated[str, typer.Argument(help="Docker image tag to import")],
@@ -940,7 +1042,6 @@ async def import_cmd(
             await anyio.Path(host_path).unlink(missing_ok=True)
 
 
-
 @app.command("exec", help="For debugging -- execute a command inside the Kagenti ADK platform VM. [Local only]")
 async def exec_cmd(
     command: typing.Annotated[list[str] | None, typer.Argument()] = None,
@@ -961,7 +1062,15 @@ async def exec_cmd(
             )
         elif detect_driver() == "lima":
             await anyio.run_process(
-                [detect_limactl(), "shell", f"--tty={sys.stdin.isatty()}", vm_name, "--", "sudo", *(command or ["/bin/bash"])],
+                [
+                    detect_limactl(),
+                    "shell",
+                    f"--tty={sys.stdin.isatty()}",
+                    vm_name,
+                    "--",
+                    "sudo",
+                    *(command or ["/bin/bash"]),
+                ],
                 check=False,
                 stdin=sys.stdin,
                 stdout=sys.stdout,

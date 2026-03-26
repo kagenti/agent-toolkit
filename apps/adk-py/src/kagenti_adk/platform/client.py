@@ -7,7 +7,7 @@ import contextlib
 import os
 import ssl
 import typing
-from collections.abc import AsyncIterator, Mapping
+from collections.abc import AsyncGenerator, Mapping
 from types import TracebackType
 
 import httpx
@@ -111,7 +111,7 @@ def wrap_context(
     context: typing.Callable[P, contextlib.AbstractContextManager[T]],
 ) -> typing.Callable[P, contextlib.AbstractAsyncContextManager[T]]:
     @contextlib.asynccontextmanager
-    async def use_async_resource(*args: P.args, **kwargs: P.kwargs) -> AsyncIterator[T]:
+    async def use_async_resource(*args: P.args, **kwargs: P.kwargs) -> AsyncGenerator[T]:
         with context(*args, **kwargs) as resource:
             async with resource:
                 yield resource

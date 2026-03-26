@@ -57,7 +57,7 @@ class ExternalMcpService:
         await self.revoke_token(connector=connector)
         await self._ensure_client_registered(connector=connector, redirect_uri=callback_url)
 
-        async with self._create_client(connector=connector) as client:
+        async with self._create_client(connector=connector) as client:  # pyrefly: ignore [bad-context-manager]
             uri, state = client.create_authorization_url(
                 auth_metadata.get("authorization_endpoint"),
                 code_verifier=(code_verifier := token_urlsafe(64)),
@@ -76,7 +76,7 @@ class ExternalMcpService:
             return
 
         try:
-            async with self._create_client(connector=connector) as client:
+            async with self._create_client(connector=connector) as client:  # pyrefly: ignore [bad-context-manager]
                 if not (auth_metadata := await self._discover_auth_metadata(connector=connector)):
                     raise RuntimeError("Authorization server no longer contains necessary metadata")
                 if not isinstance(revoke_endpoint := auth_metadata.get("revocation_endpoint"), str):
@@ -101,7 +101,9 @@ class ExternalMcpService:
                 base_url=str(connector.url),
             )
         else:
-            return self._create_client(connector=connector, headers=headers, timeout=timeout)
+            return self._create_client(  # pyrefly: ignore [bad-return]
+                connector=connector, headers=headers, timeout=timeout
+            )
 
     def _create_client(
         self, *, connector: Connector, headers: dict[str, str] | None = None, timeout: int | None = None
@@ -147,7 +149,7 @@ class ExternalMcpService:
                 await uow.commit()
 
     async def fetch_token_from_callback(self, *, connector: Connector, callback_url: str) -> Token:
-        async with self._create_client(connector=connector) as client:
+        async with self._create_client(connector=connector) as client:  # pyrefly: ignore [bad-context-manager]
             if not (auth_metadata := await self._discover_auth_metadata(connector=connector)):
                 raise RuntimeError("Authorization server no longer contains necessary metadata")
             if not (token_endpoint := auth_metadata.get("token_endpoint")):

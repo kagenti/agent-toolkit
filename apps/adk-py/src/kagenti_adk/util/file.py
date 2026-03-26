@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 import typing
-from collections.abc import AsyncIterator, Iterator
+from collections.abc import AsyncGenerator, AsyncIterator, Iterator
 from contextlib import AsyncExitStack, asynccontextmanager
 from functools import cached_property
 from typing import Protocol
@@ -228,7 +228,7 @@ async def load_file(
     part: Part,
     stream: bool = False,
     client: httpx.AsyncClient | None = None,
-) -> AsyncIterator[LoadedFile]:
+) -> AsyncGenerator[LoadedFile]:
     """
     :param stream: if stream is set to False, 'content' and 'text' fields are immediately available.
         Otherwise, they are only available after calling the '(a)read' method.

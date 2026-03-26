@@ -6,7 +6,7 @@ from __future__ import annotations
 from uuid import uuid4
 
 import pytest
-from a2a.types import SendMessageRequest, Message, Role, TaskState
+from a2a.types import Message, Role, SendMessageRequest, TaskState
 from kagenti_adk.a2a.extensions import PlatformApiExtensionClient, PlatformApiExtensionSpec
 from kagenti_adk.platform import File
 from kagenti_adk.platform.context import ContextPermissions, Permissions
@@ -49,17 +49,17 @@ async def test_file_processing_example(subtests, get_final_task_from_stream, a2a
             )
 
             # send message
-            task = await get_final_task_from_stream(running_example.client.send_message(SendMessageRequest(message=message)))
+            task = await get_final_task_from_stream(
+                running_example.client.send_message(SendMessageRequest(message=message))
+            )
 
             # verify response
-            assert task.status.state == TaskState.TASK_STATE_COMPLETED, (
-                f"Fail: {task.status.message.parts[0].root.text}"
-            )
+            assert task.status.state == TaskState.TASK_STATE_COMPLETED, f"Fail: {task.status.message.parts[0].text}"
 
             # check that first message is the content of the first_file
 
-            async with load_file(task.history[-2].parts[0].root) as processed_file:
+            async with load_file(task.history[-2].parts[0]) as processed_file:
                 assert processed_file.text == "0123456789"
 
-            first_message_text = task.history[-1].parts[0].root.text
+            first_message_text = task.history[-1].parts[0].text
             assert first_message_text == "File processing complete"

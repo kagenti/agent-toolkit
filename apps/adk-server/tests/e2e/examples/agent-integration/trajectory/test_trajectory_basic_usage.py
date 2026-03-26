@@ -21,11 +21,11 @@ async def test_trajectory_basic_usage_example(subtests, get_final_task_from_stre
         with subtests.test("agent yields trajectory steps and final response"):
             message = create_text_message_object(content="Hello")
             message.context_id = running_example.context.id
-            task = await get_final_task_from_stream(running_example.client.send_message(SendMessageRequest(message=message)))
-
-            assert task.status.state == TaskState.TASK_STATE_COMPLETED, (
-                f"Fail: {task.status.message.parts[0].root.text}"
+            task = await get_final_task_from_stream(
+                running_example.client.send_message(SendMessageRequest(message=message))
             )
+
+            assert task.status.state == TaskState.TASK_STATE_COMPLETED, f"Fail: {task.status.message.parts[0].text}"
 
             # Verify trajectory metadata was yielded (should be in history)
             trajectory_uri = TrajectoryExtensionSpec.URI
@@ -33,4 +33,4 @@ async def test_trajectory_basic_usage_example(subtests, get_final_task_from_stre
             assert len(trajectory_messages) >= 2  # Planning and Execution steps
 
             # Verify final response
-            assert "Final result goes here" in task.history[-1].parts[0].root.text
+            assert "Final result goes here" in task.history[-1].parts[0].text

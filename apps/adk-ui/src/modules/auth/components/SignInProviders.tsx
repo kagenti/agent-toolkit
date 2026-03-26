@@ -54,7 +54,6 @@ async function handleSignIn(
   }
 }
 
-
 const AUTH_ERROR_MESSAGES: Record<string, string> = {
   Configuration:
     'Unable to connect to the identity provider. Please verify that the authentication service is running and correctly configured.',

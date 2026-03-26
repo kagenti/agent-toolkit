@@ -9,7 +9,9 @@ depends = ["agents:*:check"]
 depends = ["agents:canvas:check:*"]
 
 ["agents:canvas:check:hadolint"]
-extends = "docker:check:hadolint"
+run = "hadolint --ignore DL3018 Dockerfile"
+sources = ["Dockerfile"]
+outputs = { auto = true }
 dir = "{{config_root}}/agents/canvas"
 
 # chat
@@ -18,7 +20,9 @@ dir = "{{config_root}}/agents/canvas"
 depends = ["agents:chat:check:*"]
 
 ["agents:chat:check:hadolint"]
-extends = "docker:check:hadolint"
+run = "hadolint --ignore DL3018 Dockerfile"
+sources = ["Dockerfile"]
+outputs = { auto = true }
 dir = "{{config_root}}/agents/chat"
 
 # deepagents_content_builder
@@ -27,7 +31,9 @@ dir = "{{config_root}}/agents/chat"
 depends = ["agents:deepagents_content_builder:check:*"]
 
 ["agents:deepagents_content_builder:check:hadolint"]
-extends = "docker:check:hadolint"
+run = "hadolint --ignore DL3018 Dockerfile"
+sources = ["Dockerfile"]
+outputs = { auto = true }
 dir = "{{config_root}}/agents/deepagents_content_builder"
 
 # form
@@ -36,7 +42,9 @@ dir = "{{config_root}}/agents/deepagents_content_builder"
 depends = ["agents:form:check:*"]
 
 ["agents:form:check:hadolint"]
-extends = "docker:check:hadolint"
+run = "hadolint --ignore DL3018 Dockerfile"
+sources = ["Dockerfile"]
+outputs = { auto = true }
 dir = "{{config_root}}/agents/form"
 
 # langgraph-reflection
@@ -45,7 +53,9 @@ dir = "{{config_root}}/agents/form"
 depends = ["agents:langgraph-reflection:check:*"]
 
 ["agents:langgraph-reflection:check:hadolint"]
-extends = "docker:check:hadolint"
+run = "hadolint --ignore DL3018 Dockerfile"
+sources = ["Dockerfile"]
+outputs = { auto = true }
 dir = "{{config_root}}/agents/langgraph-reflection"
 
 # rag
@@ -54,5 +64,7 @@ dir = "{{config_root}}/agents/langgraph-reflection"
 depends = ["agents:rag:check:*"]
 
 ["agents:rag:check:hadolint"]
-extends = "docker:check:hadolint"
+run = "hadolint --ignore DL3018 Dockerfile"
+sources = ["Dockerfile"]
+outputs = { auto = true }
 dir = "{{config_root}}/agents/rag"

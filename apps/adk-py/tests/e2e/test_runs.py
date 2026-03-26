@@ -8,7 +8,6 @@ from collections.abc import AsyncIterator
 
 import pytest
 from a2a.client import Client, ClientEvent, create_text_message_object
-from a2a.utils.errors import A2AError
 from a2a.types import (
     CancelTaskRequest,
     GetTaskRequest,
@@ -21,6 +20,7 @@ from a2a.types import (
     TaskState,
     TaskStatusUpdateEvent,
 )
+from a2a.utils.errors import A2AError
 from google.protobuf.json_format import MessageToDict
 
 from kagenti_adk.server import Server

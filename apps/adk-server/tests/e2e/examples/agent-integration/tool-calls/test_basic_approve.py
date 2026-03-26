@@ -7,7 +7,7 @@ from uuid import uuid4
 
 import pytest
 from a2a.client.helpers import create_text_message_object
-from a2a.types import SendMessageRequest, Message, Role, TaskState
+from a2a.types import Message, Role, SendMessageRequest, TaskState
 from kagenti_adk.a2a.extensions import (
     ApprovalExtensionClient,
     ApprovalExtensionSpec,
@@ -60,9 +60,7 @@ async def test_basic_approve_example(subtests, a2a_client_factory, test_configur
                         task, _ = event
 
             assert task is not None
-            assert task.status.state == TaskState.TASK_STATE_COMPLETED, (
-                f"Fail: {task.status.message.parts[0].root.text}"
-            )
+            assert task.status.state == TaskState.TASK_STATE_COMPLETED, f"Fail: {task.status.message.parts[0].text}"
 
         with subtests.test("tool call is rejected"):
             # Send message that should trigger the ThinkTool

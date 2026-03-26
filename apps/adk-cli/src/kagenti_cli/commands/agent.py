@@ -24,6 +24,10 @@ from a2a.types import (
     Role,
     TaskState,
 )
+from google.protobuf.json_format import MessageToDict
+from InquirerPy import inquirer
+from InquirerPy.base.control import Choice
+from InquirerPy.validator import EmptyInputValidator
 from kagenti_adk.a2a.extensions import (
     EmbeddingFulfillment,
     EmbeddingServiceExtensionClient,
@@ -58,14 +62,9 @@ from kagenti_adk.a2a.extensions.common.form import (
     TextField,
     TextFieldValue,
 )
-
 from kagenti_adk.platform import File, ModelProvider, Provider, UserFeedback
 from kagenti_adk.platform.context import Context, ContextPermissions, ContextToken, Permissions
 from kagenti_adk.platform.model_provider import ModelCapability
-from google.protobuf.json_format import MessageToDict
-from InquirerPy import inquirer
-from InquirerPy.base.control import Choice
-from InquirerPy.validator import EmptyInputValidator
 from pydantic import BaseModel
 from rich.box import HORIZONTALS
 from rich.console import ConsoleRenderable, Group, NewLine
@@ -101,7 +100,6 @@ from kagenti_cli.utils import (
     prompt_user,
     remove_nullable,
     status,
-    verbosity,
 )
 
 
@@ -172,19 +170,23 @@ async def _discover_agent_card(location: str) -> AgentCard:
     async with httpx.AsyncClient() as client:
         resp = await client.get(url, timeout=30)
         resp.raise_for_status()
-        return AgentCard.model_validate(resp.json())
+        return AgentCard.model_validate(resp.json())  # pyrefly: ignore [missing-attribute]
 
 
 @app.command("add")
 async def add_agent(
-    location: typing.Annotated[
-        str | None, typer.Argument(help="Agent image or network URL")
+    location: typing.Annotated[str | None, typer.Argument(help="Agent image or network URL")] = None,
+    name: typing.Annotated[
+        str | None, typer.Option("--name", "-n", help="Agent name (default: derived from image)")
     ] = None,
-    name: typing.Annotated[str | None, typer.Option("--name", "-n", help="Agent name (default: derived from image)")] = None,
     namespace: typing.Annotated[str, typer.Option(help="Target Kubernetes namespace")] = "team1",
     port: typing.Annotated[int, typer.Option(help="Agent service port")] = 8080,
-    env: typing.Annotated[list[str] | None, typer.Option("--env", "-e", help="Environment variable in KEY=VALUE format (repeatable)")] = None,
-    env_file: typing.Annotated[str | None, typer.Option("--env-file", help="Path to env file (KEY=VALUE per line)")] = None,
+    env: typing.Annotated[
+        list[str] | None, typer.Option("--env", "-e", help="Environment variable in KEY=VALUE format (repeatable)")
+    ] = None,
+    env_file: typing.Annotated[
+        str | None, typer.Option("--env-file", help="Path to env file (KEY=VALUE per line)")
+    ] = None,
     yes: typing.Annotated[bool, typer.Option("--yes", "-y", help="Skip confirmation prompts.")] = False,
 ) -> None:
     """Add an agent by container image or network URL. [Admin only]"""
@@ -253,7 +255,10 @@ async def _add_agent_via_kagenti(
     try:
         auth_token = await configuration.auth_manager.load_auth_token()
     except Exception:
-        if configuration.auth_manager.active_server and "adk-api.localtest.me" in configuration.auth_manager.active_server:
+        if (
+            configuration.auth_manager.active_server
+            and "adk-api.localtest.me" in configuration.auth_manager.active_server
+        ):
             with contextlib.suppress(Exception):
                 auth_token = await configuration.auth_manager.login_with_password(
                     configuration.auth_manager.active_server, username="admin", password="admin"
@@ -277,7 +282,7 @@ async def _add_agent_via_kagenti(
     # Parse --env-file (KEY=VALUE per line, ignoring comments and blank lines)
     if env_file:
         try:
-            with open(env_file) as f:
+            with open(env_file) as f:  # noqa: ASYNC230
                 for line in f:
                     line = line.strip()
                     if not line or line.startswith("#"):
@@ -372,9 +377,7 @@ async def update_agent(
     search_path: typing.Annotated[
         str | None, typer.Argument(help="Short ID, agent name or part of the provider location of agent to replace")
     ] = None,
-    location: typing.Annotated[
-        str | None, typer.Argument(help="New agent location (network URL)")
-    ] = None,
+    location: typing.Annotated[str | None, typer.Argument(help="New agent location (network URL)")] = None,
     yes: typing.Annotated[bool, typer.Option("--yes", "-y", help="Skip confirmation prompts.")] = False,
 ) -> None:
     """Update an agent's location. [Admin only]"""
@@ -530,7 +533,10 @@ async def uninstall_agent(
             try:
                 auth_token = await configuration.auth_manager.load_auth_token()
             except Exception:
-                if configuration.auth_manager.active_server and "adk-api.localtest.me" in configuration.auth_manager.active_server:
+                if (
+                    configuration.auth_manager.active_server
+                    and "adk-api.localtest.me" in configuration.auth_manager.active_server
+                ):
                     with contextlib.suppress(Exception):
                         auth_token = await configuration.auth_manager.login_with_password(
                             configuration.auth_manager.active_server, username="admin", password="admin"
@@ -781,7 +787,7 @@ async def _run_agent(
         metadata=metadata,
     )
 
-    stream = client.send_message(msg)
+    stream = client.send_message(msg)  # pyrefly: ignore [bad-argument-type]
 
     while True:
         async for response, task in stream:
@@ -831,7 +837,7 @@ async def _run_agent(
                         else None
                     ):
                         stream = client.send_message(
-                            Message(
+                            Message(  # pyrefly: ignore [bad-argument-type]
                                 message_id=str(uuid4()),
                                 parts=[],
                                 role=Role.ROLE_USER,
@@ -853,7 +859,7 @@ async def _run_agent(
                     console.print(f"\n[bold]Agent requires your input[/bold]: {text}\n")
                     user_input = handle_input()
                     stream = client.send_message(
-                        Message(
+                        Message(  # pyrefly: ignore [bad-argument-type]
                             message_id=str(uuid4()),
                             parts=[Part(text=user_input)],
                             role=Role.ROLE_USER,
@@ -886,9 +892,9 @@ async def _run_agent(
                 artifact = response.artifact_update.artifact
                 if dump_files_path is None:
                     continue
-                dump_files_path.mkdir(parents=True, exist_ok=True)
+                dump_files_path.mkdir(parents=True, exist_ok=True)  # noqa: ASYNC240
                 full_path = dump_files_path / (artifact.name or "unnamed").lstrip("/")
-                full_path.resolve().relative_to(dump_files_path.resolve())
+                full_path.resolve().relative_to(dump_files_path.resolve())  # noqa: ASYNC240
                 full_path.parent.mkdir(parents=True, exist_ok=True)
                 try:
                     for part in artifact.parts[:1]:

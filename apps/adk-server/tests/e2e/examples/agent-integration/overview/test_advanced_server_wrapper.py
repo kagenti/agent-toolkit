@@ -7,12 +7,12 @@ from uuid import uuid4
 
 import pytest
 from a2a.client.helpers import create_text_message_object
-from a2a.types import SendMessageRequest, Message, Role, TaskState
+from a2a.types import Message, Role, SendMessageRequest, TaskState
 from kagenti_adk.a2a.extensions import (
-    FormResponse,
-    TextFieldValue,
     FormRequestExtensionClient,
     FormRequestExtensionSpec,
+    FormResponse,
+    TextFieldValue,
 )
 
 from tests.e2e.examples.conftest import run_example
@@ -30,7 +30,9 @@ async def test_advanced_server_wrapper_example(subtests, get_final_task_from_str
             message = create_text_message_object(content="Hello")
             message.context_id = running_example.context.id
 
-            task = await get_final_task_from_stream(running_example.client.send_message(SendMessageRequest(message=message)))
+            task = await get_final_task_from_stream(
+                running_example.client.send_message(SendMessageRequest(message=message))
+            )
             assert task.status.state == TaskState.TASK_STATE_INPUT_REQUIRED
 
             # Parse the form request from the task status message
@@ -57,10 +59,12 @@ async def test_advanced_server_wrapper_example(subtests, get_final_task_from_str
             )
 
             # Send form response and verify final task
-            final_task = await get_final_task_from_stream(running_example.client.send_message(SendMessageRequest(message=response_message)))
+            final_task = await get_final_task_from_stream(
+                running_example.client.send_message(SendMessageRequest(message=response_message))
+            )
 
             assert final_task.status.state == TaskState.TASK_STATE_COMPLETED, (
-                f"Fail: {final_task.status.message.parts[0].root.text}"
+                f"Fail: {final_task.status.message.parts[0].text}"
             )
-            assert "Alice" in final_task.history[-1].parts[0].root.text
-            assert "alice@example.com" in final_task.history[-1].parts[0].root.text
+            assert "Alice" in final_task.history[-1].parts[0].text
+            assert "alice@example.com" in final_task.history[-1].parts[0].text

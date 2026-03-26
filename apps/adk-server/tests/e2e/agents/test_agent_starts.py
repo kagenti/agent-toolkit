@@ -18,7 +18,16 @@ from a2a.server.agent_execution import AgentExecutor
 from a2a.server.apps import A2AStarletteApplication
 from a2a.server.request_handlers import DefaultRequestHandler
 from a2a.server.tasks import InMemoryTaskStore
-from a2a.types import SendMessageRequest, AgentCapabilities, AgentCard, AgentInterface, AgentSkill, Role, Task, TaskState
+from a2a.types import (
+    AgentCapabilities,
+    AgentCard,
+    AgentInterface,
+    AgentSkill,
+    Role,
+    SendMessageRequest,
+    Task,
+    TaskState,
+)
 from kagenti_adk.a2a.extensions import LLMFulfillment, LLMServiceExtensionClient, LLMServiceExtensionSpec
 from kagenti_adk.platform import ModelProvider, Provider
 from kagenti_adk.platform.context import Context, ContextPermissions, Permissions
@@ -33,9 +42,7 @@ def extract_agent_text_from_stream(task: Task) -> str:
 
 @pytest.mark.skip(reason="Agent import from container image is now handled by kagenti operator")
 @pytest.mark.usefixtures("clean_up", "setup_real_llm", "setup_platform_client")
-async def test_imported_agent(
-    subtests, a2a_client_factory, get_final_task_from_stream, test_configuration
-):
+async def test_imported_agent(subtests, a2a_client_factory, get_final_task_from_stream, test_configuration):
     agent_image = test_configuration.test_agent_image
     with subtests.test("add chat agent"):
         _ = await Provider.create(location=agent_image)
@@ -79,7 +86,10 @@ async def test_imported_agent(
 
             # Run 3 requests in parallel (test that each request waits)
             run_results = await asyncio.gather(
-                *(get_final_task_from_stream(a2a_client.send_message(SendMessageRequest(message=message))) for _ in range(num_parallel))
+                *(
+                    get_final_task_from_stream(a2a_client.send_message(SendMessageRequest(message=message)))
+                    for _ in range(num_parallel)
+                )
             )
 
             for task in run_results:
@@ -114,7 +124,6 @@ EXTERNAL_AGENT_CARD = AgentCard(
     supported_interfaces=[AgentInterface(url="http://example.com/agent", protocol_binding="JSONRPC")],
     version="1.0",
 )
-
 
 
 @pytest.fixture

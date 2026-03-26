@@ -75,7 +75,7 @@ class ModelProvider(pydantic.BaseModel):
         watsonx_space_id: str | None = None,
         api_key: str,
         client: PlatformClient | None = None,
-    ) -> "ModelProvider":
+    ) -> ModelProvider:
         async with client or get_platform_client() as client:
             return pydantic.TypeAdapter(ModelProvider).validate_python(
                 (
@@ -96,7 +96,7 @@ class ModelProvider(pydantic.BaseModel):
                 .json()
             )
 
-    async def get(self: "ModelProvider" | str, *, client: PlatformClient | None = None) -> "ModelProvider":
+    async def get(self: ModelProvider | str, *, client: PlatformClient | None = None) -> ModelProvider:
         model_provider_id = self if isinstance(self, str) else self.id
         async with client or get_platform_client() as client:
             result = pydantic.TypeAdapter(ModelProvider).validate_python(
@@ -107,7 +107,7 @@ class ModelProvider(pydantic.BaseModel):
             return self
         return result
 
-    async def delete(self: "ModelProvider" | str, *, client: PlatformClient | None = None) -> None:
+    async def delete(self: ModelProvider | str, *, client: PlatformClient | None = None) -> None:
         # `self` has a weird type so that you can call both `instance.get()` to update an instance, or `File.get("123")` to obtain a new instance
         model_provider_id = self if isinstance(self, str) else self.id
         async with client or get_platform_client() as client:
@@ -133,7 +133,7 @@ class ModelProvider(pydantic.BaseModel):
             )
 
     @staticmethod
-    async def list(*, client: PlatformClient | None = None) -> builtins.list["ModelProvider"]:
+    async def list(*, client: PlatformClient | None = None) -> builtins.list[ModelProvider]:
         async with client or get_platform_client() as client:
             return pydantic.TypeAdapter(builtins.list[ModelProvider]).validate_python(
                 (await client.get(url="/api/v1/model_providers")).raise_for_status().json()["items"]

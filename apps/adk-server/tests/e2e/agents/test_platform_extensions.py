@@ -8,8 +8,8 @@ from typing import Annotated
 from uuid import uuid4
 
 import pytest
-from a2a.client import Client, create_text_message_object
-from a2a.types import SendMessageRequest, Message, Role, TaskState
+from a2a.client import Client
+from a2a.types import Message, Role, SendMessageRequest, TaskState
 from kagenti_adk.a2a.extensions.services.platform import (
     PlatformApiExtensionClient,
     PlatformApiExtensionServer,
@@ -115,7 +115,7 @@ async def self_registration_agent(create_server_with_agent) -> AsyncGenerator[tu
 
 @pytest.mark.usefixtures("clean_up", "setup_platform_client")
 async def test_self_registration(self_registration_agent, subtests):
-    _, client = self_registration_agent
+    _, _client = self_registration_agent
 
     with subtests.test("register provider"):
         async for attempt in AsyncRetrying(stop=stop_after_delay(6), wait=wait_fixed(0.5), reraise=True):
@@ -126,4 +126,3 @@ async def test_self_registration(self_registration_agent, subtests):
 
         assert provider.state == "online"
         assert "self_registration_agent" in provider.source
-
