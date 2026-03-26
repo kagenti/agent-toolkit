@@ -1310,14 +1310,14 @@ dev = [
 
 [[package]]
 name = "kink"
-version = "0.8.1"
+version = "0.9.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/00/28/f0bec943112929c6fe324d7a43633aafe4bd9c11949618f4a67fb280cbb9/kink-0.8.1.tar.gz", hash = "sha256:9310fa5860ad4df3cdd4a2b998517a718cbc83ed4975c51b8ebd60f640a9702c", size = 13081, upload-time = "2024-10-19T09:58:05.459Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/bc/9b/71623fd68aabf7ee785e2a4032dbccc5121d7e27db0d72125739d1ce602b/kink-0.9.0.tar.gz", hash = "sha256:febe96b17f5e071858595ed536cc046fd0377596db296137773e4eeaa344800e", size = 13269, upload-time = "2026-03-19T08:26:54.794Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a0/ce/1f98d7f0fabdd2eb0f984527d8863b38399600a6fdce00c7b887ec57bad9/kink-0.8.1-py3-none-any.whl", hash = "sha256:c046be42395de6e18776daa93ac78280a70b3aa5c70b9ea5ca716cc71b3ff91a", size = 11241, upload-time = "2024-10-19T09:58:03.461Z" },
+    { url = "https://files.pythonhosted.org/packages/72/c4/1c8fa2e8480c846bd9df3b39c53f987ae85575604acf8cd9373a5c860ae4/kink-0.9.0-py3-none-any.whl", hash = "sha256:ae4a7f644ed94ecaf94517d3c95b0f31332e11b9941e90a3f72898067020a494", size = 11627, upload-time = "2026-03-19T08:26:55.837Z" },
 ]
 
 [[package]]
