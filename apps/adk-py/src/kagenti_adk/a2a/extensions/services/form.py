@@ -41,11 +41,7 @@ class FormServiceExtensionSpec(BaseExtensionSpec[FormServiceExtensionParams]):
 
     @classmethod
     def demand_settings(cls, settings_form: SettingsFormRender) -> Self:
-        """
-        Create form extension demanding a settings_form.
-
-        This is the preferred way to add settings to an agent, replacing the deprecated SettingsExtensionSpec.
-        """
+        """Create form extension demanding a settings_form."""
         return cls(params=FormServiceExtensionParams(form_demands={"settings_form": settings_form}))
 
     @classmethod
@@ -80,12 +76,7 @@ class FormServiceExtensionServer(BaseExtensionServer[FormServiceExtensionSpec, F
         )
 
     def parse_settings_form(self, *, model: type[T] | None = None) -> T | SettingsFormResponse | None:
-        """
-        Parse settings_form from form_fulfillments.
-
-        This is the preferred way to access settings in agents, replacing the
-        deprecated SettingsExtensionServer.parse_settings_response().
-        """
+        """Parse settings_form from form_fulfillments."""
         if self.data is None:
             return None
 
