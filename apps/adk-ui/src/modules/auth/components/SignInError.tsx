@@ -22,13 +22,7 @@ export function SignInError({ message, callbackUrl = routes.home() }: Props) {
 
   return (
     <div className={classes.root}>
-      <InlineNotification
-        kind="error"
-        title="Authentication Error"
-        subtitle={message}
-        hideCloseButton
-        lowContrast
-      />
+      <InlineNotification kind="error" title="Authentication Error" subtitle={message} hideCloseButton lowContrast />
       <Button kind="primary" onClick={() => router.push(routes.signIn({ callbackUrl }))}>
         Try again
       </Button>
