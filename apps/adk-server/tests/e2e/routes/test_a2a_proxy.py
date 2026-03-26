@@ -46,10 +46,6 @@ from a2a.types.a2a_pb2 import (
 from a2a.utils import (
     AGENT_CARD_WELL_KNOWN_PATH,
 )
-
-# These constants were removed in a2a-sdk v1; tests using them are skipped
-EXTENDED_AGENT_CARD_PATH = "/agent/authenticatedExtendedCard"
-PREV_AGENT_CARD_WELL_KNOWN_PATH = "/.well-known/agent.json"
 from a2a.utils.errors import UnsupportedOperationError
 from fastapi import FastAPI
 from google.protobuf.struct_pb2 import Struct, Value
@@ -65,6 +61,10 @@ from starlette.routing import Route
 from starlette.testclient import TestClient
 
 from adk_server.infrastructure.persistence.repositories.user import users_table
+
+# These constants were removed in a2a-sdk v1; tests using them are skipped
+EXTENDED_AGENT_CARD_PATH = "/agent/authenticatedExtendedCard"
+PREV_AGENT_CARD_WELL_KNOWN_PATH = "/.well-known/agent.json"
 
 pytestmark = pytest.mark.e2e
 

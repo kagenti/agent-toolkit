@@ -7,7 +7,7 @@ from collections.abc import AsyncGenerator, AsyncIterator
 
 import pytest
 from a2a.client import Client, ClientEvent, create_text_message_object
-from a2a.types import SendMessageRequest, Message, Role, Task
+from a2a.types import Message, Role, SendMessageRequest, Task
 from kagenti_adk.a2a.extensions import PlatformApiExtensionClient, PlatformApiExtensionSpec
 from kagenti_adk.a2a.types import RunYield
 from kagenti_adk.platform.context import Context, ContextPermissions, ContextToken, Permissions
@@ -69,17 +69,23 @@ async def test_agent_history(history_agent, subtests):
             grant_global_permissions=Permissions(a2a_proxy={"*"}),
         )
 
-        final_task = await get_final_task_from_stream(client.send_message(SendMessageRequest(message=create_message(token, "first message"))))
+        final_task = await get_final_task_from_stream(
+            client.send_message(SendMessageRequest(message=create_message(token, "first message")))
+        )
         agent_messages = [msg.parts[0].text for msg in final_task.history]
         assert all(msg.metadata == {"test": "metadata"} for msg in final_task.history)
         assert agent_messages == ["first message"]
 
-        final_task = await get_final_task_from_stream(client.send_message(SendMessageRequest(message=create_message(token, "second message"))))
+        final_task = await get_final_task_from_stream(
+            client.send_message(SendMessageRequest(message=create_message(token, "second message")))
+        )
         agent_messages = [msg.parts[0].text for msg in final_task.history]
         assert all(msg.metadata == {"test": "metadata"} for msg in final_task.history)
         assert agent_messages == ["first message", "first message", "second message"]
 
-        final_task = await get_final_task_from_stream(client.send_message(SendMessageRequest(message=create_message(token, "third message"))))
+        final_task = await get_final_task_from_stream(
+            client.send_message(SendMessageRequest(message=create_message(token, "third message")))
+        )
         agent_messages = [msg.parts[0].text for msg in final_task.history]
         assert all(msg.metadata == {"test": "metadata"} for msg in final_task.history)
         assert agent_messages == [
@@ -104,7 +110,9 @@ async def test_agent_history(history_agent, subtests):
             grant_context_permissions=ContextPermissions(context_data={"*"}),
             grant_global_permissions=Permissions(a2a_proxy={"*"}),
         )
-        final_task = await get_final_task_from_stream(client.send_message(SendMessageRequest(message=create_message(token, "first message"))))
+        final_task = await get_final_task_from_stream(
+            client.send_message(SendMessageRequest(message=create_message(token, "first message")))
+        )
         agent_messages = [msg.parts[0].text for msg in final_task.history]
         assert agent_messages == ["first message"]
 

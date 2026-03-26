@@ -18,7 +18,7 @@ from beeai_framework.tools.mcp import MCPTool
 from beeai_framework.tools.think import ThinkTool
 from mcp import ClientSession
 from mcp.client.streamable_http import (
-    streamablehttp_client  # pyrefly: ignore [deprecated] -- TODO: upgrade,
+    streamablehttp_client,  # pyrefly: ignore [deprecated] -- TODO: upgrade,
 )
 
 from kagenti_adk.a2a.extensions import (

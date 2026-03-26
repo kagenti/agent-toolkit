@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useInfiniteQuery } from '@tanstack/react-query';
 import type { ListContextsRequest } from '@kagenti/adk';
+import { useInfiniteQuery } from '@tanstack/react-query';
 
 import { isNotNull } from '#utils/helpers.ts';
 

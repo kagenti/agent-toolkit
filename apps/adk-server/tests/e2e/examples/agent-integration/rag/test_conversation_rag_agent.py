@@ -7,7 +7,7 @@ from pathlib import Path
 from uuid import uuid4
 
 import pytest
-from a2a.types import SendMessageRequest, Message, Part, Role, TaskState
+from a2a.types import Message, Part, Role, SendMessageRequest, TaskState
 from kagenti_adk.a2a.extensions import (
     EmbeddingFulfillment,
     EmbeddingServiceExtensionClient,
@@ -90,11 +90,11 @@ async def test_conversation_rag_agent_example(
                 metadata=metadata,
             )
 
-            task = await get_final_task_from_stream(running_example.client.send_message(SendMessageRequest(message=message)))
-
-            assert task.status.state == TaskState.TASK_STATE_COMPLETED, (
-                f"Fail: {task.status.message.parts[0].text}"
+            task = await get_final_task_from_stream(
+                running_example.client.send_message(SendMessageRequest(message=message))
             )
+
+            assert task.status.state == TaskState.TASK_STATE_COMPLETED, f"Fail: {task.status.message.parts[0].text}"
             result_text = task.history[-1].parts[0].text
             assert "1 file(s) processed" in result_text
 
@@ -108,11 +108,11 @@ async def test_conversation_rag_agent_example(
                 metadata=metadata,
             )
 
-            task = await get_final_task_from_stream(running_example.client.send_message(SendMessageRequest(message=message)))
-
-            assert task.status.state == TaskState.TASK_STATE_COMPLETED, (
-                f"Fail: {task.status.message.parts[0].text}"
+            task = await get_final_task_from_stream(
+                running_example.client.send_message(SendMessageRequest(message=message))
             )
+
+            assert task.status.state == TaskState.TASK_STATE_COMPLETED, f"Fail: {task.status.message.parts[0].text}"
             result_text = task.history[-1].parts[0].text
             assert "Results" in result_text
             assert "42 gigawatts" in result_text

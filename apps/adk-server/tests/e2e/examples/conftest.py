@@ -15,11 +15,11 @@ import httpx
 import pytest
 from a2a.client import Client, ClientEvent
 from a2a.types import AgentCard, Task
-from httpx import HTTPStatusError
 from a2a.utils.constants import AGENT_CARD_WELL_KNOWN_PATH
+from google.protobuf.json_format import ParseDict
+from httpx import HTTPStatusError
 from kagenti_adk.platform import Provider
 from kagenti_adk.platform.context import Context, ContextPermissions, ContextToken, Permissions
-from google.protobuf.json_format import ParseDict
 from pydantic import Secret
 from tenacity import retry, stop_after_delay, wait_fixed
 

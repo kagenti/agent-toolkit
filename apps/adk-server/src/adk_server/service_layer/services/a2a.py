@@ -271,9 +271,7 @@ class ProxyRequestHandler(RequestHandler):
 
     @_handle_exception
     @override
-    async def on_message_send(
-        self, params: SendMessageRequest, context: ServerCallContext
-    ) -> Task | Message:
+    async def on_message_send(self, params: SendMessageRequest, context: ServerCallContext) -> Task | Message:
         # we set task_id and context_id if not configured
         with trace.get_tracer(INSTRUMENTATION_NAME).start_as_current_span("on_message_send") as span:
             trace_id = f"{span.get_span_context().trace_id:032x}"
@@ -429,9 +427,7 @@ class A2AProxyService:
                 await uow.commit()
 
             if provider.state is ProviderState.OFFLINE:
-                raise InvalidProviderCallError(
-                    f"Cannot send message to provider {provider_id}: provider is offline"
-                )
+                raise InvalidProviderCallError(f"Cannot send message to provider {provider_id}: provider is offline")
 
             assert isinstance(provider.source, NetworkProviderLocation)
             return provider.source.a2a_url

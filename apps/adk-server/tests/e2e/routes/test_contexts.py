@@ -6,9 +6,9 @@ from __future__ import annotations
 import uuid
 
 import pytest
+from httpx import HTTPStatusError
 from kagenti_adk.a2a.types import AgentMessage
 from kagenti_adk.platform.context import Context
-from httpx import HTTPStatusError
 
 pytestmark = pytest.mark.e2e
 

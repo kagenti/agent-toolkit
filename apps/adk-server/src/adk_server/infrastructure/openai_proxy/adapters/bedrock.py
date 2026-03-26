@@ -299,9 +299,7 @@ class BedrockOpenAIProxyAdapter(OpenAIOpenAIProxyAdapter):
                             }
                         )
                 elif "messageStop" in event:
-                    stop_reason = _bedrock_stop_reason_to_openai(
-                        event["messageStop"].get("stopReason", "end_turn")
-                    )
+                    stop_reason = _bedrock_stop_reason_to_openai(event["messageStop"].get("stopReason", "end_turn"))
                     yield openai.types.chat.ChatCompletionChunk.model_validate(
                         {
                             "id": completion_id,

@@ -273,7 +273,7 @@
           }
         }
       },
-      "options": {
+      "get": {
         "tags": [
           "a2a"
         ],
@@ -329,7 +329,63 @@
           }
         }
       },
-      "put": {
+      "post": {
+        "tags": [
+          "a2a"
+        ],
+        "summary": "A2A Proxy Http Transport",
+        "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http__path__patch",
+        "security": [
+          {
+            "HTTPBasic": []
+          },
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "provider_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Provider Id"
+            }
+          },
+          {
+            "name": "path",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Path"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "options": {
         "tags": [
           "a2a"
         ],
@@ -497,63 +553,7 @@
           }
         }
       },
-      "post": {
-        "tags": [
-          "a2a"
-        ],
-        "summary": "A2A Proxy Http Transport",
-        "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http__path__patch",
-        "security": [
-          {
-            "HTTPBasic": []
-          },
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "provider_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Provider Id"
-            }
-          },
-          {
-            "name": "path",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Path"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      },
-      "get": {
+      "put": {
         "tags": [
           "a2a"
         ],
@@ -668,7 +668,7 @@
           }
         }
       },
-      "options": {
+      "get": {
         "tags": [
           "a2a"
         ],
@@ -725,7 +725,64 @@
           }
         }
       },
-      "put": {
+      "post": {
+        "tags": [
+          "a2a"
+        ],
+        "summary": "A2A Proxy Http Transport",
+        "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http_patch",
+        "security": [
+          {
+            "HTTPBasic": []
+          },
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "provider_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Provider Id"
+            }
+          },
+          {
+            "name": "path",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "",
+              "title": "Path"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "options": {
         "tags": [
           "a2a"
         ],
@@ -896,64 +953,7 @@
           }
         }
       },
-      "post": {
-        "tags": [
-          "a2a"
-        ],
-        "summary": "A2A Proxy Http Transport",
-        "operationId": "a2a_proxy_http_transport_api_v1_a2a__provider_id__http_patch",
-        "security": [
-          {
-            "HTTPBasic": []
-          },
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "provider_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Provider Id"
-            }
-          },
-          {
-            "name": "path",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "default": "",
-              "title": "Path"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      },
-      "get": {
+      "put": {
         "tags": [
           "a2a"
         ],

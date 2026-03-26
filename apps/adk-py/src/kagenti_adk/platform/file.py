@@ -63,7 +63,7 @@ class File(pydantic.BaseModel):
         content_type: str = "application/octet-stream",
         client: PlatformClient | None = None,
         context_id: str | None | Literal["auto"] = "auto",
-    ) -> "File":
+    ) -> File:
         async with client or get_platform_client() as platform_client:
             context_id = platform_client.context_id if context_id == "auto" else context_id
             return pydantic.TypeAdapter(File).validate_python(
@@ -79,11 +79,11 @@ class File(pydantic.BaseModel):
             )
 
     async def get(
-        self: "File" | str,
+        self: File | str,
         *,
         client: PlatformClient | None = None,
         context_id: str | None | Literal["auto"] = "auto",
-    ) -> "File":
+    ) -> File:
         # `self` has a weird type so that you can call both `instance.get()` to update an instance, or `File.get("123")` to obtain a new instance
         file_id = self if isinstance(self, str) else self.id
         async with client or get_platform_client() as platform_client:
@@ -100,7 +100,7 @@ class File(pydantic.BaseModel):
             )
 
     async def delete(
-        self: "File" | str,
+        self: File | str,
         *,
         client: PlatformClient | None = None,
         context_id: str | None | Literal["auto"] = "auto",
@@ -117,7 +117,7 @@ class File(pydantic.BaseModel):
 
     @asynccontextmanager
     async def load_content(
-        self: "File" | str,
+        self: File | str,
         *,
         stream: bool = False,
         client: PlatformClient | None = None,
@@ -140,7 +140,7 @@ class File(pydantic.BaseModel):
 
     @asynccontextmanager
     async def load_text_content(
-        self: "File" | str,
+        self: File | str,
         *,
         stream: bool = False,
         client: PlatformClient | None = None,
@@ -165,7 +165,7 @@ class File(pydantic.BaseModel):
 
     @asynccontextmanager
     async def load_json_content(
-        self: "File" | str,
+        self: File | str,
         *,
         stream: bool = False,
         client: PlatformClient | None = None,
@@ -197,7 +197,7 @@ class File(pydantic.BaseModel):
             raise ValueError("No extracted JSON content available for this file.")
 
     async def create_extraction(
-        self: "File" | str,
+        self: File | str,
         *,
         formats: builtins.list[ExtractionFormatLiteral] | None = None,
         client: PlatformClient | None = None,
@@ -220,7 +220,7 @@ class File(pydantic.BaseModel):
             )
 
     async def get_extraction(
-        self: "File" | str,
+        self: File | str,
         *,
         client: PlatformClient | None = None,
         context_id: str | None | Literal["auto"] = "auto",
@@ -241,7 +241,7 @@ class File(pydantic.BaseModel):
             )
 
     async def delete_extraction(
-        self: "File" | str,
+        self: File | str,
         *,
         client: PlatformClient | None = None,
         context_id: str | None | Literal["auto"] = "auto",
@@ -271,7 +271,7 @@ class File(pydantic.BaseModel):
         order_by: Literal["created_at"] | Literal["filename"] | Literal["file_size_bytes"] | None = None,
         client: PlatformClient | None = None,
         context_id: str | None | Literal["auto"] = "auto",
-    ) -> PaginatedResult["File"]:
+    ) -> PaginatedResult[File]:
         # `self` has a weird type so that you can call both `instance.list_history()` or `ProviderBuild.list_history("123")`
         async with client or get_platform_client() as platform_client:
             context_id = platform_client.context_id if context_id == "auto" else context_id

@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useQuery } from '@tanstack/react-query';
 import type { ListProvidersRequest } from '@kagenti/adk';
+import { useQuery } from '@tanstack/react-query';
 
 import { listProviders } from '..';
 import { providerKeys } from '../keys';

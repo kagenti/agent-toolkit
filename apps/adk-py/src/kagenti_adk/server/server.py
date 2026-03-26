@@ -23,7 +23,6 @@ from a2a.server.tasks import PushNotificationConfigStore, PushNotificationSender
 from fastapi import FastAPI
 from fastapi.applications import AppType
 from fastapi.responses import PlainTextResponse
-from google.protobuf.json_format import MessageToDict
 from httpx import HTTPError, HTTPStatusError
 from starlette.authentication import AuthenticationError
 from starlette.middleware.authentication import AuthenticationMiddleware

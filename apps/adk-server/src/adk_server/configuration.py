@@ -524,7 +524,6 @@ class Configuration(BaseSettings):
         return self
 
 
-
 @cache
 def get_configuration() -> Configuration:
     """Get cached configuration"""

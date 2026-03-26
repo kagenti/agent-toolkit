@@ -18,10 +18,10 @@ import openai
 import pydantic
 from a2a.client import A2AClientError, Client, ClientConfig, ClientFactory
 from a2a.types import AgentCard
-from kagenti_adk.platform.context import ContextToken
 from google.protobuf.json_format import MessageToDict
 from httpx import HTTPStatusError
 from httpx._types import RequestFiles
+from kagenti_adk.platform.context import ContextToken
 
 from kagenti_cli import configuration
 from kagenti_cli.configuration import Configuration

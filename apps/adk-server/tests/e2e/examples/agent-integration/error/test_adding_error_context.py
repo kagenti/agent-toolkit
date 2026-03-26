@@ -21,7 +21,9 @@ async def test_adding_error_context_example(subtests, get_final_task_from_stream
         with subtests.test("agent includes context in error metadata"):
             message = create_text_message_object(content="Hello")
             message.context_id = running_example.context.id
-            task = await get_final_task_from_stream(running_example.client.send_message(SendMessageRequest(message=message)))
+            task = await get_final_task_from_stream(
+                running_example.client.send_message(SendMessageRequest(message=message))
+            )
 
             assert task.status.state == TaskState.TASK_STATE_FAILED
 

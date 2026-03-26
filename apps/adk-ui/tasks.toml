@@ -4,28 +4,37 @@
 depends = ["adk-ui:check:*"]
 
 ["adk-ui:check:prettier"]
-extends = "node:check:prettier"
+run = "pnpm prettier --log-level silent --check src"
+sources = ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx", "src/**/*.html", "src/**/*.css", "src/**/*.scss"]
+outputs = { auto = true }
 depends = ["common:setup:pnpm"]
 dir = "{{config_root}}/apps/adk-ui"
 
 ["adk-ui:check:eslint"]
-extends = "node:check:eslint"
+run = "pnpm eslint ."
+sources = ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"]
+outputs = { auto = true }
 depends = ["common:setup:pnpm"]
 dir = "{{config_root}}/apps/adk-ui"
 
 ["adk-ui:check:tsc"]
-extends = "node:check:tsc"
+run = "pnpm tsc --noEmit -p tsconfig.check.json"
+sources = ["src/**/*.ts", "src/**/*.tsx"]
+outputs = { auto = true }
 depends = ["common:setup:pnpm", "adk-ts:build"]
 dir = "{{config_root}}/apps/adk-ui"
-run = "pnpm tsc --noEmit -p tsconfig.check.json"
 
 ["adk-ui:check:stylelint"]
-extends = "node:check:stylelint"
+run = 'pnpm stylelint --fix "src/**/*.{css,scss}"'
+sources = ["src/**/*.css", "src/**/*.scss"]
+outputs = { auto = true }
 depends = ["common:setup:pnpm"]
 dir = "{{config_root}}/apps/adk-ui"
 
 ["adk-ui:check:hadolint"]
-extends = "docker:check:hadolint"
+run = "hadolint --ignore DL3018 Dockerfile"
+sources = ["Dockerfile"]
+outputs = { auto = true }
 dir = "{{config_root}}/apps/adk-ui"
 
 # fix
@@ -34,20 +43,25 @@ dir = "{{config_root}}/apps/adk-ui"
 depends = ["adk-ui:fix:*"]
 
 ["adk-ui:fix:prettier"]
-extends = "node:fix:prettier"
+run = "pnpm prettier --log-level silent --write src"
+sources = ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx", "src/**/*.html", "src/**/*.css", "src/**/*.scss"]
+outputs = { auto = true }
 depends = ["common:setup:pnpm"]
 dir = "{{config_root}}/apps/adk-ui"
 
 ["adk-ui:fix:next"]
-extends = "node:fix:eslint"
+run = "pnpm eslint . --fix"
+sources = ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"]
+outputs = { auto = true }
 depends = ["common:setup:pnpm"]
 dir = "{{config_root}}/apps/adk-ui"
 
 ["adk-ui:fix:stylelint"]
-extends = "node:fix:stylelint"
+run = "pnpm stylelint --fix=lax \"src/**/*.css\" \"src/**/*.scss\""
+sources = ["src/**/*.css", "src/**/*.scss"]
+outputs = { auto = true }
 depends = ["common:setup:pnpm"]
 dir = "{{config_root}}/apps/adk-ui"
-run = "pnpm stylelint --fix=lax \"src/**/*.css\" \"src/**/*.scss\""
 
 # run
 
@@ -61,7 +75,7 @@ run = "pnpm next start"
 depends = ["common:setup:pnpm", "adk-ts:build"]
 env.NODE_OPTIONS = "--no-experimental-global-navigator"
 dir = "{{config_root}}/apps/adk-ui"
-# Using --webpack because Turbopack doesn’t yet support some required features (e.g. the ::highlight() CSS rule).
+# Using --webpack because Turbopack doesn't yet support some required features (e.g. the ::highlight() CSS rule).
 run = "pnpm next dev --webpack"
 
 # build

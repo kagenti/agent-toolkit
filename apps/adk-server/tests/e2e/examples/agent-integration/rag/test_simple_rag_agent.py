@@ -7,7 +7,7 @@ from pathlib import Path
 from uuid import uuid4
 
 import pytest
-from a2a.types import SendMessageRequest, Message, Part, Role, TaskState
+from a2a.types import Message, Part, Role, SendMessageRequest, TaskState
 from kagenti_adk.a2a.extensions import (
     EmbeddingFulfillment,
     EmbeddingServiceExtensionClient,
@@ -91,12 +91,12 @@ async def test_simple_rag_agent_example(subtests, get_final_task_from_stream, a2
             )
 
             # Send message
-            task = await get_final_task_from_stream(running_example.client.send_message(SendMessageRequest(message=message)))
+            task = await get_final_task_from_stream(
+                running_example.client.send_message(SendMessageRequest(message=message))
+            )
 
             # Verify response
-            assert task.status.state == TaskState.TASK_STATE_COMPLETED, (
-                f"Fail: {task.status.message.parts[0].text}"
-            )
+            assert task.status.state == TaskState.TASK_STATE_COMPLETED, f"Fail: {task.status.message.parts[0].text}"
 
             # Verify results contain the relevant chunk (Power Requirements)
             result_text = task.history[-1].parts[0].text

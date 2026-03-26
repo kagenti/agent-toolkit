@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useQuery } from '@tanstack/react-query';
 import type { ContextToken } from '@kagenti/adk';
+import { useQuery } from '@tanstack/react-query';
 
 import { useApp } from '#contexts/App/index.ts';
 import type { Agent } from '#modules/agents/api/types.ts';

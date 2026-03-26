@@ -67,7 +67,9 @@ async def test_extension_is_not_reused(llm_extension_agent):
         message.metadata = extension_client.fulfillment_metadata(
             llm_fulfillments={"default": LLMFulfillment(api_key=str(i), api_model="model", api_base="base")}
         )
-        tasks.append(asyncio.create_task(get_final_task_from_stream(client.send_message(SendMessageRequest(message=message)))))
+        tasks.append(
+            asyncio.create_task(get_final_task_from_stream(client.send_message(SendMessageRequest(message=message))))
+        )
 
     results = await asyncio.gather(*tasks)
     for i, task in enumerate(results):

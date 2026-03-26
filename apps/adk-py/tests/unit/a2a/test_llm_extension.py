@@ -10,6 +10,8 @@ import pytest
 
 from kagenti_adk.a2a.extensions.services.llm import _llm_fulfillment_from_env
 
+pytestmark = pytest.mark.unit
+
 
 @pytest.fixture(autouse=True)
 def _clean_env():

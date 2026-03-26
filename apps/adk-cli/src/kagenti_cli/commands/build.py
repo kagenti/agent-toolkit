@@ -70,7 +70,9 @@ async def build_agent(
         if Configuration().running_inside_vm:
             await run_command(
                 [
-                    "sudo", "skopeo", "copy",
+                    "sudo",
+                    "skopeo",
+                    "copy",
                     f"containers-storage:{build_tag}",
                     f"docker://localhost:{REGISTRY_NODEPORT}/{image_name}",
                     "--dest-tls-verify=false",
@@ -87,7 +89,8 @@ async def build_agent(
                 await run_in_vm(
                     vm_name,
                     [
-                        "skopeo", "copy",
+                        "skopeo",
+                        "copy",
                         f"docker-archive:{guest_path}",
                         f"docker://localhost:{REGISTRY_NODEPORT}/{image_name}",
                         "--dest-tls-verify=false",
@@ -98,6 +101,5 @@ async def build_agent(
                 await anyio.Path(host_path).unlink(missing_ok=True)
 
         console.success(
-            f"Image pushed to platform registry.\n"
-            f"Add it using: [green]kagenti-adk add {cluster_ref}[/green]"
+            f"Image pushed to platform registry.\nAdd it using: [green]kagenti-adk add {cluster_ref}[/green]"
         )

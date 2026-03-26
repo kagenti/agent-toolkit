@@ -35,7 +35,7 @@ from a2a.types.a2a_pb2 import SecurityRequirement
 from google.protobuf import message as _message
 from typing_extensions import override
 
-from kagenti_adk.a2a.extensions import AgentDetailExtensionSpec, BaseExtensionServer
+from kagenti_adk.a2a.extensions import BaseExtensionServer
 from kagenti_adk.a2a.extensions.ui.agent_detail import (
     AgentDetail,
     AgentDetailExtensionSpec,
@@ -668,7 +668,10 @@ class Executor(AgentExecutor):
                         await run.cancel(request_context=request_context, event_queue=queue)
                         # the original request queue is closed at this point, we need to propagate state to store manually
                         manager = TaskManager(
-                            task_id=task_id, context_id=context_id, task_store=self._task_store, initial_message=None,
+                            task_id=task_id,
+                            context_id=context_id,
+                            task_store=self._task_store,
+                            initial_message=None,
                             context=request_context.call_context,
                         )
                         event = await queue.dequeue_event(no_wait=True)

@@ -13,14 +13,14 @@ from datetime import datetime
 
 import httpx
 import typer
+from InquirerPy import inquirer
+from InquirerPy.base.control import Choice
 from kagenti_adk.platform import (
     ModelCapability,
     ModelProvider,
     ModelProviderType,
     SystemConfiguration,
 )
-from InquirerPy import inquirer
-from InquirerPy.base.control import Choice
 from rich.table import Column
 
 from kagenti_cli.api import openai_client
@@ -209,8 +209,7 @@ async def _add_provider(
         matched = [c.value for c in choices if c.value[0].lower() == provider_type_str.lower()]
         if not matched:
             raise ValueError(
-                f"Unknown provider type: '{provider_type_str}'. "
-                f"Available: {[c.value[0] for c in choices]}"
+                f"Unknown provider type: '{provider_type_str}'. Available: {[c.value[0] for c in choices]}"
             )
         provider_type, provider_name, base_url = matched[0]
     else:
@@ -358,7 +357,9 @@ async def _add_provider(
                     )
                     if pull:
                         await run_command(
-                            [_ollama_exe(), "pull", recommended_embedding_model], "Pulling the selected model", check=True
+                            [_ollama_exe(), "pull", recommended_embedding_model],
+                            "Pulling the selected model",
+                            check=True,
                         )
 
         if not use_true_localhost:
@@ -464,7 +465,10 @@ async def _select_default_model(
                             {"role": "user", "content": "Hello!"},
                         ],
                     )
-                    if not test_response.choices or "hello" not in (test_response.choices[0].message.content or "").lower():
+                    if (
+                        not test_response.choices
+                        or "hello" not in (test_response.choices[0].message.content or "").lower()
+                    ):
                         raise ModelProviderError("Model did not provide a proper response.")
                 else:
                     test_response = await client.embeddings.create(model=selected_model, input="Hello!")
@@ -519,9 +523,7 @@ async def setup(
     llm_provider: typing.Annotated[
         str | None, typer.Option("--llm-provider", help="LLM provider type (e.g. openai, anthropic, watsonx)")
     ] = None,
-    llm_api_key: typing.Annotated[
-        str | None, typer.Option("--llm-api-key", help="LLM provider API key")
-    ] = None,
+    llm_api_key: typing.Annotated[str | None, typer.Option("--llm-api-key", help="LLM provider API key")] = None,
     llm_base_url: typing.Annotated[
         str | None, typer.Option("--llm-base-url", help="Base URL for 'other' LLM provider")
     ] = None,
@@ -596,9 +598,12 @@ async def setup(
                 console.warning("The following providers are already configured:\n")
                 _list_providers(existing_providers)
                 console.print()
-                if yes or await inquirer.confirm(
-                    message="Do you want to reset the configuration?", default=True
-                ).execute_async():
+                if (
+                    yes
+                    or await inquirer.confirm(
+                        message="Do you want to reset the configuration?", default=True
+                    ).execute_async()
+                ):
                     with console.status("Resetting configuration...", spinner="dots"):
                         await _reset_configuration(existing_providers)
                 else:
@@ -661,9 +666,12 @@ async def setup(
                     default_embedding_model = await _select_default_model(
                         ModelCapability.EMBEDDING, model_id=embedding_model, yes=yes
                     )
-                elif yes or await inquirer.confirm(
-                    message="Do you want to configure an embedding provider? (recommended)", default=True
-                ).execute_async():
+                elif (
+                    yes
+                    or await inquirer.confirm(
+                        message="Do you want to configure an embedding provider? (recommended)", default=True
+                    ).execute_async()
+                ):
                     console.print("[bold]Setting up embedding provider...[/bold]")
                     await _add_provider(capability=ModelCapability.EMBEDDING, use_true_localhost=use_true_localhost)
                     default_embedding_model = await _select_default_model(ModelCapability.EMBEDDING, yes=yes)
@@ -755,15 +763,9 @@ async def add_provider(
     provider: typing.Annotated[
         str | None, typer.Option("--provider", help="Provider type (e.g. openai, anthropic, watsonx)")
     ] = None,
-    api_key: typing.Annotated[
-        str | None, typer.Option("--api-key", help="Provider API key")
-    ] = None,
-    base_url: typing.Annotated[
-        str | None, typer.Option("--base-url", help="Base URL for 'other' provider")
-    ] = None,
-    watsonx_region: typing.Annotated[
-        str | None, typer.Option("--watsonx-region", help="IBM watsonx region")
-    ] = None,
+    api_key: typing.Annotated[str | None, typer.Option("--api-key", help="Provider API key")] = None,
+    base_url: typing.Annotated[str | None, typer.Option("--base-url", help="Base URL for 'other' provider")] = None,
+    watsonx_region: typing.Annotated[str | None, typer.Option("--watsonx-region", help="IBM watsonx region")] = None,
     watsonx_project_or_space: typing.Annotated[
         str | None, typer.Option("--watsonx-project-or-space", help="IBM watsonx: 'project' or 'space'")
     ] = None,

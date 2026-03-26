@@ -23,11 +23,11 @@ async def test_canvas_with_llm_example(subtests, get_final_task_from_stream, a2a
         with subtests.test("agent generates code artifact"):
             message = create_text_message_object(content="Write a hello world program")
             message.context_id = running_example.context.id
-            task = await get_final_task_from_stream(running_example.client.send_message(SendMessageRequest(message=message)))
-
-            assert task.status.state == TaskState.TASK_STATE_COMPLETED, (
-                f"Fail: {task.status.message.parts[0].text}"
+            task = await get_final_task_from_stream(
+                running_example.client.send_message(SendMessageRequest(message=message))
             )
+
+            assert task.status.state == TaskState.TASK_STATE_COMPLETED, f"Fail: {task.status.message.parts[0].text}"
 
             # Verify artifact is returned (the agent uses a mocked LLM response)
             assert len(task.artifacts) > 0
@@ -56,11 +56,11 @@ async def test_canvas_with_llm_example(subtests, get_final_task_from_stream, a2a
                     "description": "Change print to use f-string",
                 }
             }
-            task = await get_final_task_from_stream(running_example.client.send_message(SendMessageRequest(message=message)))
-
-            assert task.status.state == TaskState.TASK_STATE_COMPLETED, (
-                f"Fail: {task.status.message.parts[0].text}"
+            task = await get_final_task_from_stream(
+                running_example.client.send_message(SendMessageRequest(message=message))
             )
+
+            assert task.status.state == TaskState.TASK_STATE_COMPLETED, f"Fail: {task.status.message.parts[0].text}"
 
             # Verify updated artifact is returned
             assert len(task.artifacts) > 0

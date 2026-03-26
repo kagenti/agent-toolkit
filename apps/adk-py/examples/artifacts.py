@@ -16,11 +16,11 @@ from beeai_framework.backend import AssistantMessage, UserMessage
 from beeai_framework.tools.think import ThinkTool
 
 from kagenti_adk.a2a.extensions import (
-    LLMServiceExtensionServer,
-    LLMServiceExtensionSpec,
     CanvasEditRequest,
     CanvasExtensionServer,
     CanvasExtensionSpec,
+    LLMServiceExtensionServer,
+    LLMServiceExtensionSpec,
 )
 from kagenti_adk.a2a.types import AgentArtifact
 from kagenti_adk.server import Server

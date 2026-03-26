@@ -15,7 +15,7 @@ from uuid import uuid4
 import httpx
 import pytest
 import uvicorn
-from a2a.types import SendMessageRequest, Message, Part, Role, TaskState
+from a2a.types import Message, Part, Role, SendMessageRequest, TaskState
 from kagenti_adk.a2a.extensions import OAuthExtensionClient, OAuthFulfillment
 from kagenti_adk.a2a.extensions.auth.oauth import OAuthExtensionSpec
 from mcp.server.auth.provider import (

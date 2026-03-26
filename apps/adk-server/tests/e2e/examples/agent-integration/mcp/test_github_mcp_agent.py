@@ -95,7 +95,9 @@ async def test_github_mcp_agent_example(subtests, get_final_task_from_stream, a2
             message.metadata = metadata
             message.context_id = running_example.context.id
 
-            task = await get_final_task_from_stream(running_example.client.send_message(SendMessageRequest(message=message)))
+            task = await get_final_task_from_stream(
+                running_example.client.send_message(SendMessageRequest(message=message))
+            )
 
             assert task.status.state == TaskState.TASK_STATE_COMPLETED
             result_text = task.history[-1].parts[0].text

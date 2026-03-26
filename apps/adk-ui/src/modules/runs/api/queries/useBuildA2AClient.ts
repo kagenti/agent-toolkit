@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useQuery } from '@tanstack/react-query';
 import type { TaskStatusUpdateEvent } from '@kagenti/adk';
+import { useQuery } from '@tanstack/react-query';
 
 import { buildA2AClient } from '#api/a2a/client.ts';
 

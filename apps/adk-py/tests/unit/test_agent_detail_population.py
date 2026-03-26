@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 import pytest
-from a2a.types import AgentSkill, AgentInterface
+from a2a.types import AgentInterface, AgentSkill
 
 from kagenti_adk.a2a.extensions.ui.agent_detail import AgentDetailExtensionSpec
 from kagenti_adk.server.agent import agent

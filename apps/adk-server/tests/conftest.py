@@ -9,7 +9,6 @@ from pathlib import Path
 from pprint import pprint
 from typing import Any
 
-import async_lru
 import pytest
 from kagenti_adk.platform import ModelProviderType
 from kink import di

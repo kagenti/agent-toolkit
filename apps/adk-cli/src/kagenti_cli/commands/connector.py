@@ -8,10 +8,10 @@ import typing
 
 import pydantic
 import typer
-from kagenti_adk.platform.connector import Connector, ConnectorState
-from kagenti_adk.platform.types import Metadata
 from InquirerPy import inquirer
 from InquirerPy.base.control import Choice
+from kagenti_adk.platform.connector import Connector, ConnectorState
+from kagenti_adk.platform.types import Metadata
 
 from kagenti_cli import configuration
 from kagenti_cli.async_typer import AsyncTyper
