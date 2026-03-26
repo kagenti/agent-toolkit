@@ -6,9 +6,10 @@ from __future__ import annotations
 import contextlib
 import os
 import signal
+import socket
 import subprocess
 from collections.abc import AsyncGenerator, AsyncIterator, Awaitable, Callable
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, closing
 from typing import Any, NamedTuple
 
 import httpx
@@ -23,7 +24,11 @@ from kagenti_adk.platform.context import Context, ContextPermissions, ContextTok
 from pydantic import Secret
 from tenacity import retry, stop_after_delay, wait_fixed
 
-DEFAULT_PORT = 8000
+
+def _free_port() -> int:
+    with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as sock:
+        sock.bind(("", 0))
+        return int(sock.getsockname()[1])
 
 
 class RunningExample(NamedTuple):
@@ -92,10 +97,11 @@ def get_final_task_from_stream() -> Callable[[AsyncIterator[ClientEvent]], Await
 async def run_example(
     example_dir_path: str,
     a2a_client_factory: Callable[[AgentCard | dict[str, Any], ContextToken], AsyncIterator[Client]],
-    port: int = DEFAULT_PORT,
+    port: int | None = None,
     llm_model: str | None = None,
     llm_api_key: Secret[str] | None = None,
 ) -> AsyncGenerator[RunningExample]:
+    port = port or _free_port()
     process = run_process(example_dir_path, port, llm_model, llm_api_key)
     try:
         example_url = f"http://localhost:{port}"
@@ -109,6 +115,7 @@ async def run_example(
         except HTTPStatusError as e:
             if e.response.status_code == 409:
                 provider = await Provider.get_by_location(location=example_url)
+                provider = await provider.patch(agent_card=agent_card)
             else:
                 raise
 
