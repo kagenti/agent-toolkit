@@ -110,23 +110,24 @@ outputs = { auto = true }
 depends = ["adk-server:setup"]
 dir = "{{config_root}}/apps/adk-server"
 
-["adk-server:fix:docs"]
-description = "Regenerate docs/development/api-reference/openapi.json from server routes (no running server needed)"
-depends = ["adk-server:setup"]
-dir = "{{config_root}}/apps/adk-server"
-run = '''
-uv run python -c "
-import json, sys
-from fastapi import FastAPI
-from fastapi.openapi.utils import get_openapi
-from adk_server.application import mount_routes, get_version
-app = FastAPI(docs_url=None, openapi_url=None)
-mount_routes(app)
-spec = get_openapi(title='ADK server', version=get_version(), routes=app.routes)
-spec.pop('servers', None)
-print(json.dumps(spec, indent=2))
-" > ../../docs/development/api-reference/openapi.json
-'''
+# TODO: make the docs generation deterministic
+# ["adk-server:fix:docs"]
+# description = "Regenerate docs/development/api-reference/openapi.json from server routes (no running server needed)"
+# depends = ["adk-server:setup"]
+# dir = "{{config_root}}/apps/adk-server"
+# run = '''
+# uv run python -c "
+# import json, sys
+# from fastapi import FastAPI
+# from fastapi.openapi.utils import get_openapi
+# from adk_server.application import mount_routes, get_version
+# app = FastAPI(docs_url=None, openapi_url=None)
+# mount_routes(app)
+# spec = get_openapi(title='ADK server', version=get_version(), routes=app.routes)
+# spec.pop('servers', None)
+# print(json.dumps(spec, indent=2))
+# " > ../../docs/development/api-reference/openapi.json
+# '''
 
 # run
 
