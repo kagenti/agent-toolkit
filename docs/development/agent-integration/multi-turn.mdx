@@ -90,7 +90,7 @@ This is usecase-specific and one my opt for a combination of this and previous a
 import asyncio
 import os
 
-from a2a.types import Message
+from a2a.types import Message, Role
 from a2a.utils.message import get_message_text
 from kagenti_adk.a2a.types import AgentMessage
 from kagenti_adk.server import Server
@@ -108,8 +108,8 @@ async def example_tool() -> str:
 async def history_counter(history: list[Message]) -> str:
     """Create a concise conversation-state summary."""
     await asyncio.sleep(.1)  # doing some agent work
-    user_count = sum(1 for item in history if item.role.value == "user")
-    agent_count = sum(1 for item in history if item.role.value == "agent")
+    user_count = sum(1 for item in history if item.role == Role.ROLE_USER)
+    agent_count = sum(1 for item in history if item.role == Role.ROLE_AGENT)
     history_count = len(history)
     return f"total={history_count}, user={user_count}, agent={agent_count}"
 
@@ -219,11 +219,11 @@ FrameworkMessage = UserMessage | AssistantMessage
 
 def to_framework_message(message: Message) -> FrameworkMessage:
     """Convert A2A Message to Kagenti ADK Message format"""
-    message_text = "".join(part.root.text for part in message.parts if part.root.kind == "text")
+    message_text = "".join(part.text for part in message.parts if part.text)
 
-    if message.role == Role.agent:
+    if message.role == Role.ROLE_AGENT:
         return AssistantMessage(message_text)
-    elif message.role == Role.user:
+    elif message.role == Role.ROLE_USER:
         return UserMessage(message_text)
     else:
         raise ValueError(f"Invalid message role: {message.role}")

@@ -72,6 +72,14 @@ class SilentOTLPLogExporter(OTLPLogExporter):
 
 
 def configure_telemetry():
+    # Suppress noisy OTLP exporter logs that flood output when the collector is unreachable
+    for _name in (
+        "opentelemetry.exporter.otlp.proto.http.metric_exporter",
+        "opentelemetry.exporter.otlp.proto.http._log_exporter",
+        "opentelemetry.exporter.otlp.proto.http.trace_exporter",
+    ):
+        logging.getLogger(_name).setLevel(logging.CRITICAL)
+
     resource = Resource(
         attributes={
             SERVICE_NAME: "adk-server",
