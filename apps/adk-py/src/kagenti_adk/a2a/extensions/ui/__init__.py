@@ -8,5 +8,4 @@ from .canvas import *
 from .citation import *
 from .error import *
 from .form_request import *
-from .settings import *
 from .trajectory import *
