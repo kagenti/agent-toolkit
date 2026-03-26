@@ -12,7 +12,6 @@ import {
   ModalHeader,
   TextInput,
 } from '@carbon/react';
-import clsx from 'clsx';
 import { useId } from 'react';
 import { useForm } from 'react-hook-form';
 
