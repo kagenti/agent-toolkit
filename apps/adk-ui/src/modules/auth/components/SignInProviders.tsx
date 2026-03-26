@@ -4,6 +4,7 @@
  */
 
 import { auth, getProvider, signIn } from '#app/(auth)/auth.ts';
+import { runtimeConfig } from '#contexts/App/runtime-config.ts';
 import type { ThemePreference } from '#contexts/Theme/theme-context.ts';
 import { routes } from '#utils/router.ts';
 
@@ -35,7 +36,16 @@ export async function SignInProviders({ callbackUrl = routes.home(), error }: Pr
     return <AuthErrorPage callbackUrl={callbackUrl} />;
   }
 
-  return <AutoSignIn signIn={handleSignIn.bind(null, { providerId: authProvider.id, redirectTo: callbackUrl })} />;
+  const signInAction = runtimeConfig.isLocalDevAutoLogin
+    ? handleLocalDevSignIn.bind(null, callbackUrl)
+    : handleSignIn.bind(null, { providerId: authProvider.id, redirectTo: callbackUrl });
+
+  return <AutoSignIn signIn={signInAction} />;
+}
+
+async function handleLocalDevSignIn(redirectTo: string, _theme: ThemePreference) {
+  'use server';
+  await signIn('local-dev', { username: 'admin', password: 'admin', redirectTo });
 }
 
 async function handleSignIn(

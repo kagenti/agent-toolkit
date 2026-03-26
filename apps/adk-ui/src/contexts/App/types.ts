@@ -14,5 +14,6 @@ export interface RuntimeConfig {
   featureFlags: FeatureFlags;
   contextTokenPermissions: ContextTokenPermissions;
   isAuthEnabled: boolean;
+  isLocalDevAutoLogin: boolean;
   appName: string;
 }
