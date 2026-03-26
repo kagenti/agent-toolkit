@@ -292,7 +292,6 @@ function AgentRunProvider({ agent, children }: PropsWithChildren<Props>) {
         pendingSubscription.current = undefined;
 
         queryClient.invalidateQueries({ queryKey: contextKeys.lists() });
-        queryClient.invalidateQueries({ queryKey: contextKeys.history({ context_id: contextId }) });
       }
     },
     [

@@ -91,7 +91,6 @@ async def content_builder_agent(
         return
 
     started_at = datetime.now(timezone.utc)
-    await context.store(data=message)
 
     subagents: list[SubAgent] = []
     for sub_agent in AVAILABLE_SUBAGENTS:
@@ -140,7 +139,6 @@ async def content_builder_agent(
                             title=data["name"], content=json.dumps(obj=data["args"])
                         )
                         yield tool_call_metadata
-                        await context.store(data=AgentMessage(metadata=tool_call_metadata))
                     tool_calls.clear()
 
                 elif last_msg.tool_call_chunks:
@@ -151,12 +149,10 @@ async def content_builder_agent(
                             tool_calls[tc_id]["args"] += tc.get("args") or ""
                 elif last_msg.text:
                     yield AgentMessage(text=last_msg.text)
-                    await context.store(AgentMessage(text=last_msg.text))
 
             elif isinstance(last_msg, ToolMessage) and last_msg.name and last_msg.text:
                 tool_message_metadata = trajectory.trajectory_metadata(title=last_msg.name, content=last_msg.text)
                 yield tool_message_metadata
-                await context.store(data=AgentMessage(metadata=tool_message_metadata))
 
     updated_files = await agent_stack_backend.alist(order_by="created_at", order="asc", created_after=started_at)
     for updated_file in updated_files:

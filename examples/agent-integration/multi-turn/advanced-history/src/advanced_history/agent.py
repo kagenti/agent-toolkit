@@ -10,7 +10,6 @@ from kagenti_adk.a2a.extensions import LLMServiceExtensionServer, LLMServiceExte
 from kagenti_adk.a2a.types import AgentMessage
 from kagenti_adk.server import Server
 from kagenti_adk.server.context import RunContext
-from kagenti_adk.server.store.platform_context_store import PlatformContextStore
 from beeai_framework.adapters.agentstack.backend.chat import AgentStackChatModel
 from beeai_framework.agents.requirement import RequirementAgent
 from beeai_framework.agents.requirement.requirements.conditional import ConditionalRequirement
@@ -41,8 +40,6 @@ async def advanced_history_example(
     llm: Annotated[LLMServiceExtensionServer, LLMServiceExtensionSpec.single_demand()],
 ):
     """Multi-turn chat agent with conversation memory and LLM integration"""
-    await context.store(input)
-
     # Load conversation history
     history = [message async for message in context.load_history() if isinstance(message, Message) and message.parts]
 
@@ -78,14 +75,12 @@ async def advanced_history_example(
                 response = AgentMessage(text=step.input["response"])
 
                 yield response
-                await context.store(response)
 
 
 def run():
     server.run(
         host=os.getenv("HOST", "127.0.0.1"),
         port=int(os.getenv("PORT", "8000")),
-        context_store=PlatformContextStore(),  # Enable persistent storage
     )
 
 

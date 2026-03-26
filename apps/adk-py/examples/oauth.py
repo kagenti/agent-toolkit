@@ -30,7 +30,6 @@ from kagenti_adk.a2a.extensions import (
 from kagenti_adk.a2a.types import AgentMessage
 from kagenti_adk.server import Server
 from kagenti_adk.server.context import RunContext
-from kagenti_adk.server.store.platform_context_store import PlatformContextStore
 
 server = Server()
 
@@ -57,8 +56,6 @@ async def oauth_agent(
     oauth: Annotated[OAuthExtensionServer, OAuthExtensionSpec.single_demand()],
 ):
     """Multi-turn chat agent with conversation memory and LLM integration"""
-    await context.store(input)
-
     # pyrefly: ignore [deprecated] -- TODO: upgrade
     mcp_client = streamablehttp_client(
         url="https://mcp.stripe.com",
@@ -104,14 +101,12 @@ async def oauth_agent(
                     response = AgentMessage(text=step.input["response"])
 
                     yield response
-                    await context.store(response)
 
 
 def run():
     server.run(
         host=os.getenv("HOST", "127.0.0.1"),
         port=int(os.getenv("PORT", "8000")),
-        context_store=PlatformContextStore(),  # Enable persistent storage
     )
 
 

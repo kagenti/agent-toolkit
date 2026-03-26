@@ -9,10 +9,7 @@ When building conversational AI agents, one of the key requirements is maintaini
 
 | Operation | Purpose |
 | :--- | :--- |
-| **await context.store(input)** | Stores current user message in conversation history. Storage of messages must be explicitly requested|
-| **await context.store(response)** | Stores agent’s responses in conversation history, and must be explicitly requested |
-| **context: RunContext)** | Sets up a RunContext instance for storing and accessing the conversation history |
-| **context_store=PlatformContextStore()** | Configures server to use the platform’s persistent context store to maintain conversation history across agent restarts | 
+| **context: RunContext)** | Sets up a RunContext instance for accessing the conversation history |
 
 
 ## Simple History Access Example
@@ -40,9 +37,6 @@ server = Server()
 async def basic_history_example(input: Message, context: RunContext):
     """Agent that demonstrates conversation history access"""
 
-    # Store the current message in the context store
-    await context.store(input)
-
     # Get the current user message
     current_message = get_message_text(input)
     print(f"Current message: {current_message}")
@@ -57,9 +51,6 @@ async def basic_history_example(input: Message, context: RunContext):
     message = AgentMessage(text=f"Hello! I can see we have {len(history)} messages in our conversation.")
     yield message
 
-    # Store the message in the context store
-    await context.store(message)
-
 
 def run():
     server.run(host=os.getenv("HOST", "127.0.0.1"), port=int(os.getenv("PORT", 8000)))
@@ -72,10 +63,8 @@ if __name__ == "__main__":
 
 ### Steps
 
-1. **Access conversation history:** Use `RunContext` to set up an instance of the conversation history to store and load previous messages.
-1. **Store incoming messages:** Use `await context.store(input)` to store the current user message in the conversation history.
+1. **Access conversation history:** Use `RunContext` to set up an instance of the conversation history to load previous messages.
 1. **Filter and process history:** Retrieve the conversation history with `load_history()` and filter to get the messages relevant to your agent's logic.
-1. **Store agent responses:** Use `await context.store(response)` to store your agent's responses for future conversation context.
 
 
 ## Streaming with Buffered History Example
@@ -90,12 +79,11 @@ This is usecase-specific and one my opt for a combination of this and previous a
 import asyncio
 import os
 
-from a2a.types import Message, Role
+from a2a.types import Message
 from a2a.utils.message import get_message_text
 from kagenti_adk.a2a.types import AgentMessage
 from kagenti_adk.server import Server
 from kagenti_adk.server.context import RunContext
-from kagenti_adk.server.store.platform_context_store import PlatformContextStore
 
 server = Server()
 
@@ -108,8 +96,8 @@ async def example_tool() -> str:
 async def history_counter(history: list[Message]) -> str:
     """Create a concise conversation-state summary."""
     await asyncio.sleep(.1)  # doing some agent work
-    user_count = sum(1 for item in history if item.role == Role.ROLE_USER)
-    agent_count = sum(1 for item in history if item.role == Role.ROLE_AGENT)
+    user_count = sum(1 for item in history if item.role.value == "user")
+    agent_count = sum(1 for item in history if item.role.value == "agent")
     history_count = len(history)
     return f"total={history_count}, user={user_count}, agent={agent_count}"
 
@@ -120,9 +108,6 @@ async def streaming_agent_w_single_history_write_example(input: Message, context
     Stream partial answers, execute tools, and persist one finalized assistant message.
     See other examples for actual implementation of multi-turn conversation agent with tool use.
     """
-    # Store the user input as the first persisted item for this turn.
-    await context.store(data=input)
-
     history = [message async for message in context.load_history() if isinstance(message, Message) and message.parts]
 
     current_message = get_message_text(input)
@@ -159,20 +144,14 @@ async def streaming_agent_w_single_history_write_example(input: Message, context
         # This does not need to be the go-to approach in all cases, sometimes the partial outputs are of no value and one does not want them to be properly stored.
         #
         # Why not store each chunk?
-        # - Calling `context.store()`, PlatformContextStore saves every message as a distinct history item.
-        # - Storing per chunk would fragment one assistant turn into many partial messages.
-        # - A single aggregated write keeps replay, memory, and history semantics clean.
-        # 
         aggregated_response = AgentMessage(text="\n".join(buffered_parts))
-        yield "Final result check:\n" + aggregated_response.parts[0].text
-        await context.store(data=aggregated_response)
+        yield "Final result check:\n" + str(aggregated_response.text)
 
 
 def run():
     server.run(
         host=os.getenv("HOST", "127.0.0.1"),
         port=int(os.getenv("PORT", "8000")),
-        context_store=PlatformContextStore(),
     )
 
 
@@ -183,9 +162,8 @@ if __name__ == "__main__":
 
 ### When to use buffering
 
-- Use **simple yield + store** when your agent emits a single final response.
-- Use **stream + buffer + single store** when your agent emits multiple partial chunks which are streamed to the user.
-- With `PlatformContextStore`, each `context.store()` call creates a persisted history item, so buffering prevents chunk-level history fragmentation.
+- Use **simple yield** when your agent emits a single final response.
+- Use **stream + buffer** when your agent emits multiple partial chunks which are streamed to the user.
 
 ## Advanced BeeAI Framework Example
 
@@ -205,7 +183,6 @@ from kagenti_adk.a2a.extensions import LLMServiceExtensionServer, LLMServiceExte
 from kagenti_adk.a2a.types import AgentMessage
 from kagenti_adk.server import Server
 from kagenti_adk.server.context import RunContext
-from kagenti_adk.server.store.platform_context_store import PlatformContextStore
 from beeai_framework.adapters.agentstack.backend.chat import AgentStackChatModel
 from beeai_framework.agents.requirement import RequirementAgent
 from beeai_framework.agents.requirement.requirements.conditional import ConditionalRequirement
@@ -219,11 +196,11 @@ FrameworkMessage = UserMessage | AssistantMessage
 
 def to_framework_message(message: Message) -> FrameworkMessage:
     """Convert A2A Message to Kagenti ADK Message format"""
-    message_text = "".join(part.text for part in message.parts if part.text)
+    message_text = "".join(part.root.text for part in message.parts if part.root.kind == "text")
 
-    if message.role == Role.ROLE_AGENT:
+    if message.role == Role.agent:
         return AssistantMessage(message_text)
-    elif message.role == Role.ROLE_USER:
+    elif message.role == Role.user:
         return UserMessage(message_text)
     else:
         raise ValueError(f"Invalid message role: {message.role}")
@@ -236,8 +213,6 @@ async def advanced_history_example(
     llm: Annotated[LLMServiceExtensionServer, LLMServiceExtensionSpec.single_demand()],
 ):
     """Multi-turn chat agent with conversation memory and LLM integration"""
-    await context.store(input)
-
     # Load conversation history
     history = [message async for message in context.load_history() if isinstance(message, Message) and message.parts]
 
@@ -273,14 +248,12 @@ async def advanced_history_example(
                 response = AgentMessage(text=step.input["response"])
 
                 yield response
-                await context.store(response)
 
 
 def run():
     server.run(
         host=os.getenv("HOST", "127.0.0.1"),
         port=int(os.getenv("PORT", "8000")),
-        context_store=PlatformContextStore(),  # Enable persistent storage
     )
 
 
@@ -295,30 +268,8 @@ This advanced example demonstrates several key concepts:
 - **Framework Integration:** Leverages the BeeAI Framework for sophisticated agent capabilities
 - **Memory Management:** Converts conversation history to framework format and loads it into agent memory
 - **Tool Usage:** Includes thinking tools and conditional requirements for better reasoning
-- **Persistent Storage:** Uses `PlatformContextStore` for conversation persistence
 
 ## Using Content History
-
-### Persistent Storage Example
-
-By default, conversation history is stored in memory and is lost when the agent process restarts. For production applications, you'll want to use persistent context storage to maintain conversation history across agent restarts. The `PlatformContextStore` automatically handles conversation persistence, ensuring that users can continue their conversations even after agent restarts or deployments.
-
-```python
-import os
-from kagenti_adk.server import Server
-from kagenti_adk.server.store.platform_context_store import PlatformContextStore
-
-server = Server()
-
-def run():
-    server.run(
-        host=os.getenv("HOST", "127.0.0.1"), 
-        port=int(os.getenv("PORT", 8000)),
-        context_store=PlatformContextStore()
-    )
-```
-
-
 
 ### History Contents
 
@@ -339,49 +290,7 @@ The history includes the current message, so if you want only previous messages,
 The history iterator returns all message types. Always filter messages using `isinstance(message, Message)` to ensure you're working with the correct message format.
 </Warning>
 
-### Editing and Removing Messages from History
-
-Sometimes you may need to edit a previous message in a conversation or remove messages that are no longer relevant. 
-The Kagenti ADK provides a mechanism to delete history items from a specific point onward, allowing you to effectively “rewind” the conversation and replace a message with an edited version. 
-Possible use cases include editing a previous message, clearing irrelevant exchanges, or removing messages that resulted from processing errors.
-
-Here's an example of a function for editing a user message in a conversation using the context API. This assumes you know the context message id, which can be obtained as an id field of an object returned by `RunContext.load_history(load_history_items=True)`, `Context.list_history` or `Context.list_all_history`.
-
-```python
-import uuid
-from uuid import UUID
-from typing import Any
-
-from a2a.types import Message, Part, Role
-from kagenti_adk.platform.context import Context
-from kagenti_adk.server.context import RunContext
-
-async def edit_message_in_context(run_context: RunContext, id: UUID, new_text: str):
-    # Step 1: Delete from this message onwards
-    await run_context.delete_history_from_id(from_id=id)
-
-    # Step 2: Create the corrected message
-    corrected_message = Message(
-        message_id=str(uuid.uuid4()),
-        parts=[Part(text=new_text)],
-        role=Role.ROLE_USER,
-    )
-
-    # Step 3: Store the corrected message
-    await run_context.store(data=corrected_message)
-```
-
-<Tip>
-When you delete history from a specific message onwards, all messages created after that point (including the message itself) are removed. This effectively creates a new conversation branch starting from the message before the deleted one.
-</Tip>
-
-<Warning>
-This operation is permanent. Once messages are deleted, they cannot be recovered. Consider informing users about this operation or implementing a confirmation step for important conversations.
-</Warning>
-
-### Message Storage Guidelines
-
-Since messages are not automatically stored, you need to explicitly call `context.store()` for any message you want to be available in future interactions. Here are the key guidelines:
+### Message History
 
 
 #### Store Request Example
@@ -389,15 +298,9 @@ Since messages are not automatically stored, you need to explicitly call `contex
 ```python
 @server.agent()
 async def my_agent(input: Message, context: RunContext):
-    # Store the incoming user message immediately
-    await context.store(input)
-    
     # Process the message and generate response
     response = AgentMessage(text="Your response here")
     yield response
-    
-    # Store the agent's response after yielding
-    await context.store(response)
 ```
 
 #### What to Store

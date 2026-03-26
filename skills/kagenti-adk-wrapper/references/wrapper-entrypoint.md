@@ -49,18 +49,15 @@ Based on the classification in Step 2, follow exactly ONE of these workflows:
 - [ ] Pass necessary inputs (from forms or text) to original agent logic
 - [ ] Yield trajectory for meaningful intermediate activity (same rule as all agents)
 - [ ] Yield the final response via `AgentMessage(text=result)`
-- [ ] Persist both input and response via `context.store()`
 ```
 
 ### If the agent is Multi-turn
 
 ```
-- [ ] Store input: Save incoming user message immediately with `await context.store(input)`
 - [ ] Load history: Retrieve past conversation via `[msg async for msg in context.load_history() if isinstance(msg, Message)]`
 - [ ] Execute agent: Pass the filtered history to the original agent logic
 - [ ] Yield trajectory for meaningful intermediate activity (same rule as all agents)
 - [ ] Yield response: Return final answering chunks with `yield AgentMessage(text=...)`
-- [ ] Store response: Save the final response with `await context.store(response)`
 ```
 
 ## Entrypoint
@@ -68,6 +65,6 @@ Based on the classification in Step 2, follow exactly ONE of these workflows:
 Create a `run()` / `serve()` function protected by an `if __name__ == "__main__":` guard. This function should call `server.run()`:
 
 - The server should be configured to listen on a `host` and `port` from environment variables (e.g., `host=os.getenv("HOST", "127.0.0.1")`, `port=int(os.getenv("PORT", 8000))`).
-- If the agent persists or reads context history, you must pass `context_store=PlatformContextStore()` to `server.run()`.
+- Conversation history is automatically persisted in the A2A TaskStore. Use `context.load_history()` to read it.
 - **Remove all CLI argument parsing** (`argparse`). Map required CLI inputs to the wrapper parameters instead (e.g., from Forms, Settings, or Environment variables).
 - Only `auth_backend` if explicitly requested.

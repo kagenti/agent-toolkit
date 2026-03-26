@@ -36,7 +36,6 @@ from kagenti_adk.platform.provider import Provider
 from kagenti_adk.server.agent import Agent
 from kagenti_adk.server.agent import agent as agent_decorator
 from kagenti_adk.server.constants import DEFAULT_IMPLICIT_EXTENSIONS
-from kagenti_adk.server.store.context_store import ContextStore
 from kagenti_adk.server.telemetry import configure_telemetry as configure_telemetry_func
 from kagenti_adk.server.utils import cancel_task
 from kagenti_adk.types import SdkAuthenticationBackend
@@ -48,7 +47,6 @@ class Server:
     def __init__(self) -> None:
         self._agent: Agent | None = None
         self.server: uvicorn.Server | None = None
-        self._context_store: ContextStore | None = None
         self._self_registration_client: PlatformClient | None = None
         self._self_registration_id: str | None = None
         self._provider_id: str | None = None
@@ -72,7 +70,6 @@ class Server:
         self_registration: bool = True,
         self_registration_id: str | None = None,
         task_store: TaskStore | None = None,
-        context_store: ContextStore | None = None,
         queue_manager: QueueManager | None = None,
         task_timeout: timedelta = timedelta(minutes=10),
         push_config_store: PushNotificationConfigStore | None = None,
@@ -194,7 +191,6 @@ class Server:
             lifespan=_lifespan_fn,
             implicit_extensions=implicit_extensions,
             task_store=task_store,
-            context_store=context_store,
             queue_manager=queue_manager,
             push_config_store=push_config_store,
             push_sender=push_sender,

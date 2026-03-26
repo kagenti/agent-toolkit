@@ -67,8 +67,6 @@ async def artifacts_agent(
 ):
     """Works with artifacts"""
 
-    await context.store(input)
-
     canvas_edit_request = await canvas.parse_canvas_edit_request(message=input)
 
     if canvas_edit_request:
@@ -106,7 +104,6 @@ async def artifacts_agent(
     if pre_text := response[: match.start()].strip():
         message = AgentMessage(text=pre_text)
         yield message
-        await context.store(message)
 
     await asyncio.sleep(1)
 
@@ -137,7 +134,6 @@ async def artifacts_agent(
         name=artifact_name,
         parts=[TextPart(text=recipe_content)],
     )
-    await context.store(artifact)
 
     # Send first chunk with artifact_id to establish the artifact
     first_artifact = AgentArtifact(
@@ -155,13 +151,11 @@ async def artifacts_agent(
             parts=[TextPart(text=chunk)],
         )
         yield chunk_artifact
-        await context.store(chunk_artifact)
         await asyncio.sleep(0.3)
 
     if post_text := response[match.end() :]:
         message = AgentMessage(text=post_text)
         yield message
-        await context.store(message)
 
 
 if __name__ == "__main__":

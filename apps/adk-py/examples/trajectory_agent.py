@@ -13,7 +13,6 @@ from kagenti_adk.a2a.extensions import TrajectoryExtensionServer, TrajectoryExte
 from kagenti_adk.a2a.types import AgentMessage
 from kagenti_adk.server import Server
 from kagenti_adk.server.context import RunContext
-from kagenti_adk.server.store.platform_context_store import PlatformContextStore
 
 server = Server()
 
@@ -28,15 +27,11 @@ async def example_agent(
 ):
     """Agent that demonstrates conversation history access"""
 
-    # Store the current message in the context store
-    await context.store(input)
-
     metadata = trajectory.trajectory_metadata(
         title="Initializing...",
         content="Initializing...",
     )
     yield metadata
-    await context.store(AgentMessage(metadata=metadata))
 
     await asyncio.sleep(2.5)
 
@@ -46,7 +41,6 @@ async def example_agent(
             content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         )
         yield metadata
-        await context.store(AgentMessage(metadata=metadata))
         await asyncio.sleep(0.3)
 
     for i in range(4, 7):
@@ -55,7 +49,6 @@ async def example_agent(
             content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         )
         yield metadata
-        await context.store(AgentMessage(metadata=metadata))
         await asyncio.sleep(0.8)
 
     await asyncio.sleep(1)
@@ -65,7 +58,6 @@ async def example_agent(
         content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
     )
     yield metadata
-    await context.store(AgentMessage(metadata=metadata))
     await asyncio.sleep(2)
 
     metadata = trajectory.trajectory_metadata(
@@ -134,7 +126,6 @@ def extract_entities(text):
 """,
     )
     yield metadata
-    await context.store(AgentMessage(metadata=metadata))
 
     await asyncio.sleep(2)
 
@@ -169,7 +160,6 @@ def extract_entities(text):
 }""",
     )
     yield metadata
-    await context.store(AgentMessage(metadata=metadata))
 
     await asyncio.sleep(1)
 
@@ -177,25 +167,21 @@ def extract_entities(text):
         title="Web search", content="Querying search engines...", group_id="websearch"
     )
     yield metadata
-    await context.store(AgentMessage(metadata=metadata))
 
     await asyncio.sleep(4)
 
     metadata = trajectory.trajectory_metadata(content="Found 8 results.", group_id="websearch")
     yield metadata
-    await context.store(AgentMessage(metadata=metadata))
 
     await asyncio.sleep(1)
 
     metadata = trajectory.trajectory_metadata(content="Found 8 results\nAnalyzed 3/8 results", group_id="websearch")
     yield metadata
-    await context.store(AgentMessage(metadata=metadata))
 
     await asyncio.sleep(2)
 
     metadata = trajectory.trajectory_metadata(content="Found 8 results\nAnalyzed 8/8 results", group_id="websearch")
     yield metadata
-    await context.store(AgentMessage(metadata=metadata))
 
     await asyncio.sleep(4)
 
@@ -205,7 +191,6 @@ def extract_entities(text):
         group_id="websearch",
     )
     yield metadata
-    await context.store(AgentMessage(metadata=metadata))
 
     # Your agent logic here - you can now reference all messages in the conversation
     message = AgentMessage(
@@ -213,13 +198,10 @@ def extract_entities(text):
     )
     yield message
 
-    # Store the message in the context store
-    await context.store(message)
-
 
 def run():
     server.run(
-        host=os.getenv("HOST", "127.0.0.1"), port=int(os.getenv("PORT", 8000)), context_store=PlatformContextStore()
+        host=os.getenv("HOST", "127.0.0.1"), port=int(os.getenv("PORT", 8000))
     )
 
 

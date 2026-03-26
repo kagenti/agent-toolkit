@@ -13,7 +13,6 @@ class Queues(StrEnum):
     CRON_MODEL_PROVIDER = "cron:model_provider"
     CRON_CONNECTOR = "cron:connector"
     # tasks
-    GENERATE_CONVERSATION_TITLE = "generate_conversation_title"
     TEXT_EXTRACTION = "text_extraction"
     TOOLKIT_DELETION = "toolkit_deletion"
 

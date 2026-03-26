@@ -4,21 +4,17 @@
 from __future__ import annotations
 
 from collections.abc import AsyncGenerator
-from typing import Literal, overload
-from uuid import UUID
 
 import janus
+from a2a.server.tasks import TaskStore
 from a2a.types import (
     Artifact,
     Message,
     Task,
 )
-from asgiref.sync import async_to_sync
 from pydantic import BaseModel, PrivateAttr
 
 from kagenti_adk.a2a.types import RunYield, RunYieldResume
-from kagenti_adk.platform.context import ContextHistoryItem
-from kagenti_adk.server.store.context_store import ContextStoreInstance
 
 
 class RunContextSettings(BaseModel):
@@ -32,49 +28,25 @@ class RunContext(BaseModel, arbitrary_types_allowed=True):
     related_tasks: list[Task] | None = None
     strict: bool = False  # TODO: explain strict mode - what yields will stop message etc. Use in match/case
 
-    _store: ContextStoreInstance
+    _task_store: TaskStore
     _yield_queue: janus.Queue[RunYield] = PrivateAttr(default_factory=janus.Queue)
     _yield_resume_queue: janus.Queue[RunYieldResume | Exception] = PrivateAttr(default_factory=janus.Queue)
 
-    def __init__(self, _store: ContextStoreInstance, **data):
+    def __init__(self, _task_store: TaskStore, **data):
         super().__init__(**data)
-        self._store = _store
+        self._task_store = _task_store
 
-    def _prepare_store_data(self, data: Message | Artifact) -> Message | Artifact:
-        if not self._store:
-            raise RuntimeError("Context store is not initialized")
-        if isinstance(data, Message):
-            msg = Message()
-            msg.CopyFrom(data)
-            msg.context_id = self.context_id
-            msg.task_id = self.task_id
-            return msg
-        return data
+    async def load_history(self) -> AsyncGenerator[Message | Artifact, None]:
+        """Load conversation history from the A2A TaskStore.
 
-    async def store(self, data: Message | Artifact):
-        await self._store.store(self._prepare_store_data(data))
-
-    def store_sync(self, data: Message | Artifact):
-        async_to_sync(self._store.store)(self._prepare_store_data(data))
-
-    @overload
-    def load_history(self, load_history_items: Literal[False] = False) -> AsyncGenerator[Message | Artifact, None]: ...
-
-    @overload
-    def load_history(self, load_history_items: Literal[True]) -> AsyncGenerator[ContextHistoryItem, None]: ...
-
-    async def load_history(
-        self, load_history_items: bool = False
-    ) -> AsyncGenerator[ContextHistoryItem | Message | Artifact]:
-        if not self._store:
-            raise RuntimeError("Context store is not initialized")
-        async for item in self._store.load_history(load_history_items=load_history_items):
-            yield item
-
-    async def delete_history_from_id(self, from_id: UUID) -> None:
-        if not self._store:
-            raise RuntimeError("Context store is not initialized")
-        await self._store.delete_history_from_id(from_id)
+        Yields messages and artifacts from the current task's history.
+        """
+        task = await self._task_store.get(self.task_id)
+        if task:
+            for msg in task.history:
+                yield msg
+            for artifact in task.artifacts:
+                yield artifact
 
     def yield_sync(self, value: RunYield) -> RunYieldResume:
         self._yield_queue.sync_q.put(value)

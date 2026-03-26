@@ -159,7 +159,7 @@ Read the agent's code and classify it. This determines the `interaction_mode` va
 
 This classification determines:
 
-- How to use `context.store()` and `context.load_history()`: persist input/response by default for all agents; `context.load_history()` is required for multi-turn, and optional for single-turn (use only when prior context is intentionally part of behavior)
+- How to use `context.load_history()`: history is auto-persisted by the A2A TaskStore; `context.load_history()` is required for multi-turn, and optional for single-turn (use only when prior context is intentionally part of behavior)
 - Whether to define an `initial_form` for structured inputs (single-turn with named parameters)
 
 ---
@@ -277,8 +277,7 @@ When building and testing the wrapper, ensure you avoid these common pitfalls:
 - **Never use synchronous functions for the agent handler.** Agent functions must be `async def` generators using `yield`.
 - **Never hide platform wiring behind abstraction layers.** Keep `@server.agent(...)`, extension parameters, and integration contracts visible in the main entrypoint so behavior is auditable.
 - **Never treat runtime inspection as first source.** `kagenti_adk` and `a2a` details must come from provided docs first; use installed-environment inspection only as documented fallback, then validate imports at the end.
-- **Never assume history is auto-saved.** Explicitly call `await context.store(input)` and `await context.store(response)`.
-- **Never assume persistent history without `PlatformContextStore`.** Without it, context storage is in-memory and lost on restart.
+- **History is auto-saved by the A2A framework.** Messages and artifacts are persisted in the A2A TaskStore automatically — do not manually store them.
 - **Never forget to filter history.** `context.load_history()` returns Messages and Artifacts. Filter with `isinstance(message, Message)`.
 - **Never store individual streaming chunks.** Accumulate the full response and store once.
 - **Never treat extension data as dictionaries.** Use dot notation (e.g., `config.api_key`, not `config.get("api_key")`).
@@ -343,9 +342,7 @@ After wrapping, confirm:
 
 ### Context & History
 
-- [ ] `input` and `response` stored via `context.store()`
-- [ ] `context_store=PlatformContextStore()` present if context is persisted/read
-- [ ] Multi-turn uses `context.load_history()`; single-turn only if intentionally needed
+- [ ] Multi-turn uses `context.load_history()` to read conversation history from the A2A TaskStore
 
 ### Forms & Files
 

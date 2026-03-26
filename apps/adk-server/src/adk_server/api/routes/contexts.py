@@ -14,13 +14,11 @@ from adk_server.api.auth.auth import issue_internal_jwt
 from adk_server.api.dependencies import (
     ConfigurationDependency,
     ContextServiceDependency,
-    RequiresContextPermissionsPath,
     RequiresPermissions,
 )
-from adk_server.api.schema.common import EntityModel, PaginationQuery
+from adk_server.api.schema.common import EntityModel
 from adk_server.api.schema.contexts import (
     ContextCreateRequest,
-    ContextHistoryItemCreateRequest,
     ContextListQuery,
     ContextPatchMetadataRequest,
     ContextTokenCreateRequest,
@@ -28,7 +26,7 @@ from adk_server.api.schema.contexts import (
     ContextUpdateRequest,
 )
 from adk_server.domain.models.common import PaginatedResult
-from adk_server.domain.models.context import Context, ContextHistoryItem
+from adk_server.domain.models.context import Context
 from adk_server.domain.models.permissions import AuthorizedUser, Permissions
 
 logger = logging.getLogger(__name__)
@@ -136,33 +134,3 @@ async def generate_context_token(
         configuration=configuration,
     )
     return ContextTokenResponse(token=token, expires_at=expires_at)
-
-
-@router.post("/{context_id}/history", status_code=status.HTTP_201_CREATED)
-async def add_context_history_item(
-    context_id: UUID,
-    history_item_data: ContextHistoryItemCreateRequest,
-    context_service: ContextServiceDependency,
-    user: Annotated[AuthorizedUser, Depends(RequiresContextPermissionsPath(context_data={"write"}))],
-) -> None:
-    await context_service.add_history_item(context_id=context_id, data=history_item_data.root, user=user.user)
-
-
-@router.get("/{context_id}/history")
-async def list_context_history(
-    context_id: UUID,
-    context_service: ContextServiceDependency,
-    user: Annotated[AuthorizedUser, Depends(RequiresContextPermissionsPath(context_data={"read"}))],
-    pagination: Annotated[PaginationQuery, Query()],
-) -> PaginatedResult[ContextHistoryItem]:
-    return await context_service.list_history(context_id=context_id, user=user.user, pagination=pagination)
-
-
-@router.delete("/{context_id}/history", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_context_history_from_id(
-    context_id: UUID,
-    from_id: Annotated[UUID, Query()],
-    context_service: ContextServiceDependency,
-    user: Annotated[AuthorizedUser, Depends(RequiresContextPermissionsPath(context_data={"read", "write"}))],
-) -> None:
-    await context_service.delete_history_from_id(context_id=context_id, from_id=from_id, user=user.user)

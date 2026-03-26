@@ -51,13 +51,12 @@ from kagenti_adk.server.constants import _DEFAULT_AGENT_INTERFACE, _DEFAULT_AGEN
 from kagenti_adk.server.context import RunContext
 from kagenti_adk.server.dependencies import Dependency, Depends, extract_dependencies
 from kagenti_adk.server.exceptions import InvalidYieldError
-from kagenti_adk.server.store.context_store import ContextStore
 from kagenti_adk.server.utils import cancel_task, merge_messages
 from kagenti_adk.types import A2ASecurity, JsonPatch
 from kagenti_adk.util.logging import logger
 
 AgentFunction: TypeAlias = Callable[[], AsyncGenerator[RunYield, RunYieldResume]]
-AgentFunctionFactory: TypeAlias = Callable[[RequestContext, ContextStore], AbstractAsyncContextManager[AgentFunction]]
+AgentFunctionFactory: TypeAlias = Callable[[RequestContext, TaskStore], AbstractAsyncContextManager[AgentFunction]]
 
 OriginalFnType = TypeVar("OriginalFnType", bound=Callable[..., Any])
 
@@ -356,7 +355,7 @@ def agent(
 
 
 class AgentRun:
-    def __init__(self, agent: Agent, context_store: ContextStore, on_finish: Callable[[], None] | None = None) -> None:
+    def __init__(self, agent: Agent, task_store: TaskStore, on_finish: Callable[[], None] | None = None) -> None:
         self._agent: Agent = agent
         self._task: asyncio.Task[None] | None = None
         self.last_invocation: datetime = datetime.now()
@@ -364,7 +363,7 @@ class AgentRun:
         self._run_context: RunContext | None = None
         self._request_context: RequestContext | None = None
         self._task_updater: TaskUpdater | None = None
-        self._context_store: ContextStore = context_store
+        self._task_store: TaskStore = task_store
         self._lock: asyncio.Lock = asyncio.Lock()
         self._on_finish: Callable[[], None] | None = on_finish
         self._working: bool = False
@@ -403,14 +402,13 @@ class AgentRun:
                 raise RuntimeError("Attempting to start a run that is already executing or done")
             task_id, context_id, message = request_context.task_id, request_context.context_id, request_context.message
             assert task_id and context_id and message
-            context_store = await self._context_store.create(context_id)
             self._run_context = RunContext(
                 configuration=request_context.configuration,
                 context_id=context_id,
                 task_id=task_id,
                 current_task=request_context.current_task,
                 related_tasks=request_context.related_tasks,
-                _store=context_store,
+                _task_store=self._task_store,
             )
             self._request_context = request_context
             self._task_updater = TaskUpdater(event_queue, task_id, context_id)
@@ -599,14 +597,12 @@ class Executor(AgentExecutor):
         self,
         agent: Agent,
         queue_manager: QueueManager,
-        context_store: ContextStore,
         task_timeout: timedelta,
         task_store: TaskStore,
     ) -> None:
         self._agent: Agent = agent
         self._running_tasks: dict[str, AgentRun] = {}
         self._scheduled_cleanups: dict[str, asyncio.Task[None]] = {}
-        self._context_store: ContextStore = context_store
         self._task_timeout: timedelta = task_timeout
         self._task_store: TaskStore = task_store
 
@@ -618,7 +614,7 @@ class Executor(AgentExecutor):
         agent_run: AgentRun | None = None
         try:
             if not context.current_task:
-                agent_run = AgentRun(self._agent, self._context_store, lambda: self._handle_finish(task_id))
+                agent_run = AgentRun(self._agent, self._task_store, lambda: self._handle_finish(task_id))
                 self._running_tasks[task_id] = agent_run
                 await self._schedule_run_cleanup(request_context=context)
                 await agent_run.start(request_context=context, event_queue=event_queue)

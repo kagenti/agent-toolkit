@@ -7,13 +7,11 @@ import type {
   CreateContextRequest,
   CreateContextTokenRequest,
   DeleteContextRequest,
-  ListContextHistoryRequest,
   ListContextsRequest,
 } from '@kagenti/adk';
 import { type MatchModelProvidersRequest, unwrapResult } from '@kagenti/adk';
 
 import { adkClient } from '#api/adk-client.ts';
-import { fetchEntity } from '#api/utils.ts';
 
 import type { PatchContextMetadataRequest } from './types';
 import { contextSchema, listContextsResponseSchema } from './types';
@@ -39,13 +37,6 @@ export async function deleteContext(request: DeleteContextRequest) {
   return result;
 }
 
-export async function listContextHistory(request: ListContextHistoryRequest) {
-  const response = await adkClient.listContextHistory(request);
-  const result = unwrapResult(response);
-
-  return result;
-}
-
 export async function patchContextMetadata(request: PatchContextMetadataRequest) {
   const response = await adkClient.patchContextMetadata(request);
   const result = unwrapResult(response, contextSchema);
@@ -65,8 +56,4 @@ export async function createContextToken(request: CreateContextTokenRequest) {
   const result = unwrapResult(response);
 
   return result;
-}
-
-export async function fetchContextHistory(request: ListContextHistoryRequest) {
-  return await fetchEntity(() => listContextHistory(request));
 }

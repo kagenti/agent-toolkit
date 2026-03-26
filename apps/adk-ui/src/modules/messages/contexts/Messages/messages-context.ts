@@ -4,11 +4,11 @@
  */
 'use client';
 
+import type { RefObject } from 'react';
 import { createContext } from 'react';
 
 import type { Updater } from '#hooks/useImmerWithGetter.ts';
 import type { UIMessage } from '#modules/messages/types.ts';
-import type { useListContextHistory } from '#modules/platform-context/api/queries/useListContextHistory.ts';
 
 export const MessagesContext = createContext<MessagesContextValue | null>(null);
 
@@ -18,6 +18,9 @@ export interface MessagesContextValue {
   getMessages: () => UIMessage[];
   setMessages: Updater<UIMessage[]>;
   queryControl: {
-    fetchNextPageInViewAnchorRef: (node?: Element | null) => void;
-  } & Omit<ReturnType<typeof useListContextHistory>, 'data'>;
+    fetchNextPageInViewAnchorRef: RefObject<HTMLDivElement | null>;
+    isFetching: boolean;
+    isFetchingNextPage: boolean;
+    hasNextPage: boolean;
+  };
 }

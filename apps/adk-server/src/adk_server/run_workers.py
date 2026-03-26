@@ -29,11 +29,6 @@ async def run_workers(app: procrastinate.App):
             ],
             concurrency=10,
         ),
-        WorkerOptions(
-            name="generate_conversation_title_worker",
-            queues=[str(Queues.GENERATE_CONVERSATION_TITLE)],
-            concurrency=10,
-        ),
         WorkerOptions(name="text_extraction_worker", queues=[str(Queues.TEXT_EXTRACTION)], concurrency=5),
     ]
 

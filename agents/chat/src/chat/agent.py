@@ -24,11 +24,10 @@ from kagenti_adk.a2a.extensions import (
     PlatformApiExtensionServer,
     PlatformApiExtensionSpec,
 )
-from kagenti_adk.a2a.types import AgentArtifact, AgentMessage
+from kagenti_adk.a2a.types import AgentArtifact
 from kagenti_adk.server import Server
 from kagenti_adk.server.context import RunContext
 from kagenti_adk.server.middleware.platform_auth_backend import PlatformAuthBackend
-from kagenti_adk.server.store.platform_context_store import PlatformContextStore
 from beeai_framework.adapters.agentstack.backend.chat import AgentStackChatModel
 from beeai_framework.agents.requirement import RequirementAgent
 from beeai_framework.agents.requirement.events import (
@@ -36,7 +35,7 @@ from beeai_framework.agents.requirement.events import (
     RequirementAgentSuccessEvent,
 )
 from beeai_framework.agents.requirement.utils._tool import FinalAnswerTool
-from beeai_framework.backend import AssistantMessage, ChatModelParameters
+from beeai_framework.backend import ChatModelParameters
 from beeai_framework.errors import FrameworkError
 from beeai_framework.middleware.trajectory import GlobalTrajectoryMiddleware
 from beeai_framework.tools import AnyTool, Tool
@@ -45,7 +44,6 @@ from beeai_framework.tools.search.wikipedia import WikipediaTool
 from beeai_framework.tools.weather import OpenMeteoTool
 from openinference.instrumentation.beeai import BeeAIInstrumentor
 
-from chat.helpers.citations import extract_citations
 from chat.helpers.trajectory import TrajectoryContent
 from chat.tools.files.file_creator import FileCreatorTool, FileCreatorToolOutput
 from chat.tools.files.file_reader import FileReaderTool
@@ -149,8 +147,6 @@ async def chat(
     _p: Annotated[PlatformApiExtensionServer, PlatformApiExtensionSpec()],
 ):
     """Agent with memory and access to web search, Wikipedia, and weather."""
-    await context.store(input)
-
     # Send initial trajectory
     yield trajectory.trajectory_metadata(title="Starting", content="Received your request")
 
@@ -220,7 +216,6 @@ async def chat(
         middlewares=[GlobalTrajectoryMiddleware(included=[Tool])],
     )
 
-    final_answer: AssistantMessage | None = None
     new_messages = [to_framework_message(item, extracted_files) for item in history]
 
     try:
@@ -244,8 +239,6 @@ async def chat(
                 case RequirementAgentFinalAnswerEvent(delta=delta):
                     yield delta
                 case RequirementAgentSuccessEvent(state=state):
-                    final_answer = state.answer
-
                     last_step = state.steps[-1]
                     if last_step.tool and last_step.tool.name == FinalAnswerTool.name:  # internal tool
                         continue
@@ -259,7 +252,6 @@ async def chat(
                         group_id=last_step.id,
                     )
                     yield metadata
-                    await context.store(AgentMessage(metadata=metadata))
 
                     if isinstance(last_step.output, FileCreatorToolOutput):
                         for file_info in last_step.output.result.files:
@@ -267,16 +259,7 @@ async def chat(
                             part.filename = file_info.display_filename
                             artifact = AgentArtifact(name=file_info.display_filename, parts=[part])
                             yield artifact
-                            await context.store(artifact)
 
-        if final_answer:
-            citations, clean_text = extract_citations(final_answer.text)
-
-            message = AgentMessage(
-                text=clean_text,
-                metadata=(citation.citation_metadata(citations=citations) if citations else None),
-            )
-            await context.store(message)
     except FrameworkError as err:
         raise RuntimeError(err.explain())
 
@@ -287,7 +270,6 @@ def serve():
             host=os.getenv("HOST", "127.0.0.1"),
             port=int(os.getenv("PORT", 8000)),
             configure_telemetry=True,
-            context_store=PlatformContextStore(),
             auth_backend=PlatformAuthBackend(),
         )
     except KeyboardInterrupt:
