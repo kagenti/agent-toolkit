@@ -8,7 +8,7 @@ import functools
 import inspect
 import re
 import sys
-from collections.abc import Iterator
+from collections.abc import Generator
 from contextlib import contextmanager
 
 import rich.text
@@ -39,7 +39,7 @@ Markdown.elements["heading_open"] = _LeftAlignedHeading
 
 
 @contextmanager
-def create_table(*args, no_wrap: bool = True, **kwargs) -> Iterator[Table]:
+def create_table(*args, no_wrap: bool = True, **kwargs) -> Generator[Table]:
     table = Table(*args, **kwargs, box=None, pad_edge=False, width=console.width, show_header=True)
     yield table
     for column in table.columns:

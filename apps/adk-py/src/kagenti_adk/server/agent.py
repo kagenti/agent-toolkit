@@ -6,7 +6,7 @@ import asyncio
 import inspect
 import typing
 from asyncio import CancelledError
-from collections.abc import AsyncGenerator, AsyncIterator, Callable, Generator
+from collections.abc import AsyncGenerator, Callable, Generator
 from contextlib import AbstractAsyncContextManager, AsyncExitStack, asynccontextmanager, suppress
 from datetime import datetime, timedelta
 from typing import Any, Final, TypeAlias, TypeVar
@@ -168,7 +168,7 @@ class Agent:
     @asynccontextmanager
     async def dependency_container(
         self, message: Message, run_context: RunContext, request_context: RequestContext
-    ) -> AsyncIterator[ActiveDependenciesContainer]:
+    ) -> AsyncGenerator[ActiveDependenciesContainer]:
         async with AsyncExitStack() as stack:
             initialized_dependencies: dict[str, Dependency] = {}
             initialize_deps_exceptions: list[Exception] = []

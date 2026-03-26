@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import abc
 import typing
-from collections.abc import AsyncIterator
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from contextvars import ContextVar
 from types import NoneType
@@ -193,7 +193,7 @@ class BaseExtensionServer(abc.ABC, typing.Generic[ExtensionSpecT, MetadataFromCl
         return instance
 
     @asynccontextmanager
-    async def lifespan(self) -> AsyncIterator[None]:
+    async def lifespan(self) -> AsyncGenerator[None]:
         """Called when entering the agent context after the first message was parsed (__call__ was already called)"""
         yield
 

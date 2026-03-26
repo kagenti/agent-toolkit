@@ -7,7 +7,7 @@ import functools
 import inspect
 import logging
 import uuid
-from collections.abc import AsyncGenerator, AsyncIterable, AsyncIterator, Awaitable, Callable, Coroutine, Iterator
+from collections.abc import AsyncGenerator, AsyncIterable, Awaitable, Callable, Coroutine, Iterator
 from contextlib import asynccontextmanager, contextmanager
 from datetime import timedelta
 from typing import Any, NamedTuple, cast, overload, override
@@ -171,7 +171,7 @@ class ProxyRequestHandler(RequestHandler):
         self._uow = uow
 
     @asynccontextmanager
-    async def _client_transport(self, context: ServerCallContext) -> AsyncIterator[ClientTransport]:
+    async def _client_transport(self, context: ServerCallContext) -> AsyncGenerator[ClientTransport]:
         from fastapi.security.utils import get_authorization_scheme_param
 
         if self._agent_card is None:

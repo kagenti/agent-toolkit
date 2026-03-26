@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import logging
 from collections import deque
-from collections.abc import AsyncIterator, Callable, Iterable
+from collections.abc import AsyncGenerator, AsyncIterator, Callable, Iterable
 from contextlib import asynccontextmanager
 from datetime import datetime
 from enum import StrEnum
@@ -76,7 +76,7 @@ class LogsContainer:
     @asynccontextmanager
     async def stream(
         self, include_old: bool = True, max_buffer_size: int | None = None
-    ) -> AsyncIterator[AsyncIterator[ProcessLogMessage]]:
+    ) -> AsyncGenerator[AsyncIterator[ProcessLogMessage]]:
         max_buffer_size = max_buffer_size or self._max_lines * 2
         stream_send, stream_receive = anyio.create_memory_object_stream(max_buffer_size=max_buffer_size)
 

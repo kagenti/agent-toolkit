@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import builtins
 import typing
-from collections.abc import AsyncIterator
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from typing import Literal
 
@@ -122,7 +122,7 @@ class File(pydantic.BaseModel):
         stream: bool = False,
         client: PlatformClient | None = None,
         context_id: str | None | Literal["auto"] = "auto",
-    ) -> AsyncIterator[LoadedFile]:
+    ) -> AsyncGenerator[LoadedFile]:
         # `self` has a weird type so that you can call both `instance.load_content()` to create an extraction for an instance, or `File.load_content("123")`
         file_id = self if isinstance(self, str) else self.id
         async with client or get_platform_client() as platform_client:
@@ -145,7 +145,7 @@ class File(pydantic.BaseModel):
         stream: bool = False,
         client: PlatformClient | None = None,
         context_id: str | None | Literal["auto"] = "auto",
-    ) -> AsyncIterator[LoadedFile]:
+    ) -> AsyncGenerator[LoadedFile]:
         # `self` has a weird type so that you can call both `instance.load_text_content()` to create an extraction for an instance, or `File.load_text_content("123")`
         file_id = self if isinstance(self, str) else self.id
         async with client or get_platform_client() as platform_client:
@@ -170,7 +170,7 @@ class File(pydantic.BaseModel):
         stream: bool = False,
         client: PlatformClient | None = None,
         context_id: str | None | Literal["auto"] = "auto",
-    ) -> AsyncIterator[LoadedFile]:
+    ) -> AsyncGenerator[LoadedFile]:
         # `self` has a weird type so that you can call both `instance.load_json_content()` to create an extraction for an instance, or `File.load_json_content("123")`
         file_id = self if isinstance(self, str) else self.id
         async with client or get_platform_client() as platform_client:

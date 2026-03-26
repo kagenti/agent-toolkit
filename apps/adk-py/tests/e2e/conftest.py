@@ -6,7 +6,7 @@ from __future__ import annotations
 import asyncio
 import base64
 import socket
-from collections.abc import AsyncGenerator, AsyncIterator
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager, closing
 from datetime import timedelta
 
@@ -79,7 +79,7 @@ def create_server_with_agent():
     @asynccontextmanager
     async def _create_server(
         agent_fn, context_store: ContextStore | None = None, task_timeout: timedelta | None = None
-    ) -> AsyncIterator[tuple[Server, Client]]:
+    ) -> AsyncGenerator[tuple[Server, Client]]:
         server = Server()
         server.agent(detail=AgentDetail(interaction_mode="multi-turn"))(agent_fn)
         async with run_server(

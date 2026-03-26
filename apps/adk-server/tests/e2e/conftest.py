@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import logging
 import socket
-from collections.abc import AsyncIterator, Awaitable, Callable, Iterator
+from collections.abc import AsyncGenerator, AsyncIterator, Awaitable, Callable, Iterator
 from contextlib import asynccontextmanager, closing, suppress
 from typing import Any
 
@@ -37,7 +37,7 @@ def get_final_task_from_stream() -> Callable[[AsyncIterator[ClientEvent]], Await
 @pytest.fixture()
 async def a2a_client_factory() -> Callable[[AgentCard | dict[str, Any], ContextToken], AsyncIterator[Client]]:
     @asynccontextmanager
-    async def a2a_client_factory(agent_card: AgentCard | dict, context_token: ContextToken) -> AsyncIterator[Client]:
+    async def a2a_client_factory(agent_card: AgentCard | dict, context_token: ContextToken) -> AsyncGenerator[Client]:
         token = context_token.token.get_secret_value()
         async with httpx.AsyncClient(timeout=None, headers={"Authorization": f"Bearer {token}"}) as client:
             yield ClientFactory(ClientConfig(httpx_client=client)).create(card=agent_card)

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 from asyncio import CancelledError
-from collections.abc import AsyncIterator, Awaitable, Callable
+from collections.abc import AsyncGenerator, Awaitable, Callable
 from contextlib import asynccontextmanager, suppress
 from typing import Annotated
 from uuid import UUID
@@ -183,7 +183,7 @@ class FileService:
     @asynccontextmanager
     async def get_content(
         self, *, file_id: UUID, user: User, context_id: UUID | None = None
-    ) -> AsyncIterator[AsyncFile]:
+    ) -> AsyncGenerator[AsyncFile]:
         async with self._uow() as uow:
             # check if the user owns the file
             await uow.files.get(file_id=file_id, user_id=user.id, context_id=context_id)
