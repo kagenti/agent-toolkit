@@ -6,6 +6,7 @@
 import NextAuth from 'next-auth';
 import type { OIDCConfig } from 'next-auth/providers';
 import Credentials from 'next-auth/providers/credentials';
+import { match } from 'ts-pattern';
 import { z } from 'zod';
 
 import { runtimeConfig } from '#contexts/App/runtime-config.ts';
@@ -19,23 +20,24 @@ export const AUTH_COOKIE_NAME = 'adk-auth-token';
 
 const { isAuthEnabled, isLocalDevAutoLogin } = runtimeConfig;
 
-const localDevOIDCConfigSchema = z.object({
+const oidcConfigSchema = z.object({
   issuer: z.string(),
   clientId: z.string(),
   clientSecret: z.string(),
 });
 
-type LocalDevOIDCConfig = z.infer<typeof localDevOIDCConfigSchema>;
+const localDevUserSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  access_token: z.string(),
+  refresh_token: z.string(),
+  expires_in: z.number(),
+  expires_at: z.number(),
+});
 
-interface LocalDevUser {
-  id: string;
-  name: string;
-  access_token: string;
-  refresh_token: string;
-  expires_in: number;
-}
+type LocalDevUser = z.infer<typeof localDevUserSchema>;
 
-function createLocalDevCredentialsProvider(config: LocalDevOIDCConfig) {
+function createLocalDevCredentialsProvider(config: z.infer<typeof oidcConfigSchema>) {
   return Credentials({
     id: 'local-dev',
     name: 'Local Dev',
@@ -81,6 +83,7 @@ function createLocalDevCredentialsProvider(config: LocalDevOIDCConfig) {
         access_token: tokens.access_token,
         refresh_token: tokens.refresh_token,
         expires_in: tokens.expires_in,
+        expires_at: Math.floor(Date.now() / 1000 + tokens.expires_in),
       } satisfies LocalDevUser;
     },
   });
@@ -159,7 +162,7 @@ function assembleProviders(oidcProvider: ProviderWithId | null) {
   if (isLocalDevAutoLogin) {
     return [
       createLocalDevCredentialsProvider(
-        localDevOIDCConfigSchema.parse({
+        oidcConfigSchema.parse({
           issuer: process.env.OIDC_PROVIDER_ISSUER,
           clientId: process.env.OIDC_PROVIDER_CLIENT_ID,
           clientSecret: process.env.OIDC_PROVIDER_CLIENT_SECRET,
@@ -209,22 +212,24 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
 
       if (account) {
-        if (account.type === 'credentials') {
-          const localDevUser = user as LocalDevUser;
-          token.accessToken = localDevUser.access_token;
-          token.provider = account.provider;
-          token.refreshToken = localDevUser.refresh_token;
-          token.expiresIn = localDevUser.expires_in;
-          token.expiresAt = Math.floor(Date.now() / 1000 + localDevUser.expires_in);
-          token.refreshSchedule = getTokenRefreshSchedule(token.expiresAt);
-        } else {
-          token.accessToken = account.access_token;
-          token.provider = account.provider;
-          token.refreshToken = account.refresh_token;
-          token.expiresIn = account.expires_in;
-          token.expiresAt = account.expires_at;
-          token.refreshSchedule = getTokenRefreshSchedule(token.expiresAt);
-        }
+        match(account.type)
+          .with('credentials', () => {
+            const localDevUser = localDevUserSchema.parse(user);
+            token.accessToken = localDevUser.access_token;
+            token.provider = account.provider;
+            token.refreshToken = localDevUser.refresh_token;
+            token.expiresIn = localDevUser.expires_in;
+            token.expiresAt = localDevUser.expires_at;
+            token.refreshSchedule = getTokenRefreshSchedule(token.expiresAt);
+          })
+          .otherwise(() => {
+            token.accessToken = account.access_token;
+            token.provider = account.provider;
+            token.refreshToken = account.refresh_token;
+            token.expiresIn = account.expires_in;
+            token.expiresAt = account.expires_at;
+            token.refreshSchedule = getTokenRefreshSchedule(token.expiresAt);
+          });
       }
 
       try {
