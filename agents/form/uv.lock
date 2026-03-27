@@ -443,7 +443,7 @@ wheels = [
 
 [[package]]
 name = "form"
-version = "0.8.0rc5"
+version = "0.8.0rc6"
 source = { editable = "." }
 dependencies = [
     { name = "kagenti-adk" },
@@ -809,7 +809,7 @@ wheels = [
 
 [[package]]
 name = "kagenti-adk"
-version = "0.8.0rc5"
+version = "0.8.0rc6"
 source = { editable = "../../apps/adk-py" }
 dependencies = [
     { name = "a2a-sdk", extra = ["sqlite"] },
