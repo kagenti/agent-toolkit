@@ -561,7 +561,7 @@ async def start_cmd(
             ).encode("utf-8"),
         )
         # --- Prepare kagenti chart values and version before image listing ---
-        kagenti_chart_version = "0.5.0-alpha.11"
+        kagenti_chart_version = "0.6.0-alpha.2"
         kagenti_deps_values = yaml.dump(
             merge(
                 {
