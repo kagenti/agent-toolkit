@@ -30,3 +30,14 @@ export const providerConfigSchema = z.preprocess((val) => {
 export type ProviderConfig = z.infer<typeof providerConfigSchema>;
 
 export type ProviderWithId = Provider & { id: string };
+
+export const localDevUserSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  access_token: z.string(),
+  refresh_token: z.string(),
+  expires_in: z.number(),
+  expires_at: z.number(),
+});
+
+export type LocalDevUser = z.infer<typeof localDevUserSchema>;

@@ -5,7 +5,6 @@
 
 import { auth, getProvider, signIn } from '#app/(auth)/auth.ts';
 import { runtimeConfig } from '#contexts/App/runtime-config.ts';
-import type { ThemePreference } from '#contexts/Theme/theme-context.ts';
 import { routes } from '#utils/router.ts';
 
 import { AuthErrorPage } from './AuthErrorPage';
@@ -43,23 +42,17 @@ export async function SignInProviders({ callbackUrl = routes.home(), error }: Pr
   return <AutoSignIn signIn={signInAction} />;
 }
 
-async function handleLocalDevSignIn(redirectTo: string, _theme: ThemePreference) {
+async function handleLocalDevSignIn(redirectTo: string) {
   'use server';
   await signIn('local-dev', { username: 'admin', password: 'admin', redirectTo });
 }
 
-async function handleSignIn(
-  { providerId, redirectTo }: { providerId: string; redirectTo: string },
-  theme: ThemePreference,
-) {
+async function handleSignIn({ providerId, redirectTo }: { providerId: string; redirectTo: string }) {
   'use server';
 
   try {
-    await signIn(providerId, { redirectTo }, { kc_theme: theme });
+    await signIn(providerId, { redirectTo });
   } catch (error) {
-    // Sign-in can fail for a number of reasons, such as the user not existing, or the user not having the correct role.
-    // NextAuth redirects to the error page for auth errors (e.g. Configuration when the provider is unreachable).
-    // Re-throw to let Next.js handle the redirect.
     throw error;
   }
 }

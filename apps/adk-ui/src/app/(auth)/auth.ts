@@ -6,14 +6,13 @@
 import NextAuth from 'next-auth';
 import type { OIDCConfig } from 'next-auth/providers';
 import Credentials from 'next-auth/providers/credentials';
-import { match } from 'ts-pattern';
 import { z } from 'zod';
 
 import { runtimeConfig } from '#contexts/App/runtime-config.ts';
 import { routes } from '#utils/router.ts';
 
-import type { ProviderConfig, ProviderWithId } from './types';
-import { providerConfigSchema } from './types';
+import type { LocalDevUser, ProviderConfig, ProviderWithId } from './types';
+import { localDevUserSchema, providerConfigSchema } from './types';
 import { getTokenRefreshSchedule, jwtWithRefresh, RefreshTokenError } from './utils';
 
 export const AUTH_COOKIE_NAME = 'adk-auth-token';
@@ -25,17 +24,6 @@ const oidcConfigSchema = z.object({
   clientId: z.string(),
   clientSecret: z.string(),
 });
-
-const localDevUserSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  access_token: z.string(),
-  refresh_token: z.string(),
-  expires_in: z.number(),
-  expires_at: z.number(),
-});
-
-type LocalDevUser = z.infer<typeof localDevUserSchema>;
 
 function createLocalDevCredentialsProvider(config: z.infer<typeof oidcConfigSchema>) {
   return Credentials({
@@ -212,24 +200,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
 
       if (account) {
-        match(account.type)
-          .with('credentials', () => {
-            const localDevUser = localDevUserSchema.parse(user);
-            token.accessToken = localDevUser.access_token;
-            token.provider = account.provider;
-            token.refreshToken = localDevUser.refresh_token;
-            token.expiresIn = localDevUser.expires_in;
-            token.expiresAt = localDevUser.expires_at;
-            token.refreshSchedule = getTokenRefreshSchedule(token.expiresAt);
-          })
-          .otherwise(() => {
-            token.accessToken = account.access_token;
-            token.provider = account.provider;
-            token.refreshToken = account.refresh_token;
-            token.expiresIn = account.expires_in;
-            token.expiresAt = account.expires_at;
-            token.refreshSchedule = getTokenRefreshSchedule(token.expiresAt);
-          });
+        const src = account.type === 'credentials' ? localDevUserSchema.parse(user) : account;
+        token.accessToken = src.access_token;
+        token.provider = account.provider;
+        token.refreshToken = src.refresh_token;
+        token.expiresIn = src.expires_in;
+        token.expiresAt = src.expires_at;
+        token.refreshSchedule = getTokenRefreshSchedule(token.expiresAt);
       }
 
       try {
