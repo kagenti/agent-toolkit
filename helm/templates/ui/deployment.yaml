@@ -56,7 +56,7 @@ spec:
           {{- end }}
           env:
             - name: LOCAL_DEV_AUTO_LOGIN
-              value: {{ .Values.features.uiLocalDevAutoLogin | quote }}
+              value: {{ .Values.features.uiLocalSetup | quote }}
             - name: API_URL
               value: "http://adk-server-svc:{{.Values.server.service.port}}"
             - name: APP_NAME
