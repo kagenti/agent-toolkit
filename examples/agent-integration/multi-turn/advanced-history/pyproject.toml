@@ -7,7 +7,7 @@ authors = [
 ]
 requires-python = ">=3.14,<3.15"
 dependencies = [
-    "beeai-framework[duckduckgo,wikipedia,a2a]==0.1.78",
+    "beeai-framework[duckduckgo,wikipedia,a2a,agentstack]==0.1.78",
     "tiktoken>=0.12.0",  # constraint for beeai-framework dependency (first version with musl arm64 wheel)
     "fastuuid>=0.14.0",  # constraint for beeai-framework dependency (first version with musl arm64 wheel)
     "kagenti-adk>=0.5.3",
@@ -19,7 +19,7 @@ line-length = 120
 target-version = "py314"
 
 [tool.uv]
-override-dependencies = ["a2a-sdk==1.0.0a0"]
+override-dependencies = ["a2a-sdk[sqlite]==1.0.0a0"]
 
 [tool.uv.sources]
 kagenti-adk = { path = "../../../../apps/adk-py", editable = true }

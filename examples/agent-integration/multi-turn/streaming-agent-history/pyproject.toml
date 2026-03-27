@@ -19,7 +19,7 @@ line-length = 120
 target-version = "py314"
 
 [tool.uv]
-override-dependencies = ["a2a-sdk==1.0.0a0"]
+override-dependencies = ["a2a-sdk[sqlite]==1.0.0a0"]
 
 [tool.uv.sources]
 kagenti-adk = { path = "../../../../apps/adk-py", editable = true }
