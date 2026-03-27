@@ -26,14 +26,11 @@ export function AgentDemandsProvider({ children }: PropsWithChildren) {
   const [selectedLLMProviders, setSelectedLLMProviders] = useState<Record<string, string>>({});
 
   const formDemands = agentClient.demands.formDemands;
-  const settingsFormDemand = formDemands?.form_demands.settings_form;
-  const settingsFormDemanded = Boolean(settingsFormDemand);
-
   const settingsForm = formDemands?.form_demands.settings_form ?? null;
 
   const initialSettingsFormValues = getInitialSettingsFormValues(settingsForm);
   const formFulfillmentsRef = useRef<FormFulfillments>({
-    form_fulfillments: settingsFormDemanded
+    form_fulfillments: settingsForm
       ? {
           settings_form: {
             values: initialSettingsFormValues,
