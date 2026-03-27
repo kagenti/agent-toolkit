@@ -17,7 +17,7 @@ dependencies = [
     "pydantic>=2.10.6",
     "pydantic-settings>=2.7.1",
     "structlog>=25.1.0",
-    "uvicorn>=0.37.0,<0.38.0",
+    "uvicorn>=0.37.0,<0.43.0",
     "opentelemetry-sdk>=1.30.0",
     "opentelemetry-api>=1.30.0",
     "opentelemetry-exporter-otlp-proto-http>=1.30.0",
@@ -78,7 +78,7 @@ create-buckets = "adk_server:create_buckets"
 create-vector-extension = "adk_server:create_vector_extension"
 
 [build-system]
-requires = ["uv_build>=0.10.0,<0.11.0"]
+requires = ["uv_build>=0.10.0,<0.12.0"]
 build-backend = "uv_build"
 
 [tool.uv.build-backend]
