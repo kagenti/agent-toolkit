@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { FilePart, Message, Part, TextPart } from '@kagenti/adk';
+import type { FilePart, Message, Part, TextPart, Trajectory } from '@kagenti/adk';
 import {
   type Citation,
   citationExtension,
@@ -11,7 +11,6 @@ import {
   extractUiExtensionData,
   streamingExtension,
   trajectoryExtension,
-  type TrajectoryMetadata,
 } from '@kagenti/adk';
 import truncate from 'lodash/truncate';
 import { v4 as uuid } from 'uuid';
@@ -124,8 +123,8 @@ export function createSourcePart(citation: Citation, taskId: string | undefined 
   return sourcePart;
 }
 
-export function createTrajectoryPart(metadata: TrajectoryMetadata): UITrajectoryPart {
-  const { title, content, group_id } = metadata;
+export function createTrajectoryPart(trajectory: Trajectory): UITrajectoryPart {
+  const { title, content, group_id } = trajectory;
 
   const trajectoryPart: UITrajectoryPart = {
     kind: UIMessagePartKind.Trajectory,

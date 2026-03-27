@@ -13,6 +13,4 @@ export const citationSchema = z.object({
   description: z.string().nullish(),
 });
 
-export const citationMetadataSchema = z.object({
-  citations: z.array(citationSchema),
-});
+export const citationMetadataSchema = z.array(citationSchema);

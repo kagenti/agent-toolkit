@@ -17,4 +17,5 @@ export * from './ui/canvas/schemas';
 export * from './ui/citation/schemas';
 export * from './ui/error/schemas';
 export * from './ui/settings/schemas';
+export * from './ui/streaming/schemas';
 export * from './ui/trajectory/schemas';

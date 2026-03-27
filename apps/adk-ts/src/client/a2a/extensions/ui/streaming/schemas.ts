@@ -9,7 +9,7 @@ export const streamingPatchSchema = z.object({
   op: z.string(),
   path: z.string(),
   value: z.unknown().optional(),
-  pos: z.number().optional(), // for str_ins
+  pos: z.number().optional(),
 });
 
 export const streamingMetadataSchema = z.object({
