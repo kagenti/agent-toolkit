@@ -18,8 +18,8 @@ export async function getAgentClient(providerId: string, token: string): Promise
   const endpointUrl = `${baseUrl}/api/v1/a2a/${providerId}/`;
 
   const agentCard = await fetchAgentCard(agentCardUrl, fetchImpl);
+  const extensions = agentCard.capabilities.extensions?.map(({ uri }) => uri);
 
-  const extensions = agentCard.capabilities?.extensions?.map((ext) => ext.uri).filter(Boolean) as string[];
   return createA2AClient({ endpointUrl, agentCard, fetchImpl, extensions });
 }
 

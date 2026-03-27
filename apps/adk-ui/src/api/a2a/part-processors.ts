@@ -20,15 +20,15 @@ import {
 } from './utils';
 
 export function processMessageMetadata(message: Message): UIMessagePart[] {
-  const trajectory = extractTrajectory(message.metadata);
+  const trajectories = extractTrajectory(message.metadata);
   const citations = extractCitation(message.metadata);
 
   const parts: UIMessagePart[] = [];
 
-  if (trajectory) {
-    for (const item of trajectory) {
-      parts.push(createTrajectoryPart(item));
-    }
+  if (trajectories) {
+    const trajectoryParts = trajectories.map((trajectory) => createTrajectoryPart(trajectory));
+
+    parts.push(...trajectoryParts);
   }
   if (citations) {
     const sourceParts = citations.map((citation) => createSourcePart(citation, message.taskId)).filter(isNotNull);
