@@ -42,8 +42,6 @@ export function AgentDemandsProvider({ children }: PropsWithChildren) {
       : {},
   });
 
-  const [selectedSettings, setSelectedSettings] = useState<SettingsFormValues>(initialSettingsFormValues);
-
   const setDefaultSelectedLLMProviders = useCallback(
     (data: Record<string, string[]>) => {
       setSelectedLLMProviders(
@@ -120,16 +118,12 @@ export function AgentDemandsProvider({ children }: PropsWithChildren) {
 
   const onUpdateSettings = useCallback(
     (values: SettingsFormValues) => {
-      setSelectedSettings(values);
-
-      if (settingsFormDemanded) {
-        provideFormValues({
-          formId: 'settings_form',
-          values,
-        });
-      }
+      provideFormValues({
+        formId: 'settings_form',
+        values,
+      });
     },
-    [provideFormValues, settingsFormDemanded],
+    [provideFormValues],
   );
 
   const { data: connectorsData } = useListConnectors();
@@ -180,7 +174,7 @@ export function AgentDemandsProvider({ children }: PropsWithChildren) {
       },
       formDemands,
       settingsForm,
-      selectedSettings,
+      initialSettingsFormValues,
       getFulfillments,
       provideFormValues,
       onUpdateSettings,
@@ -197,11 +191,11 @@ export function AgentDemandsProvider({ children }: PropsWithChildren) {
       provideFormValues,
       formDemands,
       settingsForm,
+      initialSettingsFormValues,
       selectEmbeddingProvider,
       selectLLMProvider,
       selectedEmbeddingProviders,
       selectedLLMProviders,
-      selectedSettings,
     ],
   );
 
