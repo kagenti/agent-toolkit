@@ -35,7 +35,7 @@ class ContextHistoryItem(BaseModel, arbitrary_types_allowed=True):
     @pydantic.field_validator("data", mode="before")
     @classmethod
     def parse_data(cls: Self, value: dict[str, Any]) -> Artifact | Message:
-        return ParseDict(value, Artifact() if "artifact_id" in value else Message())
+        return ParseDict(value, Artifact() if "artifact_id" in value or "artifactId" in value else Message())
 
 
 class ContextToken(pydantic.BaseModel):

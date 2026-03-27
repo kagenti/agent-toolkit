@@ -71,7 +71,7 @@ class CitationExtensionServer(BaseExtensionServer[CitationExtensionSpec, NoneTyp
     ) -> Message:
         return AgentMessage(
             text=text,
-            parts=parts or [],
+            parts=parts,
             metadata=self.citation_metadata(citations=citations),
         )
 

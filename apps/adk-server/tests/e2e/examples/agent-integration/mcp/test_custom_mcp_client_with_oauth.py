@@ -171,7 +171,7 @@ async def test_custom_mcp_client_with_oauth_example(
             task = None
             async for event in running_example.client.send_message(SendMessageRequest(message=message)):
                 if isinstance(event, tuple):
-                    task, _ = event
+                    _, task = event
 
             assert task is not None
             assert task.status.state == TaskState.TASK_STATE_AUTH_REQUIRED
@@ -196,7 +196,7 @@ async def test_custom_mcp_client_with_oauth_example(
             # Agent completes OAuth token exchange, calls MCP tool, returns result
             async for event in running_example.client.send_message(SendMessageRequest(message=auth_response)):
                 if isinstance(event, tuple):
-                    task, _ = event
+                    _, task = event
 
             assert task.status.state == TaskState.TASK_STATE_COMPLETED
             result_text = task.history[-1].parts[0].text

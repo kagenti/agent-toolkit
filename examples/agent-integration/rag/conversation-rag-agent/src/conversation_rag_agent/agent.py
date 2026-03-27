@@ -6,7 +6,7 @@ import json
 import os
 from typing import Annotated
 
-from a2a.types import DataPart, FilePart, FileWithUri, Message, Part, TextPart
+from a2a.types import Message, Part
 from kagenti_adk.a2a.extensions import (
     EmbeddingServiceExtensionServer,
     EmbeddingServiceExtensionSpec,
@@ -65,27 +65,30 @@ async def conversation_rag_agent_example(
     files: list[File] = []
     query = ""
     for part in input.parts:
-        match part.root:
-            case FilePart(file=FileWithUri(uri=uri)):
-                files.append(await File.get(PlatformFileUrl(uri).file_id))
-            case TextPart(text=text):
-                query = text
-            case _:
-                raise NotImplementedError(f"Unsupported part: {type(part.root)}")
+        content_type = part.WhichOneof("content")
+        if content_type == "url":
+            files.append(await File.get(PlatformFileUrl(part.url).file_id))
+        elif content_type == "text":
+            query = part.text
+        else:
+            raise NotImplementedError(f"Unsupported part content type: {content_type}")
 
     # Check if vector store exists
     vector_store = None
     async for message in context.load_history():
-        match message:
-            case Message(parts=[Part(root=DataPart(data=data))]):
-                vector_store = await VectorStore.get(data["vector_store_id"])
+        if isinstance(message, Message) and len(message.parts) == 1 and message.parts[0].WhichOneof("content") == "data":
+            data = dict(message.parts[0].data.struct_value)
+            vector_store = await VectorStore.get(data["vector_store_id"])
 
     # Create vector store if it does not exist
     if not vector_store:
         vector_store = await create_vector_store(embedding_client, embedding_model)
         # store vector store id in context for future messages
-        data_part = DataPart(data={"vector_store_id": vector_store.id})
-        await context.store(AgentMessage(parts=[data_part]))
+        from google.protobuf.struct_pb2 import Value
+
+        data_value = Value()
+        data_value.struct_value.update({"vector_store_id": vector_store.id})
+        await context.store(AgentMessage(parts=[Part(data=data_value)]))
 
     # Process files, add to vector store
     for file in files:

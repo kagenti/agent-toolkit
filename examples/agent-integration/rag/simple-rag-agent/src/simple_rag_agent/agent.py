@@ -6,7 +6,7 @@ import os
 from collections.abc import AsyncGenerator
 from typing import Annotated
 
-from a2a.types import FilePart, FileWithUri, Message, TextPart
+from a2a.types import Message, Part
 from kagenti_adk.a2a.extensions import (
     EmbeddingServiceExtensionServer,
     EmbeddingServiceExtensionSpec,
@@ -59,13 +59,13 @@ async def simple_rag_agent_example(
     files: list[File] = []
     query = ""
     for part in input.parts:
-        match part.root:
-            case FilePart(file=FileWithUri(uri=uri)):
-                files.append(await File.get(PlatformFileUrl(uri).file_id))
-            case TextPart(text=text):
-                query = text
-            case _:
-                raise NotImplementedError(f"Unsupported part: {type(part.root)}")
+        content_type = part.WhichOneof("content")
+        if content_type == "url":
+            files.append(await File.get(PlatformFileUrl(part.url).file_id))
+        elif content_type == "text":
+            query = part.text
+        else:
+            raise NotImplementedError(f"Unsupported part content type: {content_type}")
 
     if not files or not query:
         raise ValueError("No files or query provided")

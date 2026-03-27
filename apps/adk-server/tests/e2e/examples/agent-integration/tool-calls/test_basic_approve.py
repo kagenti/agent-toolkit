@@ -42,7 +42,7 @@ async def test_basic_approve_example(subtests, a2a_client_factory, test_configur
             task = None
             async for event in running_example.client.send_message(SendMessageRequest(message=message)):
                 if isinstance(event, tuple):
-                    task, _ = event
+                    _, task = event
 
             # If tool call needs approval, approve it
             while task and task.status.state == TaskState.TASK_STATE_INPUT_REQUIRED:
@@ -57,7 +57,7 @@ async def test_basic_approve_example(subtests, a2a_client_factory, test_configur
                 )
                 async for event in running_example.client.send_message(SendMessageRequest(message=response_message)):
                     if isinstance(event, tuple):
-                        task, _ = event
+                        _, task = event
 
             assert task is not None
             assert task.status.state == TaskState.TASK_STATE_COMPLETED, f"Fail: {task.status.message.parts[0].text}"
@@ -72,7 +72,7 @@ async def test_basic_approve_example(subtests, a2a_client_factory, test_configur
             task = None
             async for event in running_example.client.send_message(SendMessageRequest(message=message)):
                 if isinstance(event, tuple):
-                    task, _ = event
+                    _, task = event
 
             # Keep rejecting tool calls until task reaches a terminal state
             # (agent may request approval for multiple tools after a rejection)
@@ -92,7 +92,7 @@ async def test_basic_approve_example(subtests, a2a_client_factory, test_configur
                 )
                 async for event in running_example.client.send_message(SendMessageRequest(message=response_message)):
                     if isinstance(event, tuple):
-                        task, _ = event
+                        _, task = event
                 rejection_count += 1
 
             assert task is not None

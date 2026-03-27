@@ -419,6 +419,8 @@ raw = true
 usage = 'flag "--no-clean"'
 run = """
 #!/bin/bash
+set -euxo pipefail
+
 VM_NAME=e2e-examples-test-run
 
 export KAGENTI_ADK_USERNAME=admin
@@ -451,12 +453,12 @@ export DB_URL="postgresql+asyncpg://adk-user:password@localhost:5432/adk"
 export LLM_API_BASE="${LLM_API_BASE:-http://host.docker.internal:11434/v1}"
 
 echo "Waiting for adk-server deployment to be ready..."
-kubectl wait --for=condition=available --timeout=300s deployment/adk-server
+kubectl wait -n kagenti-adk --for=condition=available --timeout=300s deployment/adk-server
 
 echo "Waiting for Keycloak provision job to complete..."
-kubectl wait --for=condition=complete --timeout=300s job/keycloak-provision
+kubectl wait -n kagenti-adk --for=condition=complete --timeout=300s job/keycloak-provision
 
-kubectl port-forward svc/postgresql 5432:5432 2>/dev/null 1>&2 &
+kubectl port-forward -n kagenti-adk svc/postgresql 5432:5432 2>/dev/null 1>&2 &
 uv run pytest -m e2e tests/e2e/examples
 result=$?
 

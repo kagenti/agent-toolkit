@@ -33,7 +33,7 @@ async def test_streaming_buffered_history_example(subtests, get_final_task_from_
                 running_example.client.send_message(SendMessageRequest(message=message))
             )
 
-            assert task.status.state == TaskState.completed, f"Fail: {task.status.message.parts[0].text}"
+            assert task.status.state == TaskState.TASK_STATE_COMPLETED, f"Fail: {task.status.message.parts[0].text}"
             text = _history_text(task)
             assert "total=1" in text and "user=1" in text
             assert "Error during execution" not in text
@@ -45,7 +45,7 @@ async def test_streaming_buffered_history_example(subtests, get_final_task_from_
                 running_example.client.send_message(SendMessageRequest(message=message))
             )
 
-            assert task.status.state == TaskState.completed, f"Fail: {task.status.message.parts[0].text}"
+            assert task.status.state == TaskState.TASK_STATE_COMPLETED, f"Fail: {task.status.message.parts[0].text}"
             text = _history_text(task)
             assert "total=3" in text and "user=2" in text
             assert "Error during execution" not in text
@@ -57,7 +57,7 @@ async def test_streaming_buffered_history_example(subtests, get_final_task_from_
                 running_example.client.send_message(SendMessageRequest(message=message))
             )
 
-            assert task.status.state == TaskState.completed, f"Fail: {task.status.message.parts[0].text}"
+            assert task.status.state == TaskState.TASK_STATE_COMPLETED, f"Fail: {task.status.message.parts[0].text}"
             text = _history_text(task)
             # The tool call completes successfully before the error occurs, so we expect to see the tool result part followed by the error message about history being too long.
             assert "Tool call completed with result:" in text

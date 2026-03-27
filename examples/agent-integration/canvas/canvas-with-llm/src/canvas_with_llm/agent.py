@@ -4,7 +4,7 @@
 import os
 from typing import Annotated
 
-from a2a.types import Message, TextPart
+from a2a.types import Message, Part
 from kagenti_adk.a2a.extensions import LLMServiceExtensionServer, LLMServiceExtensionSpec
 from kagenti_adk.a2a.extensions.ui import CanvasEditRequest
 from kagenti_adk.a2a.extensions import CanvasExtensionServer, CanvasExtensionSpec
@@ -39,11 +39,11 @@ def get_system_prompt(canvas_edit: CanvasEditRequest | None) -> str:
     if not canvas_edit:
         return BASE_PROMPT
 
-    # Check if parts list is not empty and first part is TextPart
-    if not canvas_edit.artifact.parts or not isinstance(canvas_edit.artifact.parts[0].root, TextPart):
+    # Check if parts list is not empty and first part has text
+    if not canvas_edit.artifact.parts or not canvas_edit.artifact.parts[0].text:
         return BASE_PROMPT
 
-    original_code = canvas_edit.artifact.parts[0].root.text
+    original_code = canvas_edit.artifact.parts[0].text
 
     # Validate indices are within bounds
     if not (0 <= canvas_edit.start_index <= canvas_edit.end_index <= len(original_code)):
@@ -61,8 +61,8 @@ async def call_llm(llm: LLMServiceExtensionServer, system_prompt: str, message: 
     artifact = AgentArtifact(
         name="Response",
         parts=[
-            TextPart(text=system_prompt),  # This is just for demonstration. Replace with actual LLM call.
-            TextPart(text=example),  # This is just for demonstration. Replace with actual LLM call.
+            Part(text=system_prompt),  # This is just for demonstration. Replace with actual LLM call.
+            Part(text=example),  # This is just for demonstration. Replace with actual LLM call.
         ],
     )
     return artifact

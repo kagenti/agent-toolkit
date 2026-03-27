@@ -39,16 +39,21 @@ class RunningExample(NamedTuple):
     agent_card: AgentCard
 
 
+_LLM_ENV_VARS = {"LLM_API_BASE", "LLM_API_KEY", "LLM_MODEL", "OPENAI_API_BASE", "OPENAI_API_KEY", "OPENAI_MODEL"}
+
+
 def run_process(
     example_dir_path: str, port: int, llm_model: str | None = None, llm_api_key: Secret[str] | None = None
 ) -> subprocess.Popen:
     cwd = f"../../examples/{example_dir_path}"
     print(f"Running example in {cwd}")
+    # Strip LLM env vars to prevent fallback; only pass them when explicitly provided
+    env = {k: v for k, v in os.environ.items() if k not in _LLM_ENV_VARS}
     return subprocess.Popen(
         ["uv", "run", "server"],
         cwd=cwd,
         env={
-            **os.environ,
+            **env,
             "PORT": str(port),
             "PRODUCTION_MODE": "true",
             **({"OPENAI_API_KEY": llm_api_key.get_secret_value()} if llm_api_key else {}),

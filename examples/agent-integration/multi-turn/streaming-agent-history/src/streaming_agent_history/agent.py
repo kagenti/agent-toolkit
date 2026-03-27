@@ -77,7 +77,7 @@ async def streaming_agent_w_single_history_write_example(input: Message, context
         # - A single aggregated write keeps replay, memory, and history semantics clean.
         # 
         aggregated_response = AgentMessage(text="\n".join(buffered_parts))
-        yield "Final result check:\n" + str(aggregated_response.text)
+        yield "Final result check:\n" + aggregated_response.parts[0].text
         await context.store(data=aggregated_response)
 
 
