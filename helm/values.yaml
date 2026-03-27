@@ -24,6 +24,7 @@ gateway:
 
 features:
   # UI only features
+  uiLocalDevAutoLogin: false
   uiLocalSetup: false
   uiConnectors: false
   uiVariables: true

@@ -22,7 +22,6 @@ export const runtimeConfig: RuntimeConfig = {
     defaults: contextTokenPermissionsDefaults,
   }),
   isAuthEnabled: process.env.OIDC_ENABLED !== 'false',
-  isLocalDevAutoLogin:
-    process.env.OIDC_ENABLED !== 'false' && (process.env.OIDC_PROVIDER_ISSUER?.includes('localtest.me') ?? false),
+  isLocalDevAutoLogin: process.env.LOCAL_DEV_AUTO_LOGIN === 'true',
   appName: process.env.APP_NAME || 'Kagenti ADK',
 };

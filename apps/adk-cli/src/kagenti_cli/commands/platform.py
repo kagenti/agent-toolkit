@@ -545,7 +545,7 @@ async def start_cmd(
                                 "serverClientSecret": "adk-server-secret",
                             },
                         },
-                        "features": {"uiLocalSetup": True},
+                        "features": {"uiLocalSetup": True, "uiLocalDevAutoLogin": True},
                         "providerBuilds": {"enabled": True},
                         "disableProviderDownscaling": True,
                         "server": {
