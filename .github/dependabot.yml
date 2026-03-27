@@ -4,23 +4,43 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    groups:
+      github-actions:
+        patterns:
+          - "*"
 
   - package-ecosystem: npm
     directory: /
     schedule:
       interval: weekly
+    groups:
+      npm-dependencies:
+        patterns:
+          - "*"
 
   - package-ecosystem: uv
     directory: /apps/adk-server
     schedule:
       interval: weekly
+    groups:
+      adk-server-dependencies:
+        patterns:
+          - "*"
 
   - package-ecosystem: uv
     directory: /apps/adk-cli
     schedule:
       interval: weekly
+    groups:
+      adk-cli-dependencies:
+        patterns:
+          - "*"
 
   - package-ecosystem: uv
     directory: /apps/adk-py
     schedule:
       interval: weekly
+    groups:
+      adk-py-dependencies:
+        patterns:
+          - "*"
