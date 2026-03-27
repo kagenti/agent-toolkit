@@ -33,7 +33,7 @@ async def test_basic_configuration_example(subtests, get_final_task_from_stream,
             agent_detail = get_extension(agent_card, AGENT_DETAIL_EXTENSION_URI)
             assert agent_detail is not None
 
-            params = agent_detail.model_dump()["params"]
+            params = dict(agent_detail.params)
             assert params["interaction_mode"] == "multi-turn"
             assert (
                 params["user_greeting"] == "Hi there! I can help you research topics or summarize uploaded documents."
@@ -43,14 +43,14 @@ async def test_basic_configuration_example(subtests, get_final_task_from_stream,
 
         with subtests.test("agent detail has author info"):
             agent_detail = get_extension(agent_card, AGENT_DETAIL_EXTENSION_URI)
-            params = agent_detail.model_dump()["params"]
+            params = dict(agent_detail.params)
 
             assert params["author"]["name"] == "Kagenti ADK Team"
             assert params["author"]["email"] == "team@example.com"
 
         with subtests.test("agent detail has tools"):
             agent_detail = get_extension(agent_card, AGENT_DETAIL_EXTENSION_URI)
-            params = agent_detail.model_dump()["params"]
+            params = dict(agent_detail.params)
 
             tools = params["tools"]
             assert len(tools) == 2
