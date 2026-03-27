@@ -30,7 +30,7 @@ from kagenti_adk.types import JsonPatch, JsonValue
 
 
 class StreamingExtensionSpec(NoParamsBaseExtensionSpec[NoneType]):
-    URI = "https://a2a-extensions.agentstack.beeai.dev/ui/streaming/v1"
+    URI = "https://a2a-extensions.adk.kagenti.dev/ui/streaming/v1"
     DESCRIPTION = "Enables fine-grained streaming of token chunks."
 
 

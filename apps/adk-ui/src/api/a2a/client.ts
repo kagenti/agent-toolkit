@@ -156,14 +156,12 @@ export const buildA2AClient = async <UIGenericPart = never>({
               taskId = statusUpdate.taskId;
 
               // Check for streaming patches in metadata
-              const patches = extractStreamingPatches(
-                statusUpdate.metadata as Record<string, unknown> | undefined,
-              );
+              const patches = extractStreamingPatches(statusUpdate.metadata);
 
               if (patches && taskId) {
                 // Apply patches to draft and emit as a replace update
                 applyPatches(streamingDraft, patches);
-                const draftParts = (streamingDraft.parts as Array<Record<string, unknown>>) ?? [];
+                const draftParts = Array.isArray(streamingDraft.parts) ? streamingDraft.parts : [];
                 const uiParts: UIMessagePart[] = draftParts
                   .map((part): UIMessagePart | null => {
                     if (typeof part.text === 'string') {

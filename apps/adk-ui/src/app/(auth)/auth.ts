@@ -122,7 +122,7 @@ export function getProvider(): ProviderWithId | null {
 
     if (!name || !id || !clientId || !issuer) {
       throw new Error(
-        'Missing OIDC provider configuration. Set OIDC_PROVIDER_NAME, OIDC_PROVIDER_ID, OIDC_PROVIDER_CLIENT_ID, OIDC_PROVIDER_CLIENT_SECRET, and OIDC_PROVIDER_ISSUER.',
+        'Missing OIDC provider configuration. Set OIDC_PROVIDER_NAME, OIDC_PROVIDER_ID, OIDC_PROVIDER_CLIENT_ID, and OIDC_PROVIDER_ISSUER.',
       );
     }
 

@@ -9,9 +9,7 @@ import { STREAMING_EXTENSION_URI } from '@kagenti/adk';
 /**
  * Extract streaming patches from status update metadata.
  */
-export function extractStreamingPatches(
-  metadata: Record<string, unknown> | undefined | null,
-): StreamingPatch[] | null {
+export function extractStreamingPatches(metadata: Record<string, unknown> | undefined | null): StreamingPatch[] | null {
   if (!metadata) return null;
   const streamingData = metadata[STREAMING_EXTENSION_URI] as StreamingMetadata | undefined;
   if (!streamingData?.message_update?.length) return null;
@@ -22,7 +20,7 @@ export function extractStreamingPatches(
  * Resolve a JSON pointer path to get/set a value in a nested object.
  * Returns [parent, key] for the target location.
  */
-function resolvePath(obj: Record<string, unknown>, path: string): [Record<string, unknown>, string] {
+function resolvePath(obj: Record<string, unknown>, path: string): [unknown, string] {
   if (path === '' || path === '/') return [obj, ''];
 
   const parts = path.split('/').filter(Boolean);
@@ -33,11 +31,11 @@ function resolvePath(obj: Record<string, unknown>, path: string): [Record<string
     if (Array.isArray(current)) {
       current = current[Number(key)];
     } else if (current && typeof current === 'object') {
-      current = (current as Record<string, unknown>)[key];
+      current = current[key];
     }
   }
 
-  return [current as Record<string, unknown>, parts[parts.length - 1]];
+  return [current, parts[parts.length - 1]];
 }
 
 function getByPath(obj: Record<string, unknown>, path: string): unknown {
@@ -48,7 +46,7 @@ function getByPath(obj: Record<string, unknown>, path: string): unknown {
     if (Array.isArray(current)) {
       current = current[Number(key)];
     } else if (current && typeof current === 'object') {
-      current = (current as Record<string, unknown>)[key];
+      current = current[key];
     } else {
       return undefined;
     }
@@ -64,6 +62,10 @@ function cloneValue<T>(v: T): T {
 /**
  * Apply a single streaming patch to a draft message object.
  * Supports: replace, add, str_ins (custom string insertion).
+ *
+ * Note: RFC 6902 `remove` and `move` ops are intentionally not implemented.
+ * The Python accumulator (server side) only emits replace/add/str_ins deltas
+ * for progressive text construction. If that changes, add them here.
  */
 function applyPatch(draft: Record<string, unknown>, patch: StreamingPatch): void {
   const { op, path, value } = patch;
@@ -118,6 +120,8 @@ function applyPatch(draft: Record<string, unknown>, patch: StreamingPatch): void
         }
       }
     }
+  } else {
+    console.warn(`Unsupported streaming patch op: "${op}". Skipping.`);
   }
 }
 
@@ -125,10 +129,7 @@ function applyPatch(draft: Record<string, unknown>, patch: StreamingPatch): void
  * Apply an array of streaming patches to a draft message object.
  * Mutates the draft in place and returns it.
  */
-export function applyPatches(
-  draft: Record<string, unknown>,
-  patches: StreamingPatch[],
-): Record<string, unknown> {
+export function applyPatches(draft: Record<string, unknown>, patches: StreamingPatch[]): Record<string, unknown> {
   for (const patch of patches) {
     applyPatch(draft, patch);
   }
