@@ -60,12 +60,12 @@ run = """
 test ! -d .git && exit 0
 cat >.git/hooks/pre-commit <<'HOOK'
 #!/bin/sh
-{{ mise_bin }} run git-hooks:pre-commit
+mise run git-hooks:pre-commit
 HOOK
 chmod +x .git/hooks/pre-commit
 cat >.git/hooks/commit-msg <<'HOOK'
 #!/bin/sh
-{{ mise_bin }} run git-hooks:commit-msg -- "$1"
+mise run git-hooks:commit-msg -- "$1"
 HOOK
 chmod +x .git/hooks/commit-msg
 """
