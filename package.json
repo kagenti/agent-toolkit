@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "next-mdx-remote": "^6.0.0"
+  }
+}
