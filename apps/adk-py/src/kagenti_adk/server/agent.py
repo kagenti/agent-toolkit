@@ -471,9 +471,7 @@ class AgentRun:
             return None
         return await self._dispatch_control_yield(yielded_value, result.draft)
 
-    async def _dispatch_control_yield(
-        self, yielded_value: RunYield, draft: Message | None = None
-    ) -> RunYieldResume:
+    async def _dispatch_control_yield(self, yielded_value: RunYield, draft: Message | None = None) -> RunYieldResume:
         match yielded_value:
             case Message() as message:
                 await self.task_updater.update_status(

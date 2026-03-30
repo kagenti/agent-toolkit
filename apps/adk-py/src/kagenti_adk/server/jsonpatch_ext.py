@@ -21,8 +21,8 @@ class StrInsOperation(PatchOperation):
     def apply(self, obj: Any) -> Any:
         try:
             value = self.operation["value"]
-        except KeyError:
-            raise jsonpatch.InvalidJsonPatch("The operation does not contain a 'value' member")
+        except KeyError as err:
+            raise jsonpatch.InvalidJsonPatch("The operation does not contain a 'value' member") from err
 
         subobj, part = self.pointer.to_last(obj)
 
@@ -34,8 +34,8 @@ class StrInsOperation(PatchOperation):
             try:
                 part_idx = int(part)  # type: ignore [arg-type]
                 current_val = subobj[part_idx]
-            except (IndexError, ValueError):
-                raise jsonpatch.JsonPatchConflict(f"Target path {self.location} does not exist")
+            except (IndexError, ValueError) as err:
+                raise jsonpatch.JsonPatchConflict(f"Target path {self.location} does not exist") from err
         else:
             raise jsonpatch.JsonPatchConflict(f"Cannot apply str_ins to {type(subobj)}")
 
@@ -124,7 +124,7 @@ class ExtendedDiffBuilder(DiffBuilder):
             #    For streaming, we typically expect one chunk inserted.
 
             if len(insert_ops) == 1 and all(op[0] == "equal" for op in other_ops):
-                tag, i1, i2, j1, j2 = insert_ops[0]
+                _tag, i1, _i2, j1, j2 = insert_ops[0]
                 inserted_text = item[j1:j2]
 
                 # 'pos' is i1 (index in old string where insertion starts)
@@ -141,7 +141,7 @@ class ExtendedDiffBuilder(DiffBuilder):
 
 
 class ExtendedJsonPatch(JsonPatch):
-    operations = dict(JsonPatch.operations)
+    operations = dict(JsonPatch.operations)  # noqa: RUF012
     operations["str_ins"] = StrInsOperation  # type: ignore [assignment]
 
 

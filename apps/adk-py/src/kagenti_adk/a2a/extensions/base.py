@@ -173,7 +173,7 @@ class BaseExtensionServer(abc.ABC, typing.Generic[ExtensionSpecT, MetadataFromCl
             return self._metadata_from_client
 
         if self.spec.default is not None:
-            return self.spec.default
+            return self.spec.default  # pyrefly: ignore[bad-return]
 
         if not self._is_active:
             raise AttributeError(f"Cannot access 'data' attribute: extension '{self.spec.URI}' is not active.")

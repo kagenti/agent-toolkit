@@ -211,6 +211,7 @@ class TestPatchOutput:
             assert op["path"].startswith("/metadata/")
         # Apply all patches to verify correctness
         from kagenti_adk.server.jsonpatch_ext import ExtendedJsonPatch
+
         draft = {"parts": [], "metadata": {"ext://test": [{"ref": "a"}]}}
         draft = ExtendedJsonPatch(result.patch).apply(draft)
         assert draft["metadata"]["ext://test"] == [{"ref": "a"}, {"ref": "b"}]

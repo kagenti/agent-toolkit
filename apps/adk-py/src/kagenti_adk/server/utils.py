@@ -2,14 +2,16 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from __future__ import annotations
-from kagenti_adk.types import JsonValue
-from kagenti_adk.a2a.types import Metadata
-from a2a.types import Message
+
 import asyncio
 from asyncio import CancelledError
 from contextlib import suppress
 
 from a2a.server.events import QueueManager
+from a2a.types import Message
+
+from kagenti_adk.a2a.types import Metadata
+from kagenti_adk.types import JsonValue
 
 
 async def cancel_task(task: asyncio.Task):

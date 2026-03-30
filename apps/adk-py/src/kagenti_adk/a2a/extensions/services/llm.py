@@ -14,7 +14,12 @@ from a2a.server.agent_execution.context import RequestContext
 from a2a.types import Message as A2AMessage
 from typing_extensions import override
 
-from kagenti_adk.a2a.extensions.base import DEFAULT_DEMAND_NAME, BaseExtensionClient, BaseExtensionServer, BaseExtensionSpec
+from kagenti_adk.a2a.extensions.base import (
+    DEFAULT_DEMAND_NAME,
+    BaseExtensionClient,
+    BaseExtensionServer,
+    BaseExtensionSpec,
+)
 from kagenti_adk.util.pydantic import REVEAL_SECRETS, SecureBaseModel, redact_str
 
 __all__ = [
@@ -39,7 +44,6 @@ __all__ = [
     "LLMServiceExtensionServer",
     "LLMServiceExtensionSpec",
 ]
-
 
 
 class LLMFulfillment(SecureBaseModel):

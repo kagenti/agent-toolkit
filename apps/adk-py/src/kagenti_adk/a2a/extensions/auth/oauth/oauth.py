@@ -19,7 +19,12 @@ from mcp.shared.auth import OAuthClientMetadata
 from typing_extensions import override
 
 from kagenti_adk.a2a.extensions.auth.oauth.storage import MemoryTokenStorageFactory, TokenStorageFactory
-from kagenti_adk.a2a.extensions.base import DEFAULT_DEMAND_NAME, BaseExtensionClient, BaseExtensionServer, BaseExtensionSpec
+from kagenti_adk.a2a.extensions.base import (
+    DEFAULT_DEMAND_NAME,
+    BaseExtensionClient,
+    BaseExtensionServer,
+    BaseExtensionSpec,
+)
 from kagenti_adk.a2a.types import AgentMessage, AuthRequired, Metadata, RunYieldResume
 from kagenti_adk.util.pydantic import REVEAL_SECRETS, SecureBaseModel
 
@@ -49,7 +54,6 @@ __all__ = [
     "OAuthExtensionSpec",
     "OAuthFulfillment",
 ]
-
 
 
 class AuthRequest(SecureBaseModel):

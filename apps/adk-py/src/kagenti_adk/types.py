@@ -21,12 +21,11 @@ if TYPE_CHECKING:
     JsonValue: TypeAlias = list["JsonValue"] | dict[str, "JsonValue"] | str | bool | int | float | None
     JsonDict: TypeAlias = dict[str, JsonValue]
 else:
-    from typing import Union  # noqa: F401
-
     from typing_extensions import TypeAliasType
 
-    JsonValue = TypeAliasType("JsonValue", "Union[dict[str, JsonValue], list[JsonValue], str, int, float, bool, None]")
+    JsonValue = TypeAliasType("JsonValue", "dict[str, JsonValue] | list[JsonValue] | str | int | float | bool | None")
     JsonDict = TypeAliasType("JsonDict", "dict[str, JsonValue]")
+
 
 class JsonPatchOp(TypedDict, total=False):
     """A single JSON Patch operation (RFC 6902), extended with 'str_ins' from json-crdt-patch."""

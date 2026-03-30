@@ -43,15 +43,6 @@ from kagenti_adk.a2a.extensions import (
     Trajectory,
     TrajectoryExtensionSpec,
 )
-from kagenti_adk.a2a.extensions.streaming import (
-    ArtifactDelta,
-    MetadataDelta,
-    PartDelta,
-    StateChange,
-    StreamingExtensionClient,
-    StreamingExtensionSpec,
-    TextDelta,
-)
 from kagenti_adk.a2a.extensions.common.form import (
     CheckboxField,
     CheckboxFieldValue,
@@ -71,6 +62,15 @@ from kagenti_adk.a2a.extensions.common.form import (
     SingleSelectFieldValue,
     TextField,
     TextFieldValue,
+)
+from kagenti_adk.a2a.extensions.streaming import (
+    ArtifactDelta,
+    MetadataDelta,
+    PartDelta,
+    StateChange,
+    StreamingExtensionClient,
+    StreamingExtensionSpec,
+    TextDelta,
 )
 from kagenti_adk.platform import File, ModelProvider, Provider, UserFeedback
 from kagenti_adk.platform.context import Context, ContextPermissions, ContextToken, Permissions
@@ -842,9 +842,9 @@ async def _run_agent(
                     artifact = artifact_event.artifact
                     if dump_files_path is None:
                         continue
-                    dump_files_path.mkdir(parents=True, exist_ok=True)
+                    dump_files_path.mkdir(parents=True, exist_ok=True)  # noqa: ASYNC240
                     full_path = dump_files_path / (artifact.name or "unnamed").lstrip("/")
-                    full_path.resolve().relative_to(dump_files_path.resolve())
+                    full_path.resolve().relative_to(dump_files_path.resolve())  # noqa: ASYNC240
                     full_path.parent.mkdir(parents=True, exist_ok=True)
                     try:
                         for part in artifact.parts[:1]:
@@ -929,10 +929,6 @@ async def _run_agent(
                         TaskState.TASK_STATE_REJECTED,
                     ):
                         console.print(f"\n:boom: [red][bold]Task {TaskState.Name(state)}[/bold][/red]")
-                        return
-
-                    elif state == TaskState.TASK_STATE_AUTH_REQUIRED:
-                        console.print("[yellow]Authentication required[/yellow]")
                         return
 
                     elif state == TaskState.TASK_STATE_AUTH_REQUIRED:
@@ -1236,7 +1232,6 @@ async def run_agent(
                         settings=settings_input,
                         dump_files_path=dump_files,
                         handle_input=handle_input,
-
                     )
                     console.print()
                     turn_input = handle_input()

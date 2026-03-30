@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from __future__ import annotations
+
 from kagenti_adk.a2a.types import RunYield
 
 

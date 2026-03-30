@@ -300,7 +300,7 @@ class StreamingExtensionClient(BaseExtensionClient[StreamingExtensionSpec, NoneT
 
             elif path.startswith("/metadata"):
                 # Strip /metadata prefix and collect for incremental application
-                metadata_ops.append({**patch, "path": path[len("/metadata"):]})
+                metadata_ops.append({**patch, "path": path[len("/metadata") :]})
 
         if metadata_ops:
             incremental = ExtendedJsonPatch(metadata_ops).apply({})

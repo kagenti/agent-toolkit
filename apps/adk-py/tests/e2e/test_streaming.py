@@ -9,22 +9,18 @@ import pytest
 from a2a.client import Client
 from a2a.client.helpers import create_text_message_object
 from a2a.types import (
-    Artifact,
     Message,
     Part,
-    Role,
     SendMessageRequest,
     StreamResponse,
-    TaskArtifactUpdateEvent,
     TaskState,
     TaskStatus,
     TaskStatusUpdateEvent,
 )
+from conftest import make_extension_context
 from google.protobuf.json_format import MessageToDict
 
 from kagenti_adk.a2a.extensions.streaming import (
-    ArtifactDelta,
-    MetadataDelta,
     PartDelta,
     StateChange,
     StreamingExtensionClient,
@@ -35,7 +31,6 @@ from kagenti_adk.a2a.types import AgentMessage, ArtifactChunk, InputRequired, Me
 from kagenti_adk.server import Server
 from kagenti_adk.server.context import RunContext
 from kagenti_adk.server.jsonpatch_ext import ExtendedJsonPatch
-from conftest import make_extension_context
 
 pytestmark = pytest.mark.e2e
 
@@ -83,9 +78,7 @@ async def streaming_string_agent(create_server_with_agent) -> AsyncGenerator[tup
         yield " beautiful"
         yield " world"
 
-    async with create_server_with_agent(
-        string_yielder
-    ) as (server, client):
+    async with create_server_with_agent(string_yielder) as (server, client):
         yield server, client
 
 
@@ -94,9 +87,7 @@ async def streaming_part_agent(create_server_with_agent) -> AsyncGenerator[tuple
     async def part_yielder(message: Message, context: RunContext) -> AsyncIterator[RunYield]:
         yield Part(text="explicit part")
 
-    async with create_server_with_agent(
-        part_yielder
-    ) as (server, client):
+    async with create_server_with_agent(part_yielder) as (server, client):
         yield server, client
 
 
@@ -107,9 +98,7 @@ async def streaming_mixed_agent(create_server_with_agent) -> AsyncGenerator[tupl
         yield "text2"
         yield AgentMessage(text="final")
 
-    async with create_server_with_agent(
-        mixed_yielder
-    ) as (server, client):
+    async with create_server_with_agent(mixed_yielder) as (server, client):
         yield server, client
 
 
@@ -133,7 +122,9 @@ async def test_string_yields_produce_streaming_patches(streaming_string_agent):
     """Verify applying streaming patches builds the same message as the wire."""
     _, client = streaming_string_agent
     events = []
-    async for event in client.send_message(SendMessageRequest(message=create_text_message_object(content="hi")), context=STREAMING_CONTEXT):
+    async for event in client.send_message(
+        SendMessageRequest(message=create_text_message_object(content="hi")), context=STREAMING_CONTEXT
+    ):
         events.append(event)
 
     patches = extract_streaming_patches(events)
@@ -154,7 +145,9 @@ async def test_part_yield_produces_streaming_patch(streaming_part_agent):
     """Verify applying streaming patches for Part yields builds the correct message."""
     _, client = streaming_part_agent
     events = []
-    async for event in client.send_message(SendMessageRequest(message=create_text_message_object(content="hi")), context=STREAMING_CONTEXT):
+    async for event in client.send_message(
+        SendMessageRequest(message=create_text_message_object(content="hi")), context=STREAMING_CONTEXT
+    ):
         events.append(event)
 
     patches = extract_streaming_patches(events)
@@ -173,7 +166,9 @@ async def test_completion_flushes_accumulated_message(streaming_string_agent):
     """Verify that the completed event contains all accumulated text."""
     _, client = streaming_string_agent
     events = []
-    async for event in client.send_message(SendMessageRequest(message=create_text_message_object(content="hi")), context=STREAMING_CONTEXT):
+    async for event in client.send_message(
+        SendMessageRequest(message=create_text_message_object(content="hi")), context=STREAMING_CONTEXT
+    ):
         events.append(event)
 
     status_events = extract_status_events(events)
@@ -188,16 +183,23 @@ async def test_mixed_yields_message_flush(streaming_mixed_agent):
     """Verify accumulated text is flushed before explicit AgentMessage."""
     _, client = streaming_mixed_agent
     events = []
-    async for event in client.send_message(SendMessageRequest(message=create_text_message_object(content="hi")), context=STREAMING_CONTEXT):
+    async for event in client.send_message(
+        SendMessageRequest(message=create_text_message_object(content="hi")), context=STREAMING_CONTEXT
+    ):
         events.append(event)
 
     # Extract all messages from WORKING status events
     working_messages = []
     for event in events:
         match event:
-            case (StreamResponse(status_update=TaskStatusUpdateEvent(status=TaskStatus(
-                state=TaskState.TASK_STATE_WORKING, message=Message(message_id=mid)
-            ))), _) if mid:
+            case (
+                StreamResponse(
+                    status_update=TaskStatusUpdateEvent(
+                        status=TaskStatus(state=TaskState.TASK_STATE_WORKING, message=Message(message_id=mid))
+                    )
+                ),
+                _,
+            ) if mid:
                 working_messages.append(event[0].status_update.status.message)
 
     # Should have at least the explicit AgentMessage as a WORKING event
@@ -270,8 +272,10 @@ async def test_complex_accumulator_state_machine(create_server_with_agent):
 
         # Phase 6: Artifact (bypasses accumulator entirely)
         yield ArtifactChunk(
-            artifact_id="art-1", name="data.txt",
-            parts=[Part(text="artifact body")], last_chunk=True,
+            artifact_id="art-1",
+            name="data.txt",
+            parts=[Part(text="artifact body")],
+            last_chunk=True,
         )
 
         # Phase 7: New accumulation cycle after full reset
@@ -288,7 +292,9 @@ async def test_complex_accumulator_state_machine(create_server_with_agent):
     async with create_server_with_agent(complex_agent) as (_, client):
         # --- First send: initial message ---
         events_1 = []
-        async for event in client.send_message(SendMessageRequest(message=create_text_message_object(content="go")), context=STREAMING_CONTEXT):
+        async for event in client.send_message(
+            SendMessageRequest(message=create_text_message_object(content="go")), context=STREAMING_CONTEXT
+        ):
             events_1.append(event)
 
         all_patches = extract_streaming_patches(events_1)
@@ -313,8 +319,7 @@ async def test_complex_accumulator_state_machine(create_server_with_agent):
         # The WORKING wire message = merge(draft_1, AgentMessage("checkpoint"))
         # Draft parts are a prefix of the wire message parts
         working = [
-            e for e in status_events
-            if e.status.state == TaskState.TASK_STATE_WORKING and e.status.message.message_id
+            e for e in status_events if e.status.state == TaskState.TASK_STATE_WORKING and e.status.message.message_id
         ]
         assert len(working) == 1
         wire_msg = working[0].status.message
@@ -328,7 +333,8 @@ async def test_complex_accumulator_state_machine(create_server_with_agent):
 
         # -- Artifact event (bypasses accumulator) --
         artifact_events = [
-            event for event in events_1
+            event
+            for event in events_1
             if isinstance(event[0], StreamResponse) and event[0].artifact_update.artifact.artifact_id
         ]
         assert len(artifact_events) == 1
@@ -340,10 +346,7 @@ async def test_complex_accumulator_state_machine(create_server_with_agent):
         assert draft_2["parts"][0]["text"] == "post-artifact"
 
         # The INPUT_REQUIRED wire message = merge(draft_2, InputRequired("what next?"))
-        input_required = [
-            e for e in status_events
-            if e.status.state == TaskState.TASK_STATE_INPUT_REQUIRED
-        ]
+        input_required = [e for e in status_events if e.status.state == TaskState.TASK_STATE_INPUT_REQUIRED]
         assert len(input_required) == 1
         ir_parts = [MessageToDict(p) for p in input_required[0].status.message.parts]
         assert ir_parts[:1] == draft_2["parts"]
@@ -383,7 +386,11 @@ async def test_streaming_client_text_deltas(streaming_string_agent):
 
     text_deltas = []
     state_changes = []
-    async for delta, task in streaming.stream(client.send_message(SendMessageRequest(message=create_text_message_object(content="hi")), context=STREAMING_CONTEXT)):
+    async for delta, _task in streaming.stream(
+        client.send_message(
+            SendMessageRequest(message=create_text_message_object(content="hi")), context=STREAMING_CONTEXT
+        )
+    ):
         match delta:
             case TextDelta() as td:
                 text_deltas.append(td.delta)
@@ -408,7 +415,11 @@ async def test_streaming_client_part_delta(streaming_part_agent):
     streaming = _make_streaming_client()
 
     part_deltas = []
-    async for delta, task in streaming.stream(client.send_message(SendMessageRequest(message=create_text_message_object(content="hi")), context=STREAMING_CONTEXT)):
+    async for delta, _task in streaming.stream(
+        client.send_message(
+            SendMessageRequest(message=create_text_message_object(content="hi")), context=STREAMING_CONTEXT
+        )
+    ):
         match delta:
             case PartDelta() as pd:
                 part_deltas.append(pd)
@@ -426,7 +437,9 @@ async def test_streaming_client_without_extension(no_streaming_string_agent):
 
     part_deltas = []
     state_changes = []
-    async for delta, task in streaming.stream(client.send_message(SendMessageRequest(message=create_text_message_object(content="hi")))):
+    async for delta, _task in streaming.stream(
+        client.send_message(SendMessageRequest(message=create_text_message_object(content="hi")))
+    ):
         match delta:
             case PartDelta() as pd:
                 part_deltas.append(pd)
@@ -448,7 +461,11 @@ async def test_streaming_client_reconciles_streamed_messages(streaming_mixed_age
     streaming = _make_streaming_client()
 
     all_deltas = []
-    async for delta, task in streaming.stream(client.send_message(SendMessageRequest(message=create_text_message_object(content="hi")), context=STREAMING_CONTEXT)):
+    async for delta, _task in streaming.stream(
+        client.send_message(
+            SendMessageRequest(message=create_text_message_object(content="hi")), context=STREAMING_CONTEXT
+        )
+    ):
         all_deltas.append(delta)
 
     # Should have deltas from streaming (text1, text2) and then the explicit AgentMessage
@@ -468,7 +485,11 @@ async def test_streaming_client_message_id_tracking(streaming_string_agent):
     _, client = streaming_string_agent
     streaming = _make_streaming_client()
 
-    async for delta, task in streaming.stream(client.send_message(SendMessageRequest(message=create_text_message_object(content="hi")), context=STREAMING_CONTEXT)):
+    async for _delta, _task in streaming.stream(
+        client.send_message(
+            SendMessageRequest(message=create_text_message_object(content="hi")), context=STREAMING_CONTEXT
+        )
+    ):
         pass
 
     # After stream completes, the draft should have been used

@@ -77,7 +77,7 @@ def _get_param_type_hints(fn: Callable[..., Any]) -> dict[str, Any]:
                 continue
             if isinstance(ann, str):
                 try:
-                    hints[name] = eval(ann, globalns)  # noqa: S307
+                    hints[name] = eval(ann, globalns)
                 except Exception:
                     hints[name] = ann
             else:

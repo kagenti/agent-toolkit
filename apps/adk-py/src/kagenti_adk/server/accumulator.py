@@ -157,6 +157,8 @@ class MessageAccumulator:
                 return self._process_at_message_level(ctx, value)
             case TextPartContext() as ctx:
                 return self._process_at_text_part_level(ctx, value)
+            case _:
+                raise RuntimeError(f"Unexpected accumulator state: {type(self._active)}")
 
     def flush(self) -> Message | None:
         """Flush any accumulated state into a message. Resets to base level."""

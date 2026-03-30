@@ -18,7 +18,12 @@ from pydantic import AnyUrl
 from typing_extensions import override
 
 from kagenti_adk.a2a.extensions.auth.oauth.oauth import OAuthExtensionServer
-from kagenti_adk.a2a.extensions.base import DEFAULT_DEMAND_NAME, BaseExtensionClient, BaseExtensionServer, BaseExtensionSpec
+from kagenti_adk.a2a.extensions.base import (
+    DEFAULT_DEMAND_NAME,
+    BaseExtensionClient,
+    BaseExtensionServer,
+    BaseExtensionSpec,
+)
 from kagenti_adk.a2a.extensions.services.platform import PlatformApiExtensionServer
 from kagenti_adk.platform.client import get_platform_client
 from kagenti_adk.util.logging import logger

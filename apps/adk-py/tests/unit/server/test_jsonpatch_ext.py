@@ -5,6 +5,8 @@ import pytest
 
 from kagenti_adk.server.jsonpatch_ext import StrInsOperation, make_patch
 
+pytestmark = pytest.mark.unit
+
 
 def test_str_ins_append():
     """Test optimized append detection"""

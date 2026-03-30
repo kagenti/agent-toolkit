@@ -1,14 +1,17 @@
 # Copyright 2025 © BeeAI a Series of LF Projects, LLC
 
-from kagenti_adk.server.utils import _merge_recursive, merge_metadata
-from kagenti_adk.a2a.types import Metadata
 import pytest
+
+from kagenti_adk.a2a.types import Metadata
+from kagenti_adk.server.utils import _merge_recursive, merge_metadata
+
+pytestmark = pytest.mark.unit
 
 
 def test_scalar_merge():
     assert _merge_recursive(1, 2) == 2
     assert _merge_recursive("a", "b") == "b"
-    assert _merge_recursive(True, False) == False
+    assert _merge_recursive(True, False) is False
     assert _merge_recursive(None, 1) == 1
 
 

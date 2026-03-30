@@ -142,6 +142,7 @@ class TestMessageContext:
         assert all(op["path"].startswith("/metadata/") for op in patches)
         # Verify the patches are correct by applying them
         from kagenti_adk.server.jsonpatch_ext import ExtendedJsonPatch
+
         draft = {"metadata": {"a": 1}}
         draft = ExtendedJsonPatch(patches).apply(draft)
         assert draft["metadata"] == {"a": 1, "b": 2}

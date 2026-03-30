@@ -13,7 +13,12 @@ from google.protobuf.json_format import MessageToDict
 from opentelemetry import trace
 from typing_extensions import override
 
-from kagenti_adk.a2a.extensions.base import DEFAULT_DEMAND_NAME, BaseExtensionClient, BaseExtensionServer, BaseExtensionSpec
+from kagenti_adk.a2a.extensions.base import (
+    DEFAULT_DEMAND_NAME,
+    BaseExtensionClient,
+    BaseExtensionServer,
+    BaseExtensionSpec,
+)
 from kagenti_adk.a2a.types import AgentMessage, AuthRequired
 from kagenti_adk.util.pydantic import REDACT_SECRETS, REVEAL_SECRETS, SecureBaseModel
 from kagenti_adk.util.telemetry import flatten_dict
