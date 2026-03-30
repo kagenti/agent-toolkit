@@ -6,7 +6,7 @@ from __future__ import annotations
 import os
 from typing import Annotated
 
-from a2a.types import Artifact, Message, TextPart
+from a2a.types import Artifact, Message, Part
 from kagenti_adk.a2a.extensions import (
     AgentDetail,
     AgentDetailContributor,
@@ -26,7 +26,7 @@ server = Server()
 
 
 def _get_text(object: Message | Artifact) -> str:
-    return "\n\n".join(part.root.text for part in object.parts or [] if isinstance(part.root, TextPart))
+    return "\n\n".join(part.text for part in object.parts or [] if part.WhichOneof("content") == "text")
 
 
 @server.agent(
@@ -91,7 +91,7 @@ Your task is to apply the user's instruction ONLY to the selected text and then 
 
         artifact = AgentArtifact(
             name=f"Edited - {edit_request.artifact.name}",
-            parts=[TextPart(text="")],
+            parts=[Part(text="")],
         )
     else:
         system_prompt = "You are a helpful assistant. Output only the requested text, without any additional explanation or preamble. Use Markdown syntax in your output. Be mindful of the need for double new lines in order to make a new line."
@@ -108,7 +108,7 @@ Your task is to apply the user's instruction ONLY to the selected text and then 
         llm_messages.insert(0, {"role": "system", "content": system_prompt})
         artifact = AgentArtifact(
             name="Response",
-            parts=[TextPart(text="")],
+            parts=[Part(text="")],
         )
 
     yield artifact
@@ -129,13 +129,13 @@ Your task is to apply the user's instruction ONLY to the selected text and then 
             yield AgentArtifact(
                 artifact_id=artifact.artifact_id,
                 name=artifact.name,
-                parts=[TextPart(text=content_delta)],
+                parts=[Part(text=content_delta)],
             )
 
     final_artifact = AgentArtifact(
         artifact_id=artifact.artifact_id,
         name=artifact.name,
-        parts=[TextPart(text=buffer)],
+        parts=[Part(text=buffer)],
     )
     await context.store(final_artifact)
 

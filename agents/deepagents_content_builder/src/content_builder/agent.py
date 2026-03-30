@@ -40,7 +40,9 @@ from content_builder.utils import load_subagents, create_chat_model, to_langchai
 from content_builder.tools import web_search
 
 DEFAULT_MODEL = "anthropic:claude-sonnet-4-5-20250929"
-AVAILABLE_SUBAGENTS = load_subagents(config_path=Path("./subagents.yaml"), tools={"web_search": web_search})
+AVAILABLE_SUBAGENTS = load_subagents(
+    config_path=Path(__file__).parent / "subagents.yaml", tools={"web_search": web_search}
+)
 LLM_BY_AGENT = {
     "default": LLMDemand(suggested=(DEFAULT_MODEL,), description="Default LLM for the root agent"),
     **{

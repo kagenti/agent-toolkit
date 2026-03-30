@@ -85,7 +85,6 @@ class FormData(BaseModel):
     capabilities=a2a.types.AgentCapabilities(
         streaming=True,
         push_notifications=False,
-        state_transition_history=False,
         extensions=[
             *form_extension_spec.to_agent_card_extensions(),
             *agent_detail_extension_spec.to_agent_card_extensions(),
