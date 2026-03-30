@@ -85,7 +85,6 @@ class FormData(BaseModel):
     capabilities=a2a.types.AgentCapabilities(
         streaming=True,
         push_notifications=False,
-        state_transition_history=False,
         extensions=[
             *form_extension_spec.to_agent_card_extensions(),
             *agent_detail_extension_spec.to_agent_card_extensions(),
@@ -115,7 +114,6 @@ async def agent(
 def serve():
     try:
         server.run(
-            host=os.getenv("HOST", "127.0.0.1"),
             port=int(os.getenv("PORT", 10001)),
             configure_telemetry=True,
             auth_backend=PlatformAuthBackend(),

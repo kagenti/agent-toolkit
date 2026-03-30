@@ -6,7 +6,7 @@ from __future__ import annotations
 import asyncio
 import functools
 import os
-import re
+import subprocess
 import urllib.parse
 from collections.abc import AsyncGenerator, Awaitable, Callable
 from configparser import RawConfigParser
@@ -43,6 +43,14 @@ from kagenti_adk.types import SdkAuthenticationBackend
 from kagenti_adk.util.logging import configure_logger as configure_logger_func
 from kagenti_adk.util.logging import logger
 
+if os.path.exists("/etc/adk"):
+    try:
+        _DEFAULT_HOST = subprocess.check_output(["hostname", "-I"], text=True).split()[0]
+    except Exception:
+        _DEFAULT_HOST = "127.0.0.1"
+else:
+    _DEFAULT_HOST = "127.0.0.1"
+
 
 class Server:
     def __init__(self) -> None:
@@ -78,7 +86,7 @@ class Server:
         push_config_store: PushNotificationConfigStore | None = None,
         push_sender: PushNotificationSender | None = None,
         request_context_builder: RequestContextBuilder | None = None,
-        host: str = "127.0.0.1",
+        host: str = _DEFAULT_HOST,
         port: int = 10000,
         url: str | None = None,
         uds: str | None = None,
@@ -299,8 +307,7 @@ class Server:
             logger.debug("Agent is not automatically registered in the production mode.")
             return
 
-        host = re.sub(r"localhost|127\.0\.0\.1", "host.docker.internal", self.server.config.host)
-        provider_location = f"http://{host}:{self.server.config.port}#{self._self_registration_id}"
+        provider_location = f"http://{self.server.config.host}:{self.server.config.port}#{self._self_registration_id}"
         logger.info("Attempting to register agent to the kagenti-adk platform")
         auto_register_fail_message = "Agent can not be automatically registered to kagenti-adk platform, try manual registration using `kagenti-adk add`."
         try:

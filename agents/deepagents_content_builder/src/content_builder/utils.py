@@ -65,8 +65,8 @@ def create_chat_model(llm_config: LLMFulfillment) -> ChatOpenAI:
 
 
 ROLE_TO_MESSAGE: dict[Role, type[HumanMessage] | type[AIMessage]] = {
-    Role.user: HumanMessage,
-    Role.agent: AIMessage,
+    Role.ROLE_USER: HumanMessage,
+    Role.ROLE_AGENT: AIMessage,
 }
 
 

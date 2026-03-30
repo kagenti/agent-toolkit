@@ -6,7 +6,7 @@
 import { ApiErrorType } from '../../../../api';
 import { isProductionMode } from '../config';
 import { getErrorMessage, setsEqual, withRetry } from '../utils';
-import { createAgentCardUrl, normalizeDockerHost } from './helpers';
+import { createAgentCardUrl } from './helpers';
 import type { AutoregistrationOptions } from './types';
 
 const VARIABLE_RELOAD_INTERVAL_MS = 5000;
@@ -70,7 +70,7 @@ export function createAutoregisterToAdk(options: AutoregistrationOptions): () =>
       return;
     }
 
-    const location = createAgentCardUrl(normalizeDockerHost(host), port, selfRegistrationId);
+    const location = createAgentCardUrl(host, port, selfRegistrationId);
 
     console.log('Registering agent to the Kagenti ADK platform', { location });
 
