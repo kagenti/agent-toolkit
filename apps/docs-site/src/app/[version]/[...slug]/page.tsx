@@ -23,7 +23,7 @@ import { mintlifyComponents } from "@/components/mintlify";
 
 export function generateStaticParams() {
   return getAllPages()
-    .filter(({ version }) => version === "stable")
+    .filter(({ version }) => version === "stable" || version === "development")
     .map(({ version, slug }) => ({
       version,
       slug,
@@ -89,11 +89,6 @@ export default async function DocPage({
     <div className="layout">
       <Sidebar version={version} currentSlug={slug.join("/")} />
       <main className="main-content">
-        <div className="callout callout-warning" style={{ marginBottom: "1.5rem" }}>
-          <div className="callout-content">
-            This documentation is under construction. Content may be incomplete or undergoing change.
-          </div>
-        </div>
         <h1 className="page-title">{page.title}</h1>
         {page.description && (
           <p className="page-description">{page.description}</p>
