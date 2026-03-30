@@ -26,7 +26,7 @@ depends = ["adk-py:setup"]
 dir = "{{config_root}}/apps/adk-py"
 
 ["adk-py:check:pyrefly"]
-run = "uv run pyrefly check src"
+run = "uv run pyrefly check --disable-project-excludes-heuristics src"
 sources = ["src/**/*.py"]
 outputs = { auto = true }
 dir = "{{config_root}}/apps/adk-py"

@@ -165,7 +165,7 @@ async def content_builder_agent(
 
 def serve():
     try:
-        server.run(host=os.getenv("HOST", "127.0.0.1"), port=int(os.getenv("PORT", 10003)), configure_telemetry=True)
+        server.run(port=int(os.getenv("PORT", 10003)), configure_telemetry=True)
     except KeyboardInterrupt:
         pass
 

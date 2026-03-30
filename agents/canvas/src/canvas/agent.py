@@ -143,7 +143,6 @@ Your task is to apply the user's instruction ONLY to the selected text and then 
 def serve():
     try:
         server.run(
-            host=os.getenv("HOST", "127.0.0.1"),
             port=int(os.getenv("PORT", 10002)),
             configure_telemetry=True,
             auth_backend=PlatformAuthBackend(),

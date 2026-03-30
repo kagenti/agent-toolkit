@@ -284,7 +284,6 @@ async def chat(
 def serve():
     try:
         server.run(
-            host=os.getenv("HOST", "127.0.0.1"),
             port=int(os.getenv("PORT", 8000)),
             configure_telemetry=True,
             context_store=PlatformContextStore(),
