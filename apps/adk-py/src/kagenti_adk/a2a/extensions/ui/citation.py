@@ -54,13 +54,13 @@ class CitationMetadata(pydantic.BaseModel):
     citations: list[Citation] = pydantic.Field(default_factory=list)
 
 
-class CitationExtensionSpec(NoParamsBaseExtensionSpec):
+class CitationExtensionSpec(NoParamsBaseExtensionSpec[NoneType]):
     URI: str = "https://a2a-extensions.adk.kagenti.dev/ui/citation/v1"
 
 
 class CitationExtensionServer(BaseExtensionServer[CitationExtensionSpec, NoneType]):
     def citation_metadata(self, *, citations: list[Citation]) -> Metadata:
-        return Metadata({self.spec.URI: CitationMetadata(citations=citations).model_dump(mode="json")})
+        return Metadata({self.spec.URI: [c.model_dump(mode="json") for c in citations]})
 
     def message(
         self,
@@ -76,4 +76,4 @@ class CitationExtensionServer(BaseExtensionServer[CitationExtensionSpec, NoneTyp
         )
 
 
-class CitationExtensionClient(BaseExtensionClient[CitationExtensionSpec, CitationMetadata]): ...
+class CitationExtensionClient(BaseExtensionClient[CitationExtensionSpec, list[Citation]]): ...

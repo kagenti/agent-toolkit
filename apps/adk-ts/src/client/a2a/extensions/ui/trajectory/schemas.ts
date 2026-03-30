@@ -5,8 +5,10 @@
 
 import z from 'zod';
 
-export const trajectoryMetadataSchema = z.object({
+export const trajectorySchema = z.object({
   title: z.string().nullish(),
   content: z.string().nullish(),
   group_id: z.string().nullish(),
 });
+
+export const trajectoryMetadataSchema = z.array(trajectorySchema);

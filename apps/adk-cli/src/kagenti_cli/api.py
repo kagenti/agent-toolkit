@@ -16,7 +16,8 @@ from typing import Any
 import httpx
 import openai
 import pydantic
-from a2a.client import A2AClientError, Client, ClientConfig, ClientFactory
+from a2a.client import A2AClientError, Client, ClientCallContext, ClientConfig, ClientFactory
+from a2a.extensions.common import HTTP_EXTENSION_HEADER
 from a2a.types import AgentCard
 from google.protobuf.json_format import MessageToDict
 from httpx import HTTPStatusError
@@ -131,6 +132,13 @@ async def fetch_server_version() -> str | None:
         return None
 
 
+def make_extension_context(extensions: list[str] | None = None) -> ClientCallContext | None:
+    """Create a ClientCallContext with extension URIs as service parameters."""
+    if not extensions:
+        return None
+    return ClientCallContext(service_parameters={HTTP_EXTENSION_HEADER: ",".join(extensions)})
+
+
 @asynccontextmanager
 async def a2a_client(agent_card: AgentCard, context_token: ContextToken) -> AsyncGenerator[Client]:
     try:
@@ -140,7 +148,7 @@ async def a2a_client(agent_card: AgentCard, context_token: ContextToken) -> Asyn
             timeout=timedelta(hours=1).total_seconds(),
         ) as httpx_client:
             yield ClientFactory(ClientConfig(httpx_client=httpx_client, use_client_preference=True)).create(
-                card=agent_card
+                card=agent_card,
             )
     except A2AClientError as ex:
         card_data = json.dumps(

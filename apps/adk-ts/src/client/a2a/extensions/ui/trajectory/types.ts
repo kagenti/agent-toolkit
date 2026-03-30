@@ -5,6 +5,8 @@
 
 import type z from 'zod';
 
-import type { trajectoryMetadataSchema } from './schemas';
+import type { trajectoryMetadataSchema, trajectorySchema } from './schemas';
+
+export type Trajectory = z.infer<typeof trajectorySchema>;
 
 export type TrajectoryMetadata = z.infer<typeof trajectoryMetadataSchema>;

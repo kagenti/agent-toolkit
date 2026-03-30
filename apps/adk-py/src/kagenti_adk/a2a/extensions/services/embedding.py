@@ -13,7 +13,12 @@ from a2a.server.agent_execution.context import RequestContext
 from a2a.types import Message as A2AMessage
 from typing_extensions import override
 
-from kagenti_adk.a2a.extensions.base import BaseExtensionClient, BaseExtensionServer, BaseExtensionSpec
+from kagenti_adk.a2a.extensions.base import (
+    DEFAULT_DEMAND_NAME,
+    BaseExtensionClient,
+    BaseExtensionServer,
+    BaseExtensionSpec,
+)
 from kagenti_adk.util.pydantic import REVEAL_SECRETS, SecureBaseModel, redact_str
 
 __all__ = [
@@ -88,23 +93,30 @@ class EmbeddingServiceExtensionParams(pydantic.BaseModel):
     """Model requests that the agent requires to be provided by the client."""
 
 
-class EmbeddingServiceExtensionSpec(BaseExtensionSpec[EmbeddingServiceExtensionParams]):
+class EmbeddingServiceExtensionMetadata(pydantic.BaseModel):
+    embedding_fulfillments: dict[str, EmbeddingFulfillment] = {}
+    """Provided models corresponding to the model requests."""
+
+
+class EmbeddingServiceExtensionSpec(
+    BaseExtensionSpec[EmbeddingServiceExtensionParams, EmbeddingServiceExtensionMetadata]
+):
     URI: str = "https://a2a-extensions.adk.kagenti.dev/services/embedding/v1"
 
     @classmethod
     def single_demand(
-        cls, name: str | None = None, description: str | None = None, suggested: tuple[str, ...] = ()
+        cls,
+        name: str = DEFAULT_DEMAND_NAME,
+        description: str | None = None,
+        suggested: tuple[str, ...] = (),
+        default: EmbeddingFulfillment | None = None,
     ) -> Self:
         return cls(
             params=EmbeddingServiceExtensionParams(
-                embedding_demands={name or "default": EmbeddingDemand(description=description, suggested=suggested)}
-            )
+                embedding_demands={name: EmbeddingDemand(description=description, suggested=suggested)}
+            ),
+            default=EmbeddingServiceExtensionMetadata(embedding_fulfillments={name: default}) if default else None,
         )
-
-
-class EmbeddingServiceExtensionMetadata(pydantic.BaseModel):
-    embedding_fulfillments: dict[str, EmbeddingFulfillment] = {}
-    """Provided models corresponding to the model requests."""
 
 
 class EmbeddingServiceExtensionServer(

@@ -23,13 +23,20 @@ interface CreateClientParams {
   endpointUrl: string;
   agentCard: AgentCard;
   fetchImpl: typeof fetch;
+  extensions?: string[];
 }
 
-export function createA2AClient({ endpointUrl, agentCard, fetchImpl }: CreateClientParams): A2AClient {
+export function createA2AClient({ endpointUrl, agentCard, fetchImpl, extensions }: CreateClientParams): A2AClient {
+  const headers = new Headers({ 'Content-Type': 'application/json' });
+
+  if (extensions?.length) {
+    headers.set('X-A2A-Extensions', extensions.join(','));
+  }
+
   async function jsonRpcRequest(method: string, params: Record<string, unknown>) {
     const response = await fetchImpl(endpointUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({
         jsonrpc: '2.0',
         id: uuid(),
@@ -59,7 +66,7 @@ export function createA2AClient({ endpointUrl, agentCard, fetchImpl }: CreateCli
     async *sendMessageStream(params) {
       const response = await fetchImpl(endpointUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           jsonrpc: '2.0',
           id: uuid(),

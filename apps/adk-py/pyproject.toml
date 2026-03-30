@@ -28,6 +28,8 @@ dependencies = [
     "typing-extensions>=4.15.0",
     "opentelemetry-instrumentation-httpx>=0.60b1",
     "opentelemetry-instrumentation-openai>=0.52.3",
+    "asgiref>=3.11.0",
+    "jsonpatch>=1.33",
 ]
 
 [dependency-groups]

@@ -52,6 +52,7 @@ dependencies = [
     "opentelemetry-instrumentation-openai>=0.52.1",
     "opentelemetry-instrumentation-sqlalchemy>=0.60b1",
     "aws-bedrock-token-generator>=1.1.0",
+    "jsonpatch>=1.33",
 ]
 
 [dependency-groups]

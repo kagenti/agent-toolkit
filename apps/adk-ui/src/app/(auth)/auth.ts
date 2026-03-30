@@ -120,9 +120,9 @@ export function getProvider(): ProviderWithId | null {
     const issuer = process.env.OIDC_PROVIDER_ISSUER;
     const externalIssuer = process.env.OIDC_PROVIDER_EXTERNAL_ISSUER;
 
-    if (!name || !id || !clientId || !clientSecret || !issuer) {
+    if (!name || !id || !clientId || !issuer) {
       throw new Error(
-        'Missing OIDC provider configuration. Set OIDC_PROVIDER_NAME, OIDC_PROVIDER_ID, OIDC_PROVIDER_CLIENT_ID, OIDC_PROVIDER_CLIENT_SECRET, and OIDC_PROVIDER_ISSUER.',
+        'Missing OIDC provider configuration. Set OIDC_PROVIDER_NAME, OIDC_PROVIDER_ID, OIDC_PROVIDER_CLIENT_ID, and OIDC_PROVIDER_ISSUER.',
       );
     }
 

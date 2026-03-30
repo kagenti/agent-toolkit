@@ -20,13 +20,15 @@ import {
 } from './utils';
 
 export function processMessageMetadata(message: Message): UIMessagePart[] {
-  const trajectory = extractTrajectory(message.metadata);
-  const citations = extractCitation(message.metadata)?.citations;
+  const trajectories = extractTrajectory(message.metadata);
+  const citations = extractCitation(message.metadata);
 
   const parts: UIMessagePart[] = [];
 
-  if (trajectory) {
-    parts.push(createTrajectoryPart(trajectory));
+  if (trajectories) {
+    const trajectoryParts = trajectories.map((trajectory) => createTrajectoryPart(trajectory));
+
+    parts.push(...trajectoryParts);
   }
   if (citations) {
     const sourceParts = citations.map((citation) => createSourcePart(citation, message.taskId)).filter(isNotNull);
@@ -38,7 +40,7 @@ export function processMessageMetadata(message: Message): UIMessagePart[] {
 }
 
 export function processArtifactMetadata(artifact: Artifact, taskId: string): UISourcePart[] {
-  const citations = extractCitation(artifact.metadata)?.citations;
+  const citations = extractCitation(artifact.metadata);
 
   if (!citations) {
     return [];

@@ -42,8 +42,11 @@ def test_agent_detail_population():
     # Check tools populated from skills
     assert "tools" in params
     tools = params["tools"]
+    # pyrefly: ignore [bad-argument-type]
     assert len(tools) == 1
+    # pyrefly: ignore [unsupported-operation, bad-index]
     assert tools[0]["name"] == "test_skill"
+    # pyrefly: ignore [unsupported-operation, bad-index]
     assert tools[0]["description"] == "A test skill"
 
     # Check user_greeting populated from description
@@ -88,7 +91,9 @@ def test_agent_detail_population_override():
     # Tools should still be populated because custom_detail.tools was None
     assert "tools" in params
     tools = params["tools"]
+    # pyrefly: ignore [bad-argument-type]
     assert len(tools) == 1
+    # pyrefly: ignore [unsupported-operation, bad-index]
     assert tools[0]["name"] == "test_skill"
 
     # Greeting should be custom

@@ -27,7 +27,7 @@ import { useMessages } from '#modules/messages/contexts/Messages/index.ts';
 import { MessagesProvider } from '#modules/messages/contexts/Messages/MessagesProvider.tsx';
 import type { UIAgentMessage, UIMessageForm, UIUserMessage } from '#modules/messages/types.ts';
 import { UIMessagePartKind, UIMessageStatus } from '#modules/messages/types.ts';
-import { addMessagePart, isAgentMessage } from '#modules/messages/utils.ts';
+import { addMessageParts, isAgentMessage } from '#modules/messages/utils.ts';
 import { contextKeys } from '#modules/platform-context/api/keys.ts';
 import { usePlatformContext } from '#modules/platform-context/contexts/index.ts';
 import { useEnsurePlatformContext } from '#modules/platform-context/hooks/useEnsurePlatformContext.ts';
@@ -212,20 +212,21 @@ function AgentRunProvider({ agent, children }: PropsWithChildren<Props>) {
         pendingRun.current = run;
 
         let isFirstIteration = true;
-        pendingSubscription.current = run.subscribe(({ parts, taskId: responseTaskId }) => {
+        pendingSubscription.current = run.subscribe(({ parts, taskId: responseTaskId, replace }) => {
           if (isFirstIteration) {
             queryClient.invalidateQueries({ queryKey: contextKeys.lists() });
           }
 
           updateCurrentAgentMessage((message) => {
             message.taskId = responseTaskId;
-          });
 
-          parts.forEach((part) => {
-            updateCurrentAgentMessage((message) => {
-              const updatedParts = addMessagePart(part, message);
-              message.parts = updatedParts;
-            });
+            if (replace) {
+              const nonTextParts = message.parts.filter(({ kind }) => kind !== UIMessagePartKind.Text);
+
+              message.parts = [...parts, ...nonTextParts];
+            } else {
+              message.parts = addMessageParts(parts, message);
+            }
           });
 
           isFirstIteration = false;

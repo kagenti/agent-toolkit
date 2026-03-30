@@ -17,7 +17,7 @@ from a2a.types import Message
 from typing_extensions import Doc
 
 from kagenti_adk.a2a.extensions.base import BaseExtensionServer, BaseExtensionSpec
-from kagenti_adk.server.context import RunContext
+from kagenti_adk.server.context import RunContext, RunContextSettings
 
 Dependency: TypeAlias = Callable[[Message, RunContext, RequestContext], Any] | BaseExtensionServer[Any, Any]
 
@@ -58,9 +58,36 @@ class Depends:
         return lifespan()
 
 
+def _get_param_type_hints(fn: Callable[..., Any]) -> dict[str, Any]:
+    """Get type hints for function parameters only, skipping the return annotation.
+
+    typing.get_type_hints() evaluates all annotations including return type,
+    which can fail when annotations use `X | Y` with types that don't support
+    the `|` operator at runtime (e.g. protobuf classes, factory functions).
+    """
+    try:
+        return typing.get_type_hints(fn, include_extras=True)
+    except TypeError:
+        # Evaluate parameter annotations individually, skipping any that fail
+        globalns = getattr(fn, "__globals__", {})
+        hints: dict[str, Any] = {}
+        for name, param in inspect.signature(fn).parameters.items():
+            ann = param.annotation
+            if ann is inspect.Parameter.empty:
+                continue
+            if isinstance(ann, str):
+                try:
+                    hints[name] = eval(ann, globalns)
+                except Exception:
+                    hints[name] = ann
+            else:
+                hints[name] = ann
+        return hints
+
+
 def extract_dependencies(fn: Callable[..., Any]) -> dict[str, Depends]:
     sign = inspect.signature(fn)
-    type_hints = typing.get_type_hints(fn, include_extras=True)
+    type_hints = _get_param_type_hints(fn)
     dependencies = {}
     seen_keys = set()
 
@@ -70,6 +97,11 @@ def extract_dependencies(fn: Callable[..., Any]) -> dict[str, Depends]:
             # extension_param: Annotated[some_type, Depends(some_callable)]
             if isinstance(spec, Depends):
                 dependencies[name] = spec
+            # extension_param: Annotated[RunContext, RunContextSettings()]
+            if isinstance(dep_type, RunContext) and isinstance(spec, RunContextSettings):
+                dependencies[name] = Depends(
+                    lambda _message, run_context, _request_context: run_context.model_copy(update=spec.model_dump())
+                )
             # extension_param: Annotated[BaseExtensionServer, BaseExtensionSpec()]
             elif (
                 isclass(dep_type) and issubclass(dep_type, BaseExtensionServer) and isinstance(spec, BaseExtensionSpec)
@@ -114,7 +146,7 @@ def extract_dependencies(fn: Callable[..., Any]) -> dict[str, Depends]:
     if reserved_names := {param for param in dependencies if param.startswith("__")}:
         raise TypeError(f"User-defined dependencies cannot start with double underscore: {reserved_names}")
 
-    extension_deps = Counter(dep.extension.spec.URI for dep in dependencies.values() if dep.extension)
+    extension_deps = Counter(dep.extension.spec.URI for dep in dependencies.values() if dep.extension is not None)
     if duplicate_uris := {k for k, v in extension_deps.items() if v > 1}:
         raise TypeError(f"Duplicate extension URIs found in the agent function: {duplicate_uris}")
 

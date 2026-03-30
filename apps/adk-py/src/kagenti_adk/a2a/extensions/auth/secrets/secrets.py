@@ -13,7 +13,12 @@ from google.protobuf.json_format import MessageToDict
 from opentelemetry import trace
 from typing_extensions import override
 
-from kagenti_adk.a2a.extensions.base import BaseExtensionClient, BaseExtensionServer, BaseExtensionSpec
+from kagenti_adk.a2a.extensions.base import (
+    DEFAULT_DEMAND_NAME,
+    BaseExtensionClient,
+    BaseExtensionServer,
+    BaseExtensionSpec,
+)
 from kagenti_adk.a2a.types import AgentMessage, AuthRequired
 from kagenti_adk.util.pydantic import REDACT_SECRETS, REVEAL_SECRETS, SecureBaseModel
 from kagenti_adk.util.telemetry import flatten_dict
@@ -64,15 +69,22 @@ class SecretsServiceExtensionMetadata(pydantic.BaseModel):
     secret_fulfillments: dict[str, SecretFulfillment] = {}
 
 
-class SecretsExtensionSpec(BaseExtensionSpec[SecretsServiceExtensionParams | None]):
+class SecretsExtensionSpec(BaseExtensionSpec[SecretsServiceExtensionParams | None, SecretsServiceExtensionMetadata]):
     URI: str = "https://a2a-extensions.adk.kagenti.dev/auth/secrets/v1"
 
     @classmethod
-    def single_demand(cls, name: str, key: str | None = None, description: str | None = None) -> Self:
+    def single_demand(
+        cls,
+        name: str,
+        key: str = DEFAULT_DEMAND_NAME,
+        description: str | None = None,
+        default: SecretFulfillment | None = None,
+    ) -> Self:
         return cls(
             params=SecretsServiceExtensionParams(
-                secret_demands={key or "default": SecretDemand(description=description, name=name)}
-            )
+                secret_demands={key: SecretDemand(description=description, name=name)}
+            ),
+            default=SecretsServiceExtensionMetadata(secret_fulfillments={key: default}) if default else None,
         )
 
 

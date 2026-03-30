@@ -36,6 +36,7 @@ from google.protobuf import message as _message
 from typing_extensions import override
 
 from kagenti_adk.a2a.extensions import BaseExtensionServer
+from kagenti_adk.a2a.extensions.streaming import StreamingExtensionServer
 from kagenti_adk.a2a.extensions.ui.agent_detail import (
     AgentDetail,
     AgentDetailExtensionSpec,
@@ -45,12 +46,14 @@ from kagenti_adk.a2a.extensions.ui.error import (
     get_error_extension_context,
 )
 from kagenti_adk.a2a.types import Metadata, RunYield, RunYieldResume, validate_message
+from kagenti_adk.server.accumulator import MessageAccumulator
 from kagenti_adk.server.constants import _DEFAULT_AGENT_INTERFACE, _DEFAULT_AGENT_SKILL, DEFAULT_IMPLICIT_EXTENSIONS
 from kagenti_adk.server.context import RunContext
 from kagenti_adk.server.dependencies import Dependency, Depends, extract_dependencies
+from kagenti_adk.server.exceptions import InvalidYieldError
 from kagenti_adk.server.store.context_store import ContextStore
-from kagenti_adk.server.utils import cancel_task
-from kagenti_adk.types import A2ASecurity
+from kagenti_adk.server.utils import cancel_task, merge_messages
+from kagenti_adk.types import A2ASecurity, JsonPatch
 from kagenti_adk.util.logging import logger
 
 AgentFunction: TypeAlias = Callable[[], AsyncGenerator[RunYield, RunYieldResume]]
@@ -285,15 +288,17 @@ def agent(
         if inspect.isasyncgenfunction(fn):
 
             async def execute_fn(_ctx: RunContext, *args, **kwargs) -> None:
+                gen: AsyncGenerator[RunYield, RunYieldResume] = fn(*args, **kwargs)
                 try:
-                    gen: AsyncGenerator[RunYield, RunYieldResume] = fn(*args, **kwargs)
                     value: RunYieldResume = None
                     while True:
-                        value = await _ctx.yield_async(await gen.asend(value))
+                        result = await gen.asend(value)
+                        try:
+                            value = await _ctx.yield_async(result)
+                        except Exception as e:
+                            value = await _ctx.yield_async(await gen.athrow(e))
                 except StopAsyncIteration:
                     pass
-                except Exception as e:
-                    await _ctx.yield_async(e)
                 finally:
                     _ctx.shutdown()
 
@@ -301,24 +306,26 @@ def agent(
 
             async def execute_fn(_ctx: RunContext, *args, **kwargs) -> None:
                 try:
-                    await _ctx.yield_async(await fn(*args, **kwargs))
-                except Exception as e:
-                    await _ctx.yield_async(e)
+                    result = await fn(*args, **kwargs)
+                    if result is not None:
+                        await _ctx.yield_async(result)
                 finally:
                     _ctx.shutdown()
 
         elif inspect.isgeneratorfunction(fn):
 
             def _execute_fn_sync(_ctx: RunContext, *args, **kwargs) -> None:
+                gen: Generator[RunYield, RunYieldResume] = fn(*args, **kwargs)
                 try:
-                    gen: Generator[RunYield, RunYieldResume] = fn(*args, **kwargs)
-                    value = None
+                    value: RunYieldResume = None
                     while True:
-                        value = _ctx.yield_sync(gen.send(value))
+                        result = gen.send(value)
+                        try:
+                            value = _ctx.yield_sync(result)
+                        except Exception as e:
+                            value = _ctx.yield_sync(gen.throw(e))
                 except StopIteration:
                     pass
-                except Exception as e:
-                    _ctx.yield_sync(e)
                 finally:
                     _ctx.shutdown()
 
@@ -329,9 +336,9 @@ def agent(
 
             def _execute_fn_sync(_ctx: RunContext, *args, **kwargs) -> None:
                 try:
-                    _ctx.yield_sync(fn(*args, **kwargs))
-                except Exception as e:
-                    _ctx.yield_sync(e)
+                    result = fn(*args, **kwargs)
+                    if result is not None:
+                        _ctx.yield_sync(result)
                 finally:
                     _ctx.shutdown()
 
@@ -362,6 +369,7 @@ class AgentRun:
         self._on_finish: Callable[[], None] | None = on_finish
         self._working: bool = False
         self._dependency_container: ActiveDependenciesContainer | None = None
+        self._accumulator: MessageAccumulator = MessageAccumulator()
 
     @property
     def run_context(self) -> RunContext:
@@ -440,16 +448,123 @@ class AgentRun:
             finally:
                 await cancel_task(self._task)
 
-    def _with_context(self, message: Message | None = None) -> Message | None:
-        if message:
-            message.context_id = self.task_updater.context_id
-            message.task_id = self.task_updater.task_id
-        return message
+    def _prepare_message(self, message: Message | None = None, msg_draft: Message | None = None) -> Message | None:
+        for msg in (message, msg_draft):
+            if msg:
+                msg.context_id = self.task_updater.context_id
+                msg.task_id = self.task_updater.task_id
+        msgs = [m for m in (msg_draft, message) if m]
+        return merge_messages(*msgs) if msgs else None
 
-    async def _run_agent_function(self, initial_message: Message) -> None:
+    async def _send_partial_update(self, patches: JsonPatch, message_id: str | None = None):
+        if not (ext := StreamingExtensionServer.current()):
+            return
+        await self.task_updater.update_status(
+            state=TaskState.TASK_STATE_WORKING, metadata=ext.to_metadata(patches, message_id=message_id)
+        )
+
+    async def _handle_message_yield(self, yielded_value: RunYield) -> RunYieldResume:
+        result = self._accumulator.process(yielded_value)
+        if result.accumulated:
+            if result.patch:
+                await self._send_partial_update(result.patch, message_id=result.message_id)
+            return None
+        return await self._dispatch_control_yield(yielded_value, result.draft)
+
+    async def _dispatch_control_yield(self, yielded_value: RunYield, draft: Message | None = None) -> RunYieldResume:
+        match yielded_value:
+            case Message() as message:
+                await self.task_updater.update_status(
+                    TaskState.TASK_STATE_WORKING,
+                    message=self._prepare_message(message, draft),
+                )
+            case TaskStatus(
+                state=(TaskState.TASK_STATE_AUTH_REQUIRED | TaskState.TASK_STATE_INPUT_REQUIRED) as state,
+                message=message,
+            ):
+                await self.task_updater.update_status(
+                    state=state,
+                    message=self._prepare_message(message, draft),
+                )
+                self._working = False
+                resume_value = await self.resume_queue.get()
+                self.resume_queue.task_done()
+                return resume_value
+            case TaskStatus(state=state, message=message):
+                await self.task_updater.update_status(
+                    state=state,
+                    message=self._prepare_message(message, draft),
+                )
+            case TaskStatusUpdateEvent(
+                status=TaskStatus(state=state, message=message),
+                metadata=metadata,
+            ):
+                await self.task_updater.update_status(
+                    state=state,
+                    message=self._prepare_message(message, draft),
+                    metadata=dict(metadata),
+                )
+
+    async def _agent_loop(self, task: asyncio.Task):
         yield_queue = self.run_context._yield_queue
         yield_resume_queue = self.run_context._yield_resume_queue
 
+        resume_value: RunYieldResume | Exception = None
+        opened_artifacts: set[str] = set()
+
+        while not task.done() or yield_queue.async_q.qsize() > 0:
+            yielded_value = await yield_queue.async_q.get()
+            resume_value = None
+            self.last_invocation = datetime.now()
+
+            if isinstance(yielded_value, _message.Message):
+                validate_message(yielded_value)
+
+            try:
+                match yielded_value:
+                    case Artifact(parts=parts, artifact_id=artifact_id, name=name, metadata=metadata):
+                        last_chunk = True
+                        if "_last_chunk" in metadata:
+                            last_chunk = bool(metadata["_last_chunk"])
+                            del metadata["_last_chunk"]
+                        append = artifact_id in opened_artifacts
+                        if not last_chunk:
+                            opened_artifacts.add(artifact_id)
+                        elif artifact_id in opened_artifacts:
+                            opened_artifacts.remove(artifact_id)
+
+                        await self.task_updater.add_artifact(
+                            parts=list(parts),
+                            artifact_id=artifact_id,
+                            name=name,
+                            metadata=dict(metadata),
+                            last_chunk=last_chunk,
+                            append=append,
+                        )
+
+                    case TaskArtifactUpdateEvent(
+                        artifact=Artifact(artifact_id=artifact_id, name=name, metadata=metadata, parts=parts),
+                        append=append,
+                        last_chunk=last_chunk,
+                    ):
+                        await self.task_updater.add_artifact(
+                            parts=list(parts),
+                            artifact_id=artifact_id,
+                            name=name,
+                            metadata=dict(metadata),
+                            append=append,
+                            last_chunk=last_chunk,
+                        )
+                    case Part() | dict() | Metadata() | str() | TaskStatus() | TaskStatusUpdateEvent() | Message():
+                        resume_value = await self._handle_message_yield(yielded_value)
+                    case _:
+                        raise InvalidYieldError(yielded_value)
+            except Exception as e:
+                resume_value = e
+            await yield_resume_queue.async_q.put(resume_value)
+
+    async def _run_agent_function(self, initial_message: Message) -> None:
+        task: asyncio.Task | None = None
         try:
             async with self._agent.dependency_container(
                 initial_message, self.run_context, self.request_context
@@ -459,118 +574,22 @@ class AgentRun:
                     self._agent.execute_fn(self.run_context, **dependency_container.user_dependency_args)
                 )
                 try:
-                    resume_value: RunYieldResume = None
-                    opened_artifacts: set[str] = set()
-                    while not task.done() or yield_queue.async_q.qsize() > 0:
-                        yielded_value = await yield_queue.async_q.get()
-
-                        if isinstance(yielded_value, _message.Message):
-                            validate_message(yielded_value)
-
-                        self.last_invocation = datetime.now()
-
-                        match yielded_value:
-                            case str(text):
-                                await self.task_updater.update_status(
-                                    TaskState.TASK_STATE_WORKING,
-                                    message=self.task_updater.new_agent_message(parts=[Part(text=text)]),
-                                )
-                            case Part() as part:
-                                await self.task_updater.update_status(
-                                    TaskState.TASK_STATE_WORKING,
-                                    message=self.task_updater.new_agent_message(parts=[part]),
-                                )
-                            case Message() as message:
-                                await self.task_updater.update_status(
-                                    TaskState.TASK_STATE_WORKING, message=self._with_context(message)
-                                )
-                            case Artifact(parts=parts, artifact_id=artifact_id, name=name, metadata=metadata):
-                                last_chunk = True
-                                if "_last_chunk" in metadata:
-                                    last_chunk = bool(metadata["_last_chunk"])
-                                    del metadata["_last_chunk"]
-                                append = artifact_id in opened_artifacts
-                                if not last_chunk:
-                                    opened_artifacts.add(artifact_id)
-                                elif artifact_id in opened_artifacts:
-                                    opened_artifacts.remove(artifact_id)
-
-                                await self.task_updater.add_artifact(
-                                    parts=list(parts),
-                                    artifact_id=artifact_id,
-                                    name=name,
-                                    metadata=dict(metadata),
-                                    last_chunk=last_chunk,
-                                    append=append,
-                                )
-                            case TaskStatus(
-                                state=(
-                                    TaskState.TASK_STATE_AUTH_REQUIRED | TaskState.TASK_STATE_INPUT_REQUIRED
-                                ) as state,
-                                message=message,
-                            ):
-                                await self.task_updater.update_status(state=state, message=self._with_context(message))
-                                self._working = False
-                                resume_value = await self.resume_queue.get()
-                                self.resume_queue.task_done()
-                            case TaskStatus(state=state, message=message):
-                                await self.task_updater.update_status(state=state, message=self._with_context(message))
-                            case TaskStatusUpdateEvent(
-                                status=TaskStatus(state=state, message=message),
-                                metadata=metadata,
-                            ):
-                                await self.task_updater.update_status(
-                                    state=state, message=self._with_context(message), metadata=dict(metadata)
-                                )
-                            case TaskArtifactUpdateEvent(
-                                artifact=Artifact(artifact_id=artifact_id, name=name, metadata=metadata, parts=parts),
-                                append=append,
-                                last_chunk=last_chunk,
-                            ):
-                                await self.task_updater.add_artifact(
-                                    parts=list(parts),
-                                    artifact_id=artifact_id,
-                                    name=name,
-                                    metadata=dict(metadata),
-                                    append=append,
-                                    last_chunk=last_chunk,
-                                )
-                            case Metadata() as metadata:
-                                await self.task_updater.update_status(
-                                    state=TaskState.TASK_STATE_WORKING,
-                                    message=self.task_updater.new_agent_message(parts=[], metadata=metadata),
-                                )
-                            case dict() as data:
-                                from google.protobuf.struct_pb2 import Struct, Value
-
-                                s = Struct()
-                                s.update(data)
-                                await self.task_updater.update_status(
-                                    state=TaskState.TASK_STATE_WORKING,
-                                    message=self.task_updater.new_agent_message(
-                                        parts=[Part(data=Value(struct_value=s))]
-                                    ),
-                                )
-                            case Exception() as ex:
-                                raise ex
-                            case _:
-                                raise ValueError(f"Invalid value yielded from agent: {type(yielded_value)}")
-
-                        await yield_resume_queue.async_q.put(resume_value)
-
-                    await self.task_updater.complete()
-
-                except (janus.AsyncQueueShutDown, GeneratorExit):
-                    await self.task_updater.complete()
+                    with suppress(janus.AsyncQueueShutDown, GeneratorExit):
+                        await self._agent_loop(task)
+                    await task
+                    final_message = self._accumulator.flush()
+                    await self.task_updater.complete(message=self._prepare_message(final_message))
                 except Exception as ex:
                     logger.error("Error when executing agent", exc_info=ex)
                     await self.task_updater.failed(get_error_extension_context().server.message(ex))
-                    await cancel_task(task)
         except Exception as ex:
             logger.error("Error when executing agent", exc_info=ex)
             await self.task_updater.failed(get_error_extension_context().server.message(ex))
         finally:
             self._working = False
+            if task:
+                with suppress(Exception):
+                    await cancel_task(task)
             with suppress(Exception):
                 self._handle_finish()
 

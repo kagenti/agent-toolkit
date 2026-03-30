@@ -57,7 +57,7 @@ class CanvasEditRequest(pydantic.BaseModel, arbitrary_types_allowed=True):
         return v
 
 
-class CanvasExtensionSpec(NoParamsBaseExtensionSpec):
+class CanvasExtensionSpec(NoParamsBaseExtensionSpec[CanvasEditRequestMetadata]):
     URI: str = "https://a2a-extensions.adk.kagenti.dev/ui/canvas/v1"
 
 

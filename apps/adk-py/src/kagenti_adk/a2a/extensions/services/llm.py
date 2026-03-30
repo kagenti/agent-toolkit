@@ -14,7 +14,12 @@ from a2a.server.agent_execution.context import RequestContext
 from a2a.types import Message as A2AMessage
 from typing_extensions import override
 
-from kagenti_adk.a2a.extensions.base import BaseExtensionClient, BaseExtensionServer, BaseExtensionSpec
+from kagenti_adk.a2a.extensions.base import (
+    DEFAULT_DEMAND_NAME,
+    BaseExtensionClient,
+    BaseExtensionServer,
+    BaseExtensionSpec,
+)
 from kagenti_adk.util.pydantic import REVEAL_SECRETS, SecureBaseModel, redact_str
 
 __all__ = [
@@ -89,23 +94,28 @@ class LLMServiceExtensionParams(pydantic.BaseModel):
     """Model requests that the agent requires to be provided by the client."""
 
 
-class LLMServiceExtensionSpec(BaseExtensionSpec[LLMServiceExtensionParams]):
+class LLMServiceExtensionMetadata(pydantic.BaseModel):
+    llm_fulfillments: dict[str, LLMFulfillment] = {}
+    """Provided models corresponding to the model requests."""
+
+
+class LLMServiceExtensionSpec(BaseExtensionSpec[LLMServiceExtensionParams, LLMServiceExtensionMetadata]):
     URI: str = "https://a2a-extensions.adk.kagenti.dev/services/llm/v1"
 
     @classmethod
     def single_demand(
-        cls, name: str | None = None, description: str | None = None, suggested: tuple[str, ...] = ()
+        cls,
+        name: str = DEFAULT_DEMAND_NAME,
+        description: str | None = None,
+        suggested: tuple[str, ...] = (),
+        default: LLMFulfillment | None = None,
     ) -> Self:
         return cls(
             params=LLMServiceExtensionParams(
-                llm_demands={name or "default": LLMDemand(description=description, suggested=suggested)}
-            )
+                llm_demands={name: LLMDemand(description=description, suggested=suggested)}
+            ),
+            default=LLMServiceExtensionMetadata(llm_fulfillments={name: default}) if default else None,
         )
-
-
-class LLMServiceExtensionMetadata(pydantic.BaseModel):
-    llm_fulfillments: dict[str, LLMFulfillment] = {}
-    """Provided models corresponding to the model requests."""
 
 
 class LLMServiceExtensionServer(BaseExtensionServer[LLMServiceExtensionSpec, LLMServiceExtensionMetadata]):
