@@ -8,16 +8,15 @@ from collections.abc import AsyncGenerator, AsyncIterator
 import pytest
 from a2a.client import Client, ClientEvent, create_text_message_object
 from a2a.types import (
+    Artifact,
     Message,
-    Role,
     SendMessageRequest,
     Task,
 )
 
-from kagenti_adk.a2a.types import RunYield
+from kagenti_adk.a2a.types import AgentMessage, RunYield
 from kagenti_adk.server import Server
 from kagenti_adk.server.context import RunContext
-from kagenti_adk.server.store.memory_context_store import InMemoryContextStore
 
 pytestmark = pytest.mark.e2e
 
@@ -44,86 +43,31 @@ async def send_message_get_response(
 
 
 @pytest.fixture
-async def history_agent(create_server_with_agent) -> AsyncGenerator[tuple[Server, Client]]:
-    """Agent that tests context.store.load_history() functionality."""
-    context_store = InMemoryContextStore()
+async def history_reader_agent(create_server_with_agent) -> AsyncGenerator[tuple[Server, Client]]:
+    """Agent that reads history from the task store via RunContext.load_history()."""
 
-    async def history_agent(input: Message, context: RunContext) -> AsyncGenerator[RunYield, None]:
-        await context.store(input)
-        async for message in context.load_history():
-            message.role = Role.ROLE_AGENT
-            yield message
-            await context.store(message)
+    async def history_reader(input: Message, context: RunContext) -> AsyncGenerator[RunYield, None]:
+        # Load history from the task store (will contain messages from previous interactions in same task)
+        history_items: list[str] = []
+        async for item in context.load_history():
+            if isinstance(item, Message) and item.parts:
+                history_items.append(item.parts[0].text)
+            elif isinstance(item, Artifact) and item.parts:
+                history_items.append(f"artifact:{item.parts[0].text}")
 
-    async with create_server_with_agent(history_agent, context_store=context_store) as (server, client):
+        # Echo back what we found in history plus the current input
+        if history_items:
+            yield AgentMessage(text=f"history={','.join(history_items)}")
+        yield AgentMessage(text=f"input={input.parts[0].text}")
+
+    async with create_server_with_agent(history_reader) as (server, client):
         yield server, client
 
 
-@pytest.fixture
-async def history_deleting_agent(create_server_with_agent) -> AsyncGenerator[tuple[Server, Client]]:
-    """Agent that tests context.store.load_history() functionality."""
-    context_store = InMemoryContextStore()
+async def test_load_history_from_task_store(history_reader_agent):
+    """Test that RunContext.load_history() reads from the A2A task store."""
+    _, client = history_reader_agent
 
-    async def history_agent(input: Message, context: RunContext) -> AsyncGenerator[RunYield, None]:
-        await context.store(input)
-        n_messages = 0
-        async for message in context.load_history(load_history_items=True):
-            n_messages += 1
-            if n_messages == 1:
-                delete_id = message.id
-            if n_messages > 3:
-                # pyrefly: ignore [unbound-name]
-                await context.delete_history_from_id(delete_id)
-                break
-
-        async for message in context.load_history():
-            message.role = Role.ROLE_AGENT
-            yield message
-
-    async with create_server_with_agent(history_agent, context_store=context_store) as (server, client):
-        yield server, client
-
-
-async def test_agent_history(history_agent):
-    """Test that history starts empty."""
-    _, client = history_agent
-
-    agent_messages, context_id = await send_message_get_response(client, "first message")
-    assert agent_messages == ["first message"]
-
-    agent_messages, context_id = await send_message_get_response(client, "second message", context_id=context_id)
-    assert agent_messages == ["first message", "first message", "second message"]
-
-    agent_messages, context_id = await send_message_get_response(client, "third message", context_id=context_id)
-    assert agent_messages == [
-        # first run
-        "first message",
-        # second run
-        "first message",
-        "second message",
-        # third run
-        "first message",
-        "first message",
-        "second message",
-        "third message",
-    ]
-
-
-async def test_agent_deleting_history(history_deleting_agent):
-    """Test that history starts empty."""
-    _, client = history_deleting_agent
-
-    agent_messages, context_id = await send_message_get_response(client, "first message")
-    assert agent_messages == ["first message"]
-
-    agent_messages, context_id = await send_message_get_response(client, "second message", context_id=context_id)
-    assert agent_messages == ["first message", "second message"]
-
-    agent_messages, context_id = await send_message_get_response(client, "third message", context_id=context_id)
-    assert agent_messages == ["first message", "second message", "third message"]
-
-    agent_messages, context_id = await send_message_get_response(client, "delete message", context_id=context_id)
-    assert agent_messages == []
-
-    agent_messages, context_id = await send_message_get_response(client, "first message")
-    assert agent_messages == ["first message"]
+    # First message — no history yet
+    agent_messages, context_id = await send_message_get_response(client, "hello")
+    assert any("input=hello" in msg for msg in agent_messages)

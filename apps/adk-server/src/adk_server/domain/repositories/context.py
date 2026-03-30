@@ -9,7 +9,7 @@ from typing import Protocol
 from uuid import UUID
 
 from adk_server.domain.models.common import PaginatedResult
-from adk_server.domain.models.context import Context, ContextHistoryItem, TitleGenerationState
+from adk_server.domain.models.context import Context
 
 
 class IContextRepository(Protocol):
@@ -33,17 +33,3 @@ class IContextRepository(Protocol):
     async def update(self, *, context: Context) -> None: ...
     async def delete(self, *, context_id: UUID, user_id: UUID | None = None) -> int: ...
     async def update_last_active(self, *, context_id: UUID) -> None: ...
-    async def update_title(
-        self, *, context_id: UUID, title: str | None = None, generation_state: TitleGenerationState
-    ) -> None: ...
-    async def add_history_item(self, *, context_id: UUID, history_item: ContextHistoryItem) -> None: ...
-    async def list_history(
-        self,
-        *,
-        context_id: UUID,
-        page_token: UUID | None = None,
-        limit: int = 20,
-        order_by: str = "created_at",
-        order="desc",
-    ) -> PaginatedResult[ContextHistoryItem]: ...
-    async def delete_history_from_id(self, *, context_id: UUID, from_id: UUID) -> int: ...

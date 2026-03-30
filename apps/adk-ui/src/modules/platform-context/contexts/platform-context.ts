@@ -3,21 +3,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { Context, CreateContextRequest, ListContextHistoryResponse } from '@kagenti/adk';
 import type { UseMutateAsyncFunction } from '@tanstack/react-query';
+import type { Context, CreateContextRequest, Task } from '@kagenti/adk';
 import { createContext } from 'react';
 
 import type { Agent } from '#modules/agents/api/types.ts';
 import type { ContextId } from '#modules/tasks/api/types.ts';
 
-export type ContextToken = {
-  token: string;
-  expires_at: string | null;
-};
-
 interface PlatformContextValue {
   contextId: ContextId | null;
-  history?: ListContextHistoryResponse;
+  initialTasks?: Task[];
 
   getContextId: () => ContextId;
   resetContext: () => void;

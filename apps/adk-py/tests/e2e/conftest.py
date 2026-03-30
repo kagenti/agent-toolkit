@@ -6,7 +6,7 @@ from __future__ import annotations
 import asyncio
 import base64
 import socket
-from collections.abc import AsyncGenerator
+from collections.abc import AsyncGenerator, AsyncIterator
 from contextlib import asynccontextmanager, closing
 from datetime import timedelta
 
@@ -30,7 +30,6 @@ from kagenti_adk.a2a.extensions.ui.agent_detail import AgentDetail
 from kagenti_adk.a2a.types import AgentArtifact, AgentMessage, ArtifactChunk, InputRequired, RunYield, RunYieldResume
 from kagenti_adk.server import Server
 from kagenti_adk.server.context import RunContext
-from kagenti_adk.server.store.context_store import ContextStore
 
 pytestmark = pytest.mark.e2e
 
@@ -52,7 +51,6 @@ def make_extension_context(extensions: list[str] | None = None) -> ClientCallCon
 async def run_server(
     server: Server,
     port: int,
-    context_store: ContextStore | None = None,
     task_timeout: timedelta | None = None,
 ) -> AsyncGenerator[tuple[Server, Client]]:
     async with asyncio.TaskGroup() as tg:
@@ -61,7 +59,6 @@ async def run_server(
                 server.run,
                 self_registration=False,
                 port=port,
-                context_store=context_store,
                 task_timeout=task_timeout or timedelta(minutes=5),
             )
         )
@@ -91,14 +88,14 @@ def create_server_with_agent():
 
     @asynccontextmanager
     async def _create_server(
-        agent_fn, context_store: ContextStore | None = None, task_timeout: timedelta | None = None
-    ) -> AsyncGenerator[tuple[Server, Client]]:
+        agent_fn,
+        task_timeout: timedelta | None = None,
+    ) -> AsyncIterator[tuple[Server, Client]]:
         server = Server()
         server.agent(detail=AgentDetail(interaction_mode="multi-turn"))(agent_fn)
         async with run_server(
             server,
             get_free_port(),
-            context_store=context_store,
             task_timeout=task_timeout,
         ) as (server, client):
             yield server, client

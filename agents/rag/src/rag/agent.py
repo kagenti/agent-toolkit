@@ -28,7 +28,6 @@ from kagenti_adk.a2a.types import AgentArtifact, AgentMessage
 from kagenti_adk.server import Server
 from kagenti_adk.server.context import RunContext
 from kagenti_adk.server.middleware.platform_auth_backend import PlatformAuthBackend
-from kagenti_adk.server.store.platform_context_store import PlatformContextStore
 from beeai_framework.adapters.agentstack.backend.chat import AgentStackChatModel
 from beeai_framework.agents.requirement import RequirementAgent
 from beeai_framework.agents.requirement.utils._tool import FinalAnswerTool
@@ -116,7 +115,6 @@ async def rag(
     _: Annotated[PlatformApiExtensionServer, PlatformApiExtensionSpec()],
 ):
     """RAG agent that retrieves and generates text based on user queries."""
-    await context.store(input)
     llm, embedding = _get_clients(llm_ext, embedding_ext)
 
     history = [m async for m in context.load_history()]
@@ -181,7 +179,6 @@ async def rag(
                 phase="end",
             ).metadata(trajectory)
             yield vector_store_create_metadata
-            await context.store(AgentMessage(metadata=vector_store_create_metadata))
 
         tools.append(cast(Tool, VectorSearchTool(vector_store_id=vector_store_id, embedding_function=embedding)))
         async for item in embed_all_files(
@@ -300,7 +297,6 @@ async def rag(
             metadata=(citation.citation_metadata(citations=citations) if citations else None),
         )
         yield message
-        await context.store(message)
 
 
 def _get_clients(
@@ -331,7 +327,6 @@ def serve():
             host=os.getenv("HOST", "127.0.0.1"),
             port=int(os.getenv("PORT", 8000)),
             configure_telemetry=True,
-            context_store=PlatformContextStore(),
             auth_backend=PlatformAuthBackend(),
         )
     except KeyboardInterrupt:

@@ -5,16 +5,14 @@ from __future__ import annotations
 
 from collections.abc import AsyncIterator
 from datetime import datetime
-from uuid import UUID, uuid4
+from uuid import UUID
 
 from kink import inject
-from pydantic import TypeAdapter
 from sqlalchemy import (
     JSON,
     Column,
     DateTime,
     ForeignKey,
-    Index,
     Row,
     Table,
     delete,
@@ -24,8 +22,8 @@ from sqlalchemy import (
 from sqlalchemy import UUID as SQL_UUID
 from sqlalchemy.ext.asyncio import AsyncConnection
 
-from adk_server.domain.models.common import Metadata, PaginatedResult
-from adk_server.domain.models.context import Context, ContextHistoryItem, TitleGenerationState
+from adk_server.domain.models.common import PaginatedResult
+from adk_server.domain.models.context import Context
 from adk_server.domain.repositories.context import IContextRepository
 from adk_server.exceptions import EntityNotFoundError
 from adk_server.infrastructure.persistence.repositories.db_metadata import metadata
@@ -42,16 +40,6 @@ contexts_table = Table(
     Column("created_by", ForeignKey("users.id", ondelete="CASCADE"), nullable=False),
     Column("provider_id", ForeignKey("providers.id", ondelete="CASCADE"), nullable=True),
     Column("metadata", JSON, nullable=True),
-)
-
-context_history_table = Table(
-    "context_history",
-    metadata,
-    Column("id", SQL_UUID, primary_key=True),
-    Column("context_id", ForeignKey("contexts.id", ondelete="CASCADE"), nullable=False),
-    Column("created_at", DateTime(timezone=True), nullable=False),
-    Column("data", JSON, nullable=False),
-    Index("idx_context_history_context_id", "context_id"),
 )
 
 
@@ -92,12 +80,8 @@ class SqlAlchemyContextRepository(IContextRepository):
             query = query.where(contexts_table.c.provider_id == provider_id)
         if last_active_before:
             query = query.where(contexts_table.c.last_active_at < last_active_before)
-        if not include_empty:
-            # Use EXISTS subquery to find contexts that have at least one history record
-            subquery = select(context_history_table.c.context_id).where(
-                context_history_table.c.context_id == contexts_table.c.id
-            )
-            query = query.where(subquery.exists())
+        # NOTE: include_empty is accepted but no longer filtered — context_history table has been removed.
+        # All contexts are now returned regardless of whether they have task history.
 
         result = await cursor_paginate(
             connection=self._connection,
@@ -162,88 +146,6 @@ class SqlAlchemyContextRepository(IContextRepository):
     async def update_last_active(self, *, context_id: UUID) -> None:
         query = update(contexts_table).where(contexts_table.c.id == context_id).values(last_active_at=utc_now())
         await self._connection.execute(query)
-
-    async def update_title(
-        self, *, context_id: UUID, title: str | None = None, generation_state: TitleGenerationState
-    ) -> None:
-        # validate length before saving to database
-        if title:
-            _ = TypeAdapter(Metadata).validate_python({"title": title})
-        context = await self.get(context_id=context_id)
-        query = (
-            contexts_table.update()
-            .where(contexts_table.c.id == context_id)
-            .values(
-                metadata=(context.metadata or {})
-                | ({"title": title} if title else {})
-                | {"title_generation_state": generation_state}
-            )
-        )
-        await self._connection.execute(query)
-
-    async def add_history_item(self, *, context_id: UUID, history_item: ContextHistoryItem) -> None:
-        query = context_history_table.insert().values(
-            id=uuid4(),
-            context_id=history_item.context_id,
-            created_at=history_item.created_at,
-            data=history_item.data,
-        )
-        await self._connection.execute(query)
-
-    async def list_history(
-        self,
-        *,
-        context_id: UUID,
-        page_token: UUID | None = None,
-        limit: int = 20,
-        order_by: str = "created_at",
-        order="desc",
-    ) -> PaginatedResult[ContextHistoryItem]:
-        query = context_history_table.select().where(context_history_table.c.context_id == context_id)
-        result = await cursor_paginate(
-            connection=self._connection,
-            query=query,
-            after_cursor=page_token,
-            id_column=context_history_table.c.id,
-            order_column=getattr(context_history_table.c, order_by),
-            order=order,
-            limit=limit,
-        )
-        return PaginatedResult(
-            items=[self._row_to_context_history_item(item) for item in result.items],
-            total_count=result.total_count,
-            has_more=result.has_more,
-        )
-
-    async def delete_history_from_id(self, *, context_id: UUID, from_id: UUID) -> int:
-        """Delete all history items from a specific item onwards (inclusive) in given context"""
-        # First, get the created_at timestamp of the item to delete from
-        query_item = select(context_history_table.c.created_at).where(
-            context_history_table.c.context_id == context_id,
-            context_history_table.c.id == from_id,
-        )
-        result = await self._connection.execute(query_item)
-        row = result.first()
-        if not row:
-            raise EntityNotFoundError("context_history_item", from_id)
-
-        created_at = row[0]
-
-        # Delete all history items from the specified item onwards (created_at >= the target item's created_at)
-        query = delete(context_history_table).where(
-            context_history_table.c.context_id == context_id,
-            context_history_table.c.created_at >= created_at,
-        )
-        result = await self._connection.execute(query)
-        return result.rowcount
-
-    def _row_to_context_history_item(self, row: Row) -> ContextHistoryItem:
-        return ContextHistoryItem(
-            id=row.id,
-            data=row.data,
-            context_id=row.context_id,
-            created_at=row.created_at,
-        )
 
     def _row_to_context(self, row: Row) -> Context:
         return Context(

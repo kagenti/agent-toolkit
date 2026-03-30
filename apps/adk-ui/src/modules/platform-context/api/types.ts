@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { ContextHistory } from '@kagenti/adk';
 import {
   contextSchema as sdkContextSchema,
   listContextsResponseSchema as sdkListContextsResponseSchema,
@@ -41,7 +40,3 @@ export const patchContextMetadataRequestSchema = sdkPatchContextMetadataRequestS
 });
 export type PatchContextMetadataRequest = z.infer<typeof patchContextMetadataRequestSchema>;
 
-//
-
-export type HistoryItem = ContextHistory['data'];
-export type HistoryMessage = Extract<HistoryItem, { messageId: string }>;

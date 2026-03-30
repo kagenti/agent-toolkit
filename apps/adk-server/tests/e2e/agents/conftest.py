@@ -14,7 +14,6 @@ from a2a.types import AgentCard
 from kagenti_adk.platform import PlatformClient, Provider
 from kagenti_adk.platform.context import ContextToken
 from kagenti_adk.server import Server
-from kagenti_adk.server.store.context_store import ContextStore
 from tenacity import AsyncRetrying, stop_after_attempt, wait_fixed
 
 from tests.conftest import Configuration
@@ -27,7 +26,6 @@ async def run_server(
     test_admin: tuple[str, str],
     a2a_client_factory: Callable[[AgentCard | dict[str, Any], ContextToken], AsyncIterator[Client]],
     context_token: ContextToken,
-    context_store: ContextStore | None = None,
 ) -> AsyncGenerator[tuple[Server, Client]]:
     async with asyncio.TaskGroup() as tg:
         tg.create_task(
@@ -35,7 +33,6 @@ async def run_server(
                 server.run,
                 port=port,
                 self_registration_client_factory=lambda: PlatformClient(auth=test_admin),
-                context_store=context_store,
             )
         )
 
@@ -66,7 +63,6 @@ def create_server_with_agent(
     async def _create_server(
         agent_fn,
         context_token: ContextToken,
-        context_store: ContextStore | None = None,
     ):
         server = Server()
         server.agent()(agent_fn)
@@ -74,7 +70,6 @@ def create_server_with_agent(
             server,
             free_port,
             a2a_client_factory=a2a_client_factory,
-            context_store=context_store,
             context_token=context_token,
             test_admin=test_admin,
         ) as (server, client):

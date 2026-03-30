@@ -8,6 +8,20 @@ import { agentCardSchema, streamResponseSchema } from '@kagenti/adk';
 import { EventSourceParserStream } from 'eventsource-parser/stream';
 import { v4 as uuid } from 'uuid';
 
+export interface ListTasksParams {
+  contextId?: string;
+  status?: string;
+  pageSize?: number;
+  pageToken?: string;
+}
+
+export interface ListTasksResponse {
+  tasks: Task[];
+  nextPageToken?: string;
+  totalSize?: number;
+  pageSize?: number;
+}
+
 export interface A2AClient {
   getAgentCard(): Promise<AgentCard>;
   sendMessageStream(params: {
@@ -17,6 +31,7 @@ export interface A2AClient {
   }): AsyncIterable<StreamResponse>;
   getTask(params: { id: string }): Promise<Task>;
   cancelTask(params: { id: string }): Promise<Task>;
+  listTasks(params: ListTasksParams): Promise<ListTasksResponse>;
 }
 
 interface CreateClientParams {
@@ -117,6 +132,10 @@ export function createA2AClient({ endpointUrl, agentCard, fetchImpl, extensions 
 
     async cancelTask(params) {
       return jsonRpcRequest('CancelTask', params) as Promise<Task>;
+    },
+
+    async listTasks(params) {
+      return jsonRpcRequest('ListTasks', { ...params }) as Promise<ListTasksResponse>;
     },
   };
 }

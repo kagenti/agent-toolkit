@@ -25,8 +25,6 @@ from starlette.types import Lifespan
 from kagenti_adk.a2a.extensions import BaseExtensionServer
 from kagenti_adk.server.agent import Agent, Executor
 from kagenti_adk.server.constants import DEFAULT_IMPLICIT_EXTENSIONS
-from kagenti_adk.server.store.context_store import ContextStore
-from kagenti_adk.server.store.memory_context_store import InMemoryContextStore
 from kagenti_adk.types import SdkAuthenticationBackend
 
 
@@ -34,7 +32,6 @@ def create_app(
     agent: Agent,
     url: str,
     task_store: TaskStore | None = None,
-    context_store: ContextStore | None = None,
     implicit_extensions: dict[str, BaseExtensionServer] = DEFAULT_IMPLICIT_EXTENSIONS,
     required_extensions: set[str] | None = None,
     auth_backend: SdkAuthenticationBackend | None = None,
@@ -49,12 +46,10 @@ def create_app(
 ) -> FastAPI:
     queue_manager = queue_manager or InMemoryQueueManager()
     task_store = task_store or InMemoryTaskStore()
-    context_store = context_store or InMemoryContextStore()
     http_handler = DefaultRequestHandler(
         agent_executor=Executor(
             agent,
             queue_manager,
-            context_store=context_store,
             task_timeout=task_timeout,
             task_store=task_store,
         ),
@@ -73,7 +68,7 @@ def create_app(
             AgentInterface(url=url + "/jsonrpc/", protocol_binding="JSONRPC", protocol_version=protocol_version),
         ],
         implicit_extensions=implicit_extensions,
-        required_extensions=(required_extensions or set()) | context_store.required_extensions,
+        required_extensions=required_extensions or set(),
     )
 
     jsonrpc_app = A2AFastAPIApplication(agent_card=agent.card, http_handler=http_handler).build(

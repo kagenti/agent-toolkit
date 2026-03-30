@@ -17,9 +17,6 @@ server = Server()
 async def basic_history_example(input: Message, context: RunContext):
     """Agent that demonstrates conversation history access"""
 
-    # Store the current message in the context store
-    await context.store(input)
-
     # Get the current user message
     current_message = get_message_text(input)
     print(f"Current message: {current_message}")
@@ -33,9 +30,6 @@ async def basic_history_example(input: Message, context: RunContext):
     # Your agent logic here - you can now reference all messages in the conversation
     message = AgentMessage(text=f"Hello! I can see we have {len(history)} messages in our conversation.")
     yield message
-
-    # Store the message in the context store
-    await context.store(message)
 
 
 def run():

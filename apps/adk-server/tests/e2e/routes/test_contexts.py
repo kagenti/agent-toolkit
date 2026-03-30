@@ -6,9 +6,8 @@ from __future__ import annotations
 import uuid
 
 import pytest
-from httpx import HTTPStatusError
-from kagenti_adk.a2a.types import AgentMessage
 from kagenti_adk.platform.context import Context
+from httpx import HTTPStatusError
 
 pytestmark = pytest.mark.e2e
 
@@ -68,102 +67,6 @@ async def test_context_pagination(subtests):
         nonexistent_id = uuid.uuid4()
         response = await Context.list(page_token=nonexistent_id)
         assert len(response.items) == 5  # Should return all contexts
-
-
-@pytest.mark.usefixtures("clean_up", "setup_platform_client")
-async def test_context_history_pagination(subtests):
-    """Test cursor-based pagination for context history endpoint."""
-
-    # Create a context for testing
-    context = await Context.create()
-
-    # Create more than 40 history items (default page size) to test pagination
-    num_items = 45
-
-    with subtests.test("add multiple history items"):
-        for i in range(num_items):
-            message = AgentMessage(text=f"Test message {i}")
-            await context.add_history_item(data=message)
-
-    with subtests.test("test default pagination (first page)"):
-        response = await Context.list_history(context.id)
-        assert len(response.items) == 40  # Default page size
-        assert response.has_more is True
-        assert response.next_page_token is not None
-
-        # Verify items are ordered by created_at desc (newest first)
-        created_ats = [item.created_at for item in response.items]
-        assert created_ats == sorted(created_ats, reverse=False)
-
-    with subtests.test("test pagination with custom limit"):
-        response = await Context.list_history(context.id, limit=10)
-        assert len(response.items) == 10
-        assert response.has_more is True
-        assert response.next_page_token is not None
-
-    with subtests.test("test cursor-based pagination"):
-        # Get first page with limit 20
-        first_page = await Context.list_history(context.id, limit=20)
-        assert len(first_page.items) == 20
-        assert first_page.has_more is True
-
-        # Get second page using next_page_token as cursor
-        second_page = await Context.list_history(context.id, limit=20, page_token=first_page.next_page_token)
-        assert len(second_page.items) == 20
-        assert second_page.has_more is True
-
-        # Get third page
-        third_page = await Context.list_history(context.id, limit=20, page_token=second_page.next_page_token)
-        assert len(third_page.items) == 5  # Remaining items
-        assert third_page.has_more is False
-
-        # Verify no duplicate items across pages
-        all_items = first_page.items + second_page.items + third_page.items
-        all_ids = [item.id for item in all_items if hasattr(item, "id")]
-        assert len(all_ids) == len(set(all_ids))  # No duplicates
-
-    with subtests.test("test ascending order"):
-        response = await Context.list_history(context.id, order="asc", limit=5)
-        created_ats = [item.created_at for item in response.items]
-        assert created_ats == sorted(created_ats)  # Should be ascending
-
-    with subtests.test("test list_all_history method"):
-        # Test the list_all_history method that automatically iterates through all pages
-        all_items = []
-        async for item in Context.list_all_history(context.id):
-            all_items.append(item)
-
-        assert len(all_items) == num_items
-
-        # Verify chronological order (oldest first since it yields in order)
-        created_ats = [item.created_at for item in all_items]
-        # Note: list_all_history should maintain the order from list_history (desc by default)
-        # but iterate through all pages
-
-
-@pytest.mark.usefixtures("clean_up", "setup_platform_client")
-async def test_context_empty_filtering(subtests):
-    """Test filtering contexts based on whether they have history records."""
-
-    with subtests.test("create contexts with and without history"):
-        # Create empty context (no history)
-        empty_context = await Context.create()
-
-        # Create context with history
-        context_with_history = await Context.create()
-        message = AgentMessage(text="Test message")
-        await context_with_history.add_history_item(data=message)
-
-    with subtests.test("include_empty=True returns all contexts"):
-        response = await Context.list(include_empty=True)
-        assert len(response.items) == 2  # Should include both contexts
-
-    with subtests.test("include_empty=False returns only contexts with history"):
-        response = await Context.list(include_empty=False)
-        context_ids = [ctx.id for ctx in response.items]
-        assert len(context_ids) == 1
-        assert context_with_history.id in context_ids
-        assert empty_context.id not in context_ids
 
 
 @pytest.mark.usefixtures("clean_up", "setup_platform_client")
@@ -255,42 +158,3 @@ async def test_context_provider_filtering(subtests):
         assert fetched_context.provider_id == provider1.id
 
 
-@pytest.mark.usefixtures("clean_up", "setup_platform_client")
-async def test_context_delete_context_history_from_id(subtests):
-    """Test deleting context history from a specific item ID onwards."""
-
-    context = None
-    history_items = []
-    n_messages = 3
-
-    with subtests.test("create context and add multiple history items"):
-        context = await Context.create()
-        for i in range(n_messages):
-            message = AgentMessage(text=f"Test message {i}")
-            await context.add_history_item(data=message)
-
-        history = await context.list_history(limit=50)
-        history_items = history.items
-        assert len(history.items) == n_messages
-
-    with subtests.test("delete history from a middle item onwards"):
-        await context.delete_history_from_id(from_id=history_items[1].id)
-
-        remaining_history = await context.list_history(limit=50)
-        remaining_ids = [item.id for item in remaining_history.items]
-        assert len(remaining_history.items) == 1
-        assert history_items[0].id in remaining_ids
-        assert history_items[1].id not in remaining_ids
-        assert history_items[2].id not in remaining_ids
-
-    with subtests.test("delete with nonexistent item_id raises error"):
-        nonexistent_id = uuid.uuid4()
-        with pytest.raises(HTTPStatusError) as exc_info:
-            await context.delete_history_from_id(from_id=nonexistent_id)
-        assert exc_info.value.response.status_code == 404
-
-    with subtests.test("delete from first item deletes all"):
-        await context.delete_history_from_id(from_id=remaining_ids[0])
-        # await context.delete_history_from_id(from_id=remaining_ids[0])
-        remaining_history = await context.list_history(limit=50)
-        assert len(remaining_history.items) == 0

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 'use client';
-import type { ListContextHistoryResponse } from '@kagenti/adk';
+import type { Task } from '@kagenti/adk';
 import { type PropsWithChildren, useCallback, useState } from 'react';
 
 import type { Agent } from '#modules/agents/api/types.ts';
@@ -14,10 +14,10 @@ import { PlatformContext } from './platform-context';
 
 interface Props {
   contextId?: string;
-  history?: ListContextHistoryResponse;
+  initialTasks?: Task[];
 }
 
-export function PlatformContextProvider({ history, contextId: contextIdProp, children }: PropsWithChildren<Props>) {
+export function PlatformContextProvider({ initialTasks, contextId: contextIdProp, children }: PropsWithChildren<Props>) {
   const [contextId, setContextId] = useState<string | null>(contextIdProp ?? null);
 
   const { mutateAsync: createContext } = useCreateContext({
@@ -61,7 +61,7 @@ export function PlatformContextProvider({ history, contextId: contextIdProp, chi
     <PlatformContext.Provider
       value={{
         contextId,
-        history,
+        initialTasks,
         createContext,
         getContextId,
         resetContext,

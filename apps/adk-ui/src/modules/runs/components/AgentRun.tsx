@@ -5,9 +5,8 @@
 
 import { notFound } from 'next/navigation';
 
+import { fetchTasksForContext } from '#api/a2a/list-tasks.ts';
 import { runtimeConfig } from '#contexts/App/runtime-config.ts';
-import { LIST_CONTEXT_HISTORY_DEFAULT_QUERY } from '#modules/platform-context/api/constants.ts';
-import { fetchContextHistory } from '#modules/platform-context/api/index.ts';
 import { PlatformContextProvider } from '#modules/platform-context/contexts/PlatformContextProvider.tsx';
 import { RunView } from '#modules/runs/components/RunView.tsx';
 
@@ -23,12 +22,7 @@ export async function AgentRun({ providerId, contextId }: Props) {
   const { featureFlags } = runtimeConfig;
 
   const agentPromise = fetchAgent(providerId);
-  const contextHistoryPromise = contextId
-    ? fetchContextHistory({
-        context_id: contextId,
-        query: LIST_CONTEXT_HISTORY_DEFAULT_QUERY,
-      })
-    : undefined;
+  const tasksPromise = contextId ? fetchTasksForContext(providerId, contextId) : undefined;
 
   const agent = await agentPromise;
 
@@ -40,14 +34,14 @@ export async function AgentRun({ providerId, contextId }: Props) {
     }
   }
 
-  const contextHistory = await contextHistoryPromise;
+  const tasksResponse = await tasksPromise;
 
-  if (contextId && !contextHistory) {
+  if (contextId && !tasksResponse) {
     notFound();
   }
 
   return (
-    <PlatformContextProvider contextId={contextId} history={contextHistory}>
+    <PlatformContextProvider contextId={contextId} initialTasks={tasksResponse?.tasks}>
       <RunView agent={agent} />
     </PlatformContextProvider>
   );

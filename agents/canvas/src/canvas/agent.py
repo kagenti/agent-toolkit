@@ -50,7 +50,6 @@ async def canvas_agent(
         yield "Can't run without a LLM."
         return
 
-    await context.store(message)
     edit_request = await canvas.parse_canvas_edit_request(message=message)
 
     user_text_content = _get_text(message)
@@ -132,12 +131,6 @@ Your task is to apply the user's instruction ONLY to the selected text and then 
                 parts=[TextPart(text=content_delta)],
             )
 
-    final_artifact = AgentArtifact(
-        artifact_id=artifact.artifact_id,
-        name=artifact.name,
-        parts=[TextPart(text=buffer)],
-    )
-    await context.store(final_artifact)
 
 
 def serve():

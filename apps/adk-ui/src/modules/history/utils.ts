@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { Artifact, ContextHistory, Message } from '@kagenti/adk';
+import type { Artifact, ContextHistory, Message, Task } from '@kagenti/adk';
 import { v4 as uuid } from 'uuid';
 
 import { processMessageMetadata, processParts } from '#api/a2a/part-processors.ts';
@@ -92,4 +92,52 @@ export function convertHistoryToUIMessages(history: ContextHistory[]): UIMessage
   );
 
   return messages;
+}
+
+/**
+ * Convert A2A Tasks (with their history and artifacts) into UI messages.
+ * Tasks are expected in chronological order (oldest first).
+ */
+export function convertTasksToUIMessages(tasks: Task[]): UIMessage[] {
+  const allMessages: UIMessage[] = [];
+
+  for (const task of tasks) {
+    const taskId = task.id;
+
+    // Process history messages
+    for (const msg of task.history ?? []) {
+      const uiMessage = processHistoryMessage(msg, taskId);
+
+      const lastMessage = allMessages.at(-1);
+      const shouldGroup = lastMessage && lastMessage.role === uiMessage.role && lastMessage.taskId === uiMessage.taskId;
+
+      if (shouldGroup) {
+        allMessages.splice(-1, 1, {
+          ...lastMessage,
+          parts: [...uiMessage.parts, ...lastMessage.parts],
+        });
+      } else {
+        allMessages.push(uiMessage);
+      }
+    }
+
+    // Process artifacts
+    for (const artifact of task.artifacts ?? []) {
+      const uiMessage = processHistoryArtifact(artifact, taskId);
+
+      const lastMessage = allMessages.at(-1);
+      const shouldGroup = lastMessage && lastMessage.role === uiMessage.role && lastMessage.taskId === uiMessage.taskId;
+
+      if (shouldGroup) {
+        allMessages.splice(-1, 1, {
+          ...lastMessage,
+          parts: [...uiMessage.parts, ...lastMessage.parts],
+        });
+      } else {
+        allMessages.push(uiMessage);
+      }
+    }
+  }
+
+  return allMessages;
 }

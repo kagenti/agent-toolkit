@@ -4,10 +4,8 @@
 from __future__ import annotations
 
 import logging
-from collections.abc import Sequence
 from contextlib import suppress
 from datetime import timedelta
-from typing import Any
 from uuid import UUID
 
 from fastapi import status
@@ -15,19 +13,12 @@ from kink import inject
 from pydantic import TypeAdapter
 
 from adk_server.api.schema.common import PaginationQuery
-from adk_server.api.schema.openai import ChatCompletionRequest
 from adk_server.configuration import Configuration
 from adk_server.domain.models.common import Metadata, MetadataPatch, PaginatedResult
-from adk_server.domain.models.context import (
-    Context,
-    ContextHistoryItem,
-    ContextHistoryItemData,
-    TitleGenerationState,
-)
+from adk_server.domain.models.context import Context
 from adk_server.domain.models.user import User
 from adk_server.domain.repositories.file import IObjectStorageRepository
 from adk_server.exceptions import EntityNotFoundError, PlatformError
-from adk_server.service_layer.services.model_providers import ModelProviderService
 from adk_server.service_layer.unit_of_work import IUnitOfWorkFactory
 from adk_server.utils.utils import filter_dict, utc_now
 
@@ -41,13 +32,11 @@ class ContextService:
         uow: IUnitOfWorkFactory,
         configuration: Configuration,
         object_storage: IObjectStorageRepository,
-        model_provider_service: ModelProviderService,
     ):
         self._uow = uow
         self._object_storage = object_storage
         self._configuration = configuration
         self._expire_resources_after = timedelta(days=configuration.context.resources_expire_after_days)
-        self._model_provider_service = model_provider_service
 
     async def create(self, *, user: User, metadata: Metadata, provider_id: UUID | None = None) -> Context:
         context = Context(created_by=user.id, metadata=metadata, provider_id=provider_id)
@@ -160,125 +149,3 @@ class ContextService:
             await uow.contexts.update_last_active(context_id=context_id)
             await uow.commit()
 
-    def _extract_content_for_title(self, msg: dict[str, Any]) -> tuple[str, str | None, Sequence[dict[str, Any]]]:
-        title_hint: str | None = None
-        text_parts: list[str] = []
-        files: list[dict[str, Any]] = []
-        for part in msg.get("parts", []):
-            if "text" in part:
-                text_parts.append(part["text"])
-            elif "data" in part:
-                data = part["data"]
-                if isinstance(data, dict):
-                    hint = data.get("title_hint")
-                    if isinstance(hint, str) and hint and not title_hint:
-                        title_hint = hint
-            elif "file" in part:
-                files.append(part["file"])
-
-        return "".join(text_parts), title_hint, files
-
-    async def add_history_item(self, *, context_id: UUID, data: ContextHistoryItemData, user: User) -> None:
-        async with self._uow() as uow:
-            context = await uow.contexts.get(context_id=context_id, user_id=user.id)
-            await uow.contexts.add_history_item(
-                context_id=context_id,
-                history_item=ContextHistoryItem(context_id=context_id, data=data),
-            )
-
-            if data.get("role") == "ROLE_USER" and not (context.metadata or {}).get("title"):
-                from adk_server.jobs.tasks.context import generate_conversation_title as task
-
-                # Use simple text extraction for the initial title placeholder
-                title = self._extract_content_for_title(data)[0] or "Untitled"
-                title = f"{title[:100]}..." if len(title) > 100 else title
-
-                should_generate_title = self._configuration.generate_conversation_title.enabled
-                state = TitleGenerationState.PENDING if should_generate_title else TitleGenerationState.COMPLETED
-                await uow.contexts.update_title(context_id=context_id, title=title, generation_state=state)
-
-                if should_generate_title:
-                    await task.configure(queueing_lock=str(context_id)).defer_async(context_id=str(context_id))
-
-            await uow.commit()
-
-    async def generate_conversation_title(self, *, context_id: UUID):
-        from jinja2 import Template
-
-        async with self._uow() as uow:
-            msg = await uow.contexts.list_history(context_id=context_id, limit=1, order="desc", order_by="created_at")
-            system_config = await uow.configuration.get_system_configuration()
-
-        model = self._configuration.generate_conversation_title.model
-        if model == "default":
-            if not system_config.default_llm_model:
-                logger.warning(f"Cannot generate title for context {context_id}: default LLM model not set.")
-                return
-            model = system_config.default_llm_model
-
-        if not msg.items:
-            logger.warning(f"Cannot generate title for context {context_id}: no history found.")
-            return
-
-        raw_message = msg.items[0].data
-        text, title_hint, files = self._extract_content_for_title(raw_message)
-        if not text and not title_hint and not files:
-            logger.warning(f"Cannot generate title for context {context_id}: first message has no content.")
-            return
-
-        try:
-            # Render the system prompt using Jinja2
-            template = Template(self._configuration.generate_conversation_title.prompt)
-            prompt = template.render(
-                text=text,
-                titleHint=title_hint,
-                files=[{"name": f.get("name"), "mime_type": f.get("mime_type")} for f in files],
-                rawMessage=raw_message,
-            )
-            resp = await self._model_provider_service.create_chat_completion(
-                request=ChatCompletionRequest(
-                    model=model,
-                    stream=False,
-                    max_completion_tokens=100,
-                    messages=[{"role": "user", "content": prompt}],
-                )
-            )
-            title = (resp.choices[0].message.content or "").strip().strip("\"'")
-            title = f"{title[:100]}..." if len(title) > 100 else title
-            if not title:
-                raise RuntimeError("Generated title is empty.")
-            async with self._uow() as uow:
-                await uow.contexts.update_title(
-                    context_id=context_id, title=title, generation_state=TitleGenerationState.COMPLETED
-                )
-                await uow.commit()
-        except Exception as e:
-            async with self._uow() as uow:
-                await uow.contexts.update_title(
-                    context_id=context_id, title=None, generation_state=TitleGenerationState.FAILED
-                )
-                await uow.commit()
-            logger.warning(f"Failed to generate title for context {context_id}: {e}")
-            raise e
-
-    async def list_history(
-        self, *, context_id: UUID, user: User, pagination: PaginationQuery
-    ) -> PaginatedResult[ContextHistoryItem]:
-        async with self._uow() as uow:
-            await uow.contexts.get(context_id=context_id, user_id=user.id)
-            return await uow.contexts.list_history(
-                context_id=context_id,
-                limit=pagination.limit,
-                page_token=pagination.page_token,
-                order=pagination.order,
-                order_by=pagination.order_by,
-            )
-
-    async def delete_history_from_id(self, *, context_id: UUID, from_id: UUID, user: User) -> None:
-        """Delete all history items from a specific item onwards (inclusive)"""
-        async with self._uow() as uow:
-            # Verify user has access to this context
-            await uow.contexts.get(context_id=context_id, user_id=user.id)
-            # Delete history items from the specified ID onwards
-            await uow.contexts.delete_history_from_id(context_id=context_id, from_id=from_id)
-            await uow.commit()

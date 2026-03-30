@@ -75,7 +75,6 @@ async def canvas_with_llm_example(
     llm: Annotated[LLMServiceExtensionServer, LLMServiceExtensionSpec.single_demand()],
     canvas: Annotated[CanvasExtensionServer, CanvasExtensionSpec()],
 ):
-    await context.store(message)
     canvas_edit = await canvas.parse_canvas_edit_request(message=message)
 
     # Adapt system prompt based on whether this is an edit or new generation
@@ -83,8 +82,6 @@ async def canvas_with_llm_example(
 
     artifact = await call_llm(llm, system_prompt, message)
     yield artifact
-
-    await context.store(artifact)
 
 
 def run():

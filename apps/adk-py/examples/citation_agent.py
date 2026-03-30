@@ -12,7 +12,6 @@ from kagenti_adk.a2a.extensions import Citation, CitationExtensionServer, Citati
 from kagenti_adk.a2a.types import AgentMessage
 from kagenti_adk.server import Server
 from kagenti_adk.server.context import RunContext
-from kagenti_adk.server.store.platform_context_store import PlatformContextStore
 
 server = Server()
 
@@ -26,9 +25,6 @@ async def example_agent(
     citation: Annotated[CitationExtensionServer, CitationExtensionSpec()],
 ):
     """Agent that demonstrates citation extension usage"""
-
-    # Store the current message in the context store
-    await context.store(input)
 
     # Simulate researching multiple sources
     research_text = """Based on recent research, artificial intelligence has made significant progress in natural
@@ -60,12 +56,11 @@ and generating human-like text."""
         metadata=citation.citation_metadata(citations=citations),
     )
     yield message
-    await context.store(message)
 
 
 def run():
     server.run(
-        host=os.getenv("HOST", "127.0.0.1"), port=int(os.getenv("PORT", 8000)), context_store=PlatformContextStore()
+        host=os.getenv("HOST", "127.0.0.1"), port=int(os.getenv("PORT", 8000))
     )
 
 

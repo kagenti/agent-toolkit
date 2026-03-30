@@ -378,7 +378,8 @@ class ProxyRequestHandler(RequestHandler):
         params: ListTasksRequest,
         context: ServerCallContext,
     ) -> ListTasksResponse:
-        raise NotImplementedError("This is not supported by the client transport yet")
+        async with self._client_transport(context) as transport:
+            return await transport.list_tasks(params, context=self._forward_context(context))
 
 
 @inject

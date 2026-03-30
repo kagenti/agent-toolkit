@@ -5,11 +5,10 @@ from __future__ import annotations
 from typing import Literal
 from uuid import UUID
 
-from pydantic import AwareDatetime, BaseModel, Field, RootModel, field_validator
+from pydantic import AwareDatetime, BaseModel, Field, field_validator
 
 from adk_server.api.schema.common import PaginationQuery
 from adk_server.domain.models.common import Metadata, MetadataPatch
-from adk_server.domain.models.context import ContextHistoryItemData
 
 
 class ContextCreateRequest(BaseModel):
@@ -88,5 +87,3 @@ class ContextTokenResponse(BaseModel):
     expires_at: AwareDatetime | None
 
 
-class ContextHistoryItemCreateRequest(RootModel[ContextHistoryItemData]):
-    root: ContextHistoryItemData
