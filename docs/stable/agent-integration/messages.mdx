@@ -48,12 +48,12 @@ Similar to `AgentMessage`, but specifically designed to simplify the creation an
 ```python
 yield AgentArtifact(
         parts=[
-            TextPart(text="Here is the documentation you requested."),
-            FilePart(file=FileWithUri(
-                uri="https://example.com/report.pdf", 
-                mime_type="application/pdf", 
-                name="Report.pdf"
-            ))
+            Part(text="Here is the documentation you requested."),
+            Part(
+                url="https://example.com/report.pdf",
+                media_type="application/pdf",
+                filename="Report.pdf"
+            )
         ]
     )
 ```
@@ -72,22 +72,22 @@ The basic unit representing a single turn in a conversation.
 
 ```python
 import uuid
-from a2a.types import Message, TextPart, Part, Role
+from a2a.types import Message, Part, Role
 
 # @server.agent(...)
 async def example_agent():
-    yield Message(role=Role.agent, message_id=str(uuid.uuid4()), parts=[Part(root=TextPart(text="Hello from the agent!"))])
+    yield Message(role=Role.ROLE_AGENT, message_id=str(uuid.uuid4()), parts=[Part(text="Hello from the agent!")])
 ```
 
 #### Part
 The fundamental unit of content. A `Message` consists of multiple `Part` objects such as `TextPart`, `FilePart`, or `DataPart`.
 
 ```python
-from a2a.types import TextPart
+from a2a.types import Part
 
 # @server.agent(...)
 async def example_agent():
-    yield TextPart(text="Hello from the agent!")
+    yield Part(text="Hello from the agent!")
 ```
 
 #### Artifact
@@ -95,13 +95,13 @@ Tangible outputs produced by the agent, such as documents or other generated con
 
 ```python
 import uuid
-from a2a.types import Artifact, FilePart, FileWithUri, Part
+from a2a.types import Artifact, Part
 
 # @server.agent(...)
 async def example_agent():
     yield Artifact(
         artifact_id=str(uuid.uuid4()),
-        parts=[Part(root=FilePart(file=FileWithUri(uri="https://www.ibm.com/us-en", mime_type="text/html", name="IBM Website")))],
+        parts=[Part(url="https://www.ibm.com/us-en", media_type="text/html", filename="IBM Website")],
     )
 ```
 
@@ -110,12 +110,12 @@ A stateful unit of work used to annotate a transaction spanning multiple message
 
 ```python
 import uuid
-from a2a.types import TaskStatus, TextPart, Message, TaskState, Part, Role
+from a2a.types import TaskStatus, Message, TaskState, Part, Role
 
 # @server.agent(...)
 async def example_agent():
     yield TaskStatus(
-        message=Message(message_id=str(uuid.uuid4()), role=Role.agent, parts=[Part(root=TextPart(text="Please provide some input."))]),
-        state=TaskState.input_required,
+        message=Message(message_id=str(uuid.uuid4()), role=Role.ROLE_AGENT, parts=[Part(text="Please provide some input.")]),
+        state=TaskState.TASK_STATE_INPUT_REQUIRED,
     )
 ```

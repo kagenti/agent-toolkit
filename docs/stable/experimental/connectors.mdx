@@ -173,7 +173,7 @@ The Kagenti ADK Python SDK provides a convenient wrapper around the connectors A
 
 ### Getting Started
 ```python
-from kagenti_adk.platform.connector import Connector, ConnectorState
+from kagenti_adk.platform import Connector, ConnectorState
 ```
 
 ### Core Operations
@@ -270,7 +270,7 @@ response_text = b"".join(response_chunks).decode()
 ### Complete Workflow Example
 ```python
 import asyncio
-from kagenti_adk.platform.connector import Connector, ConnectorState
+from kagenti_adk.platform import Connector, ConnectorState
 
 async def main():
     # Create connector

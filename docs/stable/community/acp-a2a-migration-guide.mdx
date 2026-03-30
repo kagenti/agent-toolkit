@@ -45,12 +45,17 @@ from a2a.types import AgentSkill, Message
 from kagenti_adk.server import Server
 from kagenti_adk.server.context import RunContext
 from kagenti_adk.a2a.extensions import (
-    AgentDetail, AgentDetailTool,
-    CitationExtensionServer, CitationExtensionSpec,
-    TrajectoryExtensionServer, TrajectoryExtensionSpec,
-    LLMServiceExtensionServer, LLMServiceExtensionSpec
+    AgentDetail,
+    AgentDetailTool,
+    CitationExtensionServer,
+    CitationExtensionSpec,
+    TrajectoryExtensionServer,
+    TrajectoryExtensionSpec,
+    LLMServiceExtensionServer,
+    LLMServiceExtensionSpec,
+    PlatformApiExtensionServer,
+    PlatformApiExtensionSpec,
 )
-from kagenti_adk.a2a.extensions.services.platform import PlatformApiExtensionServer, PlatformApiExtensionSpec
 from kagenti_adk.a2a.types import AgentMessage, AgentArtifact
 from kagenti_adk.util.file import load_file
 ```
@@ -158,10 +163,7 @@ user_msg = input[-1].parts[0].content if input else "Hello"
 Use `PlatformApiExtensionServer` in your agent to get access to files.
 
 ```py
-from kagenti_adk.a2a.extensions.services.platform import (
-    PlatformApiExtensionServer,
-    PlatformApiExtensionSpec,
-)
+from kagenti_adk.a2a.extensions import PlatformApiExtensionServer, PlatformApiExtensionSpec
 
 async def example_agent(
     input: Message,
@@ -310,4 +312,4 @@ yield response_text
 ## Complete Examples
 
 1. https://github.com/kagenti/adk/blob/main/agents/chat/src/chat/agent.py
-2. https://github.com/jenna-winkler/adk-showcase/blob/main/src/adk_agents/agent.py
+2. https://github.com/jenna-winkler/agentstack-showcase/blob/main/src/agentstack_agents/agent.py

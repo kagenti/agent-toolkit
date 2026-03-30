@@ -19,12 +19,15 @@ When building conversational AI agents, one of the key requirements is maintaini
 
 Here's an example agent that maintains conversation history and counts the number of interactions:
 
+{/* <!-- embedme examples/agent-integration/multi-turn/basic-history/src/basic_history/agent.py--> */}
 ```python
+# Copyright 2026 © IBM Corp.
+# SPDX-License-Identifier: Apache-2.0
+
 import os
 
 from a2a.types import Message
 from a2a.utils.message import get_message_text
-
 from kagenti_adk.a2a.types import AgentMessage
 from kagenti_adk.server import Server
 from kagenti_adk.server.context import RunContext
@@ -33,8 +36,8 @@ server = Server()
 
 
 @server.agent()
-#set the context as an instance of the conversation history to store and load previous messages
-async def example_agent(input: Message, context: RunContext):
+# Set the context as an instance of the conversation history to store and load previous messages
+async def basic_history_example(input: Message, context: RunContext):
     """Agent that demonstrates conversation history access"""
 
     # Store the current message in the context store
@@ -61,8 +64,10 @@ async def example_agent(input: Message, context: RunContext):
 def run():
     server.run(host=os.getenv("HOST", "127.0.0.1"), port=int(os.getenv("PORT", 8000)))
 
+
 if __name__ == "__main__":
     run()
+
 ```
 
 ### Steps
@@ -73,27 +78,20 @@ if __name__ == "__main__":
 1. **Store agent responses:** Use `await context.store(response)` to store your agent's responses for future conversation context.
 
 
-## Advanced BeeAI Framework Example
+## Streaming with Buffered History Example
 
-Here's a sophisticated example using the BeeAI Framework to build a multi-turn chat agent that leverages conversation history and LLM capabilities:
+Use this pattern when you want to stream partial outputs to users while keeping one clean assistant message in conversation history.
+This is usecase-specific and one my opt for a combination of this and previous approach.
 
+{/* <!-- embedme examples/agent-integration/multi-turn/streaming-agent-history/src/streaming_agent_history/agent.py--> */}
 ```python
+# Copyright 2026 © IBM Corp.
+# SPDX-License-Identifier: Apache-2.0
+import asyncio
 import os
-from typing import Annotated
 
-from a2a.types import Message, Role
+from a2a.types import Message
 from a2a.utils.message import get_message_text
-from beeai_framework.adapters.agentstack.backend.chat import AgentStackChatModel
-from beeai_framework.agents.requirement import RequirementAgent
-from beeai_framework.agents.requirement.requirements.conditional import ConditionalRequirement
-from beeai_framework.backend import AssistantMessage, UserMessage
-from beeai_framework.backend.types import ChatModelParameters
-from beeai_framework.tools.think import ThinkTool
-
-from kagenti_adk.a2a.extensions import (
-    LLMServiceExtensionServer,
-    LLMServiceExtensionSpec,
-)
 from kagenti_adk.a2a.types import AgentMessage
 from kagenti_adk.server import Server
 from kagenti_adk.server.context import RunContext
@@ -101,11 +99,126 @@ from kagenti_adk.server.store.platform_context_store import PlatformContextStore
 
 server = Server()
 
+
+async def example_tool() -> str:
+    await asyncio.sleep(.1)  # doing some agent work
+    return "tool result"
+
+
+async def history_counter(history: list[Message]) -> str:
+    """Create a concise conversation-state summary."""
+    await asyncio.sleep(.1)  # doing some agent work
+    user_count = sum(1 for item in history if item.role.value == "user")
+    agent_count = sum(1 for item in history if item.role.value == "agent")
+    history_count = len(history)
+    return f"total={history_count}, user={user_count}, agent={agent_count}"
+
+
+@server.agent()
+async def streaming_agent_w_single_history_write_example(input: Message, context: RunContext):
+    """
+    Stream partial answers, execute tools, and persist one finalized assistant message.
+    See other examples for actual implementation of multi-turn conversation agent with tool use.
+    """
+    # Store the user input as the first persisted item for this turn.
+    await context.store(data=input)
+
+    history = [message async for message in context.load_history() if isinstance(message, Message) and message.parts]
+
+    current_message = get_message_text(input)
+
+    # Stream user-facing partial output as each step completes.
+    # This simulates an agent that produces intermediate outputs throughout its turn which are immediately useful to the user and so sent to them
+    buffered_parts: list[str] = []
+    try: 
+        part_1 = f"Received input: '{current_message}'"
+        buffered_parts.append(part_1)
+        yield AgentMessage(text=part_1)
+
+        tool_result = await example_tool()
+        part_2 = f"Tool call completed with result: '{tool_result}'"
+        buffered_parts.append(part_2)
+        yield AgentMessage(text=part_2)
+
+        if len(history) > 3:
+            raise ValueError("History is too long!")
+
+        history_summary = await history_counter(history)
+        history_part = f"History message counts including last user message, not including any of the current agent output: {history_summary}"
+        buffered_parts.append(history_part)
+        yield AgentMessage(text=history_part)
+
+    except Exception as e:
+        error_part = f"Error during execution: {e!s}"
+        buffered_parts.append(error_part)
+        yield AgentMessage(text=error_part)
+    finally:
+        # IMPORTANT: Persisting only once after streaming finishes.
+        #
+        # The finally block ensures the aggregated response is always at least partially persisted up until the point of failure. 
+        # This does not need to be the go-to approach in all cases, sometimes the partial outputs are of no value and one does not want them to be properly stored.
+        #
+        # Why not store each chunk?
+        # - Calling `context.store()`, PlatformContextStore saves every message as a distinct history item.
+        # - Storing per chunk would fragment one assistant turn into many partial messages.
+        # - A single aggregated write keeps replay, memory, and history semantics clean.
+        # 
+        aggregated_response = AgentMessage(text="\n".join(buffered_parts))
+        yield "Final result check:\n" + str(aggregated_response.text)
+        await context.store(data=aggregated_response)
+
+
+def run():
+    server.run(
+        host=os.getenv("HOST", "127.0.0.1"),
+        port=int(os.getenv("PORT", "8000")),
+        context_store=PlatformContextStore(),
+    )
+
+
+if __name__ == "__main__":
+    run()
+
+```
+
+### When to use buffering
+
+- Use **simple yield + store** when your agent emits a single final response.
+- Use **stream + buffer + single store** when your agent emits multiple partial chunks which are streamed to the user.
+- With `PlatformContextStore`, each `context.store()` call creates a persisted history item, so buffering prevents chunk-level history fragmentation.
+
+## Advanced BeeAI Framework Example
+
+Here's a sophisticated example using the BeeAI Framework to build a multi-turn chat agent that leverages conversation history and LLM capabilities:
+
+{/* <!-- embedme examples/agent-integration/multi-turn/advanced-history/src/advanced_history/agent.py--> */}
+```python
+# Copyright 2026 © IBM Corp.
+# SPDX-License-Identifier: Apache-2.0
+
+import os
+from typing import Annotated
+
+from a2a.types import Message, Role
+from a2a.utils.message import get_message_text
+from kagenti_adk.a2a.extensions import LLMServiceExtensionServer, LLMServiceExtensionSpec
+from kagenti_adk.a2a.types import AgentMessage
+from kagenti_adk.server import Server
+from kagenti_adk.server.context import RunContext
+from kagenti_adk.server.store.platform_context_store import PlatformContextStore
+from beeai_framework.adapters.agentstack.backend.chat import AgentStackChatModel
+from beeai_framework.agents.requirement import RequirementAgent
+from beeai_framework.agents.requirement.requirements.conditional import ConditionalRequirement
+from beeai_framework.backend import AssistantMessage, UserMessage
+from beeai_framework.tools.think import ThinkTool
+
+server = Server()
+
 FrameworkMessage = UserMessage | AssistantMessage
 
 
 def to_framework_message(message: Message) -> FrameworkMessage:
-    """Convert A2A Message to BeeAI Framework Message format"""
+    """Convert A2A Message to Kagenti ADK Message format"""
     message_text = "".join(part.root.text for part in message.parts if part.root.kind == "text")
 
     if message.role == Role.agent:
@@ -117,7 +230,7 @@ def to_framework_message(message: Message) -> FrameworkMessage:
 
 
 @server.agent()
-async def multi_turn_chat_agent(
+async def advanced_history_example(
     input: Message,
     context: RunContext,
     llm: Annotated[LLMServiceExtensionServer, LLMServiceExtensionSpec.single_demand()],
@@ -128,8 +241,8 @@ async def multi_turn_chat_agent(
     # Load conversation history
     history = [message async for message in context.load_history() if isinstance(message, Message) and message.parts]
 
-    # Initialize BeeAI Framework LLM client
-    llm_client = AgentStackChatModel()
+    # Initialize Kagenti ADK LLM client
+    llm_client = AgentStackChatModel(tool_choice_support={"none", "auto"})
     llm_client.set_context(llm)
 
     # Create a RequirementAgent with conversation memory
@@ -173,6 +286,7 @@ def run():
 
 if __name__ == "__main__":
     run()
+
 ```
 
 This advanced example demonstrates several key concepts:
@@ -238,21 +352,19 @@ import uuid
 from uuid import UUID
 from typing import Any
 
-from a2a.types import Message, Part, Role, TextPart
+from a2a.types import Message, Part, Role
 from kagenti_adk.platform.context import Context
 from kagenti_adk.server.context import RunContext
 
-async def edit_message_in_context(run_context: RunContext, id: UUID, new_text: str, metadata: dict[str, Any] | None = None):
+async def edit_message_in_context(run_context: RunContext, id: UUID, new_text: str):
     # Step 1: Delete from this message onwards
     await run_context.delete_history_from_id(from_id=id)
 
     # Step 2: Create the corrected message
     corrected_message = Message(
         message_id=str(uuid.uuid4()),
-        parts=[Part(TextPart(text=new_text))],
-        role=Role.user,
-        kind="message",
-        metadata=metadata,
+        parts=[Part(text=new_text)],
+        role=Role.ROLE_USER,
     )
 
     # Step 3: Store the corrected message

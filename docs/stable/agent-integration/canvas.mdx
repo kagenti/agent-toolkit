@@ -25,6 +25,7 @@ This allows your agent to:
 
 Here's how to use canvas with an LLM, adapting your system prompt based on whether you're generating new content or editing existing content:
 
+{/* <!-- embedme examples/agent-integration/canvas/canvas-with-llm/src/canvas_with_llm/agent.py--> */}
 ````python
 # Copyright 2026 © IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
@@ -33,8 +34,9 @@ from typing import Annotated
 
 from a2a.types import Message, TextPart
 
-from kagenti_adk.a2a.extensions import LLMServiceExtensionServer, LLMServiceExtensionSpec
-from kagenti_adk.a2a.extensions.ui.canvas import (
+from kagenti_adk.a2a.extensions import (
+    LLMServiceExtensionServer,
+    LLMServiceExtensionSpec,
     CanvasExtensionServer,
     CanvasExtensionSpec,
 )
@@ -123,7 +125,7 @@ if __name__ == "__main__":
 
 <Steps>
 <Step title="Import the canvas extension">
-Import `CanvasExtensionServer` and `CanvasExtensionSpec` from `kagenti_adk.a2a.extensions.ui.canvas`.
+Import `CanvasExtensionServer` and `CanvasExtensionSpec` from `kagenti_adk.a2a.extensions`.
 </Step>
 
 <Step title='Inject the extension'>

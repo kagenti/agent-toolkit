@@ -9,28 +9,28 @@ One of the most common use cases for AI agents is working with files. Your agent
 
 Here's how to build an agent that can accept and modify files:
 
+{/* <!-- embedme examples/agent-integration/files/file-processing/src/file_processing/agent.py--> */}
 ```python
+# Copyright 2026 © IBM Corp.
+# SPDX-License-Identifier: Apache-2.0
+
 import os
 from typing import Annotated
 
-from kagenti_adk.server import Server
-from a2a.types import Message, FilePart
-from kagenti_adk.a2a.extensions.services.platform import (
-    PlatformApiExtensionServer,
-    PlatformApiExtensionSpec,
-)
+from a2a.types import FilePart, Message
+from kagenti_adk.a2a.extensions import PlatformApiExtensionServer, PlatformApiExtensionSpec
 from kagenti_adk.platform import File
+from kagenti_adk.server import Server
 from kagenti_adk.util.file import load_file
-
 
 server = Server()
 
 
 @server.agent(
     default_input_modes=["text/plain", "application/pdf", "image/*"],
-    default_output_modes=["text/plain", "application/pdf", "image/*"]
+    default_output_modes=["text/plain", "application/pdf", "image/*"],
 )
-async def file_processor_agent(
+async def file_processing_example(
     input: Message,
     _: Annotated[PlatformApiExtensionServer, PlatformApiExtensionSpec()],
 ):
@@ -47,7 +47,7 @@ async def file_processor_agent(
                 is_text_file = mime_type.startswith("text/") or mime_type in [
                     "application/json",
                     "application/xml",
-                    "text/xml"
+                    "text/xml",
                 ]
 
                 if is_text_file:
@@ -63,7 +63,7 @@ async def file_processor_agent(
                     content_type=mime_type,
                     content=content,
                 )
-                yield new_file.to_file_part()
+                yield new_file.to_part()
 
     yield "File processing complete"
 
@@ -74,6 +74,7 @@ def run():
 
 if __name__ == "__main__":
     run()
+
 ```
 
 <Steps>
@@ -90,7 +91,7 @@ Iterate through message parts to find `FilePart` objects and load their content 
 </Step>
 
 <Step title="Generate new files">
-Use the `File.create()` method to generate new files and yield them as `FilePart` objects with `to_file_part()`.
+Use the `File.create()` method to generate new files and yield them as `Part` objects with `to_part()`.
 </Step>
 </Steps>
 
@@ -110,7 +111,7 @@ Here's what you need to know to add file processing capabilities to your agent:
 
 **Create new files**: Use `File.create()` to generate new files with custom names, content types, and content.
 
-**Yield file outputs**: The `File` object created by the SDK can be easily converted to a `FilePart` using the `to_file_part()` method and then yielded as agent outputs.
+**Yield file outputs**: The `File` object created by the SDK can be easily converted to a `Part` using the `to_part()` method and then yielded as agent outputs.
 
 ## File Upload Configuration
 
