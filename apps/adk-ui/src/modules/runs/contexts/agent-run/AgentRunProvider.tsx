@@ -27,7 +27,7 @@ import { useMessages } from '#modules/messages/contexts/Messages/index.ts';
 import { MessagesProvider } from '#modules/messages/contexts/Messages/MessagesProvider.tsx';
 import type { UIAgentMessage, UIMessageForm, UIUserMessage } from '#modules/messages/types.ts';
 import { UIMessagePartKind, UIMessageStatus } from '#modules/messages/types.ts';
-import { addMessagePart, isAgentMessage } from '#modules/messages/utils.ts';
+import { addMessageParts, isAgentMessage } from '#modules/messages/utils.ts';
 import { contextKeys } from '#modules/platform-context/api/keys.ts';
 import { usePlatformContext } from '#modules/platform-context/contexts/index.ts';
 import { useEnsurePlatformContext } from '#modules/platform-context/hooks/useEnsurePlatformContext.ts';
@@ -221,13 +221,11 @@ function AgentRunProvider({ agent, children }: PropsWithChildren<Props>) {
             message.taskId = responseTaskId;
 
             if (replace) {
-              // Streaming update: replace text parts with latest draft
-              const nonTextParts = message.parts.filter((p) => p.kind !== UIMessagePartKind.Text);
+              const nonTextParts = message.parts.filter(({ kind }) => kind !== UIMessagePartKind.Text);
+
               message.parts = [...parts, ...nonTextParts];
             } else {
-              for (const part of parts) {
-                message.parts = addMessagePart(part, message);
-              }
+              message.parts = addMessageParts(parts, message);
             }
           });
 

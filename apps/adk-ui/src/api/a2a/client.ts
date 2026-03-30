@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { Task, TaskArtifactUpdateEvent, TaskStatusUpdateEvent } from '@kagenti/adk';
+import type { Part, Task, TaskArtifactUpdateEvent, TaskStatusUpdateEvent } from '@kagenti/adk';
 import { extractTextFromMessage, handleAgentCard, handleTaskStatusUpdate, resolveUserMetadata } from '@kagenti/adk';
 import { defaultIfEmpty, filter, lastValueFrom, Subject } from 'rxjs';
 import { match, P } from 'ts-pattern';
@@ -161,17 +161,12 @@ export const buildA2AClient = async <UIGenericPart = never>({
               if (patches && taskId) {
                 // Apply patches to draft and emit as a replace update
                 applyPatches(streamingDraft, patches);
-                const draftParts = Array.isArray(streamingDraft.parts) ? streamingDraft.parts : [];
-                const uiParts: UIMessagePart[] = draftParts
-                  .map((part): UIMessagePart | null => {
-                    if (typeof part.text === 'string') {
-                      return { kind: UIMessagePartKind.Text, id: 'streaming-text', text: part.text } as UITextPart;
-                    }
-                    return null;
-                  })
-                  .filter((p): p is UIMessagePart => p !== null);
+
+                const draftParts = Array.isArray(streamingDraft.parts) ? (streamingDraft.parts as Part[]) : [];
+                const uiParts = processParts(draftParts);
 
                 messageSubject.next({ type: RunResultType.Parts, parts: uiParts, taskId, replace: true });
+
                 return;
               }
 
@@ -190,14 +185,17 @@ export const buildA2AClient = async <UIGenericPart = never>({
 
               // On final message, clear the streaming draft and replace the
               // streamed text so it is not duplicated by the complete message.
-              const wasStreaming = Object.keys(streamingDraft).length > 0;
+              const streamingKeys = Object.keys(streamingDraft);
+              const wasStreaming = streamingKeys.length > 0;
+
               if (wasStreaming) {
-                Object.keys(streamingDraft).forEach((key) => delete streamingDraft[key]);
+                streamingKeys.forEach((key) => delete streamingDraft[key]);
               }
 
               if (!taskId) {
                 throw new Error(`Illegal State - taskId missing on status-update event`);
               }
+
               messageSubject.next({ type: RunResultType.Parts, parts, taskId, replace: wasStreaming });
             })
             .with({ artifactUpdate: P.nonNullable }, ({ artifactUpdate }) => {

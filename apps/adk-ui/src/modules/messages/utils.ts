@@ -212,38 +212,41 @@ export function sortMessageParts<T extends UIMessagePart>(parts: T[]): T[] {
   return [...otherParts, ...sortedSourceParts, ...sortedTransformParts] as T[];
 }
 
-export function addMessagePart(part: UIMessagePart, message: UIAgentMessage) {
-  const newParts = [...message.parts];
+export function addMessageParts(parts: UIMessagePart[], message: UIAgentMessage) {
+  return parts.reduce<UIMessagePart[]>((messageParts, part) => {
+    const newMessage = { ...message, parts: messageParts };
+    const newParts = [...message.parts];
 
-  match(part)
-    .with({ kind: UIMessagePartKind.File }, (part) => {
-      const transformPart = getFileTransformPart(part, message);
+    match(part)
+      .with({ kind: UIMessagePartKind.File }, (part) => {
+        const transformPart = getFileTransformPart(part, newMessage);
 
-      if (transformPart) {
-        newParts.push(transformPart);
-      } else {
+        if (transformPart) {
+          newParts.push(transformPart);
+        } else {
+          newParts.push(part);
+        }
+      })
+      .with({ kind: UIMessagePartKind.Source }, (part) => {
+        const transformPart = getSourceTransformPart(part);
+
+        newParts.push(part, transformPart);
+      })
+      .with({ kind: UIMessagePartKind.Artifact }, (part) => {
+        const { add: addParts, update: updateParts } = getArtifactPartUpdates(part, newParts, newMessage);
+
+        updateParts?.forEach(({ index, part }) => {
+          newParts[index] = part;
+        });
+
+        if (addParts) {
+          newParts.push(...addParts);
+        }
+      })
+      .otherwise((part) => {
         newParts.push(part);
-      }
-    })
-    .with({ kind: UIMessagePartKind.Source }, (part) => {
-      const transformPart = getSourceTransformPart(part);
-
-      newParts.push(part, transformPart);
-    })
-    .with({ kind: UIMessagePartKind.Artifact }, (part) => {
-      const { add: addParts, update: updateParts } = getArtifactPartUpdates(part, newParts, message);
-
-      updateParts?.forEach(({ index, part }) => {
-        newParts[index] = part;
       });
 
-      if (addParts) {
-        newParts.push(...addParts);
-      }
-    })
-    .otherwise((part) => {
-      newParts.push(part);
-    });
-
-  return sortMessageParts(newParts);
+    return sortMessageParts(newParts);
+  }, message.parts);
 }

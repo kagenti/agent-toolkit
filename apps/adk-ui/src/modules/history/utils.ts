@@ -10,7 +10,7 @@ import { processMessageMetadata, processParts } from '#api/a2a/part-processors.t
 import { Role } from '#modules/messages/api/types.ts';
 import type { UIAgentMessage, UIUserMessage } from '#modules/messages/types.ts';
 import { type UIMessage, UIMessageStatus } from '#modules/messages/types.ts';
-import { addMessagePart } from '#modules/messages/utils.ts';
+import { addMessageParts } from '#modules/messages/utils.ts';
 import type { TaskId } from '#modules/tasks/api/types.ts';
 
 function isMessage(data: Message | Artifact): data is Message {
@@ -32,9 +32,7 @@ function processHistoryMessage(message: Message, lastTaskId?: TaskId): UIAgentMe
       parts: [],
     };
 
-    parts.forEach((part) => {
-      uiMessage.parts = addMessagePart(part, uiMessage);
-    });
+    uiMessage.parts = addMessageParts(parts, uiMessage);
 
     return uiMessage;
   }
