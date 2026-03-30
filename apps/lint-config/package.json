@@ -2,7 +2,7 @@
   "name": "@kagenti/adk-lint-config",
   "author": "IBM Corp.",
   "private": true,
-  "version": "0.8.0-rc7",
+  "version": "0.8.0",
   "type": "module",
   "exports": {
     "./eslint": "./eslint.config.js",

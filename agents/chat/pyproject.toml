@@ -1,6 +1,6 @@
 [project]
 name = "chat"
-version = "0.8.0-rc7"
+version = "0.8.0"
 description = "AI-powered conversational system with memory and tools."
 authors = [
     { name = "IBM Corp." },

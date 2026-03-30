@@ -1,6 +1,6 @@
 [project]
 name = "form"
-version = "0.8.0-rc7"
+version = "0.8.0"
 description = "Agent with structured input."
 authors = [
     { name = "IBM Corp." },

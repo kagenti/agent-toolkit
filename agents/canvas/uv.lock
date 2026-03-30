@@ -228,7 +228,7 @@ wheels = [
 
 [[package]]
 name = "canvas"
-version = "0.8.0rc7"
+version = "0.8.0"
 source = { editable = "." }
 dependencies = [
     { name = "kagenti-adk" },
@@ -811,7 +811,7 @@ wheels = [
 
 [[package]]
 name = "kagenti-adk"
-version = "0.8.0rc7"
+version = "0.8.0"
 source = { editable = "../../apps/adk-py" }
 dependencies = [
     { name = "a2a-sdk", extra = ["sqlite"] },
