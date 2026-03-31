@@ -715,11 +715,12 @@ wheels = [
 
 [[package]]
 name = "kagenti-adk"
-version = "0.8.1"
+version = "0.8.2"
 source = { editable = "../../apps/adk-py" }
 dependencies = [
     { name = "a2a-sdk", extra = ["sqlite"] },
     { name = "anyio" },
+    { name = "asgiref" },
     { name = "async-lru" },
     { name = "asyncclick" },
     { name = "authlib" },
@@ -727,6 +728,7 @@ dependencies = [
     { name = "fastapi" },
     { name = "httpx" },
     { name = "janus" },
+    { name = "jsonpatch" },
     { name = "mcp" },
     { name = "objprint" },
     { name = "opentelemetry-api" },
@@ -746,6 +748,7 @@ dependencies = [
 requires-dist = [
     { name = "a2a-sdk", extras = ["sqlite"], specifier = "==1.0.0a0" },
     { name = "anyio", specifier = ">=4.9.0" },
+    { name = "asgiref", specifier = ">=3.11.0" },
     { name = "async-lru", specifier = ">=2.0.4" },
     { name = "asyncclick", specifier = ">=8.1.8" },
     { name = "authlib", specifier = ">=1.3.0" },
@@ -753,6 +756,7 @@ requires-dist = [
     { name = "fastapi", specifier = ">=0.116.1" },
     { name = "httpx" },
     { name = "janus", specifier = ">=2.0.0" },
+    { name = "jsonpatch", specifier = ">=1.33" },
     { name = "mcp", specifier = ">=1.12.3" },
     { name = "objprint", specifier = ">=0.3.0" },
     { name = "opentelemetry-api", specifier = ">=1.35.0" },
@@ -856,7 +860,7 @@ wheels = [
 
 [[package]]
 name = "langgraph-reflection"
-version = "0.8.1"
+version = "0.8.2"
 source = { editable = "." }
 dependencies = [
     { name = "kagenti-adk" },
