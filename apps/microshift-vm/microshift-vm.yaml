@@ -1,7 +1,0 @@
-images:
-  - location: "./apps/microshift-vm/dist/aarch64/microshift-vm-aarch64.qcow2"
-    arch: "aarch64"
-  - location: "./apps/microshift-vm/dist/x86_64/microshift-vm-x86_64.qcow2"
-    arch: "x86_64"
-memory: 8GiB
-cpus: 4
