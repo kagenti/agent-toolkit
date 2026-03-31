@@ -922,7 +922,7 @@ wheels = [
 
 [[package]]
 name = "kagenti-adk"
-version = "0.8.1rc1"
+version = "0.8.1rc2"
 source = { editable = "../../apps/adk-py" }
 dependencies = [
     { name = "a2a-sdk", extra = ["sqlite"] },
@@ -1809,7 +1809,7 @@ wheels = [
 
 [[package]]
 name = "rag"
-version = "0.8.1rc1"
+version = "0.8.1rc2"
 source = { editable = "." }
 dependencies = [
     { name = "beeai-framework", extra = ["a2a", "agentstack", "duckduckgo", "wikipedia"] },
