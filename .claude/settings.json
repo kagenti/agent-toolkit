@@ -6,9 +6,16 @@
       "Bash(git diff:*)",
       "Bash(git branch:*)",
       "Bash(ls:*)",
-      "Bash(make lint:*)",
-      "Bash(make fmt:*)",
-      "Bash(pre-commit run:*)"
+      "Bash(pre-commit run:*)",
+      "Bash(mise run check:*)",
+      "Bash(mise run fix:*)",
+      "Bash(mise run dev:status:*)",
+      "Bash(mise run dev:ensure:*)",
+      "Bash(mise run dev:stop:*)",
+      "Bash(mise run adk-server:test:unit:*)",
+      "Bash(uv run pytest:*)",
+      "Bash(uv run ruff:*)",
+      "Bash(curl localhost:*)"
     ]
   }
 }
