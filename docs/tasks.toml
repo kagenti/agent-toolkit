@@ -57,7 +57,6 @@ pyrefly check "$TMPDIR/snippets"
 depends = ["common:setup:pnpm"]
 dir = "{{config_root}}/docs"
 sources = ["**/*.mdx"]
-outputs = { auto = true }
 run = "pnpm mintlify broken-links"
 
 
@@ -75,7 +74,6 @@ pnpm embedme --source-root=.. ./development/**/*.mdx --verify --silent || {
 }
 """
 sources = ["./development/**/*.mdx", "../examples/**/*"]
-outputs = { auto = true }
 
 # fix
 
@@ -87,7 +85,6 @@ depends = ["common:setup:pnpm"]
 dir = "{{config_root}}/docs"
 run = "pnpm embedme --source-root=.. ./development/**/*.mdx --silent"
 sources = ["./development/**/*.mdx", "../examples/**/*"]
-outputs = { auto = true }
 
 
 ## manual check
@@ -95,5 +92,4 @@ outputs = { auto = true }
 ["docs:manual-check:external-links"]
 dir = "{{config_root}}/docs"
 sources = ["**/*.mdx"]
-outputs = { auto = true }
 run = "lychee --base-url=http://localhost --exclude-all-private --exclude '^https://www\\.npmjs\\.com' ." # npmjs.com is behind CloudFlare

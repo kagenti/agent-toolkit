@@ -6,21 +6,18 @@ depends = ["adk-ts:check:*"]
 ["adk-ts:check:prettier"]
 run = "pnpm prettier --log-level silent --check src"
 sources = ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx", "src/**/*.html", "src/**/*.css", "src/**/*.scss"]
-outputs = { auto = true }
 depends = ["common:setup:pnpm"]
 dir = "{{config_root}}/apps/adk-ts"
 
 ["adk-ts:check:eslint"]
 run = "pnpm eslint ."
 sources = ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"]
-outputs = { auto = true }
 depends = ["common:setup:pnpm"]
 dir = "{{config_root}}/apps/adk-ts"
 
 ["adk-ts:check:tsc"]
 run = "pnpm tsc --noEmit -p tsconfig.check.json"
 sources = ["src/**/*.ts", "src/**/*.tsx"]
-outputs = { auto = true }
 depends = ["common:setup:pnpm"]
 dir = "{{config_root}}/apps/adk-ts"
 
@@ -32,14 +29,12 @@ depends = ["adk-ts:fix:*"]
 ["adk-ts:fix:prettier"]
 run = "pnpm prettier --log-level silent --write src"
 sources = ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx", "src/**/*.html", "src/**/*.css", "src/**/*.scss"]
-outputs = { auto = true }
 depends = ["common:setup:pnpm"]
 dir = "{{config_root}}/apps/adk-ts"
 
 ["adk-ts:fix:lint"]
 run = "pnpm eslint . --fix"
 sources = ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"]
-outputs = { auto = true }
 depends = ["common:setup:pnpm"]
 dir = "{{config_root}}/apps/adk-ts"
 
@@ -50,4 +45,3 @@ depends = ["common:setup:pnpm"]
 dir = "{{config_root}}/apps/adk-ts"
 run = "pnpm build"
 sources = ["src/**/*", "package.json", "tsconfig.json"]
-outputs = { auto = true }

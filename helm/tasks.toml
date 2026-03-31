@@ -8,14 +8,12 @@ depends = ["helm:build:dependencies"]
 dir = "{{config_root}}/helm"
 run = "helm lint . --with-subcharts --set encryptionKey=dummy --set auth.enabled=false --strict"
 sources = ["Chart.yaml", "Chart.lock", "values.yaml", ".helmignore", "charts/*", "templates/**/*"]
-outputs = { auto = true }
 
 ["helm:check:render"]
 depends = ["helm:build:dependencies"]
 dir = "{{config_root}}/helm"
 run = "helm template . --set encryptionKey=dummy --set auth.enabled=false | kubeconform -strict -summary"
 sources = ["Chart.yaml", "Chart.lock", "values.yaml", ".helmignore", "charts/*", "templates/**/*"]
-outputs = { auto = true }
 
 # build
 
@@ -30,4 +28,3 @@ outputs = ["dist/kagenti-adk*.tgz"]
 dir = "{{config_root}}/helm"
 run = "helm repo add seaweedfs https://seaweedfs.github.io/seaweedfs/helm && helm dependency build"
 sources = ["Chart.yaml", "Chart.lock"]
-outputs = { auto = true }

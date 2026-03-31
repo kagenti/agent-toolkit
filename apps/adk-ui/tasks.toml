@@ -6,35 +6,30 @@ depends = ["adk-ui:check:*"]
 ["adk-ui:check:prettier"]
 run = "pnpm prettier --log-level silent --check src"
 sources = ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx", "src/**/*.html", "src/**/*.css", "src/**/*.scss"]
-outputs = { auto = true }
 depends = ["common:setup:pnpm"]
 dir = "{{config_root}}/apps/adk-ui"
 
 ["adk-ui:check:eslint"]
 run = "pnpm eslint ."
 sources = ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"]
-outputs = { auto = true }
 depends = ["common:setup:pnpm"]
 dir = "{{config_root}}/apps/adk-ui"
 
 ["adk-ui:check:tsc"]
 run = "pnpm tsc --noEmit -p tsconfig.check.json"
 sources = ["src/**/*.ts", "src/**/*.tsx"]
-outputs = { auto = true }
 depends = ["common:setup:pnpm", "adk-ts:build"]
 dir = "{{config_root}}/apps/adk-ui"
 
 ["adk-ui:check:stylelint"]
 run = 'pnpm stylelint --fix "src/**/*.{css,scss}"'
 sources = ["src/**/*.css", "src/**/*.scss"]
-outputs = { auto = true }
 depends = ["common:setup:pnpm"]
 dir = "{{config_root}}/apps/adk-ui"
 
 ["adk-ui:check:hadolint"]
 run = "hadolint --ignore DL3018 Dockerfile"
 sources = ["Dockerfile"]
-outputs = { auto = true }
 dir = "{{config_root}}/apps/adk-ui"
 
 # fix
@@ -45,21 +40,18 @@ depends = ["adk-ui:fix:*"]
 ["adk-ui:fix:prettier"]
 run = "pnpm prettier --log-level silent --write src"
 sources = ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx", "src/**/*.html", "src/**/*.css", "src/**/*.scss"]
-outputs = { auto = true }
 depends = ["common:setup:pnpm"]
 dir = "{{config_root}}/apps/adk-ui"
 
 ["adk-ui:fix:next"]
 run = "pnpm eslint . --fix"
 sources = ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"]
-outputs = { auto = true }
 depends = ["common:setup:pnpm"]
 dir = "{{config_root}}/apps/adk-ui"
 
 ["adk-ui:fix:stylelint"]
 run = "pnpm stylelint --fix=lax \"src/**/*.css\" \"src/**/*.scss\""
 sources = ["src/**/*.css", "src/**/*.scss"]
-outputs = { auto = true }
 depends = ["common:setup:pnpm"]
 dir = "{{config_root}}/apps/adk-ui"
 
