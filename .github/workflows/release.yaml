@@ -11,70 +11,6 @@ permissions:
   id-token: write
 
 jobs:
-  agents:
-    runs-on: ubuntu-latest
-    environment: release
-    strategy:
-      matrix:
-        agent:
-          - chat
-          - rag
-          - form
-          - canvas
-    steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
-      - id: version
-        run: |
-          echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
-          echo "latestTag=$([[ ${GITHUB_REF#refs/tags/v} =~ [a-zA-Z] ]] && echo prerelease || echo latest)" >> $GITHUB_OUTPUT
-      - uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
-      - uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2 # v4.0.0
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294 # v7.0.0
-        with:
-          context: .
-          file: ./agents/${{ matrix.agent }}/Dockerfile
-          push: false
-          load: true
-          build-args: |
-            RELEASE_VERSION=${{ github.ref_name }}
-          tags: tmp-agent-image
-          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}/agents/${{ matrix.agent }}:cache
-          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}/agents/${{ matrix.agent }}:cache,mode=max
-      - id: agent-manifest
-        run: |
-          set -e
-          docker run -d --rm --name=tmp-agent -p 8000:8000 -e HOST=0.0.0.0 -e PORT=8000 tmp-agent-image
-          success=0
-          for i in {1..30}; do
-            echo "Extracting manifest: attempt $i"
-            response=$(curl http://localhost:8000/.well-known/agent-card.json 2>/dev/null) && success=1 && break
-            sleep 0.5
-          done
-          [[ "$success" == 1 ]] || (echo "Failed to discover agents" && exit 1)
-          docker kill tmp-agent
-          AGENT_MANIFEST=$(echo "$response" | base64 -w 0)
-          echo "content=$AGENT_MANIFEST" >> $GITHUB_OUTPUT
-      - uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294 # v7.0.0
-        with:
-          context: .
-          file: ./agents/${{ matrix.agent }}/Dockerfile
-          push: true
-          platforms: linux/amd64,linux/arm64
-          build-args: |
-            RELEASE_VERSION=${{ github.ref_name }}
-          tags: |
-            ghcr.io/${{ github.repository }}/agents/${{ matrix.agent }}:${{ github.sha }}
-            ghcr.io/${{ github.repository }}/agents/${{ matrix.agent }}:${{ steps.version.outputs.version }}
-            ghcr.io/${{ github.repository }}/agents/${{ matrix.agent }}:${{ steps.version.outputs.latestTag }}
-          labels: |
-            kagenti.dev.agent.json=${{ steps.agent-manifest.outputs.content }}
-          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}/agents/${{ matrix.agent }}:cache
-          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}/agents/${{ matrix.agent }}:cache,mode=max
-
   vm:
     environment: release
     strategy:
@@ -105,7 +41,7 @@ jobs:
             apps/microshift-vm/dist/${{ matrix.arch }}/microshift-vm-${{ matrix.arch }}.incus.tar.gz
 
   adk:
-    needs: [agents, vm]
+    needs: [vm]
     runs-on: ubuntu-latest
     environment: release
     env:
