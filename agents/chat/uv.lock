@@ -370,7 +370,7 @@ wheels = [
 
 [[package]]
 name = "chat"
-version = "0.8.1rc2"
+version = "0.8.1rc3"
 source = { editable = "." }
 dependencies = [
     { name = "a2a-sdk", extra = ["sqlite"] },
@@ -963,7 +963,7 @@ wheels = [
 
 [[package]]
 name = "kagenti-adk"
-version = "0.8.1rc2"
+version = "0.8.1rc3"
 source = { editable = "../../apps/adk-py" }
 dependencies = [
     { name = "a2a-sdk", extra = ["sqlite"] },
