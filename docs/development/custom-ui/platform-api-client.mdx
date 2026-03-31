@@ -209,48 +209,6 @@ if (result.ok && result.data) {
 }
 ```
 
-### Provider Builds
-
-- `listProviderBuilds({ query }: ListProviderBuildsRequest): ListProviderBuildsResponse`
-- `createProviderBuild({ location, build_configuration, on_complete }: CreateProviderBuildRequest): CreateProviderBuildResponse`
-- `readProviderBuild({ id }: ReadProviderBuildRequest): ReadProviderBuildResponse`
-- `deleteProviderBuild({ id }: DeleteProviderBuildRequest): DeleteProviderBuildResponse`
-- `readProviderBuildLogs({ id }: ReadProviderBuildLogsRequest): ReadProviderBuildLogsResponse`
-- `previewProviderBuild({ location, build_configuration, on_complete }: PreviewProviderBuildRequest): PreviewProviderBuildResponse`
-
-#### Example: Create a Provider Build
-
-```typescript
-const build = unwrapResult(
-  await api.createProviderBuild({
-    location: "github.com/org/repo",
-    build_configuration: { dockerfile_path: "Dockerfile" },
-    on_complete: {
-      type: "add_provider",
-      auto_stop_timeout_sec: 900,
-      variables: {
-        OPENAI_API_KEY: "secret",
-      },
-    },
-  }),
-);
-
-console.log(build.status);
-```
-
-#### Example: Streaming Provider Build Logs
-
-`readProviderBuildLogs` returns a `ReadableStream<Uint8Array>` in `data`:
-
-```typescript
-const result = await api.readProviderBuildLogs({ id: build.id });
-
-if (result.ok && result.data) {
-  const reader = result.data.getReader();
-  await reader.read();
-}
-```
-
 ### Model Providers
 
 - `listModelProviders(): ListModelProvidersResponse`
