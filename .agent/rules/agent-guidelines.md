@@ -2,106 +2,71 @@
 
 Decision tables and commands for common tasks.
 
-- **Project structure** → Section 1
-- **Environment setup** → Section 2
-- **Testing** → Section 3
-- **Architecture context** → Section 6
-
 ## 1. Project Structure & Task Runner
 
-- **Monorepo**: This is a monorepo containing multiple projects (apps, agents, generic packages).
-- **Task Runner**: We use [mise](https://mise.jdx.dev) as the task runner.
-- **Python**: Each Python project has its own `.venv`. Always execute commands like `pytest` within the specific project directory using `uv run`.
+- **Monorepo** with multiple projects (apps, agents, generic packages).
+- **Task runner**: [mise](https://mise.jdx.dev).
+- **Python**: Each project has its own `.venv`. Use `uv run` to execute commands (e.g. `uv run pytest`).
 
 ## 2. Development Environment
 
-### What Do I Need?
-
-| You're working on... | Tier | Command |
-|---|---|---|
-| adk-py, linting, formatting, helm | 0 | Just run tests/checks directly |
-| adk-server unit tests | 0 | `mise run adk-server:test:unit` |
-| adk-server code (debugging/testing) | 2 | `mise run dev:ensure` |
-| adk-ui development | 3 | `mise run dev:ensure --with-ui` |
-| Database migrations | 2 | `mise run dev:ensure`, then `mise run adk-server:migrations:generate` |
-| Auth-enabled testing | 2 | `mise run dev:ensure --set auth.enabled=true` |
-
-`dev:ensure` is **idempotent** — run it as often as you need. It checks what's already running and only starts what's missing. It delegates to `adk-server:dev:start` for bootstrapping the platform.
-
-Extra CLI args are passed through to `adk-server:dev:start` → `adk:start`, e.g. `mise run dev:ensure --set auth.enabled=true`.
-
-### Starting the Dev Environment
-
-If the user doesn't specify what they need, ask about these options before running `dev:ensure`:
-
-- **UI dev server?** (`--with-ui`)
-- **Auth enabled?** (`--set auth.enabled=true`)
-- **Static UI disabled?** (`--set ui.enabled=false`)
-
 ### Environment Tiers
 
-| Tier | Name | What's Running | Used For |
-|------|------|---------------|----------|
-| 0 | `none` | Nothing | adk-py work, adk-server unit tests, linting, formatting, helm checks |
-| 1 | `cluster` | Lima VM + MicroShift + platform (incl. static UI) | Base infrastructure — prerequisite for tiers 2+ |
-| 2 | `dev` | Tier 1 + telepresence + local server on :18333 | Server development, debugging, running individual tests via `uv run pytest` |
-| 3 | `dev-ui` | Tier 2 + local UI dev server on localhost:3000 (hot-reload) | Active UI development |
+| Tier | What's Running | Use Case | How to Start |
+|------|---------------|----------|--------------|
+| 0 | Nothing | adk-py, unit tests, linting, formatting, helm | Run checks directly |
+| 1 | Lima VM + MicroShift + platform | Base infrastructure (prerequisite for 2+) | (automatic) |
+| 2 | Tier 1 + telepresence + local server on :18333 | Server dev, debugging, migrations | `mise run dev:ensure` |
+| 3 | Tier 2 + UI dev server on :3000 (hot-reload) | UI development | `mise run dev:ensure --with-ui` |
+
+`dev:ensure` is **idempotent** — safe to run anytime. Extra CLI args pass through to `adk-server:dev:start` → `adk:start` (e.g. `--set auth.enabled=true`). Multiple `--set` flags can be combined.
+
+If the user doesn't specify what they need, ask before running `dev:ensure`:
+- UI dev server? (`--with-ui`)
+- Auth enabled? (`--set auth.enabled=true`)
+- Static UI disabled? (`--set ui.enabled=false`)
+
+### Other Commands
+
+- `mise run dev:status` — show what's running.
+- `mise run dev:stop` — stop everything including the VM.
+- `curl localhost:18333/healthcheck` — quick server liveness check.
 
 ### `.env` Configuration
 
 The server reads configuration from `apps/adk-server/.env`.
 
-- If `.env` doesn't exist, copy from `apps/adk-server/template.env`.
-- **For development**: template defaults work as-is.
-- **For running tests** against the dev cluster:
-  - Add `DB_URL=postgresql+asyncpg://adk-user:password@localhost:5432/adk` (tests connect directly, not through telepresence).
-  - Uncomment auth settings at the bottom of `template.env` if testing with auth enabled.
-- **Never overwrite** a `.env` file without reading it first — it may contain the developer's custom values.
-
-### Checking Environment Status
-
-- `mise run dev:status` — shows what's running (cluster, telepresence, server, ports, UI).
-- `curl localhost:18333/healthcheck` — quick check if the local server is responding.
-
-### Dev Lifecycle Commands
-
-| Command | What it does |
-|---|---|
-| `mise run dev:ensure` | Start dev environment (idempotent). Includes static UI in cluster. Delegates to `adk-server:dev:start` if platform not running. |
-| `mise run dev:ensure --with-ui` | Same + local UI dev server with hot-reload on :3000. |
-| `mise run dev:ensure --set ui.enabled=false` | Start without static UI in cluster. |
-| `mise run dev:ensure --set auth.enabled=true` | Start with authentication enabled. |
-| `mise run dev:stop` | Kill local processes (server, UI, port-forwards) + stop telepresence and VM. |
-| `mise run dev:status` | Show what's running. |
-
-Extra CLI args after `dev:ensure` are passed through to `adk-server:dev:start` → `adk:start`. Multiple `--set` flags can be combined.
+- If `.env` doesn't exist, copy from `apps/adk-server/template.env`. Template defaults work for development.
+- **Running tests directly** (via `uv run pytest`, not via `mise run` tasks): add `DB_URL=postgresql+asyncpg://adk-user:password@localhost:5432/adk` — tests connect to Postgres directly, not through telepresence. The `mise run` test tasks set this automatically.
+- **Auth-enabled testing**: uncomment auth settings at the bottom of `.env` (copied from `template.env`).
+- **Never overwrite** a `.env` file without reading it first — it may contain custom values.
 
 ### Safety Rules
 
-- `mise run dev:ensure` is **safe to run at any time** — it's idempotent.
-- `dev:stop` stops everything including the VM. Use it when done developing.
-- **Never** run `adk:delete` or `adk-server:dev:delete` without asking the developer. These destroy the VM, which takes longer to recreate.
+- **Never** run `adk:delete` or `adk-server:dev:delete` without asking the developer — these destroy the VM, which takes longer to recreate.
 
 ## 3. Testing Strategies
 
 ### adk-server
 
-Tests use pytest markers to separate infrastructure requirements:
+Tests use pytest markers. **Always use a marker** — bare `uv run pytest` hits all tests including integration/e2e that fail without infrastructure.
 
-| Marker | Command | Infrastructure needed |
-|---|---|---|
-| `unit` | `uv run pytest -m unit` | None |
-| `integration` | `uv run pytest -m integration` | Postgres (+ Redis for some). Run `mise run dev:ensure` first. |
-| `e2e` | `uv run pytest -m e2e` | Full stack (Postgres, Keycloak, LLM, K8s). Run `mise run dev:ensure` first. |
+| Marker | mise task | Direct (from `apps/adk-server`) | Infrastructure |
+|---|---|---|---|
+| `unit` | `mise run adk-server:test:unit` | `uv run pytest -m unit` | None |
+| `integration` | `mise run adk-server:test:integration` | `uv run pytest -m integration` | Postgres (+ Redis for some). `dev:ensure` first. |
+| `e2e` | `mise run adk-server:test:e2e` | `uv run pytest -m e2e` | Full stack. `dev:ensure` first. |
 
-- **Always use a marker** — running `uv run pytest` without `-m` hits all tests, including integration/e2e fixtures that fail on missing connections.
-- **Integration/E2E**: Run specific tests (e.g., `uv run pytest -m integration -k 'test_name'`), not the full suite; it takes too long.
-- **Connection errors at fixture setup** (e.g., "cannot connect to postgresql") mean the infrastructure isn't running — run `mise run dev:ensure`, don't chase code bugs.
+- `mise run adk-server:test` runs unit tests only. The integration and e2e mise tasks spin up their own infrastructure automatically.
+- When running tests directly (`uv run pytest`), prefer specific tests (`-k 'test_name'`), not the full integration/e2e suite.
+- Connection errors at fixture setup = infrastructure not running → `mise run dev:ensure`, don't chase code bugs.
 
 ### adk-py
 
-- **Independence**: Tests are completely independent of the dev stack/infrastructure.
-- **Execution**: Run freely using `uv run pytest` from the `apps/adk-py` directory.
+Tests are independent of the dev stack. Run from `apps/adk-py`:
+
+- Direct: `uv run pytest` (all tests, current Python)
+- Via mise: `mise run adk-py:test-all` (defaults to Python 3.14, configurable with `--python <version>`)
 
 ## 4. Database Migrations
 
