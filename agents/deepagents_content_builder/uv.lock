@@ -348,7 +348,7 @@ wheels = [
 
 [[package]]
 name = "content-builder"
-version = "0.8.1rc4"
+version = "0.8.1rc5"
 source = { editable = "." }
 dependencies = [
     { name = "cachetools" },
@@ -837,7 +837,7 @@ wheels = [
 
 [[package]]
 name = "kagenti-adk"
-version = "0.8.1rc4"
+version = "0.8.1rc5"
 source = { editable = "../../apps/adk-py" }
 dependencies = [
     { name = "a2a-sdk", extra = ["sqlite"] },
