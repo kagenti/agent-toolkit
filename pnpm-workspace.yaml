@@ -59,8 +59,7 @@ packages:
   - apps/adk-ui
   - apps/lint-config
   - apps/adk-ts
-  # TODO: Uncomment, when published to npm
-  # - apps/adk-ts/examples/chat-ui
+  - apps/adk-ts/examples/chat-ui
   - apps/docs-site
   - docs
 
