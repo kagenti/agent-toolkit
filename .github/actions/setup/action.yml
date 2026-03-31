@@ -128,3 +128,4 @@ runs:
     - uses: jdx/mise-action@9a9bfbd065d075c5eb56872e8913c7708d4ba741
       with:
         cache: false
+        github_token: ${{ secrets.GITHUB_TOKEN }}
