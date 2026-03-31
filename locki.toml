@@ -1,0 +1,3 @@
+[incus_image]
+arm64 = "./apps/microshift-vm/dist/aarch64/microshift-vm-aarch64.incus.tar.gz"
+amd64 = "./apps/microshift-vm/dist/x86_64/microshift-vm-x86_64.incus.tar.gz"
