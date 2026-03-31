@@ -37,8 +37,8 @@ async def test_citation_basic_usage_example(subtests, get_final_task_from_stream
             assert response_metadata is not None
             assert citation_uri in response_metadata
 
-            # Verify citation content
-            citations = response_metadata[citation_uri]["citations"]
+            # Verify citation content - metadata value is directly a list of citations
+            citations = response_metadata[citation_uri]
             assert len(citations) == 1
             assert citations[0]["url"] == "https://survey.stackoverflow.com/2023"
             assert citations[0]["title"] == "Stack Overflow Developer Survey 2023"

@@ -56,10 +56,11 @@ async def test_file_processing_example(subtests, get_final_task_from_stream, a2a
             # verify response
             assert task.status.state == TaskState.TASK_STATE_COMPLETED, f"Fail: {task.status.message.parts[0].text}"
 
-            # check that first message is the content of the first_file
+            # check the response - agent yields file part then text, both in the last message
+            last_message = task.history[-1]
+            assert len(last_message.parts) >= 2
 
-            async with load_file(task.history[-2].parts[0]) as processed_file:
+            async with load_file(last_message.parts[0]) as processed_file:
                 assert processed_file.text == "0123456789"
 
-            first_message_text = task.history[-1].parts[0].text
-            assert first_message_text == "File processing complete"
+            assert last_message.parts[1].text == "File processing complete"
