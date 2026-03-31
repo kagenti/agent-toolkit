@@ -388,7 +388,7 @@ echo -e "✅ Updated \x1b[36minstall.sh\x1b[0m on \x1b[36mmain\x1b[0m to install
 
 git checkout $release_branch
 
-echo -e "💡 Check the pipeline progress and result on: https://github.com/kagenti/adk/actions/workflows/release.yml"
+echo -e "💡 Check the pipeline progress and result on: https://github.com/kagenti/adk/actions/workflows/release.yaml"
 '''
 
 ["release:publish-stable"]
@@ -486,7 +486,7 @@ git push origin main
 set +x
 echo -e "✅ Published \x1b[36mstable\x1b[0m docs for \x1b[36mv$publish_version\x1b[0m"
 
-echo "💡 Check the pipeline progress and result on: https://github.com/kagenti/adk/actions/workflows/release.yml"
+echo "💡 Check the pipeline progress and result on: https://github.com/kagenti/adk/actions/workflows/release.yaml"
 '''
 
 ["release:checkout"]
