@@ -48,4 +48,5 @@ includes = [
     "apps/microshift-vm/tasks.toml",
     "agents/tasks.toml",
     "docs/tasks.toml",
+    "apps/docs-site/tasks.toml",
 ]

@@ -51,6 +51,9 @@ overrides:
   # @mintlify/previewing uses `import tar from 'tar'` (ESM default import) which only works with tar@6.x
   # Dev-only tool; no exploitation risk
   "@mintlify/previewing>tar": "6.2.1"
+  # Fix GHSA-3x4c-7xq6-9pq8: Next.js unbounded next/image disk cache growth
+  # Transitive via docs-site using next@15.x
+  "next@>=10.0.0 <15.5.14": "15.5.14"
 
 packages:
   - apps/adk-ui
@@ -58,6 +61,7 @@ packages:
   - apps/adk-ts
   # TODO: Uncomment, when published to npm
   # - apps/adk-ts/examples/chat-ui
+  - apps/docs-site
   - docs
 
 catalog:

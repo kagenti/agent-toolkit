@@ -1,0 +1,11 @@
+["docs-site:run:dev"]
+depends = ["common:setup:pnpm"]
+dir = "{{config_root}}/apps/docs-site"
+run = "pnpm dev"
+
+["docs-site:build"]
+depends = ["common:setup:pnpm"]
+dir = "{{config_root}}/apps/docs-site"
+run = "pnpm build"
+sources = ["src/**/*", "package.json", "next.config.ts", "tsconfig.json", "../../docs/development/**/*.mdx", "../../docs/stable/**/*.mdx", "../../docs/docs.json"]
+outputs = ["out/**/*"]

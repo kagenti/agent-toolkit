@@ -34,8 +34,7 @@
             "pages": [
               "stable/deploy-agents/wrap-existing-agents",
               "stable/deploy-agents/building-agents",
-              "stable/deploy-agents/deploy-your-agents",
-              "stable/deploy-agents/a2a-agents"
+              "stable/deploy-agents/deploy-your-agents"
             ]
           },
           {
@@ -121,8 +120,7 @@
             "pages": [
               "development/deploy-agents/wrap-existing-agents",
               "development/deploy-agents/building-agents",
-              "development/deploy-agents/deploy-your-agents",
-              "development/deploy-agents/a2a-agents"
+              "development/deploy-agents/deploy-your-agents"
             ]
           },
           {
