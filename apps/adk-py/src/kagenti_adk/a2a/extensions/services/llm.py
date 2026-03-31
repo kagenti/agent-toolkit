@@ -123,13 +123,13 @@ class LLMServiceExtensionServer(BaseExtensionServer[LLMServiceExtensionSpec, LLM
     def handle_incoming_message(self, message: A2AMessage, run_context: RunContext, request_context: RequestContext):
         super().handle_incoming_message(message, run_context, request_context)
 
-        if self.data and self.data.llm_fulfillments:
+        if self._metadata_from_client and self._metadata_from_client.llm_fulfillments:
             from kagenti_adk.platform import get_platform_client
 
-            for fulfillment in self.data.llm_fulfillments.values():
+            for fulfillment in self._metadata_from_client.llm_fulfillments.values():
                 platform_url = str(get_platform_client().base_url).rstrip("/")
                 fulfillment.api_base = re.sub("{platform_url}", platform_url, fulfillment.api_base)
-        elif not self.data or not self.data.llm_fulfillments:
+        elif not self._metadata_from_client or not self._metadata_from_client.llm_fulfillments:
             fulfillment = _llm_fulfillment_from_env()
             if fulfillment:
                 self._metadata_from_client = LLMServiceExtensionMetadata(llm_fulfillments={"default": fulfillment})
