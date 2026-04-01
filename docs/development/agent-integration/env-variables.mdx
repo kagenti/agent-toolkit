@@ -70,12 +70,8 @@ Import the necessary components from the Kagenti ADK.
 Add an `EnvVar` list to the `variables` field in your `AgentDetail` configuration.
 </Step>
 
-<Step title="Deploy your agent to the Kagenti ADK">
-Use `kagenti-adk add` command to [deploy your agent in Kagenti ADK](../deploy-agents/deploy-your-agents)
-</Step>
-
-<Step title="Configure the variables via CLI">
-Supply environment variables when deploying your agent using the `--env` flag: `kagenti-adk add --env KEY=VALUE <repo-url>`.
+<Step title="Deploy your agent and pass the variables">
+Pass environment variables when deploying your agent using `kagenti-adk add --env KEY=VALUE` or via an env file with `--env-file .env`. See [Deploy Your Agents](../deploy-agents/deploy-your-agents) for details.
 </Step>
 
 
@@ -84,7 +80,7 @@ Use `os.getenv()` to access the environment variables in your agent code.
 </Step>
 </Steps>
 
-## Managing Environment Variables
+## Providing Environment Variables
 
 When deploying your agent to Kagenti ADK, you supply environment variables at the time of deployment using the `--env` flag on `kagenti-adk add`. You can pass multiple variables and also load them from a file.
 
@@ -93,13 +89,17 @@ When deploying your agent to Kagenti ADK, you supply environment variables at th
 Use one or more `--env KEY=VALUE` flags when adding your agent:
 
 ```bash
-kagenti-adk add --env FIRST_VAR=VALUE --env SECOND_VAR=VALUE https://github.com/myorg/my-agent
+# Pass individual variables
+kagenti-adk add <image> --env FIRST_VAR=VALUE --env SECOND_VAR=VALUE
+
+# Or use an env file (KEY=VALUE per line)
+kagenti-adk add <image> --env-file path/to/.env
 ```
 
 <Tip>
-Use `--env-file path/to/.env` to load variables from a file with `KEY=VALUE` lines instead of specifying each one on the command line.
+You can combine `--env` and `--env-file`. Individual `--env` entries take precedence over the file.
 </Tip>
 
 ### Checking Missing Variables
 
-When a required variable hasn't been provided, you can see this in the agent list. Use `kagenti-adk list` to view all agents - the `INFO` column shows which variables still need to be configured.
+If a required variable is missing, your agent will likely fail to start. Run `kagenti-adk list` — an agent in `error` state will show the error message in the `Info` column, which may indicate the missing variable.
