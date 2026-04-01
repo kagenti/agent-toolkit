@@ -19,7 +19,7 @@ Decision tables and commands for common tasks.
 | 2 | Tier 1 + telepresence + local server on :18333 | Server dev, debugging, migrations | `mise run dev:ensure` |
 | 3 | Tier 2 + UI dev server on :3000 (hot-reload) | UI development | `mise run dev:ensure --with-ui` |
 
-`dev:ensure` is **idempotent** — safe to run anytime. Extra CLI args pass through to `adk-server:dev:start` → `adk:start` (e.g. `--set auth.enabled=true`). Multiple `--set` flags can be combined.
+`dev:ensure` is **idempotent** — safe to run anytime. Takes ~10 minutes on a cold start. Extra CLI args pass through to `adk-server:dev:start` → `adk:start` (e.g. `--set auth.enabled=true`). Multiple `--set` flags can be combined.
 
 If the user doesn't specify what they need, ask before running `dev:ensure`:
 - UI dev server? (`--with-ui`)
@@ -30,7 +30,7 @@ If the user doesn't specify what they need, ask before running `dev:ensure`:
 
 - `mise run dev:status` — show what's running.
 - `mise run dev:stop` — stop everything including the VM.
-- `curl localhost:18333/healthcheck` — quick server liveness check.
+- `curl localhost:18333/healthcheck` — quick server liveness check (direct local port). `adk-api.localtest.me:8080` also works — it routes through cluster networking via telepresence to the same server.
 
 ### `.env` Configuration
 
