@@ -17,7 +17,7 @@ This example uses the [BeeAI Framework](https://framework.beeai.dev/modules/agen
 import os
 from typing import Annotated, Any
 
-from a2a.types import Message, TextPart
+from a2a.types import Message, Part
 from kagenti_adk.a2a.extensions import (
     ApprovalExtensionParams,
     ApprovalExtensionServer,
@@ -58,7 +58,7 @@ async def basic_approve_example(
         requirements=[AskPermissionRequirement([think_tool], handler=handler)],
     )
 
-    result = await agent.run("".join(part.root.text for part in input.parts if isinstance(part.root, TextPart)))
+    result = await agent.run("".join(part.text for part in input.parts if part.text))
     yield result.output[0].text
 
 

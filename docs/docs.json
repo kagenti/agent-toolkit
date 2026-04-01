@@ -34,7 +34,8 @@
             "pages": [
               "stable/deploy-agents/wrap-existing-agents",
               "stable/deploy-agents/building-agents",
-              "stable/deploy-agents/deploy-your-agents"
+              "stable/deploy-agents/deploy-your-agents",
+              "stable/deploy-agents/a2a-agents"
             ]
           },
           {

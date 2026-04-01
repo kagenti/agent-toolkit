@@ -17,7 +17,7 @@ Here's how to build an agent that can accept and modify files:
 import os
 from typing import Annotated
 
-from a2a.types import FilePart, Message
+from a2a.types import Message, Part
 from kagenti_adk.a2a.extensions import PlatformApiExtensionServer, PlatformApiExtensionSpec
 from kagenti_adk.platform import File
 from kagenti_adk.server import Server
@@ -36,13 +36,11 @@ async def file_processing_example(
 ):
     """Agent that handles both text and binary files"""
 
-    for file_part in input.parts:
-        file_part_root = file_part.root
+    for part in input.parts:
+        if part.url or part.HasField("raw"):
+            mime_type = part.media_type or "application/octet-stream"
 
-        if isinstance(file_part_root, FilePart):
-            mime_type = file_part_root.file.mime_type or "application/octet-stream"
-
-            async with load_file(file_part_root) as loaded_content:
+            async with load_file(part) as loaded_content:
                 # Determine if file is text or binary based on MIME type
                 is_text_file = mime_type.startswith("text/") or mime_type in [
                     "application/json",
@@ -59,7 +57,7 @@ async def file_processing_example(
 
                 # Create new file with appropriate content
                 new_file = await File.create(
-                    filename=f"processed_{file_part_root.file.name}",
+                    filename=f"processed_{part.filename or 'file'}",
                     content_type=mime_type,
                     content=content,
                 )
