@@ -87,3 +87,6 @@ catalog:
   stylelint: ^17.0.0
   typescript: ^5.9.3
   usehooks-ts: ^3.1.1
+
+minimumReleaseAge: 10080
+minimumReleaseAgeExclude: ["@kagenti/adk", "@kagenti/adk-ui", "@kagenti/adk-lint-config", "@kagenti/docs-site"]

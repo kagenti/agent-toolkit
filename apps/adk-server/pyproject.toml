@@ -126,3 +126,7 @@ project-includes = [
     "**/*.py*",
     "**/*.ipynb",
 ]
+
+[tool.uv]
+exclude-newer = "7 days"
+exclude-newer-package = { kagenti-adk = false }
