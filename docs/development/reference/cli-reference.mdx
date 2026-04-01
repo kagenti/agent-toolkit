@@ -22,8 +22,8 @@ $ kagenti-adk [OPTIONS] COMMAND [ARGS]...
 
 **Options**:
 
-* `--version`: Show CLI version and exit.
 * `--help`: Show this message and exit.
+* `--version`: Show CLI version and exit.
 * `--install-completion`: Install completion for the current shell.
 * `--show-completion`: Show completion for the current shell, to copy it or customize the installation.
 
@@ -31,16 +31,16 @@ $ kagenti-adk [OPTIONS] COMMAND [ARGS]...
 
 * `version`: Print version of the Kagenti ADK CLI.
 * `ui`: Launch the graphical interface.
+* `admin`: Launch the admin console.
 * `model`: Manage model providers.
 * `agent`: Manage agents.
 * `connector`: Manage connectors to external services.
 * `platform`: Manage Kagenti ADK platform.
-* `build`: Build an agent image locally and push to platform registry.
-* `server`: Manage Kagenti ADK servers and authentication.
+* `server`: Manage Kagenti ADK servers and...
 * `self`: Manage Kagenti ADK installation.
-* `admin`: Launch the admin console.
-* `add`: Add an agent by container image or network URL.
-* `update`: Update an agent's location.
+* `build`: Build an agent image locally and push it...
+* `add`: Add an agent by container image or network...
+* `update`: Update an agent&#x27;s location.
 * `remove | uninstall | rm | delete`: Remove agent.
 * `run`: Run an agent.
 * `list`: List agents.
@@ -70,6 +70,20 @@ Launch the graphical interface.
 
 ```console
 $ kagenti-adk ui [OPTIONS]
+```
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+## `kagenti-adk admin`
+
+Launch the admin console.
+
+**Usage**:
+
+```console
+$ kagenti-adk admin [OPTIONS]
 ```
 
 **Options**:
@@ -312,8 +326,8 @@ $ kagenti-adk agent [OPTIONS] COMMAND [ARGS]...
 
 **Commands**:
 
-* `add`: Add an agent by container image or network URL.
-* `update`: Update an agent's location.
+* `add`: Add an agent by container image or network...
+* `update`: Update an agent&#x27;s location.
 * `remove | uninstall | rm | delete`: Remove agent.
 * `run`: Run an agent.
 * `list`: List agents.
@@ -336,17 +350,17 @@ $ kagenti-adk agent add [OPTIONS] [LOCATION]
 
 **Options**:
 
-* `--name, -n TEXT`: Agent name (default: derived from image)
+* `-n, --name TEXT`: Agent name (default: derived from image)
 * `--namespace TEXT`: Target Kubernetes namespace  [default: team1]
 * `--port INTEGER`: Agent service port  [default: 8080]
-* `--env, -e TEXT`: Environment variable in KEY=VALUE format (repeatable)
+* `-e, --env TEXT`: Environment variable in KEY=VALUE format (repeatable)
 * `--env-file TEXT`: Path to env file (KEY=VALUE per line)
 * `-y, --yes`: Skip confirmation prompts.
 * `--help`: Show this message and exit.
 
 ### `kagenti-adk agent update`
 
-Update an agent's location. [Admin only]
+Update an agent&#x27;s location. [Admin only]
 
 **Usage**:
 
@@ -643,7 +657,7 @@ $ kagenti-adk platform [OPTIONS] COMMAND [ARGS]...
 * `start`: Start Kagenti ADK platform.
 * `stop`: Stop Kagenti ADK platform.
 * `delete`: Delete Kagenti ADK platform.
-* `import`: Import a local docker image into the Agent...
+* `import`: Import a local docker image into the...
 * `exec`: For debugging -- execute a command inside...
 
 ### `kagenti-adk platform start`
@@ -658,7 +672,7 @@ $ kagenti-adk platform start [OPTIONS]
 
 **Options**:
 
-* `--set TEXT`: Set Helm chart values. Prefix with chart name: --set kagenti:key=val, --set kagenti-deps:key=val. Unprefixed applies to kagenti-adk.
+* `--set TEXT`: Set Helm chart values. Prefix with chart name: --set kagenti:key=val, --set kagenti-deps:key=val. Unprefixed applies to kagenti-adk.  [default: &lt;class &#x27;list&#x27;&gt;]
 * `--image-pull-mode [guest|host|hybrid|skip]`: guest = pull all images inside VM 
 <span style="color: #000000; text-decoration-color: #000000">host = pull unavailable images on host, then import all</span>
 <span style="color: #000000; text-decoration-color: #000000">hybrid = import available images from host, pull the rest in VM</span>
@@ -734,27 +748,6 @@ $ kagenti-adk platform exec [OPTIONS] [COMMAND]...
 
 **Options**:
 
-* `-v, --verbose`: Show verbose output
-* `--help`: Show this message and exit.
-
-## `kagenti-adk build`
-
-Build an agent image locally and push it to the platform registry. [Local only]
-
-**Usage**:
-
-```console
-$ kagenti-adk build [OPTIONS] [CONTEXT]
-```
-
-**Arguments**:
-
-* `[CONTEXT]`: Docker build context (path or URL)  [default: .]
-
-**Options**:
-
-* `-f, --dockerfile TEXT`: Dockerfile path
-* `-t, --tag TEXT`: Image tag (default: auto-generated)
 * `-v, --verbose`: Show verbose output
 * `--help`: Show this message and exit.
 
@@ -919,18 +912,25 @@ $ kagenti-adk self uninstall [OPTIONS]
 * `-v, --verbose`: Show verbose output
 * `--help`: Show this message and exit.
 
-## `kagenti-adk admin`
+## `kagenti-adk build`
 
-Launch the admin console.
+Build an agent image locally and push it to the platform registry. [Local only]
 
 **Usage**:
 
 ```console
-$ kagenti-adk admin [OPTIONS]
+$ kagenti-adk build [OPTIONS] [CONTEXT]
 ```
+
+**Arguments**:
+
+* `[CONTEXT]`: Docker build context (path or URL)  [default: .]
 
 **Options**:
 
+* `-f, --dockerfile TEXT`: Dockerfile path
+* `-t, --tag TEXT`: Image tag (default: auto-generated)
+* `-v, --verbose`: Show verbose output
 * `--help`: Show this message and exit.
 
 ## `kagenti-adk add`
@@ -949,17 +949,17 @@ $ kagenti-adk add [OPTIONS] [LOCATION]
 
 **Options**:
 
-* `--name, -n TEXT`: Agent name (default: derived from image)
+* `-n, --name TEXT`: Agent name (default: derived from image)
 * `--namespace TEXT`: Target Kubernetes namespace  [default: team1]
 * `--port INTEGER`: Agent service port  [default: 8080]
-* `--env, -e TEXT`: Environment variable in KEY=VALUE format (repeatable)
+* `-e, --env TEXT`: Environment variable in KEY=VALUE format (repeatable)
 * `--env-file TEXT`: Path to env file (KEY=VALUE per line)
 * `-y, --yes`: Skip confirmation prompts.
 * `--help`: Show this message and exit.
 
 ## `kagenti-adk update`
 
-Update an agent's location. [Admin only]
+Update an agent&#x27;s location. [Admin only]
 
 **Usage**:
 

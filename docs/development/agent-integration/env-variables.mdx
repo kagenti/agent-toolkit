@@ -75,7 +75,7 @@ Use `kagenti-adk add` command to [deploy your agent in Kagenti ADK](../deploy-ag
 </Step>
 
 <Step title="Configure the variables via CLI">
-Configure environment variables for your agent using `kagenti-adk env add "Name or ID of your Agent" KEY=VALUE`.
+Supply environment variables when deploying your agent using the `--env` flag: `kagenti-adk add --env KEY=VALUE <repo-url>`.
 </Step>
 
 
@@ -86,35 +86,19 @@ Use `os.getenv()` to access the environment variables in your agent code.
 
 ## Managing Environment Variables
 
-Once your agent is deployed to Kagenti ADK, you need to provide the environment variables it requires. You can manage these variables using the `kagenti-adk env` CLI commands.
+When deploying your agent to Kagenti ADK, you supply environment variables at the time of deployment using the `--env` flag on `kagenti-adk add`. You can pass multiple variables and also load them from a file.
 
-### Adding Environment Variables
+### Adding Environment Variables at Deploy Time
 
-To provide environment variables to your agent, use the `kagenti-adk env add` command:
+Use one or more `--env KEY=VALUE` flags when adding your agent:
 
 ```bash
-kagenti-adk env add "Name or ID of the agent" FIRST_VAR=VALUE SECOND_VAR=VALUE ...
+kagenti-adk add --env FIRST_VAR=VALUE --env SECOND_VAR=VALUE https://github.com/myorg/my-agent
 ```
 
 <Tip>
-You can add multiple variables at once by including them all in a single command.
+Use `--env-file path/to/.env` to load variables from a file with `KEY=VALUE` lines instead of specifying each one on the command line.
 </Tip>
-
-### Listing Environment Variables
-
-To view the environment variables configured for an agent:
-
-```bash
-kagenti-adk env list "Name or ID of the agent"
-```
-
-### Removing Environment Variables
-
-To remove an environment variable from an agent:
-
-```bash
-kagenti-adk env remove "Name or ID of the agent" VARIABLE_NAME
-```
 
 ### Checking Missing Variables
 

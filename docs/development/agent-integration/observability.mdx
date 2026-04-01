@@ -83,24 +83,6 @@ server.run(configure_telemetry=True)
   For an enhanced user experience and richer trace detail, consider instrumenting agents using the [OpenInference](https://github.com/Arize-ai/openinference/) standard for custom instrumentation.
 </Tip>
 
-## Simple Monitoring: Agent Logs
-
-The quickest way to see what your agent is doing is by streaming its logs directly to your terminal. This is ideal for debugging container lifecycle events and immediate request errors.
-
-```bash
-kagenti-adk logs
-```
-
-What you'll see:
-- Agent startup and initialization
-- Request processing steps
-- Error messages and stack traces
-- Container lifecycle events
-
-<Note>
-  Logs are only available for managed (containerized) agents that are currently running on Kagenti ADK.
-</Note>
-
 ## Advanced Observability: Traces & Metrics
 
 By default, Kagenti ADK integrates with [Arize Phoenix](https://phoenix.arize.com/) for local visualization of agent traces. For cloud-based observability and production monitoring, you can easily integrate [Langfuse](https://langfuse.com/).
