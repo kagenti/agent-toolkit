@@ -1,164 +1,53 @@
 ---
 title: Welcome
-description: "Kagenti ADK is open infrastructure for turning AI agents into running services in minutes."
+description: "The developer toolkit for deploying agents to Kagenti."
 ---
 
-**Writing an agent is easy. Shipping one is not.**
+Kagenti ADK (Agent Development Kit) is the developer toolkit for [Kagenti](https://kagenti.org) — the open-source platform for deploying, securing, and governing AI agents. ADK gives you the CLI, SDKs, and local development environment to build agents with any framework and deploy them to Kagenti as [A2A](https://a2a-protocol.org/)-compliant services.
 
-Kagenti ADK gives you everything you need to run agents as backend services: LLM routing, vector storage, authentication, file handling, and deployment tooling out of the box. You write agent logic in any framework. Kagenti ADK provides the infrastructure so you can ship to users in minutes, not weeks.
-| Component | What's Included |
-|----------|----------------|
-| **Agent Runtime** | - Self-hostable server to run agents in production |
-| **LLM & AI Services** | - LLM service with support for 15+ providers (Anthropic, OpenAI, watsonx.ai, Ollama)<br /> - Embeddings and vector search for RAG and semantic search |
-| **Agent Deployment & Management** | - CLI for deploying, updating, and managing agents |
-| **Storage & Documents** | - S3-compatible file storage for uploads and downloads<br />- Document text extraction via Docling |
-| **Interfaces & Tooling** | - Out-of-the-box Web UI for testing and sharing agents<br />- Client SDK for building custom UIs and applications |
-| **Integrations** | - External integrations via MCP protocol (APIs, Slack, Google Drive, etc.) with OAuth |
-| **Security** | - Secrets management for API keys and credentials<br />- OAuth support for secure external integrations |
-| **Kagenti ADK Deployment** | - Helm chart for Kubernetes with customizable storage, databases, and authentication |
-| **Framework Interoperability** | - Build agents using LangGraph, CrewAI, or your own framework<br />- Agents are automatically exposed as A2A-compatible agents<br />- `kagenti-adk` handles runtime service requests and agent-to-agent communication |
+## Why ADK
 
+You have an agent. You want it running as a service — callable over a standard protocol, with user isolation, scoped credentials, session management, and connected to managed infrastructure. And you don't want to build all of that yourself.
 
-## Get running in one command
-Start a complete agent runtime locally — models, storage, and services included.
+ADK gets your agent onto the Kagenti platform:
+- Wraps it as an A2A service with multi-user isolation and session management
+- Manages scoped credentials and permissions per user and context
+- Connects it to platform-managed runtime services — LLM gateway, vector store, file storage, MCP tools
+- Runs locally so you can develop and test against the same services you'll use in production
 
-```bash
-sh -c "$(curl -LsSf https://raw.githubusercontent.com/kagenti/adk/main/install.sh)"
-```
-You now have a working environment for running agents as services.
+## What you get
 
-<Tip>
-Follow the [quickstart](./quickstart) for full installation instructions and requirements.
-</Tip>
-
-## Getting from “agent” to “running service” is harder than it should be
-
-When you go from running your agent locally to powering a real application, you run into a wall of infrastructure work:
-- Choosing and wiring an LLM gateway
-- Configuring vector storage and embeddings
-- Handling auth, secrets, files, and artifacts
-- Making local experiments behave the same way in deployment
-- Rebuilding everything once production enters the picture
-
-**Kagenti ADK removes that friction.**
-It gives you a ready-made runtime for running agents as services, so you can focus on agent logic instead of infrastructure glue.
-
-With Kagenti ADK:
-- Agents run locally and in deployed environments without major refactoring
-- Agents are exposed as stable, callable services
-- Applications can integrate with agents like any backend dependency
-- Infrastructure is decoupled from application logic
-
-You keep full freedom in how agents are authored. Kagenti ADK standardizes how agents are run, deployed, and integrated.
-
-## How does it work?
-Kagenti ADK runs agents as services alongside your applications.
-
-```
-Application
-    |
-    |  SDK / HTTP
-    v
-Kagenti ADK (agent services)
-    |
-    v
-LLMs • Vector Store • Auth • Files
-```
-Kagenti ADK provides sensible defaults for instant usability. However, it's fully pluggable, giving you the freedom to swap in your own custom services and configurations whenever needed.
-
-## Getting started
-
-### 1. Wrap an existing agent
-Kagenti ADK lets you take an agent you already have and expose it as a service by providing the sensible infrastructure defaults they need.
-
-Here’s an example wrapping a simple agent function:
-
-```shell
-uv add kagenti-adk
-```
-
-```python
-import os
-
-from a2a.types import Message
-from a2a.utils.message import get_message_text
-from kagenti_adk.server import Server
-from kagenti_adk.server.context import RunContext
-from kagenti_adk.a2a.types import AgentMessage
-
-server = Server()
-
-@server.agent()
-async def example_agent(input: Message, context: RunContext):
-    """Polite agent that greets the user"""
-    hello_template: str = os.getenv("HELLO_TEMPLATE", "Ciao %s!")
-    yield AgentMessage(text=hello_template % get_message_text(input))
-
-def run():
-    server.run(host=os.getenv("HOST", "127.0.0.1"), port=int(os.getenv("PORT", 8000)))
-
-
-if __name__ == "__main__":
-    run()
-```
-
-```shell
-uv run example_agent.py
-```
-
-Your agent can be:
-- A LangGraph workflow
-- A custom reasoning loop
-- A thin wrapper around an LLM call
-
-Kagenti ADK doesn’t care—as long as it can be executed.
-
-### 2. Deploy the agent as service
-
-Run the agent locally or on infrastructure you control.
-
-```shell
-uv run example_agent "Emily"
-```
-Your agent is now running as a backend service.
-
-### 3. Call the agent from your application
-
-Integrate the agent into your app using the [Client SDK](../custom-ui/getting-started), HTTP API, or our out of the box UI extensions. Kagenti ADK takes care of running and deploying agents so you can wire them into your application like any other backend service.
-
-## What Kagenti ADK is (and isn’t)
-
-Kagenti ADK is:
-- A bundled runtime for deploying agent services
-- Optimized for experimentation and fast iteration
-- Flexible enough to grow with you from local testing to a sandboxed deployment platform
-
-Kagenti ADK isn't:
-- An agent building framework
-- A hosted AI service
-- A replacement for enterprise AI platforms
-
-## Getting help, contributing, and staying up to date
-
-Kagenti ADK is an open-source project maintained as part of the Linux Foundation community.
-- **Documentation**: Start here for guides and examples
-- **Issues**: Use [GitHub Issues](https://github.com/kagenti/adk/issues) to report bugs or request features
-- **Discussions**: Use [Github Discussions](https://github.com/kagenti/adk/discussions) to ask questions, share ideas, and compare approaches
-- **Contributing**: Contributions are welcome— see the [contributing guide](https://github.com/kagenti/adk/blob/main/CONTRIBUTING.md) for details
-
-Kagenti ADK is being actively developed and intended to evolve alongside the agent ecosystem. Defaults may change, components may improve, but the goal remains the same: make agents easy to run, easy to deploy, and easy to integrate.
+- **CLI** — scaffold, run, and deploy agents to Kagenti
+- **Python SDK** — wrap any agent with A2A, inject platform services (LLMs, storage, auth, MCP) via dependency injection
+- **TypeScript Client SDK** — build applications that talk to your deployed agents
+- **Local development environment** — run Kagenti services locally so you can develop and test before deploying
+- **LLM proxy** — single API for 15+ providers (OpenAI, Anthropic, watsonx.ai, Bedrock, Ollama)
+- **MCP connectors** — connect agents to external tools via the [Model Context Protocol](https://modelcontextprotocol.io/), with OAuth
+- **Storage** — PostgreSQL for state, pgvector for RAG, SeaweedFS for files, Docling for document extraction
+- **Auth & secrets** — Keycloak identity management and secure credential storage
+- **Observability** — LLM tracing and agent debugging via Phoenix
+- **Web UI** — chat interface for testing and sharing agents
 
 <CardGroup cols={2}>
   <Card title="Quickstart" icon="rocket" href="./quickstart">
-    Get up and running in one command
+    Install ADK and run your first agent
   </Card>
   <Card title="Wrap Existing Agents" icon="box" href="../deploy-agents/wrap-existing-agents">
-    Deploy your existing agents to Kagenti ADK
+    Deploy agents you've already built
   </Card>
-  <Card title="Build New Agents" icon="code" href="../deploy-agents/building-agents">
-    Build your first agent with the SDK
+  <Card title="Server SDK Reference" icon="code" href="../agent-integration/overview">
+    Explore the Python SDK
   </Card>
   <Card title="Deploy to Production" icon="server" href="../deploy-adk/deployment-guide">
-    Deploy Kagenti ADK to Kubernetes for your team
+    Deploy Kagenti to Kubernetes
   </Card>
 </CardGroup>
+
+## Community
+
+We'd love to hear from you — whether you have questions, want to share what you're building, or want to contribute.
+
+- [GitHub](https://github.com/kagenti/adk) — source code, issues, and releases
+- [Discord](https://discord.gg/aJ92dNDzqB) — come say hi
+- [Email](mailto:kagenti-maintainers@googlegroups.com) — reach the maintainers directly
+- [Contributing guide](https://github.com/kagenti/adk/blob/main/CONTRIBUTING.md) — all contributions welcome
