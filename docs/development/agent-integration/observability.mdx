@@ -3,7 +3,7 @@ title: Monitoring & Observability
 description: Monitor traces, logs, and metrics from your agents and platform
 ---
 
-Kagenti ADK provides built-in observability through [OpenTelemetry (OTLP)](https://opentelemetry.io/). This allows you to monitor agent health, performance metrics, and execution traces in real-time. By default, the stack integrates with [Arize Phoenix](https://docs.arize.com/phoenix) for local visualization, but it can be routed to any OTLP-compliant backend.
+Kagenti ADK provides built-in observability through [OpenTelemetry (OTLP)](https://opentelemetry.io/). This allows you to monitor agent health, performance metrics, and execution traces in real-time. The stack can integrate with [Arize Phoenix](https://docs.arize.com/phoenix) for local visualization (opt-in), or be routed to any OTLP-compliant backend.
 
 
 ```mermaid
@@ -16,7 +16,7 @@ graph LR
     OTLP[OpenTelemetry<br/>Collector<br/>:4318]
     
     %% Destinations
-    Phoenix[Phoenix<br/>:6006<br/>✓ Built-in]
+    Phoenix[Phoenix<br/>internal: :6006<br/>⚙ Opt-in]
     Langfuse[Langfuse<br/>Cloud<br/>⚙ Config Required]
     Custom[Custom<br/>Backend<br/>⚙ Config Required]
     
@@ -36,8 +36,7 @@ graph LR
 
     
     class OTLP collector
-    class Phoenix builtin
-    class Langfuse,Custom optional
+    class Phoenix,Langfuse,Custom optional
 ```
 
 For telemetry to flow successfully, it must be enabled at three levels:
@@ -103,7 +102,7 @@ What you'll see:
 
 ## Advanced Observability: Traces & Metrics
 
-By default, Kagenti ADK integrates with [Arize Phoenix](https://phoenix.arize.com/) for local visualization of agent traces. For cloud-based observability and production monitoring, you can easily integrate [Langfuse](https://langfuse.com/).
+Kagenti ADK can integrate with [Arize Phoenix](https://phoenix.arize.com/) for local visualization of agent traces. For cloud-based observability and production monitoring, you can easily integrate [Langfuse](https://langfuse.com/).
 
 Telemetry details include:
 - Platform version and runtime details
@@ -118,14 +117,9 @@ Telemetry details include:
 <Steps>
    <Step title="Install and Enable">
 
-Phoenix is included by default as part of the kagenti observability stack (OTel collector + Phoenix). Simply start the platform:
+Phoenix and the OTel collector are **disabled by default**. To enable them, start the platform with:
 ```sh
-kagenti-adk platform start
-```
-
-To disable Phoenix and the OTel collector, pass:
-```sh
-kagenti-adk platform start --set kagenti-deps:components.otel.enabled=false
+kagenti-adk platform start --set kagenti-deps:components.otel.enabled=true
 ```
 
   </Step>
@@ -145,7 +139,7 @@ kagenti-adk run chat "Hello"
    </Step>
    <Step title="View Traces in Phoenix">
 
-Open [http://localhost:6006](http://localhost:6006) in your browser and navigate to the **default** project to explore the collected traces.
+Open [http://phoenix.localtest.me:8080](http://phoenix.localtest.me:8080) in your browser and navigate to the **default** project to explore the collected traces.
 
    </Step>
 </Steps>

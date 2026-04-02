@@ -117,10 +117,15 @@ async def streaming_agent(input: Message, context: RunContext):
 Access previous messages in the conversation:
 
 ```python
+from a2a.types import Message as A2AMessage
+
 @server.agent()
 async def contextual_agent(input: Message, context: RunContext):
-    # Get conversation history
-    previous_messages = context.history
+    # Load conversation history (async generator)
+    previous_messages = [
+        msg async for msg in context.load_history()
+        if isinstance(msg, A2AMessage)
+    ]
     
     # Your agent can use this context
     result = await my_agent_with_context(
