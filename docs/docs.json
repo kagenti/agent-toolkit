@@ -74,8 +74,8 @@
           {
             "group": "Deploy Kagenti ADK",
             "pages": [
-              "stable/deploy-agent-stack/deployment-guide",
-              "stable/deploy-agent-stack/authenticate-cli-to-server"
+              "stable/deploy-adk/deployment-guide",
+              "stable/deploy-adk/authenticate-cli-to-server"
             ]
           },
           {
@@ -160,8 +160,8 @@
           {
             "group": "Deploy Kagenti ADK",
             "pages": [
-              "development/deploy-agent-stack/deployment-guide",
-              "development/deploy-agent-stack/authenticate-cli-to-server"
+              "development/deploy-adk/deployment-guide",
+              "development/deploy-adk/authenticate-cli-to-server"
             ]
           },
           {

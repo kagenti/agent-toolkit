@@ -79,7 +79,6 @@ auth:
   enabled: true
   basic:
     enabled: true
-    adminPassword: 'my-secret-password'
 ```
 
 ### 3. Install the Chart
@@ -193,7 +192,6 @@ auth:
   enabled: true
   basic:
     enabled: true
-    adminPassword: 'my-secret-password'
 ```
 
 #### Keycloak OIDC (Default)
@@ -303,8 +301,8 @@ Without verified emails, authentication will fail with "Verified email not found
 
 **Roles:**
 
-- `kagenti-admin`: Full ADK system access.
-- `kagenti-developer`: Access to agent management.
+- `adk-admin`: Full ADK system access.
+- `adk-developer`: Agent management access.
 - `kagenti-admin`: Full kagenti platform access.
 - `kagenti-operator`: Operational access to kagenti resources.
 - `kagenti-viewer`: Read-only access to kagenti resources.
@@ -364,7 +362,9 @@ If the migration fails while installing the vector extension, you can disable au
 manually.
 
 ```yaml
-initContainers.createVectorDbExtension=false
+server:
+  initContainers:
+    createVectorDbExtension: false
 ```
 
 Then make sure the following SQL statements were executed in your database:
@@ -391,8 +391,13 @@ seaweedfs:
   enabled: false
 externalS3:
   host: <your-s3-host>
+  port: 443
   accessKeyID: <your-s3-access-key>
   accessKeySecret: <your-s3-access-key-secret>
+  # existingSecret: ""  # Use existing secret instead of inline credentials
+  protocol: "https"     # "http" or "https"
+  bucket: "adk-files"   # S3 bucket name
+  region: "us-east-1"   # S3 region
 ```
 
 ### Redis

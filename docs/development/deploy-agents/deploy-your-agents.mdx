@@ -8,25 +8,26 @@ ADK can run it as a managed service.
 
 ## Prerequisites
 
-- Kagenti ADK installed ([Quickstart](/stable/introduction/quickstart))
+- Kagenti ADK installed and platform running ([Quickstart](/stable/introduction/quickstart))
 - Agent wrapped with Kagenti ADK ([Wrap Existing Agents](/stable/deploy-agents/wrap-existing-agents) or
   [Build New Agent](/stable/deploy-agents/building-agents))
+- A container runtime with `docker` CLI available (e.g. Docker Desktop, Colima, Rancher Desktop)
 
 ## Agent Deploy Process
 
-To deploy your agent to Kagenti ADK, you need to create a github repository with your agent and then deploy from that
-repository to Kagenti ADK.
+Deploying an agent involves three steps: creating a repository with a Dockerfile, building a container image, and registering it with the platform.
 
-### 1. Create an Agent github repository
+### 1. Create an Agent Repository
 
-You can quickly create an agent repository by using the Kagenti ADK starter template. The
-[adk-starter template](https://github.com/kagenti/adk-starter) includes everything you need:
+Your agent needs a `Dockerfile` so it can be built as a container image. The easiest way to get started is the
+Kagenti ADK starter template. The [adk-starter template](https://github.com/kagenti/adk-starter) includes everything
+you need:
 
 - Production-ready Dockerfile
 - GitHub Actions for automated builds
 - Kagenti ADK deployment configuration
 
-Clone it and modify it for your agent as follows:
+Clone it and modify it for your agent:
 
 ```bash
 git clone https://github.com/kagenti/adk-starter my-agent
@@ -34,12 +35,11 @@ cd my-agent
 # Replace the example agent with your code
 ```
 
-Alternatively, if you want to start from scratch, you can create your own github repository. You will need to include a
-`Dockerfile` with the following information:
+Alternatively, add the following `Dockerfile` to your own project:
 
 ```dockerfile
-FROM python:3.13-alpine3.23
-COPY --from=ghcr.io/astral-sh/uv:0.10.4 /uv /bin/
+FROM python:3.14-alpine3.23
+COPY --from=ghcr.io/astral-sh/uv:0.10.9 /uv /bin/
 WORKDIR /app
 ADD . .
 RUN HOME=/tmp uv sync --no-cache --locked --link-mode copy
@@ -47,66 +47,72 @@ ENV PRODUCTION_MODE=true
 CMD ["/app/.venv/bin/server"]
 ```
 
-### 2. Deploy your Agent to Kagenti ADK
+### 2. Build the Agent Image
 
-To deploy from your my-agent github repo, run the following with your organization name substituted for myorg:
-
-```bash
-kagenti-adk add https://github.com/myorg/my-agent
-```
-
-This command automatically:
-
-1. ✓ Builds your Docker image from github using the provided Dockerfile in the github root directory
-2. ✓ Copies the image into Kagenti ADK's VM
-3. ✓ Registers it as an available agent
-
-As a specific example, to deploy the adk-starter example agent without modification, you can issue the following
-command:
+Use `kagenti-adk build` to build your container image and push it to the platform's internal registry.
+The command accepts any Docker build context:
 
 ```bash
-kagenti-adk add https://github.com/kagenti/adk-starter
+# Build from current directory (most common)
+kagenti-adk build .
+
+# Build from a specific path
+kagenti-adk build ./path/to/agent
+
+# Build from a GitHub repository URL
+kagenti-adk build https://github.com/myorg/my-agent.git
+
+# Build from a specific branch or tag
+kagenti-adk build "https://github.com/myorg/my-agent.git#mybranch"
+
+# Build from a subfolder within a repository
+kagenti-adk build "https://github.com/myorg/my-agent.git#:path/to/agent"
+
+# Use a custom Dockerfile
+kagenti-adk build . -f Dockerfile.prod
+
+# Set a custom image tag
+kagenti-adk build . -t my-agent
 ```
+
+On success, the command prints the exact `kagenti-adk add` command to use in the next step.
 
 <Note>
-  **Why "copy into VM"?** Kagenti ADK runs in an isolated VM (Lima on Mac/Linux, WSL on Windows). Even though Docker
-  Desktop builds your image, Kagenti ADK needs it copied into its VM to run it. The `add` command handles this
-  automatically.
+  **Why "push to platform registry"?** Kagenti ADK runs in an isolated VM (Lima on Mac/Linux, WSL on Windows). The
+  `build` command builds the image locally with Docker and imports it into the VM's registry so Kagenti ADK can run it.
 </Note>
 
-## Github Deploy Options
+### 3. Register the Agent
 
-The `kagenti-adk add` command supports various URL formats to specify the repository, version, and location of your
-agent's code.
-
-The supported formats include:
-
-- **Basic URL**: `https://github.com/myorg/myrepo`
-- **Git Protocol URL**: `git+https://github.com/myorg/myrepo`
-- **URL with .git suffix**: `https://github.com/myorg/myrepo.git`
-- **URL with Version Tag**: `https://github.com/myorg/myrepo@v1.0.0`
-- **URL with Branch Name**: `https://github.com/myorg/myrepo@my-branch`
-- **URL with Subfolder Path**: `https://github.com/myorg/myrepo#path=/path/to/agent`
-- **Combined Formats**: `https://github.com/myorg/myrepo.git@v1.0.0#path=/path/to/agent`
-- **Enterprise GitHub**: `https://github.mycompany.com/myorg/myrepo`
-
-#### Example
-
-To deploy an agent from a specific branch and subfolder, you would run:
+Run the `kagenti-adk add` command printed by the build step, e.g.:
 
 ```bash
-kagenti-adk add "https://github.com/my-org/my-awesome-agents@main#path=/my-agent"
+kagenti-adk add registry.cr-system.svc.cluster.local:5000/my-agent:latest
 ```
 
-This command tells Kagenti ADK to:
+This deploys your agent as a managed service inside the Kagenti ADK platform and waits for it to become healthy.
 
-1. Fetch the `main` branch of the `my-awesome-agents` repository.
-2. Look for the agent's `Dockerfile` and source code in the `/my-agent` directory.
-3. Build the Docker image and register it with the platform.
+## Using Pre-built Images
 
-### Verify Deployment
+If you already have a container image published to a registry (e.g., via GitHub Actions), you can add it directly
+without running `kagenti-adk build`:
 
-You can check that your agent is registered by running:
+```bash
+kagenti-adk add ghcr.io/myorg/my-agent:latest
+```
+
+This also supports environment variables and an env file:
+
+```bash
+kagenti-adk add ghcr.io/myorg/my-agent:latest \
+  --name my-agent \
+  -e API_KEY=abc123 \
+  --env-file .env
+```
+
+## Verify Deployment
+
+Check that your agent is registered:
 
 ```bash
 kagenti-adk list
@@ -130,20 +136,6 @@ kagenti-adk ui
 
 Your agent will be available at `http://adk.localtest.me:8080`
 
-## Advanced Options
-
-### Two-step build process
-
-If you need more control over the build:
-
-```bash
-# Step 1: Build and copy to Kagenti ADK VM
-kagenti-adk build https://github.com/myorg/myrepo
-
-# Step 2: Register the agent
-kagenti-adk add adk.local/my-agent-abc123:latest
-```
-
 ## Next Steps
 
 Now that your agent is deployed, enhance it with extensions:
@@ -154,7 +146,7 @@ Change your agent's LLM at runtime and manage model connections dynamically
 </Card>
 
 <Card title="Agent Trajectory Visualization" icon="list" href="/stable/agent-integration/trajectory">
-  Visualize your agent’s decision-making and interactions over time in the UI
+  Visualize your agent's decision-making and interactions over time in the UI
 </Card>
 
 <Card title="Citations & Source Linking" icon="link" href="/stable/agent-integration/citations">
