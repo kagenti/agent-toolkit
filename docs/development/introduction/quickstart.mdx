@@ -5,9 +5,9 @@ description: "Get Kagenti ADK up and running in minutes. Then explore running pr
 
 ## Prerequisites
 
-- Basic terminal/command line experience  
-- LLM API key (OpenAI, Anthropic, Gemini, watsonx, or free via [OpenRouter](https://openrouter.ai/) / [Groq](https://groq.com/)) or [Ollama](https://ollama.com/) (requires a powerful computer)  
-- Fast internet (2–3GB download)  
+- Basic terminal/command line experience
+- LLM API key (OpenAI, Anthropic, Gemini, watsonx, or free via [OpenRouter](https://openrouter.ai/) / [Groq](https://groq.com/)) or [Ollama](https://ollama.com/) (requires a powerful computer)
+- Fast internet (2–3GB download)
 
 ## Installation
 
@@ -22,7 +22,7 @@ Open the terminal and run this command to install Kagenti ADK:
 sh -c "$(curl -LsSf https://raw.githubusercontent.com/kagenti/adk/main/install.sh)"
 ```
 
-<Info> 
+<Info>
 
 The installer sets up `uv` and the `kagenti-adk` on your host machine. Kagenti ADK uses a virtual machine (managed via a bundled [Lima](https://github.com/lima-vm/lima) binary) to keep your host machine clean. The Kubernetes cluster running the Kagenti ADK server, agent containers, and associated storage and services live entirely inside the VM and not on your host directly.
 
@@ -49,7 +49,7 @@ On Linux, Lima requires QEMU. Install it via these ([instructions](https://www.q
 Open a new terminal and run:
 
 ```bash
-uv python install --quiet --python-preference=only-managed --no-bin 3.14 && uv tool install --refresh --force --python-preference=only-managed --python=3.14 --with kagenti-adk kagenti-cli && kagenti-adk self install
+uv python install --quiet --python-preference=only-managed --no-bin 3.13 && uv tool install --python-preference=only-managed --python=3.14 --refresh --prerelease allow --with kagenti-adk kagenti-cli --force && kagenti-adk platform start
 ```
 
 Follow the interactive prompts to finish setup and optionally start the VM.
